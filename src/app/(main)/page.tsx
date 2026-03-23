@@ -10,8 +10,8 @@ export default function Home() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await logoutAction(); // Clear Server Cookie
-    logoutState();        // Clear Client Zustand Store
+    await logoutAction();
+    logoutState();
     router.push('/login');
   };
 

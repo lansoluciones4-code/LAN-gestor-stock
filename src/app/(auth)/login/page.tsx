@@ -14,7 +14,6 @@ export default function LoginPage() {
   const loginState = useAuthStore((state) => state.loginState);
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // We are currently utilizing react-hook-form here properly.
   const {
     register,
     handleSubmit,

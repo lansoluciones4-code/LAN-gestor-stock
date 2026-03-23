@@ -1,9 +1,8 @@
 import { SignJWT, jwtVerify } from 'jose';
 import type { UserSession } from '@/types';
+import { userSessionSchema } from '@/schemas/auth.schema';
 
-// The secret key used to sign and verify JWT tokens.
-// Fallback to a default for development if not provided.
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_dev_key_change_me_later';
+const JWT_SECRET = process.env.JWT_SECRET || 'AuAsL3XRmf7g2XG7e82Pfwlj6xeytKUJu0ZxpJmAG6S';
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
 /**
@@ -34,8 +33,8 @@ export async function signToken(
 export async function verifyToken(token: string): Promise<UserSession> {
   try {
     const { payload } = await jwtVerify(token, secretKey);
-    return payload as unknown as UserSession;
+    return userSessionSchema.parse(payload);
   } catch (error) {
-    throw new Error('Invalid or expired token');
+    throw new Error('Invalid or expired token payload');
   }
 }

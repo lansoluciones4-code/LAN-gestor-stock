@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { UserSession } from '@/types';
+import type { UserSession } from '@/schemas/auth.schema';
 
-// Zustand store interface representing auth state client-side
 interface AuthState {
   user: UserSession | null;
   isAuthenticated: boolean;
@@ -10,21 +9,15 @@ interface AuthState {
   logoutState: () => void;
 }
 
-/**
- * Zustand store utilized mostly by UI components
- * to determine role-based rendering (e.g. edit/delete buttons for admins).
- */
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
       isAuthenticated: false,
 
-      // Setting authenticated state upon successful auth logic
       loginState: (user: UserSession) =>
         set({ user, isAuthenticated: true }),
 
-      // Wiping client state gracefully
       logoutState: () =>
         set({ user: null, isAuthenticated: false }),
     }),

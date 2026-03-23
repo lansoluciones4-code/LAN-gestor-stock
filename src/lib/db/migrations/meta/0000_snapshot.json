@@ -1,5 +1,5 @@
 {
-  "id": "8e016ceb-0492-4799-85fa-07a942da24d3",
+  "id": "4f4cea4f-adde-4919-bced-b659feb32d91",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -705,7 +705,7 @@
       "schema": "public",
       "values": [
         "admin",
-        "vendor"
+        "vendedor"
       ]
     }
   },

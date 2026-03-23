@@ -11,7 +11,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql, relations } from 'drizzle-orm';
 
-export const roleEnum = pgEnum('role', ['admin', 'vendor']);
+export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
 
 export const users = pgTable('users', {
   id: uuid('id')
