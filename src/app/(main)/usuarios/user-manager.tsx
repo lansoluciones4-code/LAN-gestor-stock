@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, ShieldAlert, UserCog } from 'lucide-react';
 import { userSchema, type UserInput } from '@/schemas/user.schema';
@@ -13,12 +14,14 @@ import {
 } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-type UserDef = {
-  id: string;
-  username: string;
-  role: 'admin' | 'vendedor';
-  createdAt: Date | string;
-};
+const userDefSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  role: z.enum(['admin', 'vendedor']),
+  createdAt: z.union([z.date(), z.string()]),
+});
+
+type UserDef = z.infer<typeof userDefSchema>;
 
 export function UserManager({ initialData }: { initialData: UserDef[] }) {
   const currentSession = useAuthStore((s) => s.user);
@@ -46,7 +49,12 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchUsers();
-      setUsers(resp as unknown as UserDef[]);
+      const parsed = z.array(userDefSchema).safeParse(resp);
+      if (parsed.success) {
+        setUsers(parsed.data);
+      } else {
+        console.error('Data mismatch:', parsed.error);
+      }
     });
   };
 

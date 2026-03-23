@@ -1,110 +1,122 @@
-# Stock Management System — Technology Stores
+# Stock Management Application — Tech Retail POS
 
-> A fullstack, robust web application tailored for managing inventory, sales, clients, providers, and users within local technology and mobile phone businesses.
+> A robust, full-stack web application meticulously engineered to manage inventory, sales, clients, providers, and user credentials for local technology and mobile phone retail businesses. Built with scalability, clean architecture, and modern security patterns in mind.
 
-## Overview and Goals
-This project serves as a highly scalable and solid foundation for a backend-driven dashboard built cleanly using **Next.js 15 (App Router)**. It aims to solve the operational needs of technology stores by tracking devices (stock flow), processing receipts (in PDF format), auditing every critical action in the system, and splitting authorization contexts between `Admin` and `Vendedor` (Vendor) roles via JWT authentication.
+## 📖 Official Documentation
 
-Every layer of the application is deeply separated, applying best practices in Object-Oriented principles, SOLID concepts, and Liskov Substitution Principle (LSP) while retaining the simplicity of modern functional React components.
-
-## Technology Stack
-
-### Core Frameworks
-- **[Next.js 15](https://nextjs.org/)** — Fullstack framework leveraging React server components (App Router). API routes are avoided in favor of Server Actions, concentrating backend and frontend in a unified execution model. (TypeScript strictly enabled).
-
-### Front-End Tooling
-- **[Tailwind CSS v4](https://tailwindcss.com/)** — Utility-first framework handling responsiveness, dark modes, and dynamic aesthetic requirements (zinc palettes natively).
-- **[Zustand](https://github.com/pmndrs/zustand)** — Minimalistic global state manager. Primarily used to store client-side Authentication status seamlessly syncing across components without excessive nested context providers.
-- **[Framer Motion](https://www.framer.com/motion/)** *(Planned)* — Used for smooth panel transitions, structural lists styling natively integrated.
-- **Form Handling & Validity** — Handled via **[Zod](https://zod.dev/)**, guaranteeing that the shapes traversing client-to-server strictly match schema definitions.
-
-### Back-End / Infrastructure 
-- **[PostgreSQL](https://www.postgresql.org/) (Docker Compose)** — Relationally sound source-of-truth.
-- **[Drizzle ORM](https://orm.drizzle.team/)** — Lightweight, highly performant type-safe object relational mapper. Enables strict type parity between TS shapes and postgres columns.
-- **[bcrypt](https://www.npmjs.com/package/bcrypt) & [jose](https://github.com/panva/jose)** — Hashing and edge-compatible JSON Web Token provisioning used for rigorous stateful security verification at `middleware.ts`.
-- **[Pino](https://github.com/pinojs/pino)** *(Planned)* — High-throughput JSON structured logger mapping out audit events chronologically.
+This repository serves as the official source of truth for the system's architecture, technologies, capabilities, and workflows. It is meant to provide seamless onboarding for future maintainers and developers. All architectural decisions strictly honor **Clean Code**, **SOLID principles** (particularly Single Responsibility and Liskov Substitution Principle), and **Separation of Concerns**.
 
 ---
 
-## Infrastructure: Running Locally
+## 🛠 Technology Stack
 
-The execution context relies heavily on Docker. Assuming you have `Node.js >= 18` and `Docker Compose` installed.
+The project sits on the absolute bleeding edge of the JavaScript/TypeScript ecosystem, leveraging the highest performance paradigms currently available:
 
-### 1. Pre-requisites
-Spin up the PosgreSQL instance via compose. Due to frequent overlaps, it binds externally exposed over `5433` by default mapping internally to `5432`.
+### Core Frameworks & UI
+- **[Next.js 15 (App Router)](https://nextjs.org/)** — Full-stack framework utilizing React Server Components (RSC). We strictly avoid standalone API routes; preferring Next.js **Server Actions** to unify the backend/frontend execution model efficiently.
+- **[React 19](https://react.dev/)** — Employing cutting-edge hooks (`useTransition`, `useActionState`, `useFormStatus`) and concurrent rendering features.
+- **[Tailwind CSS v4](https://tailwindcss.com/)** — A utility-first CSS engine handling layout constraints, dark mode integrations via dynamic system preferences, and complex CSS custom properties natively.
+- **[Lucide React](https://lucide.dev/)** — For consistent, clean, and scalable vector iconography.
+
+### State & Forms
+- **[Zustand](https://github.com/pmndrs/zustand)** — A lightweight, un-opinionated global state manager. Solely used to handle Client-Side Authentication state sync across disjointed components avoiding deeply nested Context Providers.
+- **[React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)** — We enforce rigorous end-to-end type safety. Zod schemas guarantee the exact shape of data bridging the client payload into backend Server Actions.
+
+### Back-End Engine & Infrastructure
+- **[PostgreSQL](https://www.postgresql.org/)** — Relational database providing transactional integrity and robust querying capability. Orchestrated locally via Docker Compose.
+- **[Drizzle ORM](https://orm.drizzle.team/)** — A high-performance, edge-ready Object Relational Mapper. It bridges our TypeScript schemas with Postgres gracefully utilizing deep relational `with` queries to eliminate N+1 problems.
+- **[jose](https://github.com/panva/jose) & [bcrypt](https://www.npmjs.com/package/bcrypt)** — Used for cryptographically secure hashing of user passwords and minting / verifying Edge-compatible JSON Web Tokens (JWT).
+
+---
+
+## 🏗 Architectural Decisions & Patterns
+
+### 1. The Repository Pattern
+To maintain the Single Responsibility Principle, database interactions are purely isolated within the `/src/server/repositories/` layer. Server Actions orchestrate business logic but delegate actual DB reads/writes to Repositories. This avoids bleeding ORM logic into UI components or handler orchestration.
+
+### 2. React Server Components (RSC) vs Client Components
+- **Server Components:** Utilized heavily at `/page.tsx` boundaries to pre-fetch initial data concurrently via `Promise.all()` directly from the DB, shipping zero JavaScript to the browser.
+- **Client Components (`'use client'`):** Confined to specific interactive islands (`*-manager.tsx`), managing local states, modal dialogs, and real-time client-side search filtering arrays without triggering costly network roundtrips per keystroke.
+
+### 3. Dual-Layer Security Model (RBAC)
+Security enforces Strict Role-Based Access Control (`admin` vs `vendedor`).
+1. **Edge Middleware (`middleware.ts`):** Intercepts requests evaluating HttpOnly Session Cookies. Unauthenticated users are permanently locked out of the `/(main)` route group.
+2. **Server Action Authorization (`verifyAuthOrAdmin`):** Every mutation validates permissions on execution. If a `vendedor` forcibly attempts to mock a backend payload reserved for `admin`, the Server Action aborts instantly.
+3. **Self-Harm Protections:** Administrators contain logical blocks preventing them from accidentally downgrading their own roles or deleting their own active profile.
+
+---
+
+## 📦 System Modules & Workflows
+
+### 💻 1. Authentication Module (`/login`)
+A pristine, fully-responsive login interface evaluating credentials against the hashed PostgreSQL records. Successful logins mint an HttpOnly token shielding against XSS payload extractions.
+
+### 📊 2. Dashboard (`/`)
+The analytical focal point. Aggregates metrics (active stock value, monthly revenue margins, top sellers) pulling statistical slices concurrently.
+
+### 📱 3. Devices & Categories (`/equipos`)
+An administrative classification ledger. Defines models, brands, or device variations (e.g., iPhone 15 Pro, Samsung S24). 
+- **Admin Privilege:** Full CRUD.
+
+### 📦 4. Stock & Inventory Management (`/productos`)
+The core beating heart of the system. Represents actual physical units tied to a `device` and a `provider`.
+- **Pricing:** Manages specific `purchasePrice` vs `salePrice`.
+- **Smart Filtering:** Instantaneous client-side memory search against Device Names and Descriptions without loading states.
+- **Conditional Soft Deletes:** To preserve FK integrity for invoices, reducing stock to `0` filters it seamlessly from the active inventory grid instead of forcing a hard table `DELETE`.
+
+### 👥 5. Client Portfolio (`/clientes`)
+A CRM directory preserving final purchaser identities required for warranties or invoice association.
+- **Vendor Privilege:** Can register new clients and edit contact information (Phone/Email/DNI).
+- **Admin Privilege:** Exclusive rights to perform deletions.
+
+### 🏢 6. Provider Registry (`/proveedores`)
+A B2B directory managing wholesalers and external suppliers from whom hardware is sourced.
+- **Admin Privilege:** Exclusive rights to create, modify, and delete supplier relationships.
+
+### 🛡 7. User Profiles & Credentials (`/usuarios`)
+A strict internal Administrative panel designed to onboard new employees, assigning them access bounds (`vendedor` / `admin`). Capable of password overrides or complete access revocation.
+
+---
+
+## 🚀 Running the Project Locally
+
+Assuming you have `Node.js >= 18` and `Docker Compose` installed.
+
+### 1. Spawn Infrastructure
+Start the PostgreSQL container. It binds externally to port `5433` (as designated in `docker-compose.yml`) to prevent clashes with native Postgres installations.
 ```bash
 docker compose up -d
 ```
 
-### 2. Dependency Management
-Install Node modules.
+### 2. Install Dependencies
 ```bash
 npm install
 ```
 
-Ensure your `.env` encapsulates:
+### 3. Configure Environment Variables
+Create a `.env` file at the root:
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
 JWT_SECRET=super_secret_dev_key_change_me_later
 ```
 
-### 3. Database Sync & Seeding
-Using Drizzle natively, invoke generation, migration, and the programmatic seeder scripts mapping admin users and standard inventory baselines automatically.
+### 4. Database Sync & Seeding
+Execute Drizzle to generate SQL structures, push migrations, and seed out the foundational Administrative User.
 ```bash
 npm run db:generate
 npm run db:migrate
 npm run db:seed
 ```
 
-### 4. Spawning Edge Engine
+### 5. Ignite the Server
 ```bash
 npm run dev
 ```
-Navigate to `http://localhost:3000`. Default Administrative Credentials:
-**User:** `admin` | **Pass:** `admin`
+Navigate to `http://localhost:3000`. 
+**Default Administrative Credentials:**
+- **User:** `admin`
+- **Pass:** `admin`
 
 ---
 
-## Architectonic Decisions & Flux
-
-### 1. Component Boundaries & "Next.js Action" Model
-Express logic has been completely decoupled. We depend on decoupled generic Service Action modules located logically inside `/server`. No `/api` fallback happens unless forced for specific Edge features like non-SSR'd PDF rendering buffering outputs.
-We structure persistence rigorously into repositories. (`src/server/repositories/` acts as the Drizzle boundary abstracting DB intricacies, preventing DB logic bleeding into handler logic). **Single Responsibility Principle**.
-
-### 2. Dual Shield Authentication Flow
-Security ensures no UI bypass or data exfiltration happens.
-1. `middleware.ts` intercepts requests at the Edge runtime using the lightweight `jose` library (since native Node APIs are banned in standard Vercel edge). Without a token, users are pushed backwards.
-2. Inside `Server Actions`, incoming context extracts roles. A standard user attempting to invoke an Administrative mutation `ServerAction` receives a `403/Forbidden` instantly preventing DB penetration.
-3. Client Side Store (`Zustand`) triggers conditional UI layers masking buttons they cannot enact upon.
-
-### 3. Feature Directory Structure
-
-```text
-src/
-├── app/                  → Next.js Route directory representing physical URL paths.
-│   ├── (auth)/           → Grouped public pathways bridging layout wrappers.
-│   └── (dashboard)/      → Secured interface segments enforcing Session integrity.
-├── components/           → Pure UI, reusable and functional segments (Modals, ComboBoxes).
-├── lib/
-│   ├── auth/             → Key generator & encrypter helpers (jwt.ts).
-│   ├── db/               → Drizzle Schema declarations and connection bootstrapping.
-│   └── logger/           → JSON Logging (Pino).
-├── schemas/              → Extracted Zod schemas for multi-pass validations.
-├── server/
-│   ├── actions/          → Backend execution closures consumed symmetrically in frontend. 
-│   └── repositories/     → Concrete DB interactions, separating query shapes from controllers.
-├── stores/               → Zustand state trees (e.g., auth.store.ts).
-├── middleware.ts         → The initial execution layer before any router renders UI.
-└── types/                → Custom TS Interfaces extending DB inferred structures.
-```
-
-## Detailed Entity Context
-
-- **Users**: Admin vs Vendedor. Regulates privileges.
-- **Equipos / Categories**: Product line markers (e.g., iPhone 15, Samsung Galaxy S24). Simple dimensional definitions providing categorical grounding.
-- **Products**: Actual stock nodes. Binds equipments, quantities (availability logic), metadata (IMEI, Color), tracking purchasing, and forecasted sale price.
-- **Transactions / Ventas**: Connects Sellers to Clients bridging total margins spanning snapshot configurations over `venta_items`.
-- **Auditing Logs**: Immutable register of `CREATES`, `UPDATES` mapped relationally enabling behavioral analysis context if discrepancies arise.
-
----
-*Built incrementally following SOLID tenets allowing painless expansions for deeper analytics and distributed stock modules.*
+*Code is meant to be read by humans, and occasionally compiled by machines. Prioritize the clean code lifecycle.*

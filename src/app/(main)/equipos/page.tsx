@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { fetchDevices } from '@/server/actions/device.actions';
 import { DeviceManager } from './device-manager';
 

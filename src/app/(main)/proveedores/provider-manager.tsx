@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, Store } from 'lucide-react';
 import { providerSchema, type ProviderInput } from '@/schemas/provider.schema';
@@ -13,12 +14,14 @@ import {
 } from '@/server/actions/provider.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-type ProviderDef = {
-  id: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-};
+const providerDefSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  phone: z.string().nullable(),
+  email: z.string().nullable(),
+});
+
+type ProviderDef = z.infer<typeof providerDefSchema>;
 
 export function ProviderManager({ initialData }: { initialData: ProviderDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
@@ -40,7 +43,12 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchProviders();
-      setProviders(resp as unknown as ProviderDef[]);
+      const parsed = z.array(providerDefSchema).safeParse(resp);
+      if (parsed.success) {
+        setProviders(parsed.data);
+      } else {
+        console.error('Data mismatch:', parsed.error);
+      }
     });
   };
 

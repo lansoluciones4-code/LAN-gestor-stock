@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { fetchProducts, fetchSelectorData } from '@/server/actions/product.actions';
 import { ProductManager } from './product-manager';
 

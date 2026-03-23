@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, Users } from 'lucide-react';
 import { customerSchema, type CustomerInput } from '@/schemas/customer.schema';
@@ -13,13 +14,15 @@ import {
 } from '@/server/actions/customer.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-type CustomerDef = {
-  id: string;
-  name: string;
-  phone: string | null;
-  email: string | null;
-  documentNumber: string | null;
-};
+const customerDefSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  phone: z.string().nullable(),
+  email: z.string().nullable(),
+  documentNumber: z.string().nullable(),
+});
+
+type CustomerDef = z.infer<typeof customerDefSchema>;
 
 export function CustomerManager({ initialData }: { initialData: CustomerDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
@@ -41,7 +44,12 @@ export function CustomerManager({ initialData }: { initialData: CustomerDef[] })
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchCustomers();
-      setCustomers(resp as unknown as CustomerDef[]);
+      const parsed = z.array(customerDefSchema).safeParse(resp);
+      if (parsed.success) {
+        setCustomers(parsed.data);
+      } else {
+        console.error('Data mismatch:', parsed.error);
+      }
     });
   };
 

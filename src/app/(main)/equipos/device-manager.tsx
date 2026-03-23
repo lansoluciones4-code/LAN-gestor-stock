@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, Plus, Edit, Trash2, X } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, X, MonitorSmartphone } from 'lucide-react';
 import { deviceSchema, type DeviceInput } from '@/schemas/device.schema';
 import {
   createDeviceAction,
@@ -13,11 +14,13 @@ import {
 } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-type DeviceDef = {
-  id: string;
-  name: string;
-  createdAt: Date;
-};
+const deviceDefSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  createdAt: z.union([z.date(), z.string()]),
+});
+
+type DeviceDef = z.infer<typeof deviceDefSchema>;
 
 export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
@@ -27,7 +30,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingDevice, setEditingDevice] = useState<DeviceDef | null>(null);
+  const [editingItem, setEditingItem] = useState<DeviceDef | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -42,26 +45,31 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     resolver: zodResolver(deviceSchema),
   });
 
-  const loadData = async (query: string = '') => {
+  const loadData = async () => {
     startTransition(async () => {
-      const resp = await fetchDevices(query);
-      setDevices(resp as unknown as DeviceDef[]);
+      const resp = await fetchDevices();
+      const parsed = z.array(deviceDefSchema).safeParse(resp);
+      if (parsed.success) {
+        setDevices(parsed.data);
+      } else {
+        console.error('Data mismatch:', parsed.error);
+      }
     });
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearch(val);
-    loadData(val);
+    loadData();
   };
 
   const openModal = (dev?: DeviceDef) => {
     setServerError(null);
     if (dev) {
-      setEditingDevice(dev);
+      setEditingItem(dev);
       reset({ name: dev.name });
     } else {
-      setEditingDevice(null);
+      setEditingItem(null);
       reset({ name: '' });
     }
     setIsModalOpen(true);
@@ -74,7 +82,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
 
   const onSubmit = async (data: DeviceInput) => {
     setServerError(null);
-    const action = editingDevice ? updateDeviceAction(editingDevice.id, data) : createDeviceAction(data);
+    const action = editingItem ? updateDeviceAction(editingItem.id, data) : createDeviceAction(data);
     const result = await action;
     
     if (!result.success) {
@@ -85,7 +93,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     closeModal();
     setGlobalMessage({ type: 'success', text: result.message });
     setTimeout(() => setGlobalMessage(null), 3000);
-    loadData(search);
+    loadData();
   };
 
   const confirmDelete = async () => {
@@ -100,7 +108,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
-      loadData(search);
+      loadData();
     }
   };
 
@@ -198,7 +206,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
           <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-zinc-200 dark:border-zinc-800'>
             <div className='flex justify-between items-center p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
               <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>
-                {editingDevice ? 'Editar Equipo' : 'Nuevo Equipo'}
+                {editingItem ? 'Editar Equipo' : 'Nuevo Equipo'}
               </h3>
               <button onClick={closeModal} className='text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 p-1'>
                 <X className='w-5 h-5' />

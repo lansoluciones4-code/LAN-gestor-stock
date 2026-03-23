@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, DollarSign, PackageOpen } from 'lucide-react';
 import { productSchema, type ProductInput } from '@/schemas/product.schema';
@@ -13,17 +14,19 @@ import {
 } from '@/server/actions/product.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-type EnrichedProduct = {
-  id: string;
-  description: string;
-  purchasePrice: number;
-  salePrice: number;
-  stock: number;
-  deviceId: string;
-  providerId: string;
-  device?: { id: string; name: string };
-  provider?: { id: string; name: string };
-};
+const enrichedProductSchema = z.object({
+  id: z.string(),
+  description: z.string().nullable().optional(),
+  purchasePrice: z.number(),
+  salePrice: z.number(),
+  stock: z.number(),
+  deviceId: z.string(),
+  providerId: z.string(),
+  device: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
+  provider: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
+});
+
+type EnrichedProduct = z.infer<typeof enrichedProductSchema>;
 
 type OptionDef = { id: string; name: string };
 
@@ -61,7 +64,12 @@ export function ProductManager({
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchProducts();
-      setProducts(resp as unknown as EnrichedProduct[]);
+      const parsed = z.array(enrichedProductSchema).safeParse(resp);
+      if (parsed.success) {
+        setProducts(parsed.data);
+      } else {
+        console.error('Data mismatch [Productos]:', parsed.error);
+      }
     });
   };
 
