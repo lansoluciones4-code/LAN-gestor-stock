@@ -1,0 +1,207 @@
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  pgEnum,
+  numeric,
+  integer,
+  jsonb,
+  index,
+} from 'drizzle-orm/pg-core';
+import { sql, relations } from 'drizzle-orm';
+
+export const roleEnum = pgEnum('role', ['admin', 'vendor']);
+
+export const users = pgTable('users', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  username: varchar('username', { length: 50 }).notNull().unique(),
+  passwordHash: varchar('password_hash').notNull(),
+  role: roleEnum('role').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const devices = pgTable('devices', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const providers = pgTable('providers', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 100 }).notNull(),
+  phone: varchar('phone', { length: 30 }),
+  email: varchar('email', { length: 100 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const customers = pgTable('customers', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 100 }).notNull(),
+  phone: varchar('phone', { length: 30 }),
+  email: varchar('email', { length: 100 }),
+  documentNumber: varchar('document_number', { length: 20 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const products = pgTable(
+  'products',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    deviceId: uuid('device_id')
+      .notNull()
+      .references(() => devices.id),
+    providerId: uuid('provider_id')
+      .notNull()
+      .references(() => providers.id),
+    customerId: uuid('customer_id').references(() => customers.id),
+    description: varchar('description', { length: 255 }),
+    purchasePrice: numeric('purchase_price', { precision: 10, scale: 2 }).notNull(),
+    salePrice: numeric('sale_price', { precision: 10, scale: 2 }).notNull(),
+    stock: integer('stock').default(1).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('device_id_idx').on(table.deviceId),
+    index('provider_id_idx').on(table.providerId),
+    index('customer_id_idx').on(table.customerId),
+  ]
+);
+
+export const sales = pgTable(
+  'sales',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    customerId: uuid('customer_id').references(() => customers.id),
+    vendorId: uuid('vendor_id')
+      .notNull()
+      .references(() => users.id),
+    total: numeric('total', { precision: 10, scale: 2 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('sales_customer_id_idx').on(table.customerId),
+    index('sales_vendor_id_idx').on(table.vendorId),
+  ]
+);
+
+export const saleItems = pgTable(
+  'sale_items',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    saleId: uuid('sale_id')
+      .notNull()
+      .references(() => sales.id),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id),
+    quantity: integer('quantity').notNull(),
+    unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
+    subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
+  },
+  (table) => [
+    index('sale_items_sale_id_idx').on(table.saleId),
+    index('sale_items_product_id_idx').on(table.productId),
+  ]
+);
+
+export const auditLogs = pgTable(
+  'audit_logs',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: uuid('user_id').references(() => users.id),
+    username: varchar('username', { length: 50 }),
+    action: varchar('action', { length: 50 }).notNull(),
+    entity: varchar('entity', { length: 50 }).notNull(),
+    entityId: uuid('entity_id'),
+    detail: jsonb('detail'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('audit_logs_user_id_idx').on(table.userId),
+    index('audit_logs_entity_idx').on(table.entity),
+  ]
+);
+
+export const productsRelations = relations(products, ({ one }) => ({
+  device: one(devices, {
+    fields: [products.deviceId],
+    references: [devices.id],
+  }),
+  provider: one(providers, {
+    fields: [products.providerId],
+    references: [providers.id],
+  }),
+  customer: one(customers, {
+    fields: [products.customerId],
+    references: [customers.id],
+  }),
+}));
+
+export const salesRelations = relations(sales, ({ one, many }) => ({
+  customer: one(customers, {
+    fields: [sales.customerId],
+    references: [customers.id],
+  }),
+  vendor: one(users, {
+    fields: [sales.vendorId],
+    references: [users.id],
+  }),
+  items: many(saleItems),
+}));
+
+export const saleItemsRelations = relations(saleItems, ({ one }) => ({
+  sale: one(sales, {
+    fields: [saleItems.saleId],
+    references: [sales.id],
+  }),
+  product: one(products, {
+    fields: [saleItems.productId],
+    references: [products.id],
+  }),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  sales: many(sales),
+  logs: many(auditLogs),
+}));
+
+export const devicesRelations = relations(devices, ({ many }) => ({
+  products: many(products),
+}));
+
+export const providersRelations = relations(providers, ({ many }) => ({
+  products: many(products),
+}));
+
+export const customersRelations = relations(customers, ({ many }) => ({
+  products: many(products),
+  sales: many(sales),
+}));
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [auditLogs.userId],
+    references: [users.id],
+  }),
+}));
