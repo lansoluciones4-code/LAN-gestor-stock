@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const productSchema = z.object({
   id: z.string().optional(),
-  deviceId: z.string('Debes seleccionar un equipo válido'),
-  providerId: z.string('Debes seleccionar un proveedor válido'),
+  deviceId: z.string().min(1, 'Debes seleccionar un equipo válido'),
+  providerId: z.string().min(1, 'Debes seleccionar un proveedor válido'),
   description: z.string().max(255, 'La descripción es demasiado larga').optional(),
   purchasePrice: z.number().min(0, 'El precio de compra no puede ser negativo'),
   salePrice: z.number().min(0, 'El precio de venta no puede ser negativo'),

@@ -175,18 +175,9 @@ export default function MainLayout({ children }: { children: ReactNode }) {
 
         {/* Dynamic Route Content */}
         <main className='flex-1 relative overflow-hidden focus:outline-none flex flex-col'>
-          <AnimatePresence mode='wait'>
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className='flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col'
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          <div className='flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col'>
+            {children}
+          </div>
         </main>
       </div>
 

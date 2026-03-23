@@ -1,24 +1,12 @@
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql, gt } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { products, devices, providers } from '@/lib/db/schema';
 import type { ProductInput } from '@/schemas/product.schema';
 
 export class ProductRepository {
-  async getAllProducts(search?: string) {
-    if (search) {
-      // Basic relational search filtering, could be expanded. 
-      // For now we get all enriched and filter in memory if complex, or simple ILike on description
-      return await db.query.products.findMany({
-        with: {
-          device: true,
-          provider: true,
-        },
-        where: (products, { ilike }) => ilike(products.description, `%${search}%`),
-        orderBy: [desc(products.createdAt)],
-      });
-    }
-
+  async getAllProducts() {
     return await db.query.products.findMany({
+      where: (products, { gt }) => gt(products.stock, 0),
       with: {
         device: true,
         provider: true,
