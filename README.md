@@ -38,6 +38,12 @@ To maintain the Single Responsibility Principle, database interactions are purel
 - **Server Components:** Utilized heavily at `/page.tsx` boundaries to pre-fetch initial data concurrently via `Promise.all()` directly from the DB, shipping zero JavaScript to the browser.
 - **Client Components (`'use client'`):** Confined to specific interactive islands (`*-manager.tsx`), managing local states, modal dialogs, and real-time client-side search filtering arrays without triggering costly network roundtrips per keystroke.
 
+### 3. Rigorous Type-Safety & Data Validation (Zod)
+We have eradicated unsafe type-casting (`as Type[]`) across the client-side state. Every data fetch triggered by the client (via `loadData`) is put through a Zod `safeParse` pipeline. This ensures that the application:
+1.  **Fails Gracefully:** If the database schema shifts, the client detects it before rendering, preventing "undefined" crashes.
+2.  **Self-Documents:** The schemas in `/src/app/(main)/*-manager.tsx` serve as the contract for what the UI expects from the Backend.
+3.  **End-to-End Integrity:** Type safety flows from the Postgres Schema $\rightarrow$ Drizzle $\rightarrow$ Server Actions $\rightarrow$ Zod $\rightarrow$ UI State.
+
 ### 3. Dual-Layer Security Model (RBAC)
 Security enforces Strict Role-Based Access Control (`admin` vs `vendedor`).
 1. **Edge Middleware (`middleware.ts`):** Intercepts requests evaluating HttpOnly Session Cookies. Unauthenticated users are permanently locked out of the `/(main)` route group.
@@ -61,8 +67,15 @@ An administrative classification ledger. Defines models, brands, or device varia
 ### 📦 4. Stock & Inventory Management (`/productos`)
 The core beating heart of the system. Represents actual physical units tied to a `device` and a `provider`.
 - **Pricing:** Manages specific `purchasePrice` vs `salePrice`.
-- **Smart Filtering:** Instantaneous client-side memory search against Device Names and Descriptions without loading states.
-- **Conditional Soft Deletes:** To preserve FK integrity for invoices, reducing stock to `0` filters it seamlessly from the active inventory grid instead of forcing a hard table `DELETE`.
+- **In-Memory Search Architecture:** Instantaneous client-side memory search against Device Names and Descriptions. By avoiding debounced API calls for filtering, we achieve sub-millisecond responsiveness for the user.
+- **Conditional Soft Deletes:** To preserve FK integrity for invoices, reducing stock to `0` filters it seamlessly from the active inventory grid instead of forcing a hard table `DELETE`. This keeps historical data intact for future audits.
+
+### 🛒 5. Point of Sale (POS) - *Current Development Phase*
+The upcoming engine for generating revenue. It will allow vendors to:
+- **Select Products:** Add multiple items to a synchronized cart.
+- **Client Association:** Link sales to existing customers or fast-track a guest checkout.
+- **Stock Automation:** Automatic decrement of `products.stock` upon checkout completion.
+- **Revenue Tracking:** Integrated with the Dashboard for real-time sales metrics.
 
 ### 👥 5. Client Portfolio (`/clientes`)
 A CRM directory preserving final purchaser identities required for warranties or invoice association.
@@ -75,6 +88,9 @@ A B2B directory managing wholesalers and external suppliers from whom hardware i
 
 ### 🛡 7. User Profiles & Credentials (`/usuarios`)
 A strict internal Administrative panel designed to onboard new employees, assigning them access bounds (`vendedor` / `admin`). Capable of password overrides or complete access revocation.
+
+### ⚡ UI/UX Philosophy: Performance over Decoration
+We have explicitly removed transition animations (`Framer Motion`) from the main layouts. The application is tuned to feel like a high-performance native cockpit: **instant interaction, zero latency.** Every click and search result is immediate, prioritizing professional efficiency over decorative effects.
 
 ---
 

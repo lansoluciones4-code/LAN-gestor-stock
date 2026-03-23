@@ -58,10 +58,12 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setSearch(val);
-    loadData();
+    setSearch(e.target.value);
   };
+
+  const filteredDevices = devices.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   const openModal = (dev?: DeviceDef) => {
     setServerError(null);
@@ -163,7 +165,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
             </tr>
           </thead>
           <tbody className={`divide-y divide-zinc-200 dark:divide-zinc-800 ${isPending ? 'opacity-50' : ''}`}>
-            {devices.map((dev) => (
+            {filteredDevices.map((dev) => (
               <tr key={dev.id} className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors'>
                 <td className='px-6 py-4 font-medium text-zinc-900 dark:text-zinc-100'>
                   {dev.name}
@@ -189,7 +191,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
               </tr>
             ))}
 
-            {devices.length === 0 && !isPending && (
+            {filteredDevices.length === 0 && !isPending && (
               <tr>
                 <td colSpan={role === 'admin' ? 2 : 1} className='px-6 py-8 text-center'>
                   No se han encontrado equipos.
