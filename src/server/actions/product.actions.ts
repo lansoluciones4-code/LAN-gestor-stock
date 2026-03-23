@@ -20,9 +20,9 @@ async function verifyAuthOrAdmin(requireAdmin = false) {
   return user;
 }
 
-export async function fetchProducts(search?: string) {
+export async function fetchProducts() {
   try {
-    const products = await productRepository.getAllProducts(search);
+    const products = await productRepository.getAllProducts();
     return products.map(p => ({
       ...p,
       salePrice: parseFloat(p.salePrice as any),
