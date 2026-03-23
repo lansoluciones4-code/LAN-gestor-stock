@@ -40,6 +40,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   const user = useAuthStore((state) => state.user);
   const logoutState = useAuthStore((state) => state.logoutState);
@@ -68,7 +69,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </span>
       </div>
 
-      <nav className='flex-1 space-y-1 px-4 mt-6 overflow-y-auto'>
+      <nav className='flex-1 space-y-1 px-4 mt-6 overflow-y-auto custom-scrollbar'>
         {navLinks.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -93,24 +94,21 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         })}
       </nav>
 
-      <div className='p-4 border-t border-zinc-200 dark:border-zinc-800'>
-        <div className='flex items-center justify-between px-3 py-2'>
-          <div className='flex flex-col'>
-            <span className='text-sm font-medium text-zinc-900 dark:text-zinc-100'>
-              {user?.username}
+      <div className='p-4 border-t border-zinc-200 dark:border-zinc-800 shrink-0'>
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          className='w-full flex items-center justify-between px-3 py-2 text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:text-zinc-400 dark:hover:bg-red-500/10 transition-colors rounded-lg group'
+        >
+          <div className='flex flex-col text-left'>
+            <span className='text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-400'>
+              Cerrar sesión
             </span>
-            <span className='text-xs text-zinc-500 capitalize'>
-              {user?.role}
+            <span className='text-xs opacity-70'>
+              {user?.username} ({user?.role})
             </span>
           </div>
-          <button
-            onClick={handleLogout}
-            className='p-2 text-zinc-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10'
-            title='Cerrar sesión'
-          >
-            <LogOut className='w-5 h-5' />
-          </button>
-        </div>
+          <LogOut className='w-5 h-5' />
+        </button>
       </div>
     </div>
   );
@@ -175,7 +173,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Dynamic Route Content */}
-        <main className='flex-1 relative overflow-y-auto focus:outline-none'>
+        <main className='flex-1 relative overflow-hidden focus:outline-none flex flex-col'>
           <AnimatePresence mode='wait'>
             <motion.div
               key={pathname}
@@ -183,13 +181,51 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className='p-4 sm:p-6 lg:p-8 h-full'
+              className='flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col'
             >
               {children}
             </motion.div>
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Confirm Logout Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm'>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-zinc-200 dark:border-zinc-800 p-6'
+            >
+              <div className='flex items-center text-amber-500 mb-4'>
+                <div className='p-2 bg-amber-100 dark:bg-amber-500/10 rounded-full mr-3'>
+                  <ShieldAlert className='w-6 h-6' />
+                </div>
+                <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Cerrar sesión</h3>
+              </div>
+              <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>
+                ¿Estás seguro de que deseas salir del panel de control? Tendrás que volver a ingresar tus credenciales.
+              </p>
+              <div className='flex justify-end gap-3'>
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className='px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg transition-colors'
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium'
+                >
+                  Sí, Cerrar sesión
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
