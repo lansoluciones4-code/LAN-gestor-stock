@@ -13,10 +13,10 @@ import {
   MonitorSmartphone,
   ShieldAlert,
   Menu,
-  X,
-  Moon,
   Sun,
+  Moon,
   LogOut,
+  UserCog,
 } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/auth.store';
@@ -32,6 +32,7 @@ const navigation = [
 
 const adminNavigation = [
   { name: 'Equipos', href: '/equipos', icon: MonitorSmartphone },
+  { name: 'Usuarios', href: '/usuarios', icon: UserCog },
   { name: 'Auditoría', href: '/logs', icon: ShieldAlert },
 ];
 

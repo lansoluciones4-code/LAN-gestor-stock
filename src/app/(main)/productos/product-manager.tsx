@@ -58,18 +58,25 @@ export function ProductManager({
     defaultValues: { stock: 1, purchasePrice: 0, salePrice: 0 },
   });
 
-  const loadData = async (query: string = '') => {
+  const loadData = async () => {
     startTransition(async () => {
-      const resp = await fetchProducts(query);
+      const resp = await fetchProducts();
       setProducts(resp as unknown as EnrichedProduct[]);
     });
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setSearch(val);
-    loadData(val);
+    setSearch(e.target.value);
   };
+
+  const filteredProducts = products.filter((p) => {
+    const term = search.toLowerCase();
+    return (
+      p.device?.name?.toLowerCase().includes(term) ||
+      p.description?.toLowerCase().includes(term) ||
+      p.provider?.name?.toLowerCase().includes(term)
+    );
+  });
 
   const openModal = (item?: EnrichedProduct) => {
     setServerError(null);
@@ -115,7 +122,7 @@ export function ProductManager({
     closeModal();
     setGlobalMessage({ type: 'success', text: result.message });
     setTimeout(() => setGlobalMessage(null), 3000);
-    loadData(search);
+    loadData();
   };
 
   const confirmDelete = async () => {
@@ -130,7 +137,7 @@ export function ProductManager({
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
-      loadData(search);
+      loadData();
     }
   };
 
@@ -185,7 +192,7 @@ export function ProductManager({
             </tr>
           </thead>
           <tbody className={`divide-y divide-zinc-200 dark:divide-zinc-800 ${isPending ? 'opacity-50' : ''}`}>
-            {products.map((p) => (
+            {filteredProducts.map((p) => (
               <tr key={p.id} className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors'>
                 <td className='px-6 py-4'>
                   <div className='font-bold text-zinc-900 dark:text-zinc-100'>{p.device?.name || '---'}</div>

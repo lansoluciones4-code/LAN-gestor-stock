@@ -19,9 +19,7 @@ export default async function ProductsPage() {
         </div>
       </div>
 
-      <Suspense fallback={<div className='animate-pulse h-64 bg-zinc-100 dark:bg-zinc-800 rounded-lg' />}>
-        <ProductManager initialData={initialProducts as any} suppliers={selectors.providers} devices={selectors.devices} />
-      </Suspense>
+      <ProductManager initialData={initialProducts as any} suppliers={selectors.providers} devices={selectors.devices} />
     </div>
   );
 }

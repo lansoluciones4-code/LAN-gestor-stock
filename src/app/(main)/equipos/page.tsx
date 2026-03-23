@@ -16,9 +16,7 @@ export default async function DevicesPage() {
         </div>
       </div>
 
-      <Suspense fallback={<div className='animate-pulse h-64 bg-zinc-100 dark:bg-zinc-800 rounded-lg' />}>
-        <DeviceManager initialData={initialDevices} />
-      </Suspense>
+      <DeviceManager initialData={initialDevices} />
     </div>
   );
 }
