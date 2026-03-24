@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { fetchCustomers } from '@/server/actions/customer.actions';
 import { CustomerManager } from './customer-manager';
 

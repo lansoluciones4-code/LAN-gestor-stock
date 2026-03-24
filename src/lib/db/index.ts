@@ -4,8 +4,14 @@ import * as schema from './schema';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/stock_db';
+
+const isProd = process.env.NODE_ENV === 'production';
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
+  ssl: isProd ? { rejectUnauthorized: false } : false,
+  max: isProd ? 10 : undefined, // Increased for better concurrency in production
 });
 
-export const db = drizzle(pool, { schema, logger: true });
+export const db = drizzle(pool, { schema, logger: !isProd });

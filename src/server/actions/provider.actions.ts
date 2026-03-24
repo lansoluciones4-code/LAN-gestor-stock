@@ -47,6 +47,7 @@ export async function createProviderAction(input: ProviderInput) {
 
     const newProvider = await providerRepository.createProvider(parsed.data);
     revalidatePath('/proveedores');
+    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -70,6 +71,7 @@ export async function updateProviderAction(id: string, input: ProviderInput) {
 
     await providerRepository.updateProvider(id, parsed.data);
     revalidatePath('/proveedores');
+    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,

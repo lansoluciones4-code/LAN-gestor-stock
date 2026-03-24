@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { fetchAuditLogs } from '@/server/actions/audit.actions';
 import { LogManager } from './log-manager';
 

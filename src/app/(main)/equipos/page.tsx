@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { fetchDevices } from '@/server/actions/device.actions';
 import { DeviceManager } from './device-manager';
 

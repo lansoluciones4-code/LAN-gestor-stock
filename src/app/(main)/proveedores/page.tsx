@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { fetchProviders } from '@/server/actions/provider.actions';
 import { ProviderManager } from './provider-manager';
 
