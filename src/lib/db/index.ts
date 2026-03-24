@@ -4,8 +4,10 @@ import * as schema from './schema';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/stock_db';
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
 });
 
 export const db = drizzle(pool, { schema, logger: true });
