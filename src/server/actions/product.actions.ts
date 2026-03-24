@@ -100,6 +100,16 @@ export async function updateProductAction(id: string, input: ProductInput) {
 export async function deleteProductAction(id: string) {
   try {
     const caller = await verifyAuthOrAdmin(true);
+    
+    // Rule: Cannot delete if has sales
+    const hasSales = await productRepository.checkHasRelations(id);
+    if (hasSales) {
+      return { 
+        success: false, 
+        message: 'No se puede eliminar: este producto ya ha sido parte de una venta. Prueba bajar su stock a 0 si ya no lo quieres ofrecer.' 
+      };
+    }
+
     await productRepository.deleteProduct(id);
     revalidatePath('/productos');
 

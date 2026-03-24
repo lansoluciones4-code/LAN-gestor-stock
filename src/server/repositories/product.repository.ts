@@ -1,9 +1,16 @@
 import { desc, eq, sql, gt } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { products, devices, providers } from '@/lib/db/schema';
+import { products, devices, providers, saleItems } from '@/lib/db/schema';
 import type { ProductInput } from '@/schemas/product.schema';
 
 export class ProductRepository {
+  async checkHasRelations(id: string) {
+    const items = await db.query.saleItems.findFirst({
+      where: (items, { eq }) => eq(items.productId, id),
+    });
+    return !!items;
+  }
+
   async getAllProducts() {
     return await db.query.products.findMany({
       where: (products, { gt }) => gt(products.stock, 0),
