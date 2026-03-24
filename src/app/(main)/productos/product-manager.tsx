@@ -31,6 +31,8 @@ export function ProductManager({
   const [products, setProducts] = useState<ProductDef[]>(initialData);
   const [search, setSearch] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ProductDef | null>(null);
@@ -62,11 +64,17 @@ export function ProductManager({
 
   const filteredProducts = products.filter((p) => {
     const term = search.toLowerCase();
-    return (
+    const min = parseFloat(minPrice) || 0;
+    const max = parseFloat(maxPrice) || Infinity;
+
+    const matchesSearch =
       p.device?.name?.toLowerCase().includes(term) ||
       p.description?.toLowerCase().includes(term) ||
-      p.provider?.name?.toLowerCase().includes(term)
-    );
+      p.provider?.name?.toLowerCase().includes(term);
+
+    const matchesPrice = p.salePrice >= min && p.salePrice <= max;
+
+    return matchesSearch && matchesPrice;
   });
 
   const openModal = (item?: ProductDef) => {
@@ -136,15 +144,40 @@ export function ProductManager({
     <div className='flex flex-col flex-1 h-full overflow-hidden'>
       {/* Search Header */}
       <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 top-2.5 h-5 w-5 text-zinc-400' />
-          <input
-            type='text'
-            placeholder='Buscar productos por descripción o detalles...'
-            value={search}
-            onChange={handleSearch}
-            className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors'
-          />
+        <div className='flex flex-col sm:flex-row gap-2 flex-1'>
+          <div className='relative flex-1'>
+            <Search className='absolute left-3 top-2.5 h-5 w-5 text-zinc-400' />
+            <input
+              type='text'
+              placeholder='Buscar productos...'
+              value={search}
+              onChange={handleSearch}
+              className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm'
+            />
+          </div>
+
+          <div className='flex items-center gap-2'>
+            <div className='relative max-w-[120px]'>
+              <DollarSign className='absolute left-2 top-2 h-4 w-4 text-zinc-400' />
+              <input
+                type='number'
+                placeholder='Min'
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className='w-full pl-7 pr-2 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors text-xs font-bold'
+              />
+            </div>
+            <div className='relative max-w-[120px]'>
+              <DollarSign className='absolute left-2 top-2 h-4 w-4 text-zinc-400' />
+              <input
+                type='number'
+                placeholder='Max'
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className='w-full pl-7 pr-2 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors text-xs font-bold'
+              />
+            </div>
+          </div>
         </div>
         {role === 'admin' && (
           <button
