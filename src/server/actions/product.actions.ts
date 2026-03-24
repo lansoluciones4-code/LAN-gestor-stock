@@ -44,12 +44,26 @@ export async function fetchSelectorData(): Promise<{ devices: DeviceDef[], provi
 
 export async function createProductAction(input: ProductInput) {
   try {
-    await verifyAuthOrAdmin(true);
+    const caller = await verifyAuthOrAdmin(true);
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    await productRepository.createProduct(parsed.data);
+    const newProduct = await productRepository.createProduct(parsed.data);
     revalidatePath('/productos');
+
+    await recordAuditLog(
+      caller.id,
+      'CREATE',
+      'PRODUCT',
+      newProduct.id,
+      { 
+        deviceId: parsed.data.deviceId,
+        stock: parsed.data.stock,
+        purchasePrice: parsed.data.purchasePrice,
+        salePrice: parsed.data.salePrice
+      }
+    );
+
     return { success: true, message: 'Producto registrado exitosamente' };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al guardar producto' };
@@ -58,12 +72,25 @@ export async function createProductAction(input: ProductInput) {
 
 export async function updateProductAction(id: string, input: ProductInput) {
   try {
-    await verifyAuthOrAdmin(true);
+    const caller = await verifyAuthOrAdmin(true);
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     await productRepository.updateProduct(id, parsed.data);
     revalidatePath('/productos');
+
+    await recordAuditLog(
+      caller.id,
+      'UPDATE',
+      'PRODUCT',
+      id,
+      { 
+        deviceId: parsed.data.deviceId,
+        stock: parsed.data.stock,
+        salePrice: parsed.data.salePrice
+      }
+    );
+
     return { success: true, message: 'Producto actualizado exitosamente' };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al actualizar producto' };
@@ -72,9 +99,17 @@ export async function updateProductAction(id: string, input: ProductInput) {
 
 export async function deleteProductAction(id: string) {
   try {
-    await verifyAuthOrAdmin(true);
+    const caller = await verifyAuthOrAdmin(true);
     await productRepository.deleteProduct(id);
     revalidatePath('/productos');
+
+    await recordAuditLog(
+      caller.id,
+      'DELETE',
+      'PRODUCT',
+      id
+    );
+
     return { success: true, message: 'Producto eliminado exitosamente' };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al eliminar producto' };

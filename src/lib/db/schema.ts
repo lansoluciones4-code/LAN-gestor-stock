@@ -8,6 +8,7 @@ import {
   integer,
   jsonb,
   index,
+  boolean,
 } from 'drizzle-orm/pg-core';
 import { sql, relations } from 'drizzle-orm';
 
@@ -20,6 +21,7 @@ export const users = pgTable('users', {
   username: varchar('username', { length: 50 }).notNull().unique(),
   passwordHash: varchar('password_hash').notNull(),
   role: roleEnum('role').notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -29,6 +31,7 @@ export const devices = pgTable('devices', {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar('name', { length: 100 }).notNull().unique(),
+  isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -40,6 +43,7 @@ export const providers = pgTable('providers', {
   name: varchar('name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 30 }),
   email: varchar('email', { length: 100 }),
+  isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -52,6 +56,7 @@ export const customers = pgTable('customers', {
   phone: varchar('phone', { length: 30 }),
   email: varchar('email', { length: 100 }),
   documentNumber: varchar('document_number', { length: 20 }),
+  isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -73,6 +78,7 @@ export const products = pgTable(
     purchasePrice: numeric('purchase_price', { precision: 10, scale: 2 }).notNull(),
     salePrice: numeric('sale_price', { precision: 10, scale: 2 }).notNull(),
     stock: integer('stock').default(1).notNull(),
+    isActive: boolean('is_active').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

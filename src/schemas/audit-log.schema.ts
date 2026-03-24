@@ -7,6 +7,11 @@ import { auditLogs } from '@/lib/db/schema';
  */
 export const auditLogDefSchema = createSelectSchema(auditLogs).extend({
   createdAt: z.union([z.date(), z.string()]),
+  user: z.object({
+    id: z.string(),
+    username: z.string(),
+    role: z.string(),
+  }).optional().nullable(),
 });
 
 export type AuditLogDef = z.infer<typeof auditLogDefSchema>;

@@ -15,6 +15,13 @@
       "when": 1774311374547,
       "tag": "0001_good_spot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774313730535,
+      "tag": "0002_classy_scourge",
+      "breakpoints": true
     }
   ]
 }

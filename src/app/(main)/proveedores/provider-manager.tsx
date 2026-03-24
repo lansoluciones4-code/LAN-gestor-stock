@@ -11,6 +11,7 @@ import {
   updateProviderAction,
   deleteProviderAction,
   fetchProviders,
+  toggleProviderActiveAction,
 } from '@/server/actions/provider.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -19,6 +20,7 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
   const role = useAuthStore((s) => s.user?.role);
   const [providers, setProviders] = useState<ProviderDef[]>(initialData);
   const [search, setSearch] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,9 +34,9 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
     resolver: zodResolver(providerSchema),
   });
 
-  const loadData = async () => {
+  const loadData = async (inactive = showInactive) => {
     startTransition(async () => {
-      const resp = await fetchProviders();
+      const resp = await fetchProviders(inactive);
       setProviders(resp);
     });
   };
@@ -81,6 +83,19 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
     loadData();
   };
 
+  const handleToggleActive = async (item: ProviderDef) => {
+    const nextStatus = !item.isActive;
+    const result = await toggleProviderActiveAction(item.id, nextStatus);
+    if (!result.success) {
+      setGlobalMessage({ type: 'error', text: result.message });
+      setTimeout(() => setGlobalMessage(null), 4000);
+    } else {
+      setGlobalMessage({ type: 'success', text: result.message });
+      setTimeout(() => setGlobalMessage(null), 3000);
+      loadData();
+    }
+  };
+
   const confirmDelete = async () => {
     if (!itemToDelete) return;
     const id = itemToDelete;
@@ -89,7 +104,7 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
     const result = await deleteProviderAction(id);
     if (!result.success) {
       setGlobalMessage({ type: 'error', text: result.message });
-      setTimeout(() => setGlobalMessage(null), 4000);
+      setTimeout(() => setGlobalMessage(null), 5000);
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
@@ -109,6 +124,22 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
             onChange={handleSearch}
             className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors'
           />
+        </div>
+        <div className='flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg'>
+          <input 
+            type='checkbox' 
+            id='showInactive' 
+            checked={showInactive} 
+            onChange={(e) => {
+              const val = e.target.checked;
+              setShowInactive(val);
+              loadData(val);
+            }} 
+            className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700'
+          />
+          <label htmlFor='showInactive' className='text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none'>
+            Ver Inactivos
+          </label>
         </div>
         {role === 'admin' && (
           <button
@@ -141,12 +172,22 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
             {filteredProviders.map((p) => (
               <tr key={p.id} className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors'>
                 <td className='px-6 py-4 font-bold text-zinc-900 dark:text-zinc-100'>
-                  {p.name}
+                  <div className='flex items-center gap-2'>
+                    {p.name}
+                    {!p.isActive && <span className='px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase'>Inactivo</span>}
+                  </div>
                 </td>
                 <td className='px-6 py-4 text-zinc-500'>{p.phone || '---'}</td>
                 <td className='px-6 py-4 text-zinc-500'>{p.email || '---'}</td>
                 {role === 'admin' && (
                   <td className='px-6 py-4 flex gap-2 justify-end'>
+                    <button 
+                      onClick={() => handleToggleActive(p)} 
+                      className={`p-2 rounded-lg transition ${p.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`} 
+                      title={p.isActive ? 'Desactivar' : 'Activar'}
+                    >
+                      <Plus className={`w-4 h-4 ${p.isActive ? 'rotate-45' : ''}`} />
+                    </button>
                     <button onClick={() => openModal(p)} className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition' title='Editar'>
                       <Edit className='w-4 h-4' />
                     </button>
@@ -252,7 +293,7 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
               <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Eliminar Firma Proveedor</h3>
             </div>
             <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>
-              Esta acción no se puede deshacer. Cuidado: fallará si tienes stock activo asociado a este proveedor.
+              Esta acción es permanente y eliminará el registro físico de la base de datos. Solo recomendado si lo creaste por error y aún no tiene productos asociados.
             </p>
             <div className='flex justify-end gap-3'>
               <button onClick={() => setItemToDelete(null)} className='px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg transition-colors'>

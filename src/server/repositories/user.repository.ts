@@ -14,27 +14,47 @@ export class UserRepository {
    */
   async getUserByUsername(username: string) {
     return await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.username, username),
+      where: (users, { eq, and }) => and(eq(users.username, username), eq(users.isActive, true)),
       columns: {
         id: true,
         username: true,
         role: true,
         passwordHash: true,
+        isActive: true,
       },
     });
   }
 
-  async getAllUsers() {
+  async getAllUsers(includeInactive = false) {
     return await db.query.users.findMany({
+      where: includeInactive ? undefined : eq(users.isActive, true),
       columns: {
         id: true,
         username: true,
         role: true,
+        isActive: true,
         createdAt: true,
         updatedAt: true,
       },
       orderBy: [desc(users.createdAt)],
     });
+  }
+
+  async checkHasRelations(id: string) {
+    // Check if user has audit logs
+    const logsList = await db.query.auditLogs.findMany({
+      where: (l, { eq }) => eq(l.userId, id),
+      limit: 1,
+    });
+    return logsList.length > 0;
+  }
+
+  async updateActiveStatus(id: string, isActive: boolean) {
+    const result = await db.update(users)
+      .set({ isActive, updatedAt: sql`NOW()` })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
   }
 
   async createUser(input: UserInput) {
@@ -52,6 +72,7 @@ export class UserRepository {
       username: input.username,
       passwordHash: hashedPassword,
       role: input.role,
+      isActive: true,
     }).returning({
       id: users.id,
       username: users.username,

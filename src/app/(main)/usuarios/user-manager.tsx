@@ -10,6 +10,7 @@ import {
   updateUserAction,
   deleteUserAction,
   fetchUsers,
+  toggleUserActiveAction,
 } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -19,6 +20,7 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
   const [users, setUsers] = useState<UserDef[]>(initialData);
   const [search, setSearch] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [showInactive, setShowInactive] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<UserDef | null>(null);
@@ -37,9 +39,9 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
     defaultValues: { role: 'vendedor' },
   });
 
-  const loadData = async () => {
+  const loadData = async (includeInactive = showInactive) => {
     startTransition(async () => {
-      const resp = await fetchUsers();
+      const resp = await fetchUsers(includeInactive);
       setUsers(resp);
     });
   };
@@ -94,6 +96,20 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
     loadData();
   };
 
+  const handleToggleActive = async (item: UserDef) => {
+    if (currentSession?.id === item.id) return;
+    const nextStatus = !item.isActive;
+    const result = await toggleUserActiveAction(item.id, nextStatus);
+    if (!result.success) {
+      setGlobalMessage({ type: 'error', text: result.message });
+      setTimeout(() => setGlobalMessage(null), 4000);
+    } else {
+      setGlobalMessage({ type: 'success', text: result.message });
+      setTimeout(() => setGlobalMessage(null), 3000);
+      loadData();
+    }
+  };
+
   const confirmDelete = async () => {
     if (!itemToDelete) return;
     const id = itemToDelete;
@@ -102,7 +118,7 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
     const result = await deleteUserAction(id);
     if (!result.success) {
       setGlobalMessage({ type: 'error', text: result.message });
-      setTimeout(() => setGlobalMessage(null), 4000);
+      setTimeout(() => setGlobalMessage(null), 5000);
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
@@ -123,6 +139,22 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
             onChange={handleSearch}
             className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors'
           />
+        </div>
+        <div className='flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shrink-0'>
+          <input 
+            type='checkbox' 
+            id='showInactive' 
+            checked={showInactive} 
+            onChange={(e) => {
+              const val = e.target.checked;
+              setShowInactive(val);
+              loadData(val);
+            }} 
+            className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700'
+          />
+          <label htmlFor='showInactive' className='text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none'>
+            Ver Inactivos
+          </label>
         </div>
         <button
           onClick={() => openModal()}
@@ -161,6 +193,7 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
                 <td className='px-6 py-4'>
                   <div className='font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
                     {u.username}
+                    {!u.isActive && <span className='px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase tracking-tighter'>Inactivo</span>}
                     {currentSession?.id === u.id && (
                       <span className='px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 text-[10px] uppercase font-bold ml-2'>
                         Tú
@@ -176,7 +209,15 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
                     {u.role === 'admin' ? 'Administrador' : 'Vendedor'}
                   </span>
                 </td>
-                <td className='px-6 py-4 flex gap-2 justify-end'>
+                <td className='px-6 py-4 flex gap-2 justify-end items-center'>
+                  <button 
+                    disabled={currentSession?.id === u.id}
+                    onClick={() => handleToggleActive(u)} 
+                    className={`p-2 rounded-lg transition ${currentSession?.id === u.id ? 'opacity-20 cursor-not-allowed' : (u.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10')}`} 
+                    title={u.isActive ? 'Desactivar Usuario' : 'Activar Usuario'}
+                  >
+                    <Plus className={`w-4 h-4 ${u.isActive ? 'rotate-45' : ''}`} />
+                  </button>
                   <button onClick={() => openModal(u)} className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition' title='Editar Seguridad'>
                     <Edit className='w-4 h-4' />
                   </button>
@@ -284,7 +325,7 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
               <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Inhabilitar Usuario</h3>
             </div>
             <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>
-              Estás a punto de borrar definitivamente las credenciales de este usuario. Se revocará inmediatamente cualquier sesión activa.
+              Esta acción es permanente y eliminará físicamente al usuario. Solo recomendado si nunca operó en el sistema. De lo contrario, usa la opción de desactivar.
             </p>
             <div className='flex justify-end gap-3'>
               <button

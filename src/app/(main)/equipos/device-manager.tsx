@@ -11,6 +11,7 @@ import {
   updateDeviceAction,
   deleteDeviceAction,
   fetchDevices,
+  toggleDeviceActiveAction,
 } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -20,6 +21,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   const [devices, setDevices] = useState<DeviceDef[]>(initialData);
   const [search, setSearch] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [showInactive, setShowInactive] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<DeviceDef | null>(null);
@@ -37,9 +39,9 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     resolver: zodResolver(deviceSchema),
   });
 
-  const loadData = async () => {
+  const loadData = async (includeInactive = showInactive) => {
     startTransition(async () => {
-      const resp = await fetchDevices();
+      const resp = await fetchDevices(includeInactive, search);
       setDevices(resp);
     });
   };
@@ -85,6 +87,19 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     loadData();
   };
 
+  const handleToggleActive = async (item: DeviceDef) => {
+    const nextStatus = !item.isActive;
+    const result = await toggleDeviceActiveAction(item.id, nextStatus);
+    if (!result.success) {
+      setGlobalMessage({ type: 'error', text: result.message });
+      setTimeout(() => setGlobalMessage(null), 4000);
+    } else {
+      setGlobalMessage({ type: 'success', text: result.message });
+      setTimeout(() => setGlobalMessage(null), 3000);
+      loadData();
+    }
+  };
+
   const confirmDelete = async () => {
     if (!itemToDelete) return;
     const id = itemToDelete;
@@ -93,7 +108,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     const result = await deleteDeviceAction(id);
     if (!result.success) {
       setGlobalMessage({ type: 'error', text: result.message });
-      setTimeout(() => setGlobalMessage(null), 4000);
+      setTimeout(() => setGlobalMessage(null), 5000);
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
@@ -114,6 +129,22 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
             onChange={handleSearch}
             className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors'
           />
+        </div>
+        <div className='flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shrink-0'>
+          <input 
+            type='checkbox' 
+            id='showInactive' 
+            checked={showInactive} 
+            onChange={(e) => {
+              const val = e.target.checked;
+              setShowInactive(val);
+              loadData(val);
+            }} 
+            className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700'
+          />
+          <label htmlFor='showInactive' className='text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none'>
+            Ver Inactivos
+          </label>
         </div>
         {role === 'admin' && (
           <button
@@ -154,11 +185,21 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
           <tbody className={`divide-y divide-zinc-200 dark:divide-zinc-800 ${isPending ? 'opacity-50' : ''}`}>
             {filteredDevices.map((dev) => (
               <tr key={dev.id} className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors'>
-                <td className='px-6 py-4 font-medium text-zinc-900 dark:text-zinc-100'>
-                  {dev.name}
+                <td className='px-6 py-4 font-bold text-zinc-900 dark:text-zinc-100'>
+                  <div className='flex items-center gap-2'>
+                    {dev.name}
+                    {!dev.isActive && <span className='px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase tracking-tighter'>Inactivo</span>}
+                  </div>
                 </td>
                 {role === 'admin' && (
                   <td className='px-6 py-4 flex gap-2 justify-end'>
+                    <button 
+                      onClick={() => handleToggleActive(dev)} 
+                      className={`p-2 rounded-lg transition ${dev.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`} 
+                      title={dev.isActive ? 'Desactivar' : 'Activar'}
+                    >
+                      <Plus className={`w-4 h-4 ${dev.isActive ? 'rotate-45' : ''}`} />
+                    </button>
                     <button
                       onClick={() => openModal(dev)}
                       className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition'
@@ -257,7 +298,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
               <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Eliminar Equipo</h3>
             </div>
             <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>
-              ¿Estás seguro de que deseas eliminar este equipo? Esta acción eliminará el modelo permanentemente.
+              Esta acción es permanente. Solo se recomienda si el equipo no tiene stock asociado. De lo contrario, usa la opción de desactivar.
             </p>
             <div className='flex justify-end gap-3'>
               <button

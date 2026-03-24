@@ -4,10 +4,27 @@ import { providers } from '@/lib/db/schema';
 import type { ProviderInput } from '@/schemas/provider.schema';
 
 export class ProviderRepository {
-  async getAllProviders() {
+  async getAllProviders(includeInactive = false) {
     return await db.query.providers.findMany({
+      where: includeInactive ? undefined : eq(providers.isActive, true),
       orderBy: [desc(providers.createdAt)],
     });
+  }
+
+  async checkHasRelations(id: string) {
+    const productsList = await db.query.products.findMany({
+      where: (p, { eq }) => eq(p.providerId, id),
+      limit: 1,
+    });
+    return productsList.length > 0;
+  }
+
+  async updateActiveStatus(id: string, isActive: boolean) {
+    const result = await db.update(providers)
+      .set({ isActive, updatedAt: sql`NOW()` })
+      .where(eq(providers.id, id))
+      .returning();
+    return result[0];
   }
 
   async createProvider(input: ProviderInput) {
@@ -15,6 +32,7 @@ export class ProviderRepository {
       name: input.name,
       phone: input.phone || null,
       email: input.email || null,
+      isActive: true,
     }).returning();
     return result[0];
   }

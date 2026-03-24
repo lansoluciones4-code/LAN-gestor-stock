@@ -78,7 +78,7 @@ An administrative classification ledger. Defines models, brands, or device varia
 The core beating heart of the system. Represents actual physical units tied to a `device` and a `provider`.
 - **Pricing:** Manages specific `purchasePrice` vs `salePrice`.
 - **In-Memory Search Architecture:** Instantaneous client-side memory search against Device Names and Descriptions. By avoiding debounced API calls for filtering, we achieve sub-millisecond responsiveness for the user.
-- **Conditional Soft Deletes:** To preserve FK integrity for invoices, reducing stock to `0` filters it seamlessly from the active inventory grid instead of forcing a hard table `DELETE`. This keeps historical data intact for future audits.
+- **Conditional Soft Deletes:** To preserve FK integrity, the system implements a strict "Relationship Check" before any hard deletion. If an entity (Provider, Device, Customer) has ever been part of a transaction or record, it is restricted to a **Soft Delete** (`isActive: false`). This keeps historical data intact for future audits while removing the item from active operational views.
 
 ### 🛒 5. Point of Sale (POS) - *Current Development Phase*
 The upcoming engine for generating revenue. It will allow vendors to:
@@ -98,6 +98,12 @@ A B2B directory managing wholesalers and external suppliers from whom hardware i
 
 ### 🛡 7. User Profiles & Credentials (`/usuarios`)
 A strict internal Administrative panel designed to onboard new employees, assigning them access bounds (`vendedor` / `admin`). Capable of password overrides or complete access revocation.
+
+### 📜 8. Audit Logging & Tracing (`/logs`) — *Newly Implemented*
+To ensure absolute accountability, the system maintains a **High-Fidelity Audit Log** of all critical operations:
+- **Event Capture:** Every `CREATE`, `UPDATE`, `DELETE`, and `LOGIN` event is recorded with the specific User ID, Entity ID, and a JSON payload of the affected data.
+- **Data Integrity (Soft Deletes):** Entites are now protected by an `isActive` flag. The system prohibits the permanent deletion of any record that has historical relationships (Foreign Keys) to preserve data consistency. 
+- **Administrative Inspector:** Admins can filter logs and view a deep-dive JSON comparison of data states, ensuring complete visibility over who changed what and when.
 
 ### ⚡ UI/UX Philosophy: Performance over Decoration
 We have explicitly removed transition animations (`Framer Motion`) from the main layouts. The application is tuned to feel like a high-performance native cockpit: **instant interaction, zero latency.** Every click and search result is immediate, prioritizing professional efficiency over decorative effects.

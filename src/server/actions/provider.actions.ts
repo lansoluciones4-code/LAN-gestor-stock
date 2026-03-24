@@ -8,14 +8,34 @@ import { providerSchema, providerDefSchema, ProviderInput, type ProviderDef } fr
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
-export async function fetchProviders(): Promise<ProviderDef[]> {
+export async function fetchProviders(includeInactive = false): Promise<ProviderDef[]> {
   try {
     await verifyAuthOrAdmin(false); // Vendors can see providers
-    const providersList = await providerRepository.getAllProviders();
+    const providersList = await providerRepository.getAllProviders(includeInactive);
     return z.array(providerDefSchema).parse(providersList);
   } catch (error) {
     console.error('fetchProviders error:', error);
     return [];
+  }
+}
+
+export async function toggleProviderActiveAction(id: string, isActive: boolean) {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+    await providerRepository.updateActiveStatus(id, isActive);
+    revalidatePath('/proveedores');
+
+    await recordAuditLog(
+      caller.id,
+      isActive ? 'UPDATE' : 'DELETE',
+      'PROVIDER',
+      id,
+      { active: isActive, note: isActive ? 'Proveedor reactivado' : 'Proveedor desactivado' }
+    );
+
+    return { success: true, message: `Proveedor ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+  } catch (error: any) {
+    return { success: false, message: error.message || 'Error al cambiar estado del proveedor' };
   }
 }
 
@@ -68,6 +88,16 @@ export async function updateProviderAction(id: string, input: ProviderInput) {
 export async function deleteProviderAction(id: string) {
   try {
     const caller = await verifyAuthOrAdmin(true);
+    
+    // Rule: Cannot delete if has products
+    const hasProducts = await providerRepository.checkHasRelations(id);
+    if (hasProducts) {
+      return { 
+        success: false, 
+        message: 'No se puede eliminar permanentemente: este proveedor tiene productos asociados. Prueba desactivarlo.' 
+      };
+    }
+
     await providerRepository.deleteProvider(id);
     revalidatePath('/proveedores');
 
@@ -75,12 +105,12 @@ export async function deleteProviderAction(id: string) {
       caller.id,
       'DELETE',
       'PROVIDER',
-      id
+      id,
+      { note: 'Eliminación permanente' }
     );
 
-    return { success: true, message: 'Proveedor eliminado exitosamente' };
+    return { success: true, message: 'Proveedor eliminado permanentemente' };
   } catch (error: any) {
-    // This could fail if there are products linked via Foreign Key Constraints
-    return { success: false, message: 'Error al eliminar proveedor. Verifica que no tenga productos asociados.' };
+    return { success: false, message: 'Error al eliminar proveedor de la base de datos.' };
   }
 }

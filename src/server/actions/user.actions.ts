@@ -8,14 +8,37 @@ import { userSchema, userDefSchema, UserInput, type UserDef } from '@/schemas/us
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
-export async function fetchUsers(): Promise<UserDef[]> {
+export async function fetchUsers(includeInactive = false): Promise<UserDef[]> {
   try {
     await verifyAuthOrAdmin(true);
-    const usersList = await userRepository.getAllUsers();
+    const usersList = await userRepository.getAllUsers(includeInactive);
     return z.array(userDefSchema).parse(usersList);
   } catch (error) {
     console.error('fetchUsers error:', error);
     return [];
+  }
+}
+
+export async function toggleUserActiveAction(id: string, isActive: boolean) {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+    if (caller.id === id) {
+      return { success: false, message: 'No puedes cambiar tu propio estado de actividad.' };
+    }
+    await userRepository.updateActiveStatus(id, isActive);
+    revalidatePath('/usuarios');
+
+    await recordAuditLog(
+      caller.id,
+      isActive ? 'UPDATE' : 'DELETE',
+      'USER',
+      id,
+      { active: isActive }
+    );
+
+    return { success: true, message: `Usuario ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+  } catch (error: any) {
+    return { success: false, message: error.message || 'Error al cambiar estado del usuario' };
   }
 }
 
@@ -77,6 +100,15 @@ export async function deleteUserAction(id: string) {
       return { success: false, message: 'No puedes Auto-Inmolarte (Eliminar tu propia cuenta).' };
     }
 
+    // Check relations (audit logs)
+    const hasRelations = await userRepository.checkHasRelations(id);
+    if (hasRelations) {
+      return { 
+        success: false, 
+        message: 'No se puede eliminar permanentemente: este usuario tiene registros de auditoría asociados. Prueba desactivarlo.' 
+      };
+    }
+
     await userRepository.deleteUser(id);
     revalidatePath('/usuarios');
 
@@ -84,7 +116,8 @@ export async function deleteUserAction(id: string) {
       caller.id,
       'DELETE',
       'USER',
-      id
+      id,
+      { note: 'Eliminación permanente' }
     );
 
     return { success: true, message: 'Usuario eliminado exitosamente' };
