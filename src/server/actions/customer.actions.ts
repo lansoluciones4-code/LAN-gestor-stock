@@ -47,6 +47,7 @@ export async function createCustomerAction(input: CustomerInput) {
 
     const newCustomer = await customerRepository.createCustomer(parsed.data);
     revalidatePath('/clientes');
+    revalidatePath('/ventas');
 
     await recordAuditLog(
       caller.id,
@@ -70,6 +71,7 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
 
     await customerRepository.updateCustomer(id, parsed.data);
     revalidatePath('/clientes');
+    revalidatePath('/ventas');
 
     await recordAuditLog(
       caller.id,

@@ -47,6 +47,7 @@ export async function createDeviceAction(input: DeviceInput) {
 
     const newDevice = await deviceRepository.createDevice(parsed.data);
     revalidatePath('/equipos');
+    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,

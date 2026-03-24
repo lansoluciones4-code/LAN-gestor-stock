@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { fetchUsers } from '@/server/actions/user.actions';
 import { UserManager } from './user-manager';
 
