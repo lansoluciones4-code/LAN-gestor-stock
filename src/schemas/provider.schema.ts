@@ -7,8 +7,8 @@ import { providers } from '@/lib/db/schema';
  */
 export const providerSchema = createInsertSchema(providers, {
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'Nombre demasiado largo'),
-  phone: z.string().max(30, 'Número de teléfono demasiado largo').optional().or(z.literal('')),
-  email: z.string().max(100).optional().or(z.literal('')),
+  phone: z.string().min(1, 'El teléfono es obligatorio').max(30, 'Número de teléfono demasiado largo'),
+  email: z.string().min(1, 'El correo es obligatorio').max(100),
 })
   .pick({ name: true, phone: true, email: true })
   .extend({

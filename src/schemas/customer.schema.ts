@@ -8,10 +8,9 @@ import { customers } from '@/lib/db/schema';
 export const customerSchema = createInsertSchema(customers, {
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'Nombre demasiado largo'),
   phone: z.string()
+    .min(1, 'El teléfono es obligatorio')
     .max(30, 'Número de teléfono demasiado largo')
-    .regex(/^[0-9\s+-]*$/, 'Formato de teléfono inválido (solo números, +, - y espacios)')
-    .optional()
-    .or(z.literal('')),
+    .regex(/^[0-9\s+-]*$/, 'Formato de teléfono inválido (solo números, +, - y espacios)'),
   email: z.string().max(100).optional().or(z.literal('')),
   documentNumber: z.string().min(1, 'El DNI es obligatorio').max(20, 'Documento demasiado largo'),
 })

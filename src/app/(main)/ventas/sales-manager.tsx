@@ -258,7 +258,15 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
     return (
       <div className='flex flex-col h-full space-y-4 animate-in fade-in duration-300 relative overflow-hidden'>
         <div className='flex items-center justify-between shrink-0 px-1'>
-          <Button variant='ghost' size='sm' onClick={() => setView('list')} leftIcon={<ArrowLeft className='w-4 h-4'/>}>Volver</Button>
+          <Button 
+            variant='secondary' 
+            size='sm' 
+            onClick={() => setView('list')} 
+            leftIcon={<ArrowLeft className='w-4 h-4'/>}
+            className='font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md'
+          >
+            Volver Al Listado
+          </Button>
           <div className='flex items-center gap-2'>
             <ShoppingCart className='w-5 h-5 text-indigo-600' />
             <h2 className='text-lg font-bold'>Facturar Venta</h2>
