@@ -256,7 +256,7 @@ export function ProductManager({
                       errors.deviceId ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700'
                     }`}
                   >
-                    <option value=''>-- Seleccionar Equipo Matrix --</option>
+                    <option value=''>Seleccionar Equipo</option>
                     {devices.map(d => (
                       <option key={d.id} value={d.id}>{d.name}</option>
                     ))}
@@ -272,7 +272,7 @@ export function ProductManager({
                       errors.providerId ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700'
                     }`}
                   >
-                    <option value=''>-- Seleccionar Proveedor --</option>
+                    <option value=''>Seleccionar Proveedor</option>
                     {suppliers.map(s => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
