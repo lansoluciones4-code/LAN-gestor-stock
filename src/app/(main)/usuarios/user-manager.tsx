@@ -3,7 +3,8 @@
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, Plus, Edit, Trash2, X, ShieldAlert, UserCog } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, X, ShieldAlert, UserCog, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { userSchema, type UserInput, type UserDef } from '@/schemas/user.schema';
 import {
   createUserAction,
@@ -179,8 +180,8 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
 
       {/* Grid Container */}
       <div className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar'>
-        <table className='w-full text-sm text-left text-zinc-600 dark:text-zinc-400'>
-          <thead className='sticky top-0 z-10 text-xs uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
+        <table className='w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400'>
+          <thead className='sticky top-0 z-10 text-sm uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
             <tr>
               <th scope='col' className='px-6 py-4'>Usuario Creado</th>
               <th scope='col' className='px-6 py-4'>Rol Autorizado</th>

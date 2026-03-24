@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, Plus, Edit, Trash2, X, Store } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, X, Store, Truck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { providerSchema, providerDefSchema, type ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
 import {
   createProviderAction,
@@ -159,8 +160,8 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
       )}
 
       <div className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar'>
-        <table className='w-full text-sm text-left text-zinc-600 dark:text-zinc-400'>
-          <thead className='sticky top-0 z-10 text-xs uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
+        <table className='w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400'>
+          <thead className='sticky top-0 z-10 text-sm uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
             <tr>
               <th scope='col' className='px-6 py-4'>Empresa / Mayorista</th>
               <th scope='col' className='px-6 py-4'>Teléfono</th>
@@ -263,19 +264,10 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
               </div>
 
               <div className='flex justify-end pt-4 gap-3 border-t border-zinc-200 dark:border-zinc-800 mt-6'>
-                <button
-                  type='button'
-                  onClick={closeModal}
-                  className='px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg transition font-medium'
-                >
-                  Cancelar
-                </button>
-                <button
-                  type='submit'
-                  className='px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm'
-                >
-                  Registrar Firma
-                </button>
+                <Button variant='ghost' type='button' onClick={closeModal}>Cancelar</Button>
+                <Button type='submit' disabled={isPending}>
+                   {editingItem ? 'Actualizar Firma' : 'Registrar Proveedor'}
+                </Button>
               </div>
             </form>
           </div>
