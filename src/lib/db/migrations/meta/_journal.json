@@ -8,6 +8,13 @@
       "when": 1774303404646,
       "tag": "0000_uneven_gunslinger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774311374547,
+      "tag": "0001_good_spot",
+      "breakpoints": true
     }
   ]
 }

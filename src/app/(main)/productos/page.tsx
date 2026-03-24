@@ -18,7 +18,11 @@ export default async function ProductsPage() {
         </div>
       </div>
 
-      <ProductManager initialData={initialProducts as any} suppliers={selectors.providers} devices={selectors.devices} />
+      <ProductManager
+        initialData={initialProducts}
+        suppliers={selectors.providers}
+        devices={selectors.devices}
+      />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, Users } from 'lucide-react';
-import { customerSchema, type CustomerInput } from '@/schemas/customer.schema';
+import { customerSchema, customerDefSchema, type CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
 import {
   createCustomerAction,
   updateCustomerAction,
@@ -14,15 +14,6 @@ import {
 } from '@/server/actions/customer.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-const customerDefSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  phone: z.string().nullable(),
-  email: z.string().nullable(),
-  documentNumber: z.string().nullable(),
-});
-
-type CustomerDef = z.infer<typeof customerDefSchema>;
 
 export function CustomerManager({ initialData }: { initialData: CustomerDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
@@ -44,12 +35,7 @@ export function CustomerManager({ initialData }: { initialData: CustomerDef[] })
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchCustomers();
-      const parsed = z.array(customerDefSchema).safeParse(resp);
-      if (parsed.success) {
-        setCustomers(parsed.data);
-      } else {
-        console.error('Data mismatch:', parsed.error);
-      }
+      setCustomers(resp);
     });
   };
 
@@ -178,7 +164,7 @@ export function CustomerManager({ initialData }: { initialData: CustomerDef[] })
             {filteredCustomers.length === 0 && !isPending && (
               <tr>
                 <td colSpan={5} className='px-6 py-8 text-center'>
-                  No hay clientes que coincidan con la búsqueda.
+                  No se han encontrado clientes.
                 </td>
               </tr>
             )}

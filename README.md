@@ -39,10 +39,20 @@ To maintain the Single Responsibility Principle, database interactions are purel
 - **Client Components (`'use client'`):** Confined to specific interactive islands (`*-manager.tsx`), managing local states, modal dialogs, and real-time client-side search filtering arrays without triggering costly network roundtrips per keystroke.
 
 ### 3. Rigorous Type-Safety & Data Validation (Zod)
-We have eradicated unsafe type-casting (`as Type[]`) across the client-side state. Every data fetch triggered by the client (via `loadData`) is put through a Zod `safeParse` pipeline. This ensures that the application:
-1.  **Fails Gracefully:** If the database schema shifts, the client detects it before rendering, preventing "undefined" crashes.
-2.  **Self-Documents:** The schemas in `/src/app/(main)/*-manager.tsx` serve as the contract for what the UI expects from the Backend.
-3.  **End-to-End Integrity:** Type safety flows from the Postgres Schema $\rightarrow$ Drizzle $\rightarrow$ Server Actions $\rightarrow$ Zod $\rightarrow$ UI State.
+We enforce a strict **Fail-Fast** architecture on the server. Data integrity is managed through a dual-schema pattern in the `/src/schemas/` directory:
+
+#### The `DefSchema` Pattern
+To maintain absolute consistency, we separate **Input** from **Output/Definition** schemas:
+-   **`InputSchema` (e.g., `userSchema`):** Defines the requirements for creating or updating an entity (validation of names, email formats, password lengths). Used by `react-hook-form` and Server Actions for payload verification.
+-   **`DefSchema` (e.g., `userDefSchema`):** Defines the **Source of Truth** for an entity as it exists in the system. This includes database-generated fields like `id`, `createdAt`, `updatedAt`, and nested relations (e.g., a product's associated `provider`).
+
+#### Centralized Server Validation
+Unlike traditional patterns where the frontend "casts" types blindly, our architecture offloads validation to the **Server Actions**:
+1.  **Server-Side Parsing:** Every `fetch` action validates the database output against its `DefSchema` before shipping it to the client.
+2.  **Type Inference:** The frontend receives already-validated, strongly-typed objects. This eliminates the need for `as any` or manual `parse` calls in UI components.
+3.  **Contract Enforcement:** If a database migration adds or changes a field, the Server Action will throw an error immediately, preventing the UI from entering an inconsistent state with missing or malformed data.
+
+This ensures a seamless flow of integrity from the Postgres Schema $\rightarrow$ Drizzle $\rightarrow$ Server Actions $\rightarrow$ Zod $\rightarrow$ UI State.
 
 ### 3. Dual-Layer Security Model (RBAC)
 Security enforces Strict Role-Based Access Control (`admin` vs `vendedor`).

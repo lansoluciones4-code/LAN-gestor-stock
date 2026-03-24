@@ -5,7 +5,9 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, DollarSign, PackageOpen } from 'lucide-react';
-import { productSchema, type ProductInput } from '@/schemas/product.schema';
+import { productSchema, productDefSchema, type ProductInput, type ProductDef } from '@/schemas/product.schema';
+import { type ProviderDef } from '@/schemas/provider.schema';
+import { type DeviceDef } from '@/schemas/device.schema';
 import {
   createProductAction,
   updateProductAction,
@@ -14,38 +16,23 @@ import {
 } from '@/server/actions/product.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-const enrichedProductSchema = z.object({
-  id: z.string(),
-  description: z.string().nullable().optional(),
-  purchasePrice: z.number(),
-  salePrice: z.number(),
-  stock: z.number(),
-  deviceId: z.string(),
-  providerId: z.string(),
-  device: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
-  provider: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
-});
-
-type EnrichedProduct = z.infer<typeof enrichedProductSchema>;
-
-type OptionDef = { id: string; name: string };
 
 export function ProductManager({
   initialData,
   devices,
   suppliers,
 }: {
-  initialData: EnrichedProduct[];
-  devices: OptionDef[];
-  suppliers: OptionDef[];
+  initialData: ProductDef[];
+  devices: DeviceDef[];
+  suppliers: ProviderDef[];
 }) {
   const role = useAuthStore((s) => s.user?.role);
-  const [products, setProducts] = useState<EnrichedProduct[]>(initialData);
+  const [products, setProducts] = useState<ProductDef[]>(initialData);
   const [search, setSearch] = useState('');
   const [isPending, startTransition] = useTransition();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<EnrichedProduct | null>(null);
+  const [editingItem, setEditingItem] = useState<ProductDef | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -64,12 +51,7 @@ export function ProductManager({
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchProducts();
-      const parsed = z.array(enrichedProductSchema).safeParse(resp);
-      if (parsed.success) {
-        setProducts(parsed.data);
-      } else {
-        console.error('Data mismatch [Productos]:', parsed.error);
-      }
+      setProducts(resp);
     });
   };
 
@@ -86,7 +68,7 @@ export function ProductManager({
     );
   });
 
-  const openModal = (item?: EnrichedProduct) => {
+  const openModal = (item?: ProductDef) => {
     setServerError(null);
     if (item) {
       setEditingItem(item);
@@ -234,10 +216,10 @@ export function ProductManager({
                 )}
               </tr>
             ))}
-            {products.length === 0 && !isPending && (
+            {filteredProducts.length === 0 && !isPending && (
               <tr>
                 <td colSpan={role === 'admin' ? 6 : 4} className='px-6 py-8 text-center'>
-                  No hay productos registrados en el inventario.
+                  No se han encontrado productos.
                 </td>
               </tr>
             )}

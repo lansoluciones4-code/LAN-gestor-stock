@@ -30,6 +30,7 @@ export const devices = pgTable('devices', {
     .default(sql`gen_random_uuid()`),
   name: varchar('name', { length: 100 }).notNull().unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const providers = pgTable('providers', {

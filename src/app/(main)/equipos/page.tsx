@@ -2,7 +2,7 @@ import { fetchDevices } from '@/server/actions/device.actions';
 import { DeviceManager } from './device-manager';
 
 export default async function DevicesPage() {
-  const initialDevices = await fetchDevices();
+  const initialData = await fetchDevices();
 
   return (
     <div className='flex flex-col h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 overflow-hidden'>
@@ -15,7 +15,7 @@ export default async function DevicesPage() {
         </div>
       </div>
 
-      <DeviceManager initialData={initialDevices} />
+      <DeviceManager initialData={initialData} />
     </div>
   );
 }

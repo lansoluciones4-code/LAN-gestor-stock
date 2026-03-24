@@ -15,7 +15,7 @@ export default async function ProvidersPage() {
         </div>
       </div>
 
-      <ProviderManager initialData={initialData as any} />
+      <ProviderManager initialData={initialData} />
     </div>
   );
 }

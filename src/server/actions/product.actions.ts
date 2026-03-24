@@ -2,42 +2,44 @@
 
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { productRepository } from '@/server/repositories/product.repository';
 import { deviceRepository } from '@/server/repositories/device.repository';
 import { providerRepository } from '@/server/repositories/provider.repository';
-import { productSchema, ProductInput } from '@/schemas/product.schema';
-import { verifyToken } from '@/lib/auth/jwt';
+import { productSchema, productDefSchema, ProductInput, type ProductDef } from '@/schemas/product.schema';
+import { providerDefSchema, type ProviderDef } from '@/schemas/provider.schema';
+import { deviceDefSchema, type DeviceDef } from '@/schemas/device.schema';
+import { verifyAuthOrAdmin } from '@/lib/auth/utils';
+import { recordAuditLog } from '@/lib/audit-logs';
 
-async function verifyAuthOrAdmin(requireAdmin = false) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('session')?.value;
-  if (!token) throw new Error('No autorizado (Token faltante)');
-  
-  const user = await verifyToken(token);
-  if (requireAdmin && user.role !== 'admin') {
-    throw new Error('Solo los administradores pueden realizar esta acción');
-  }
-  return user;
-}
-
-export async function fetchProducts() {
+export async function fetchProducts(): Promise<ProductDef[]> {
   try {
     const products = await productRepository.getAllProducts();
-    return products.map(p => ({
+    const formatted = products.map(p => ({
       ...p,
       salePrice: parseFloat(p.salePrice as any),
       purchasePrice: parseFloat(p.purchasePrice as any)
     }));
+    return z.array(productDefSchema).parse(formatted);
   } catch (error) {
     console.error('fetchProducts error:', error);
     return [];
   }
 }
 
-export async function fetchSelectorData() {
-  const devices = await deviceRepository.getAllDevices();
-  const providers = await providerRepository.getAllProviders();
-  return { devices, providers };
+export async function fetchSelectorData(): Promise<{ devices: DeviceDef[], providers: ProviderDef[] }> {
+  try {
+    const devicesList = await deviceRepository.getAllDevices();
+    const providersList = await providerRepository.getAllProviders();
+    
+    return {
+      devices: z.array(deviceDefSchema).parse(devicesList),
+      providers: z.array(providerDefSchema).parse(providersList),
+    };
+  } catch (error) {
+    console.error('fetchSelectorData error:', error);
+    return { devices: [], providers: [] };
+  }
 }
 
 export async function createProductAction(input: ProductInput) {

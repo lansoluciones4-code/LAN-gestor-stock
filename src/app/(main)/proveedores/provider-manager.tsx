@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, Store } from 'lucide-react';
-import { providerSchema, type ProviderInput } from '@/schemas/provider.schema';
+import { providerSchema, providerDefSchema, type ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
 import {
   createProviderAction,
   updateProviderAction,
@@ -14,14 +14,6 @@ import {
 } from '@/server/actions/provider.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-const providerDefSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  phone: z.string().nullable(),
-  email: z.string().nullable(),
-});
-
-type ProviderDef = z.infer<typeof providerDefSchema>;
 
 export function ProviderManager({ initialData }: { initialData: ProviderDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
@@ -43,12 +35,7 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchProviders();
-      const parsed = z.array(providerDefSchema).safeParse(resp);
-      if (parsed.success) {
-        setProviders(parsed.data);
-      } else {
-        console.error('Data mismatch:', parsed.error);
-      }
+      setProviders(resp);
     });
   };
 
@@ -173,7 +160,7 @@ export function ProviderManager({ initialData }: { initialData: ProviderDef[] })
             {filteredProviders.length === 0 && !isPending && (
               <tr>
                 <td colSpan={role === 'admin' ? 4 : 3} className='px-6 py-8 text-center'>
-                  No hay proveedores registrados.
+                  No se han encontrado proveedores.
                 </td>
               </tr>
             )}

@@ -15,7 +15,7 @@ export default async function CustomersPage() {
         </div>
       </div>
 
-      <CustomerManager initialData={initialData as any} />
+      <CustomerManager initialData={initialData} />
     </div>
   );
 }

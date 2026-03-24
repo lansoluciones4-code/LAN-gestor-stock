@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Search, Plus, Edit, Trash2, X, MonitorSmartphone } from 'lucide-react';
-import { deviceSchema, type DeviceInput } from '@/schemas/device.schema';
+import { deviceSchema, deviceDefSchema, type DeviceInput, type DeviceDef } from '@/schemas/device.schema';
 import {
   createDeviceAction,
   updateDeviceAction,
@@ -14,13 +14,6 @@ import {
 } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-const deviceDefSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  createdAt: z.union([z.date(), z.string()]),
-});
-
-type DeviceDef = z.infer<typeof deviceDefSchema>;
 
 export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
@@ -28,7 +21,6 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   const [search, setSearch] = useState('');
   const [isPending, startTransition] = useTransition();
 
-  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<DeviceDef | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -48,12 +40,7 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   const loadData = async () => {
     startTransition(async () => {
       const resp = await fetchDevices();
-      const parsed = z.array(deviceDefSchema).safeParse(resp);
-      if (parsed.success) {
-        setDevices(parsed.data);
-      } else {
-        console.error('Data mismatch:', parsed.error);
-      }
+      setDevices(resp);
     });
   };
 

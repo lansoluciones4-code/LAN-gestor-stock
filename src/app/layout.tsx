@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Stock Management',
+  title: 'StockApp',
   description: 'Manage technology store stock effectively',
 };
 

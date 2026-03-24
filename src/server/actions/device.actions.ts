@@ -2,8 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { deviceRepository } from '@/server/repositories/device.repository';
-import { deviceSchema, DeviceInput } from '@/schemas/device.schema';
+import { deviceSchema, deviceDefSchema, DeviceInput, type DeviceDef } from '@/schemas/device.schema';
 import { verifyToken } from '@/lib/auth/jwt';
 
 async function checkAdminAccess() {
@@ -17,9 +18,10 @@ async function checkAdminAccess() {
   }
 }
 
-export async function fetchDevices(search?: string) {
+export async function fetchDevices(search?: string): Promise<DeviceDef[]> {
   try {
-    return await deviceRepository.getAllDevices(search);
+    const devicesList = await deviceRepository.getAllDevices(search);
+    return z.array(deviceDefSchema).parse(devicesList);
   } catch (error) {
     console.error('fetchDevices error:', error);
     return [];

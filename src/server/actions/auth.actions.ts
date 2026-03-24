@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { loginSchema, LoginInput, Role } from '@/schemas/auth.schema';
 import { userRepository } from '@/server/repositories/user.repository';
 import { signToken } from '@/lib/auth/jwt';
+import { recordAuditLog } from '@/lib/audit-logs';
 
 type LoginResult = {
   success: boolean;
@@ -64,6 +65,9 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
       path: '/',
       maxAge: 60 * 60 * 24, // 24 hours
     });
+
+    // 7. Record successful login to audit logs
+    await recordAuditLog(user.id, 'LOGIN', 'USER', user.id, { username: user.username });
 
     return {
       success: true,

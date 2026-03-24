@@ -15,7 +15,7 @@ export default async function UsersPage() {
         </div>
       </div>
 
-      <UserManager initialData={initialUsers as any} />
+      <UserManager initialData={initialUsers} />
     </div>
   );
 }

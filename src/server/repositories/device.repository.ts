@@ -1,4 +1,4 @@
-import { desc, eq, ilike } from 'drizzle-orm';
+import { desc, eq, ilike, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { devices } from '@/lib/db/schema';
 import type { DeviceInput } from '@/schemas/device.schema';
@@ -33,7 +33,10 @@ export class DeviceRepository {
   async updateDevice(id: string, input: DeviceInput) {
     const result = await db
       .update(devices)
-      .set({ name: input.name })
+      .set({ 
+        name: input.name,
+        updatedAt: sql`NOW()`,
+      })
       .where(eq(devices.id, id))
       .returning();
     return result[0];
