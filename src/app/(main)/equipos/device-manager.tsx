@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, Plus, Edit, Trash2, X, MonitorSmartphone } from 'lucide-react';
-import { deviceSchema, deviceDefSchema, type DeviceInput, type DeviceDef } from '@/schemas/device.schema';
+import { Plus, Edit, Trash2, X, MonitorSmartphone, Search, Smartphone } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Table } from '@/components/ui/table';
+import { deviceSchema, type DeviceInput, type DeviceDef } from '@/schemas/device.schema';
 import {
   createDeviceAction,
   updateDeviceAction,
@@ -15,39 +16,28 @@ import {
 } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
-
 export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
   const [devices, setDevices] = useState<DeviceDef[]>(initialData);
   const [search, setSearch] = useState('');
-  const [isPending, startTransition] = useTransition();
   const [showInactive, setShowInactive] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<DeviceDef | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
-
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [globalMessage, setGlobalMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<DeviceInput>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<DeviceInput>({
     resolver: zodResolver(deviceSchema),
   });
 
-  const loadData = async (includeInactive = showInactive) => {
+  const loadData = async (inactive = showInactive) => {
     startTransition(async () => {
-      const resp = await fetchDevices(includeInactive, search);
+      const resp = await fetchDevices(inactive, search);
       setDevices(resp);
     });
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
   };
 
   const filteredDevices = devices.filter((d) =>
@@ -104,7 +94,6 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
     if (!itemToDelete) return;
     const id = itemToDelete;
     setItemToDelete(null);
-
     const result = await deleteDeviceAction(id);
     if (!result.success) {
       setGlobalMessage({ type: 'error', text: result.message });
@@ -118,19 +107,19 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
 
   return (
     <div className='flex flex-col flex-1 h-full overflow-hidden'>
-      {/* Search Line */}
       <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
         <div className='relative flex-1'>
           <Search className='absolute left-3 top-2.5 h-5 w-5 text-zinc-400' />
           <input
             type='text'
-            placeholder='Buscar modelo por nombre...'
+            placeholder='Buscar modelos de equipos...'
             value={search}
-            onChange={handleSearch}
+            onChange={(e) => setSearch(e.target.value)}
             className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors'
           />
         </div>
-        <div className='flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shrink-0'>
+        
+        <div className='flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shrink-0 h-10'>
           <input 
             type='checkbox' 
             id='showInactive' 
@@ -140,12 +129,13 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
               setShowInactive(val);
               loadData(val);
             }} 
-            className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700'
+            className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300'
           />
           <label htmlFor='showInactive' className='text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none'>
-            Ver Inactivos
+            Inactivos
           </label>
         </div>
+
         {role === 'admin' && (
           <button
             onClick={() => openModal()}
@@ -158,161 +148,88 @@ export function DeviceManager({ initialData }: { initialData: DeviceDef[] }) {
       </div>
 
       {globalMessage && (
-        <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${
-          globalMessage.type === 'error' 
-            ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' 
-            : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'
-        }`}>
+        <div className={`shrink-0 mb-4 p-4 rounded-lg border text-sm shadow-sm ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
           {globalMessage.text}
         </div>
       )}
 
-      {/* Table Container - Only Scrollable Area */}
-      <div className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar'>
-        <table className='w-full text-sm text-left text-zinc-600 dark:text-zinc-400'>
-          <thead className='sticky top-0 z-10 text-xs uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
-            <tr>
-              <th scope='col' className='px-6 py-4'>
-                Modelo
-              </th>
-              {role === 'admin' && (
-                <th scope='col' className='px-6 py-4 text-right'>
-                  Acciones
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className={`divide-y divide-zinc-200 dark:divide-zinc-800 ${isPending ? 'opacity-50' : ''}`}>
-            {filteredDevices.map((dev) => (
-              <tr key={dev.id} className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors'>
-                <td className='px-6 py-4 font-bold text-zinc-900 dark:text-zinc-100'>
-                  <div className='flex items-center gap-2'>
-                    {dev.name}
-                    {!dev.isActive && <span className='px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase tracking-tighter'>Inactivo</span>}
-                  </div>
-                </td>
-                {role === 'admin' && (
-                  <td className='px-6 py-4 flex gap-2 justify-end'>
-                    <button 
-                      onClick={() => handleToggleActive(dev)} 
-                      className={`p-2 rounded-lg transition ${dev.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`} 
-                      title={dev.isActive ? 'Desactivar' : 'Activar'}
-                    >
-                      <Plus className={`w-4 h-4 ${dev.isActive ? 'rotate-45' : ''}`} />
-                    </button>
-                    <button
-                      onClick={() => openModal(dev)}
-                      className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition'
-                      title='Editar'
-                    >
-                      <Edit className='w-4 h-4' />
-                    </button>
-                    <button
-                      onClick={() => setItemToDelete(dev.id)}
-                      className='p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition'
-                      title='Eliminar'
-                    >
-                      <Trash2 className='w-4 h-4' />
-                    </button>
-                  </td>
-                )}
-              </tr>
-            ))}
-
-            {filteredDevices.length === 0 && !isPending && (
-              <tr>
-                <td colSpan={role === 'admin' ? 2 : 1} className='px-6 py-8 text-center'>
-                  No se han encontrado equipos.
-                </td>
-              </tr>
+      <Table headers={['Modelo y Categoría', 'Acciones']} isPending={isPending}>
+        {filteredDevices.map((dev) => (
+          <tr key={dev.id} className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors'>
+            <td className='px-6 py-4 font-bold text-zinc-900 dark:text-zinc-100'>
+              <div className='flex items-center gap-2'>
+                {dev.name}
+                {!dev.isActive && <span className='px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase'>Inactivo</span>}
+              </div>
+            </td>
+            {role === 'admin' && (
+              <td className='px-6 py-4 flex gap-2 justify-end'>
+                <button 
+                  onClick={() => handleToggleActive(dev)} 
+                  className={`p-2 rounded-lg transition ${dev.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`} 
+                  title={dev.isActive ? 'Desactivar' : 'Activar'}
+                >
+                  <Plus className={`w-4 h-4 ${dev.isActive ? 'rotate-45' : ''}`} />
+                </button>
+                <button onClick={() => openModal(dev)} className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition' title='Editar Ficha'>
+                  <Edit className='w-4 h-4' />
+                </button>
+                <button onClick={() => setItemToDelete(dev.id)} className='p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition' title='Eliminar'>
+                  <Trash2 className='w-4 h-4' />
+                </button>
+              </td>
             )}
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        ))}
+        {filteredDevices.length === 0 && !isPending && (
+          <tr><td colSpan={2} className='px-6 py-12 text-center text-zinc-400'>No hay equipos registrados</td></tr>
+        )}
+      </Table>
 
-      {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-sm p-4'>
           <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-zinc-200 dark:border-zinc-800'>
-            <div className='flex justify-between items-center p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
-              <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>
-                {editingItem ? 'Editar Equipo' : 'Nuevo Equipo'}
+            <div className='flex justify-between items-center p-6 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
+              <h3 className='text-2xl font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+                <MonitorSmartphone className='w-6 h-6 text-indigo-500' />
+                {editingItem ? 'Actualizar Equipo' : 'Nuevo Modelo en Catálogo'}
               </h3>
-              <button onClick={closeModal} className='text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 p-1'>
-                <X className='w-5 h-5' />
-              </button>
+              <button onClick={closeModal} className='text-zinc-500 hover:text-zinc-800 p-1'><X className='w-6 h-6' /></button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className='p-6 space-y-5'>
-              {serverError && (
-                <div className='p-3 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-200 dark:border-red-900/30'>
-                  {serverError}
-                </div>
-              )}
-
+            <form onSubmit={handleSubmit(onSubmit)} className='p-8 space-y-6'>
+              {serverError && <div className='p-4 bg-red-50 text-red-600 text-sm font-bold uppercase rounded-lg border border-red-200'>{serverError}</div>}
               <div>
-                <label htmlFor='name' className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>
-                  Nombre del Modelo
-                </label>
+                <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Nombre / Modelo / Marca</label>
                 <input
-                  id='name'
                   type='text'
                   {...register('name')}
                   autoFocus
-                  placeholder='Ej: iPhone 15 Pro'
-                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${
-                    errors.name ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700'
-                  }`}
+                  placeholder='Ej: iPhone 15 Pro Max'
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
                 />
-                {errors.name && <p className='text-red-500 text-xs mt-1.5 font-medium'>{errors.name.message}</p>}
+                {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
               </div>
-
-              <div className='flex justify-end pt-2 gap-3'>
-                <button
-                  type='button'
-                  onClick={closeModal}
-                  className='px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg transition font-medium'
-                >
-                  Cancelar
-                </button>
-                <button
-                  type='submit'
-                  className='px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm'
-                >
-                  Guardar
-                </button>
+              <div className='flex justify-end pt-4 gap-3 border-t border-zinc-200 dark:border-zinc-800 mt-6'>
+                <Button variant='ghost' type='button' onClick={closeModal}>Cancelar</Button>
+                <Button type='submit' disabled={isPending}>Fichar Equipo</Button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {itemToDelete && (
         <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm'>
           <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-zinc-200 dark:border-zinc-800 p-6'>
             <div className='flex items-center text-red-500 mb-4'>
-              <div className='p-2 bg-red-100 dark:bg-red-500/10 rounded-full mr-3'>
-                <Trash2 className='w-6 h-6' />
-              </div>
-              <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Eliminar Equipo</h3>
+              <Trash2 className='w-6 h-6 mr-3' />
+              <h3 className='text-lg font-bold'>Eliminar Modelo</h3>
             </div>
-            <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>
-              Esta acción es permanente. Solo se recomienda si el equipo no tiene stock asociado. De lo contrario, usa la opción de desactivar.
-            </p>
+            <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>¿Confirmar eliminación física de este catálogo? Esta acción no se puede deshacer.</p>
             <div className='flex justify-end gap-3'>
-              <button
-                onClick={() => setItemToDelete(null)}
-                className='px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg transition-colors'
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDelete}
-                className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-sm'
-              >
-                Eliminar
-              </button>
+              <button onClick={() => setItemToDelete(null)} className='px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg'>Cancelar</button>
+              <button onClick={confirmDelete} className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium'>Eliminar</button>
             </div>
           </div>
         </div>

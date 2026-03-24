@@ -17,6 +17,7 @@ import {
   Moon,
   LogOut,
   UserCog,
+  X,
 } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/auth.store';
@@ -60,14 +61,22 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     : navigation;
 
   const SidebarContent = () => (
-    <div className='flex h-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors'>
-      <div className='p-6 flex items-center shrink-0'>
-        <div className='w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3'>
-          <Package className='text-white w-5 h-5' />
+    <div className='flex h-full w-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors relative'>
+      <div className='p-6 flex items-center justify-between shrink-0'>
+        <div className='flex items-center'>
+          <div className='w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3'>
+            <Package className='text-white w-5 h-5' />
+          </div>
+          <span className='font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100 uppercase'>
+            StockApp
+          </span>
         </div>
-        <span className='font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100'>
-          StockApp
-        </span>
+        <button 
+          onClick={() => setIsMobileMenuOpen(false)}
+          className='lg:hidden p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
+        >
+          <X className='w-6 h-6' />
+        </button>
       </div>
 
       <nav className='flex-1 space-y-1 px-4 mt-6 overflow-y-auto custom-scrollbar'>
@@ -78,7 +87,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               key={item.name}
               href={item.href}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${
+              className={`flex items-center px-3 py-2.5 text-md font-medium rounded-lg transition-all ${
                 isActive
                   ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400'
                   : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200'
@@ -101,10 +110,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           className='w-full flex items-center justify-between px-3 py-2 text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:text-zinc-400 dark:hover:bg-red-500/10 transition-colors rounded-lg group'
         >
           <div className='flex flex-col text-left'>
-            <span className='text-sm font-medium group-hover:text-red-600 dark:group-hover:text-red-400'>
+            <span className='text-md font-medium group-hover:text-red-600 dark:group-hover:text-red-400'>
               Cerrar sesión
             </span>
-            <span className='text-xs opacity-70'>
+            <span className='text-sm opacity-70'>
               {user?.username} ({user?.role})
             </span>
           </div>
@@ -132,7 +141,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
-              className='fixed inset-y-0 left-0 w-72 z-50 lg:hidden'
+              className='fixed inset-y-0 left-0 w-[320px] z-50 lg:hidden'
             >
               <SidebarContent />
             </motion.div>
@@ -141,14 +150,14 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <div className='hidden lg:flex lg:shrink-0 lg:w-72'>
+      <div className='hidden lg:flex lg:shrink-0 lg:w-80 no-print'>
         <SidebarContent />
       </div>
 
       {/* Main Column */}
       <div className='flex flex-col flex-1 min-w-0 overflow-hidden'>
         {/* Top Header */}
-        <header className='shrink-0 h-16 flex items-center justify-between px-4 lg:px-8 transition-colors bg-transparent border-none'>
+        <header className='shrink-0 h-16 flex items-center justify-between px-4 lg:px-8 transition-colors bg-transparent border-none no-print'>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className='lg:hidden p-2 -ml-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-100'
@@ -197,7 +206,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
                 </div>
                 <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Cerrar sesión</h3>
               </div>
-              <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>
+              <p className='text-zinc-500 dark:text-zinc-400 text-md mb-6'>
                 ¿Estás seguro de que deseas salir del panel de control? Tendrás que volver a ingresar tus credenciales.
               </p>
               <div className='flex justify-end gap-3'>

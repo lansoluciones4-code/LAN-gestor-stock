@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, Plus, Edit, Trash2, X, DollarSign, PackageOpen } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, X, DollarSign, PackageOpen, PlusCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { productSchema, productDefSchema, type ProductInput, type ProductDef } from '@/schemas/product.schema';
 import { type ProviderDef } from '@/schemas/provider.schema';
 import { type DeviceDef } from '@/schemas/device.schema';
@@ -170,13 +171,13 @@ export function ProductManager({
 
       {/* Grid Container */}
       <div className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar'>
-        <table className='w-full text-sm text-left text-zinc-600 dark:text-zinc-400'>
-          <thead className='sticky top-0 z-10 text-xs uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
+        <table className='w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400'>
+          <thead className='sticky top-0 z-10 text-sm uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
             <tr>
               <th scope='col' className='px-6 py-4'>Equipo y Detalle</th>
               <th scope='col' className='px-6 py-4'>Stock</th>
               <th scope='col' className='px-6 py-4'>Precio Público</th>
-              {role === 'admin' && <th scope='col' className='px-6 py-4'>Costo (Admin)</th>}
+              {role === 'admin' && <th scope='col' className='px-6 py-4'>Costo</th>}
               <th scope='col' className='px-6 py-4'>Proveedor</th>
               {role === 'admin' && <th scope='col' className='px-6 py-4 text-right'>Acciones</th>}
             </tr>
@@ -230,9 +231,9 @@ export function ProductManager({
       {isModalOpen && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-sm p-4 overflow-y-auto'>
           <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 m-auto'>
-            <div className='flex justify-between items-center p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
-              <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
-                <PackageOpen className='w-5 h-5 text-indigo-500'/>
+            <div className='flex justify-between items-center p-6 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
+              <h3 className='text-2xl font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+                <PackageOpen className='w-6 h-6 text-indigo-500'/>
                 {editingItem ? 'Editar Producto / Stock' : 'Añadir Nuevo Lote de Stock'}
               </h3>
               <button onClick={closeModal} className='text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 p-1'>
@@ -240,16 +241,16 @@ export function ProductManager({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className='p-6 space-y-5'>
+            <form onSubmit={handleSubmit(onSubmit)} className='p-8 space-y-6'>
               {serverError && (
-                <div className='p-3 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-200 dark:border-red-900/30'>
+                <div className='p-4 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 text-sm font-bold uppercase rounded-lg border border-red-200 dark:border-red-900/30'>
                   {serverError}
                 </div>
               )}
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='col-span-1 md:col-span-2'>
-                  <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Modelo / Equipo</label>
+                  <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Modelo / Equipo</label>
                   <select
                     {...register('deviceId')}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${
