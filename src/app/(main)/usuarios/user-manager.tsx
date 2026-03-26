@@ -214,15 +214,15 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
                   <button 
                     disabled={currentSession?.id === u.id}
                     onClick={() => handleToggleActive(u)} 
-                    className={`p-2 rounded-lg transition ${currentSession?.id === u.id ? 'opacity-20 cursor-not-allowed' : (u.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10')}`} 
+                    className={`hidden p-2 rounded-lg transition ${currentSession?.id === u.id ? 'opacity-20 cursor-not-allowed' : (u.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10')}`} 
                     title={u.isActive ? 'Desactivar Usuario' : 'Activar Usuario'}
                   >
                     <Plus className={`w-4 h-4 ${u.isActive ? 'rotate-45' : ''}`} />
                   </button>
-                  <button onClick={() => openModal(u)} className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition' title='Editar Seguridad'>
+                  <button onClick={() => openModal(u)} className='hidden p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition' title='Editar Seguridad'>
                     <Edit className='w-4 h-4' />
                   </button>
-                  <button onClick={() => setItemToDelete(u.id)} disabled={currentSession?.id === u.id} className={`p-2 rounded-lg transition ${currentSession?.id === u.id ? 'opacity-30 cursor-not-allowed text-zinc-500' : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'}`} title='Retirar Acceso'>
+                  <button onClick={() => setItemToDelete(u.id)} disabled={currentSession?.id === u.id} className={`hidden p-2 rounded-lg transition ${currentSession?.id === u.id ? 'opacity-30 cursor-not-allowed text-zinc-500' : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'}`} title='Retirar Acceso'>
                     <Trash2 className='w-4 h-4' />
                   </button>
                 </td>
