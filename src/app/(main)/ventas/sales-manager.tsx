@@ -47,7 +47,9 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
 
   // --- New Sale State ---
   const [cart, setCart] = useState<any[]>([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(
+    initialCustomers.find((c) => c.name.toLowerCase() === 'mostrador')?.id || ''
+  );
   const [saleSearch, setSaleSearch] = useState('');
   const [selectedSaleForPrint, setSelectedSaleForPrint] = useState<SaleDef | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
@@ -110,7 +112,7 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
   const cartTotal = cart.reduce((acc, i) => acc + i.subtotal, 0);
 
   const handleCreateSale = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || !selectedCustomerId) return;
     startTransition(async () => {
       const result = await createSaleAction({
         customerId: selectedCustomerId || undefined,
@@ -125,7 +127,7 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
       if (result.success) {
         setGlobalMessage({ type: 'success', text: result.message });
         setCart([]);
-        setSelectedCustomerId('');
+        setSelectedCustomerId(initialCustomers.find((c) => c.name.toLowerCase() === 'mostrador')?.id || initialCustomers[0]?.id || '');
         setShowMobileCart(false);
         setView('list');
         loadData();
@@ -144,7 +146,7 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
   const filteredSales = useMemo(() => {
     return sales.filter((s) => {
        const term = searchTerm.toLowerCase();
-       const matchesSearch = (s.customer?.name || 'Mostrador').toLowerCase().includes(term) || (s.vendor?.username || '').toLowerCase().includes(term);
+       const matchesSearch = (s.customer?.name || 'Consumidor Final').toLowerCase().includes(term) || (s.vendor?.username || '').toLowerCase().includes(term);
        const saleTime = new Date(s.createdAt).getTime();
 
        let matchesStart = true;
@@ -344,8 +346,11 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
             <div className='p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4'>
               <div>
                 <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Cliente</label>
-                <select className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm font-medium' value={selectedCustomerId} onChange={(e) => setSelectedCustomerId(e.target.value)}>
-                    <option value=''>Mostrador (Consumidor Final)</option>
+                <select 
+                  className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm font-medium' 
+                  value={selectedCustomerId} 
+                  onChange={(e) => setSelectedCustomerId(e.target.value)}
+                >
                     {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
@@ -353,7 +358,7 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
                  <span className='text-[10px] text-zinc-400 uppercase font-black'>Total</span>
                  <span className='text-2xl text-emerald-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
               </div>
-              <Button fullWidth onClick={handleCreateSale} disabled={cart.length === 0 || isPending}>
+              <Button fullWidth onClick={handleCreateSale} disabled={cart.length === 0 || !selectedCustomerId || isPending}>
                  {isPending ? 'Facturando...' : 'Finalizar Venta'}
               </Button>
             </div>
@@ -399,11 +404,21 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
                   ))}
                 </div>
                 <div className='p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-10'>
-                    <div className='flex justify-between items-center text-2xl font-black'>
+                    <div className='space-y-1.5'>
+                      <label className='text-[10px] font-black uppercase text-zinc-400 tracking-widest block'>Cliente Seleccionado</label>
+                      <select 
+                        className='w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500'
+                        value={selectedCustomerId}
+                        onChange={(e) => setSelectedCustomerId(e.target.value)}
+                      >
+                         {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div className='flex justify-between items-center text-2xl font-black pt-2'>
                       <span className='text-[10px] text-zinc-400 uppercase tracking-widest'>Total</span>
                       <span className='text-emerald-600 font-black'>${cartTotal.toLocaleString('es-AR')}</span>
                     </div>
-                    <Button fullWidth onClick={handleCreateSale} disabled={cart.length === 0 || isPending}>
+                    <Button fullWidth onClick={handleCreateSale} disabled={cart.length === 0 || !selectedCustomerId || isPending}>
                        {isPending ? '...' : 'Confirmar Venta'}
                     </Button>
                 </div>
@@ -459,7 +474,7 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
                {new Date(sale.createdAt).toLocaleDateString('es-AR')}
             </td>
             <td className='px-6 py-4 text-sm'>
-               {sale.customer?.name || 'Cliente Final'}
+               {sale.customer?.name || 'Consumidor Final'}
             </td>
             <td className='px-6 py-4'>
               <span className='px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[13px] font-bold rounded uppercase'>
