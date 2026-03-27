@@ -150,7 +150,29 @@ export const auditLogs = pgTable(
   ]
 );
 
-export const productsRelations = relations(products, ({ one }) => ({
+export const productLosses = pgTable(
+  'product_losses',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    quantity: integer('quantity').notNull(),
+    reason: varchar('reason', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('loss_product_id_idx').on(table.productId),
+    index('loss_user_id_idx').on(table.userId),
+  ]
+);
+
+export const productsRelations = relations(products, ({ one, many }) => ({
   device: one(devices, {
     fields: [products.deviceId],
     references: [devices.id],
@@ -163,6 +185,7 @@ export const productsRelations = relations(products, ({ one }) => ({
     fields: [products.customerId],
     references: [customers.id],
   }),
+  losses: many(productLosses),
 }));
 
 export const salesRelations = relations(sales, ({ one, many }) => ({
@@ -175,6 +198,17 @@ export const salesRelations = relations(sales, ({ one, many }) => ({
     references: [users.id],
   }),
   items: many(saleItems),
+}));
+
+export const productLossesRelations = relations(productLosses, ({ one }) => ({
+  product: one(products, {
+    fields: [productLosses.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [productLosses.userId],
+    references: [users.id],
+  }),
 }));
 
 export const saleItemsRelations = relations(saleItems, ({ one }) => ({
@@ -191,6 +225,7 @@ export const saleItemsRelations = relations(saleItems, ({ one }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   sales: many(sales),
   logs: many(auditLogs),
+  losses: many(productLosses),
 }));
 
 export const devicesRelations = relations(devices, ({ many }) => ({
@@ -212,3 +247,4 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
     references: [users.id],
   }),
 }));
+

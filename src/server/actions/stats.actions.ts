@@ -2,7 +2,7 @@
 
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { db } from '@/lib/db';
-import { sales, products, saleItems } from '@/lib/db/schema';
+import { sales, products, saleItems, productLosses } from '@/lib/db/schema';
 import { sum, count, gte, lte, and, eq } from 'drizzle-orm';
 
 export async function fetchDashboardStats(startDate?: string, endDate?: string) {
@@ -21,23 +21,25 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       .from(products);
 
     // 2. Fetch Sales in range with their items to calculate Net Profit
-    const salesWithItems = await db.query.sales.findMany({
-      where: and(
-        gte(sales.createdAt, start),
-        lte(sales.createdAt, end)
-      ),
-      with: {
-        vendor: true,
-        items: {
-          with: {
-            product: true
-          }
+    const [salesWithItems, lossesWithProducts] = await Promise.all([
+      db.query.sales.findMany({
+        where: and(gte(sales.createdAt, start), lte(sales.createdAt, end)),
+        with: {
+          vendor: true,
+          items: { with: { product: true } }
+        },
+      }),
+      db.query.productLosses.findMany({
+        where: and(gte(productLosses.createdAt, start), lte(productLosses.createdAt, end)),
+        with: {
+          product: true
         }
-      },
-    });
+      })
+    ]);
 
     let totalRevenue = 0;
     let totalCostOfGoodsSold = 0;
+    let totalLossCost = 0;
 
     const sellerMap: Record<string, { username: string; total: number; count: number }> = {};
 
@@ -60,7 +62,14 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       sellerMap[vendorId].count += 1;
     });
 
-    const netProfit = totalRevenue - totalCostOfGoodsSold;
+    // Calculate Losses Cost
+    lossesWithProducts.forEach((l: any) => {
+      const purchasePrice = Number(l.product?.purchasePrice || 0);
+      totalLossCost += (purchasePrice * (l.quantity || 0));
+    });
+
+    // Net Profit = Revenue - COGS - Losses
+    const netProfit = totalRevenue - totalCostOfGoodsSold - totalLossCost;
 
     // 3. Current Inventory Cost (Investment - actual physical stock)
     const allProducts = await db.select().from(products);
@@ -76,6 +85,7 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         totalRevenue,
         currentInventoryCost,
         netProfit,
+        totalLossCost,
         topSellers,
         salesCount: salesWithItems.length,
       }

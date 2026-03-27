@@ -16,6 +16,8 @@ import {
 } from '@/server/actions/customer.actions';
 import { useAuthStore } from '@/stores/auth.store';
 
+import { CustomerModal } from '@/components/modals/customer-modal';
+
 export function CustomerManager({ initialData }: { initialData: CustomerDef[] }) {
   const role = useAuthStore((s) => s.user?.role);
   const [customers, setCustomers] = useState<CustomerDef[]>(initialData);
@@ -25,14 +27,9 @@ export function CustomerManager({ initialData }: { initialData: CustomerDef[] })
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CustomerDef | null>(null);
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [globalMessage, setGlobalMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CustomerInput>({
-    resolver: zodResolver(customerSchema),
-  });
 
   const loadData = async (includeInactive = showInactive) => {
     startTransition(async () => {
@@ -50,34 +47,17 @@ export function CustomerManager({ initialData }: { initialData: CustomerDef[] })
   });
 
   const openModal = (item?: CustomerDef) => {
-    setServerError(null);
-    if (item) {
-      setEditingItem(item);
-      reset({ name: item.name, phone: item.phone || '', email: item.email || '', documentNumber: item.documentNumber || '' });
-    } else {
-      setEditingItem(null);
-      reset({ name: '', phone: '', email: '', documentNumber: '' });
-    }
+    setEditingItem(item || null);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    reset();
+    setEditingItem(null);
   };
 
-  const onSubmit = async (data: CustomerInput) => {
-    setServerError(null);
-    const action = editingItem ? updateCustomerAction(editingItem.id!, data) : createCustomerAction(data);
-    const result = await action;
-
-    if (!result.success) {
-      setServerError(result.message);
-      return;
-    }
-
-    closeModal();
-    setGlobalMessage({ type: 'success', text: result.message });
+  const handleSuccess = (data: any) => {
+    setGlobalMessage({ type: 'success', text: editingItem ? 'Cliente actualizado' : 'Cliente registrado' });
     setTimeout(() => setGlobalMessage(null), 3000);
     loadData();
   };
@@ -174,61 +154,12 @@ export function CustomerManager({ initialData }: { initialData: CustomerDef[] })
         )}
       </Table>
 
-      {isModalOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-sm p-4 overflow-y-auto'>
-          <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-zinc-200 dark:border-zinc-800 m-auto'>
-            <div className='flex justify-between items-center p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
-              <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
-                <Users className='w-5 h-5 text-indigo-500'/>
-                {editingItem ? 'Editar Ficha Cliente' : 'Nuevo Registro de Cliente'}
-              </h3>
-              <button onClick={closeModal} className='text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 p-1'>
-                <X className='w-5 h-5' />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit(onSubmit)} className='p-6 space-y-5'>
-              {serverError && <div className='p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200'>{serverError}</div>}
-
-              <div>
-                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Nombre Completo / Razón Social</label>
-                <input
-                  type='text'
-                  {...register('name')}
-                  placeholder='Ej: Carlos Sanchez'
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
-                />
-                {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
-              </div>
-
-              <div>
-                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>
-                  DNI / CUIT <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='text'
-                  {...register('documentNumber')}
-                  placeholder='DNI del cliente...'
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.documentNumber ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
-                />
-                {errors.documentNumber && <p className='text-red-500 text-xs mt-1.5'>{errors.documentNumber.message}</p>}
-              </div>
-
-              <div>
-                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Teléfono Contacto</label>
-                <input type='text' {...register('phone')} placeholder='Móvil o Fijo...' className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm' />
-              </div>
-
-              <div className='flex justify-end pt-4 gap-3 border-t border-zinc-200 dark:border-zinc-800 mt-6'>
-                <Button variant='ghost' type='button' onClick={closeModal}>Cancelar</Button>
-                <Button type='submit' disabled={isPending}>
-                   {editingItem ? 'Actualizar Ficha' : 'Guardar Cliente'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CustomerModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal} 
+        editingItem={editingItem}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

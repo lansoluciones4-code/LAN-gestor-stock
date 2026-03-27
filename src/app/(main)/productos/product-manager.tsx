@@ -14,8 +14,11 @@ import {
   updateProductAction,
   deleteProductAction,
   fetchProducts,
+  registerProductLossAction,
 } from '@/server/actions/product.actions';
 import { useAuthStore } from '@/stores/auth.store';
+import { Combobox } from '@/components/ui/combobox';
+import { PackageX } from 'lucide-react';
 
 
 export function ProductManager({
@@ -39,6 +42,10 @@ export function ProductManager({
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [lossProduct, setLossProduct] = useState<ProductDef | null>(null);
+  const [lossQuantity, setLossQuantity] = useState<string>('1');
+  const [lossReason, setLossReason] = useState<string>('');
+  const [showZeroStock, setShowZeroStock] = useState(true);
   const [globalMessage, setGlobalMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
 
   const {
@@ -46,10 +53,15 @@ export function ProductManager({
     handleSubmit,
     reset,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
-    defaultValues: { stock: 1, purchasePrice: 0, salePrice: 0 },
+    defaultValues: { stock: 1, purchasePrice: 0, salePrice: 0, deviceId: '', providerId: '' },
   });
+
+  const selectedDeviceId = watch('deviceId');
+  const selectedProviderId = watch('providerId');
 
   const loadData = async () => {
     startTransition(async () => {
@@ -74,8 +86,39 @@ export function ProductManager({
 
     const matchesPrice = p.salePrice >= min && p.salePrice <= max;
 
-    return matchesSearch && matchesPrice;
+    const matchesStock = showZeroStock || p.stock > 0;
+
+    return matchesSearch && matchesPrice && matchesStock;
   });
+
+  const handleRegisterLoss = async () => {
+    if (!lossProduct) return;
+    const qty = parseInt(lossQuantity);
+    if (!qty || qty <= 0) {
+      setServerError('La cantidad debe ser mayor a 0');
+      return;
+    }
+    if (qty > (lossProduct.stock || 0)) {
+      setServerError('No puedes reportar más pérdida que el stock disponible');
+      return;
+    }
+    
+    setServerError(null);
+
+    const result = await registerProductLossAction(lossProduct.id, qty, lossReason);
+    
+    if (!result.success) {
+      setServerError(result.message);
+      return;
+    }
+
+    setLossProduct(null);
+    setLossQuantity('1');
+    setLossReason('');
+    setGlobalMessage({ type: 'success', text: result.message });
+    setTimeout(() => setGlobalMessage(null), 3000);
+    loadData();
+  };
 
   const openModal = (item?: ProductDef) => {
     setServerError(null);
@@ -180,13 +223,24 @@ export function ProductManager({
           </div>
         </div>
         {role === 'admin' && (
-          <button
-            onClick={() => openModal()}
-            className='flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap'
-          >
-            <Plus className='w-5 h-5 mr-2' />
-            Ingresar Stock
-          </button>
+          <div className='flex items-center gap-4'>
+            <label className='flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors shadow-sm'>
+              <input 
+                type='checkbox' 
+                checked={showZeroStock} 
+                onChange={(e) => setShowZeroStock(e.target.checked)}
+                className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300'
+              />
+              <span className='text-sm font-medium text-zinc-600 dark:text-zinc-400 select-none'>Ver sin stock</span>
+            </label>
+            <button
+              onClick={() => openModal()}
+              className='flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-sm whitespace-nowrap'
+            >
+              <Plus className='w-5 h-5 mr-2' />
+              Ingresar Stock
+            </button>
+          </div>
         )}
       </div>
 
@@ -240,6 +294,17 @@ export function ProductManager({
                 </td>
                 {role === 'admin' && (
                   <td className='px-6 py-4 flex gap-2 justify-end'>
+                    <button onClick={() => {
+                        setLossProduct(p);
+                        setLossQuantity('1');
+                        setLossReason('');
+                        setServerError(null);
+                      }} 
+                      className='p-2 text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition' 
+                      title='Registrar Pérdida'
+                    >
+                      <PackageX className='w-4 h-4' />
+                    </button>
                     <button onClick={() => openModal(p)} className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition' title='Editar'>
                       <Edit className='w-4 h-4' />
                     </button>
@@ -284,33 +349,25 @@ export function ProductManager({
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <div className='col-span-1 md:col-span-2'>
                   <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Modelo / Equipo</label>
-                  <select
-                    {...register('deviceId')}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${
-                      errors.deviceId ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700'
-                    }`}
-                  >
-                    <option value=''>Seleccionar Equipo</option>
-                    {devices.map(d => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </select>
+                  <Combobox 
+                    options={devices.map(d => ({ id: d.id, name: d.name }))}
+                    value={selectedDeviceId}
+                    onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
+                    placeholder="Seleccionar Equipo"
+                    searchPlaceholder="Buscar modelo..."
+                  />
                   {errors.deviceId && <p className='text-red-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
                 </div>
 
                 <div className='col-span-1 md:col-span-2'>
                   <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Proveedor Entrante</label>
-                  <select
-                    {...register('providerId')}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${
-                      errors.providerId ? 'border-red-500 focus:ring-red-500' : 'border-zinc-300 dark:border-zinc-700'
-                    }`}
-                  >
-                    <option value=''>Seleccionar Proveedor</option>
-                    {suppliers.map(s => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </select>
+                  <Combobox 
+                    options={suppliers.map(s => ({ id: s.id, name: s.name }))}
+                    value={selectedProviderId}
+                    onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
+                    placeholder="Seleccionar Proveedor"
+                    searchPlaceholder="Buscar proveedor..."
+                  />
                   {errors.providerId && <p className='text-red-500 text-xs mt-1.5'>{errors.providerId.message}</p>}
                 </div>
 
@@ -409,6 +466,64 @@ export function ProductManager({
               >
                 Purgar Stock
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Loss Registration Modal */}
+      {lossProduct && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm overflow-y-auto'>
+          <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-zinc-200 dark:border-zinc-800 m-auto'>
+            <div className='flex justify-between items-center p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
+              <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+                <PackageX className='w-5 h-5 text-amber-500'/>
+                Registrar Pérdida
+              </h3>
+              <button onClick={() => setLossProduct(null)} className='text-zinc-500 p-1'><X className='w-5 h-5' /></button>
+            </div>
+            <div className='p-6 space-y-4'>
+              {serverError && <div className='p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200'>{serverError}</div>}
+              
+              <div className='p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg'>
+                <p className='text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1'>Producto</p>
+                <p className='text-sm font-bold'>{lossProduct.device?.name} - {lossProduct.description}</p>
+                <p className='text-xs text-zinc-500 mt-1'>Stock actual: {lossProduct.stock} Uds</p>
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Cantidad perdida</label>
+                <input 
+                  type='text' 
+                  value={lossQuantity}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '' || /^[0-9]*$/.test(val)) {
+                      setLossQuantity(val);
+                    }
+                  }}
+                  className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Motivo / Razón</label>
+                <textarea 
+                  placeholder='Ej: Se rompió durante el traslado, falla de fábrica detectada...'
+                  value={lossReason}
+                  onChange={(e) => setLossReason(e.target.value)}
+                  className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[100px] text-sm transition-colors'
+                />
+              </div>
+
+              <div className='flex justify-end pt-4 gap-3 border-t border-zinc-200 dark:border-zinc-800'>
+                <button onClick={() => setLossProduct(null)} className='px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors'>Cancelar</button>
+                <button 
+                  onClick={handleRegisterLoss}
+                  className='px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors font-bold shadow-sm'
+                >
+                  Confirmar Pérdida
+                </button>
+              </div>
             </div>
           </div>
         </div>

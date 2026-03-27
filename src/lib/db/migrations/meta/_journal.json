@@ -22,6 +22,13 @@
       "when": 1774313730535,
       "tag": "0002_classy_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774627884769,
+      "tag": "0003_woozy_senator_kelly",
+      "breakpoints": true
     }
   ]
 }

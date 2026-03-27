@@ -70,48 +70,56 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 shrink-0'>
-        <div className='bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 shrink-0'>
+        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
            <div className='flex justify-between items-start mb-4'>
-             <div className='p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg'><DollarSign className='w-6 h-6 text-indigo-600' /></div>
-             <span className='text-xs font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 px-2 py-0.5 rounded-full'>BRUTO</span>
+             <div className='p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg'><DollarSign className='w-5 h-5 text-indigo-600' /></div>
+             <span className='text-[10px] font-bold text-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter'>Ingresos</span>
            </div>
-           <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Ventas Totales</span>
-           <span className='text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.totalRevenue?.toLocaleString('es-AR') || '0'}</span>
+           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Bruto Ventas</span>
+           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.totalRevenue?.toLocaleString('es-AR') || '0'}</span>
         </div>
 
-        <div className='bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-indigo-200 dark:border-indigo-800 shadow-md shadow-indigo-50 dark:shadow-none flex flex-col ring-2 ring-indigo-500/5'>
+        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-indigo-200 dark:border-indigo-800 shadow-md shadow-indigo-50 dark:shadow-none flex flex-col ring-2 ring-indigo-500/5'>
            <div className='flex justify-between items-start mb-4'>
-             <div className='p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg'><TrendingUp className='w-6 h-6 text-emerald-600' /></div>
-             <span className='text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1'><ArrowUpRight className='w-3 h-3'/> NETO</span>
+             <div className='p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg'><TrendingUp className='w-5 h-5 text-emerald-600' /></div>
+             <span className='text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1'><ArrowUpRight className='w-3 h-3'/> NETO</span>
            </div>
-           <span className='text-xs font-black uppercase text-indigo-500 tracking-widest'>Ganancia Real</span>
-           <span className='text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.netProfit?.toLocaleString('es-AR') || '0'}</span>
+           <span className='text-[10px] font-black uppercase text-indigo-500 tracking-widest leading-none'>Ganancia Real</span>
+           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.netProfit?.toLocaleString('es-AR') || '0'}</span>
         </div>
 
-        <div className='bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
+        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
            <div className='flex justify-between items-start mb-4'>
-             <div className='p-2 bg-rose-50 dark:bg-rose-500/10 rounded-lg'><TrendingDown className='w-6 h-6 text-rose-600' /></div>
-             <span className='text-xs font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full'>STOCKED</span>
+             <div className='p-2 bg-rose-50 dark:bg-rose-500/10 rounded-lg'><TrendingDown className='w-5 h-5 text-rose-600' /></div>
+             <span className='text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full'>COSTO</span>
            </div>
-           <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Inversión en Depósito</span>
-           <span className='text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.currentInventoryCost?.toLocaleString('es-AR') || '0'}</span>
+           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Pérdidas Totales</span>
+           <span className='text-xl font-black text-rose-600 dark:text-rose-400 mt-1'>-${stats?.totalLossCost?.toLocaleString('es-AR') || '0'}</span>
         </div>
 
-        <div className='bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
+        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
            <div className='flex justify-between items-start mb-4'>
-             <div className='p-2 bg-amber-50 dark:bg-amber-500/10 rounded-lg'><Package className='w-6 h-6 text-amber-600' /></div>
+             <div className='p-2 bg-zinc-50 dark:bg-zinc-500/10 rounded-lg'><Package className='w-5 h-5 text-zinc-600' /></div>
            </div>
-           <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Unidades Físicas</span>
-           <span className='text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>{stats?.totalEquipos || '0'} <small className='text-xs font-normal opacity-40 ml-1'>unid.</small></span>
+           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Valor en Stock</span>
+           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.currentInventoryCost?.toLocaleString('es-AR') || '0'}</span>
         </div>
 
-        <div className='bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
+        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
            <div className='flex justify-between items-start mb-4'>
-             <div className='p-2 bg-zinc-50 dark:bg-zinc-500/10 rounded-lg'><Briefcase className='w-6 h-6 text-zinc-600' /></div>
+             <div className='p-2 bg-zinc-50 dark:bg-zinc-500/10 rounded-lg'><Activity className='w-5 h-5 text-amber-500' /></div>
            </div>
-           <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Órdenes Procesadas</span>
-           <span className='text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>{stats?.salesCount || '0'} <small className='text-xs font-normal opacity-40 ml-1'>ventas</small></span>
+           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Unidades Físicas</span>
+           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>{stats?.totalEquipos || '0'}</span>
+        </div>
+
+        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
+           <div className='flex justify-between items-start mb-4'>
+             <div className='p-2 bg-zinc-50 dark:bg-zinc-500/10 rounded-lg'><Briefcase className='w-5 h-5 text-zinc-600' /></div>
+           </div>
+           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Órdenes Procesadas</span>
+           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>{stats?.salesCount || '0'}</span>
         </div>
       </div>
 
@@ -158,32 +166,44 @@ export default function DashboardPage() {
         </div>
 
         {/* Informative Grid */}
-        <div className='lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6'>
-           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800'>
+        <div className='lg:col-span-12 grid grid-cols-1 md:grid-cols-4 gap-6 px-2 pb-6'>
+           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
               <div className='flex items-center gap-3 mb-4'>
                  <Clock className='w-5 h-5 text-indigo-500' />
                  <h4 className='font-bold text-sm'>Actividad Reciente</h4>
               </div>
               <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-                El inventario actual cuenta con <strong>{stats?.totalEquipos}</strong> unidades operativas distribuidas en <strong>{stats?.totalModels}</strong> modelos de equipos diferentes.
+                El inventario actual cuenta con <strong>{stats?.totalEquipos}</strong> unidades operativas distribuidas en <strong>{stats?.totalModels}</strong> modelos diferentes.
               </p>
            </div>
-           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800'>
+           
+           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
               <div className='flex items-center gap-3 mb-4'>
                  <ArrowUpRight className='w-5 h-5 text-emerald-500' />
                  <h4 className='font-bold text-sm'>Rendimiento Operativo</h4>
               </div>
               <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-                Se han procesado exitosamente <strong>{stats?.salesCount}</strong> órdenes de venta, lo que genera una ganancia bruta proyectada de <strong>${stats?.totalRevenue?.toLocaleString('es-AR')}</strong>.
+                Se han procesado <strong>{stats?.salesCount}</strong> órdenes de venta, generando una ganancia bruta de <strong>${stats?.totalRevenue?.toLocaleString('es-AR')}</strong>.
               </p>
            </div>
-           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800'>
+
+           <div className='bg-rose-50/50 dark:bg-rose-900/10 p-6 rounded-2xl border border-rose-100 dark:border-rose-900/30 transition-all hover:border-rose-200 dark:hover:border-rose-900/50'>
+              <div className='flex items-center gap-3 mb-4'>
+                 <TrendingDown className='w-5 h-5 text-rose-500' />
+                 <h4 className='font-bold text-sm text-rose-800 dark:text-rose-400'>Impacto de Pérdidas</h4>
+              </div>
+              <p className='text-xs text-rose-600/80 dark:text-rose-400/80 leading-relaxed font-medium'>
+                Se han registrado mermas por un valor acumulado de <strong>${stats?.totalLossCost?.toLocaleString('es-AR')}</strong>, afectando el margen neto final.
+              </p>
+           </div>
+
+           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
               <div className='flex items-center gap-3 mb-4'>
                  <Briefcase className='w-5 h-5 text-amber-500' />
                  <h4 className='font-bold text-sm'>Inversión en Activos</h4>
               </div>
               <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-                El capital total invertido y actualmente retenido en stock físico asciende a <strong>${stats?.currentInventoryCost?.toLocaleString('es-AR')}</strong>.
+                El capital total actualmente retenido en stock físico (mercadería disponible) asciende a <strong>${stats?.currentInventoryCost?.toLocaleString('es-AR')}</strong>.
               </p>
            </div>
         </div>
