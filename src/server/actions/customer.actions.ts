@@ -57,7 +57,7 @@ export async function createCustomerAction(input: CustomerInput) {
       { name: newCustomer.name }
     );
 
-    return { success: true, message: 'Cliente registrado exitosamente' };
+    return { success: true, message: 'Cliente registrado exitosamente', data: newCustomer };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al guardar cliente' };
   }
@@ -69,7 +69,7 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
     const parsed = customerSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    await customerRepository.updateCustomer(id, parsed.data);
+    const updated = await customerRepository.updateCustomer(id, parsed.data);
     revalidatePath('/clientes');
     revalidatePath('/ventas');
 
@@ -81,7 +81,7 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
       { name: input.name }
     );
 
-    return { success: true, message: 'Cliente actualizado exitosamente' };
+    return { success: true, message: 'Cliente actualizado exitosamente', data: updated };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al actualizar cliente' };
   }

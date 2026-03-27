@@ -12,7 +12,8 @@ import {
   PlusCircle,
   X,
   Search,
-  Calendar
+  Calendar,
+  UserPlus
 } from 'lucide-react';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Table } from '@/components/ui/table';
@@ -22,7 +23,10 @@ import { type CustomerDef } from '@/schemas/customer.schema';
 import { type ProductDef } from '@/schemas/product.schema';
 import { createSaleAction, deleteSaleAction, fetchSales } from '@/server/actions/sale.actions';
 import { fetchProducts } from '@/server/actions/product.actions';
+import { fetchCustomers } from '@/server/actions/customer.actions';
 import { useAuthStore } from '@/stores/auth.store';
+import { Combobox } from '@/components/ui/combobox';
+import { CustomerModal } from '@/components/modals/customer-modal';
 
 interface SalesManagerProps {
   initialSales: SaleDef[];
@@ -34,7 +38,6 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
   const role = useAuthStore((s) => s.user?.role);
   const [view, setView] = useState<'list' | 'new'>('list');
   const [sales, setSales] = useState<SaleDef[]>(initialSales);
-  const [customers] = useState<CustomerDef[]>(initialCustomers);
   const [products, setProducts] = useState<ProductDef[]>(initialProducts);
   
   const [isPending, startTransition] = useTransition();
@@ -42,6 +45,9 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [globalMessage, setGlobalMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+
+  const [customers, setCustomers] = useState<CustomerDef[]>(initialCustomers);
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
@@ -56,12 +62,14 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
 
   const loadData = async () => {
     startTransition(async () => {
-      const [updatedS, updatedP] = await Promise.all([
+      const [updatedS, updatedP, updatedC] = await Promise.all([
         fetchSales(),
-        fetchProducts()
+        fetchProducts(),
+        fetchCustomers()
       ]);
       setSales(updatedS);
       setProducts(updatedP);
+      setCustomers(updatedC);
     });
   };
 
@@ -139,6 +147,7 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
   };
 
   const filteredProducts = products.filter((p) => {
+    if (p.stock <= 0) return false;
     const term = saleSearch.toLowerCase();
     return p.device?.name.toLowerCase().includes(term) || (p.description && p.description.toLowerCase().includes(term));
   });
@@ -186,8 +195,14 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
     return (
       <div className='flex flex-col h-full space-y-4 animate-in fade-in duration-300 overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-1'>
         <div className='flex items-center justify-between sticky top-4 bg-white dark:bg-zinc-900 px-4 py-3 z-30 border-b border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl mx-2'>
-          <Button variant='ghost' size='sm' onClick={() => setSelectedSaleForPrint(null)} leftIcon={<ArrowLeft className='w-4 h-4'/>}>
-             Volver
+          <Button 
+            variant='secondary' 
+            size='sm' 
+            onClick={() => setSelectedSaleForPrint(null)} 
+            leftIcon={<ArrowLeft className='w-4 h-4'/>}
+            className='font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md'
+          >
+            Volver
           </Button>
           <div className='flex gap-2 shrink-0'>
             <Button size='sm' variant='secondary' onClick={() => window.print()} leftIcon={<Printer className='w-4 h-4'/>}>
@@ -315,8 +330,21 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
 
           {/* Desktop Cart */}
           <div className='hidden lg:flex lg:col-span-5 flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shrink-0 shadow-sm'>
-            <div className='p-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex justify-between items-center'>
-              <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Resumen de Items</span>
+            <div className='p-5 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 space-y-4'>
+              <div>
+                <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-2'>Cliente de la Operación</label>
+                <Combobox 
+                  options={customers.map(c => ({ id: c.id, name: c.name }))}
+                  value={selectedCustomerId}
+                  onChange={setSelectedCustomerId}
+                  placeholder="Buscar o registrar cliente..."
+                  addNewLabel="+ Registrar Nuevo Cliente"
+                  onAddNew={() => setIsCustomerModalOpen(true)}
+                />
+              </div>
+            </div>
+            <div className='p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center'>
+              <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Items en Carrito</span>
               <span className='bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded'>{cart.length}</span>
             </div>
             <div className='flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar'>
@@ -343,23 +371,13 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
                 </div>
               )}
             </div>
-            <div className='p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4'>
-              <div>
-                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Cliente</label>
-                <select 
-                  className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm font-medium' 
-                  value={selectedCustomerId} 
-                  onChange={(e) => setSelectedCustomerId(e.target.value)}
-                >
-                    {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+            <div className='p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl'>
+              <div className='flex justify-between items-center pt-2'>
+                 <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
+                 <span className='text-3xl text-emerald-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
               </div>
-              <div className='flex justify-between items-center pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800'>
-                 <span className='text-[10px] text-zinc-400 uppercase font-black'>Total</span>
-                 <span className='text-2xl text-emerald-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
-              </div>
-              <Button fullWidth onClick={handleCreateSale} disabled={cart.length === 0 || !selectedCustomerId || isPending}>
-                 {isPending ? 'Facturando...' : 'Finalizar Venta'}
+              <Button fullWidth onClick={handleCreateSale} size="lg" disabled={cart.length === 0 || !selectedCustomerId || isPending}>
+                 {isPending ? 'Procesando...' : 'Finalizar y Facturar'}
               </Button>
             </div>
           </div>
@@ -403,28 +421,41 @@ export function SalesManager({ initialSales, initialCustomers, initialProducts }
                     </div>
                   ))}
                 </div>
-                <div className='p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-10'>
-                    <div className='space-y-1.5'>
-                      <label className='text-[10px] font-black uppercase text-zinc-400 tracking-widest block'>Cliente Seleccionado</label>
-                      <select 
-                        className='w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-bold focus:outline-none focus:border-indigo-500'
+                <div className='p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-12 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'>
+                    <div className='space-y-2'>
+                      <label className='text-[10px] font-black uppercase text-zinc-400 tracking-widest block'>Cliente de la Operación</label>
+                      <Combobox 
+                        options={customers.map(c => ({ id: c.id, name: c.name }))}
                         value={selectedCustomerId}
-                        onChange={(e) => setSelectedCustomerId(e.target.value)}
-                      >
-                         {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                      </select>
+                        onChange={setSelectedCustomerId}
+                        placeholder="Buscar o registrar..."
+                        addNewLabel="+ Registrar Nuevo Cliente"
+                        onAddNew={() => setIsCustomerModalOpen(true)}
+                      />
                     </div>
-                    <div className='flex justify-between items-center text-2xl font-black pt-2'>
-                      <span className='text-[10px] text-zinc-400 uppercase tracking-widest'>Total</span>
-                      <span className='text-emerald-600 font-black'>${cartTotal.toLocaleString('es-AR')}</span>
+                    <div className='flex justify-between items-center pt-2'>
+                      <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
+                      <span className='text-emerald-600 text-3xl font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
                     </div>
-                    <Button fullWidth onClick={handleCreateSale} disabled={cart.length === 0 || !selectedCustomerId || isPending}>
-                       {isPending ? '...' : 'Confirmar Venta'}
+                    <Button fullWidth onClick={handleCreateSale} size="lg" disabled={cart.length === 0 || !selectedCustomerId || isPending}>
+                       {isPending ? 'Procesando...' : 'Confirmar Venta'}
                     </Button>
                 </div>
              </div>
           </div>
         )}
+
+        <CustomerModal 
+          isOpen={isCustomerModalOpen} 
+          onClose={() => setIsCustomerModalOpen(false)} 
+          onSuccess={(newC) => {
+            // Add new customer to local list and select it
+            setCustomers(prev => [...prev, newC]);
+            setSelectedCustomerId(newC.id);
+            setGlobalMessage({ type: 'success', text: 'Cliente creado y seleccionado.' });
+            setTimeout(() => setGlobalMessage(null), 3000);
+          }}
+        />
       </div>
     );
   }

@@ -125,3 +125,40 @@ export async function deleteProductAction(id: string) {
     return { success: false, message: error.message || 'Error al eliminar producto' };
   }
 }
+
+export async function registerProductLossAction(productId: string, quantity: number, reason: string) {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+
+    if (quantity <= 0) return { success: false, message: 'La cantidad debe ser mayor a 0' };
+    if (!reason.trim()) return { success: false, message: 'Debe especificar un motivo' };
+
+    await productRepository.registerLoss(productId, caller.id, quantity, reason);
+
+    revalidatePath('/productos');
+
+    await recordAuditLog(
+      caller.id,
+      'LOSS',
+      'PRODUCT',
+      productId,
+      { quantity, reason }
+    );
+
+    return { success: true, message: 'Pérdida registrada exitosamente' };
+  } catch (error: any) {
+    console.error('Error in registerProductLossAction:', error);
+    
+    // Check for specific DB errors or throw generic message
+    const errorMsg = error.message?.toLowerCase() || '';
+    if (errorMsg.includes('insufficient stock') || errorMsg.includes('check constraint')) {
+      return { success: false, message: 'No hay stock suficiente disponible para este producto' };
+    }
+    if (errorMsg.includes('not found')) {
+      return { success: false, message: 'El producto no existe' };
+    }
+    
+    return { success: false, message: 'No se pudo completar la operación. Por favor, verifica los datos e intenta de nuevo.' };
+  }
+}
+
