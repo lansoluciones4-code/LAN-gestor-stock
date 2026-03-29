@@ -1,10 +1,9 @@
-export const dynamic = 'force-dynamic';
+import { Suspense } from 'react';
 import { fetchUsers } from '@/server/actions/user.actions';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { UserManager } from './user-manager';
 
-export default async function UsersPage() {
-  const initialUsers = await fetchUsers();
-
+export default function UsersPage() {
   return (
     <div className='flex flex-col h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 overflow-hidden'>
       <div className='flex justify-between items-center mb-6 shrink-0'>
@@ -16,7 +15,14 @@ export default async function UsersPage() {
         </div>
       </div>
 
-      <UserManager initialData={initialUsers} />
+      <Suspense fallback={<TableSkeleton />}>
+        <UserManagerLoader />
+      </Suspense>
     </div>
   );
+}
+
+async function UserManagerLoader() {
+  const initialUsers = await fetchUsers();
+  return <UserManager initialData={initialUsers} />;
 }

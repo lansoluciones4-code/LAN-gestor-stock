@@ -1,13 +1,9 @@
-export const dynamic = 'force-dynamic';
+import { Suspense } from 'react';
 import { fetchProducts, fetchSelectorData } from '@/server/actions/product.actions';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ProductManager } from './product-manager';
 
-export default async function ProductsPage() {
-  const [initialProducts, selectors] = await Promise.all([
-    fetchProducts(),
-    fetchSelectorData(),
-  ]);
-
+export default function ProductsPage() {
   return (
     <div className='flex flex-col h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 overflow-hidden'>
       <div className='flex justify-between items-center mb-6 shrink-0'>
@@ -19,11 +15,24 @@ export default async function ProductsPage() {
         </div>
       </div>
 
-      <ProductManager
-        initialData={initialProducts}
-        suppliers={selectors.providers}
-        devices={selectors.devices}
-      />
+      <Suspense fallback={<TableSkeleton />}>
+        <ProductManagerLoader />
+      </Suspense>
     </div>
+  );
+}
+
+async function ProductManagerLoader() {
+  const [initialProducts, selectors] = await Promise.all([
+    fetchProducts(),
+    fetchSelectorData(),
+  ]);
+
+  return (
+    <ProductManager
+      initialData={initialProducts}
+      suppliers={selectors.providers}
+      devices={selectors.devices}
+    />
   );
 }
