@@ -4,7 +4,7 @@ import { verifyToken } from '@/lib/auth/jwt';
 
 const publicPaths = ['/login', '/favicon.ico', '/api/public'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (

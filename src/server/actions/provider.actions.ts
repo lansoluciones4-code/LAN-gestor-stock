@@ -8,7 +8,7 @@ import { providerSchema, providerDefSchema, ProviderInput, type ProviderDef } fr
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
-export async function fetchProviders(includeInactive = false): Promise<ProviderDef[]> {
+export async function fetchProviders(includeInactive = true): Promise<ProviderDef[]> {
   try {
     await verifyAuthOrAdmin(false); // Vendors can see providers
     const providersList = await providerRepository.getAllProviders(includeInactive);

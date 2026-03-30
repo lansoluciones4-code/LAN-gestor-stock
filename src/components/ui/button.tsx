@@ -7,7 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
   fullWidth?: boolean;
   leftIcon?: ReactNode;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
 }
 
 export function Button({ 
@@ -19,15 +19,13 @@ export function Button({
   className = '', 
   ...props 
 }: ButtonProps) {
-  // Use font-bold (as the user said it was 'mejor' before) OR nothing
-  // User liked UserManager button, which has no font class.
-  // I will use exactly the UserManager's class set.
   const baseStyles = 'flex items-center justify-center rounded-lg transition-colors shadow-sm whitespace-nowrap';
   
   const sizes = {
     sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
+    md: 'px-4 py-2.5 text-base',
+    lg: 'px-6 py-3 text-lg',
+    icon: 'p-2.5',
   };
 
   const variants = {

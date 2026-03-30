@@ -7,7 +7,9 @@ export default defineConfig({
   out: './src/lib/db/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.NODE_ENV === 'production'
+      ? process.env.DATABASE_URL!
+      : (process.env.LOCAL_DATABASE_URL || 'postgresql://postgres:password@127.0.0.1:5432/stock_db'),
   },
   verbose: true,
   strict: true,
