@@ -84,7 +84,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
             type='text'
             {...register('name')}
             autoFocus
-            placeholder='Ej: Carlos Sanchez'
+            placeholder='Ej: Carlos Pérez Martínez'
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
@@ -95,7 +95,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
           <input
             type='text'
             {...register('documentNumber')}
-            placeholder='Número de identificación...'
+            placeholder='Ej: 35.123.456 o 20-35123456-9'
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.documentNumber ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.documentNumber && <p className='text-red-500 text-xs mt-1.5'>{errors.documentNumber.message}</p>}
@@ -107,7 +107,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
             <input 
               type='text' 
               {...register('phone')} 
-              placeholder='Móvil o Fijo...' 
+              placeholder='+54 9 11 9876-5432' 
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} 
             />
             {errors.phone && <p className='text-red-500 text-xs mt-1.5'>{errors.phone.message}</p>}
@@ -117,7 +117,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
             <input 
               type='email' 
               {...register('email')} 
-              placeholder='correo@ejemplo.com' 
+              placeholder='cliente@correo.com' 
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} 
             />
             {errors.email && <p className='text-red-500 text-xs mt-1.5'>{errors.email.message}</p>}

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -233,21 +235,21 @@ export function ProductsPanel() {
           </div>
           <div className='col-span-1 md:col-span-2'>
             <label className='block text-sm font-medium mb-1.5'>Descripción Física (Color, Memoria)</label>
-            <input type='text' {...register('description')} className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700' />
+            <input type='text' {...register('description')} placeholder='Ej: Negro, 256GB - Kit Funda' className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700' />
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Precio de Costo ($)</label>
-            <div className='relative'><DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' /><input type='number' step='0.01' {...register('purchasePrice', { valueAsNumber: true })} className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' /></div>
+            <div className='relative'><DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' /><input type='number' step='0.01' {...register('purchasePrice', { valueAsNumber: true })} placeholder='0.00' className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' /></div>
             {errors.purchasePrice && <p className='text-red-500 text-xs mt-1'>{errors.purchasePrice.message}</p>}
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Precio de Venta ($)</label>
-            <div className='relative'><DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-emerald-500' /><input type='number' step='0.01' {...register('salePrice', { valueAsNumber: true })} className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' /></div>
+            <div className='relative'><DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-emerald-500' /><input type='number' step='0.01' {...register('salePrice', { valueAsNumber: true })} placeholder='0.00' className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' /></div>
             {errors.salePrice && <p className='text-red-500 text-xs mt-1'>{errors.salePrice.message}</p>}
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Stock Inicial Lote</label>
-            <input type='number' {...register('stock', { valueAsNumber: true })} className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' />
+            <input type='number' {...register('stock', { valueAsNumber: true })} placeholder='1' className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' />
             {errors.stock && <p className='text-red-500 text-xs mt-1'>{errors.stock.message}</p>}
           </div>
         </div>
@@ -282,11 +284,11 @@ export function ProductsPanel() {
         <div className="space-y-4">
           <div>
             <label className='block text-sm font-medium mb-1.5'>Cantidad perdida</label>
-            <input type='number' value={lossQuantity} onChange={(e) => setLossQuantity(e.target.value)} className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500' />
+            <input type='number' value={lossQuantity} onChange={(e) => setLossQuantity(e.target.value)} placeholder='Ej: 1' className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500' />
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Motivo / Razón</label>
-            <textarea value={lossReason} onChange={(e) => setLossReason(e.target.value)} className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm' />
+            <textarea value={lossReason} onChange={(e) => setLossReason(e.target.value)} placeholder='Ej: Pantalla rota al desembalar' className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm' />
           </div>
         </div>
       </ResponsiveModal>
