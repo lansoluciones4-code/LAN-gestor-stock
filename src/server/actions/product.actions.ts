@@ -29,8 +29,8 @@ export async function fetchProducts(): Promise<ProductDef[]> {
 
 export async function fetchSelectorData(): Promise<{ devices: DeviceDef[], providers: ProviderDef[] }> {
   try {
-    const devicesList = await deviceRepository.getAllDevices();
-    const providersList = await providerRepository.getAllProviders();
+    const devicesList = await deviceRepository.getAllDevices(true);
+    const providersList = await providerRepository.getAllProviders(true);
     
     return {
       devices: z.array(deviceDefSchema).parse(devicesList),
