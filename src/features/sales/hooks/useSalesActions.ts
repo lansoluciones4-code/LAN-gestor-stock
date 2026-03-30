@@ -10,6 +10,7 @@ import { useProvidersStore } from '@/stores/providers.store';
 import { useDevicesStore } from '@/stores/devices.store';
 import { useCustomersStore } from '@/stores/customers.store';
 import { useLogsStore } from '@/stores/logs.store';
+import { useStatsStore } from '@/stores/stats.store';
 
 interface UseSalesActionsProps {
   onSuccessMessage: (msg: string) => void;
@@ -52,6 +53,7 @@ export function useSalesActions({
       useProvidersStore.getState().setLoaded(false);
       useDevicesStore.getState().setLoaded(false);
       useCustomersStore.getState().setLoaded(false);
+      useStatsStore.getState().setLoaded(false);
     });
   };
 

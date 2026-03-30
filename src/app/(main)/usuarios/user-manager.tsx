@@ -19,6 +19,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useUsersStore } from '@/stores/users.store';
 import { useSalesStore } from '@/stores/sales.store';
 import { useLogsStore } from '@/stores/logs.store';
+import { useStatsStore } from '@/stores/stats.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -62,6 +63,7 @@ export function UserManager() {
     onAfterSuccess: () => {
       useSalesStore.getState().setLoaded(false);
       useLogsStore.getState().setLoaded(false);
+      useStatsStore.getState().setLoaded(false);
     },
   });
 

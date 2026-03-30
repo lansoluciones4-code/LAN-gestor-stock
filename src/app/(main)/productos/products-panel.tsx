@@ -16,6 +16,7 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { DataTable } from '@/components/ui/data-table';
 import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction } from '@/server/actions/product.actions';
 import { useLogsStore } from '@/stores/logs.store';
+import { useStatsStore } from '@/stores/stats.store';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
@@ -68,6 +69,7 @@ export function ProductsPanel() {
     onAfterSuccess: () => {
       useProvidersStore.getState().setLoaded(false);
       useDevicesStore.getState().setLoaded(false);
+      useStatsStore.getState().setLoaded(false);
     }
   });
 
@@ -86,6 +88,7 @@ export function ProductsPanel() {
       onLossClose();
       showGlobalMessage('success', result.message);
       useLogsStore.getState().setLoaded(false);
+      useStatsStore.getState().setLoaded(false);
       syncData();
     });
   };

@@ -28,7 +28,7 @@ export async function toggleCustomerActiveAction(id: string, isActive: boolean) 
 
     await recordAuditLog(
       caller.id,
-      isActive ? 'UPDATE' : 'DELETE',
+      isActive ? 'ACTUALIZAR' : 'ELIMINAR',
       'CUSTOMER',
       id,
       { active: isActive }
@@ -53,7 +53,7 @@ export async function createCustomerAction(input: CustomerInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'CUSTOMER',
       newCustomer.id,
       { name: newCustomer.name }
@@ -78,7 +78,7 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
 
     await recordAuditLog(
       caller.id,
-      'UPDATE',
+      'ACTUALIZAR',
       'CUSTOMER',
       id,
       { name: input.name }
@@ -110,7 +110,7 @@ export async function deleteCustomerAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'CUSTOMER',
       id,
       { note: 'Eliminación permanente' }

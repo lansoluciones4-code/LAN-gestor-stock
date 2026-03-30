@@ -27,7 +27,7 @@ export async function toggleProviderActiveAction(id: string, isActive: boolean) 
 
     await recordAuditLog(
       caller.id,
-      isActive ? 'UPDATE' : 'DELETE',
+      isActive ? 'ACTUALIZAR' : 'ELIMINAR',
       'PROVIDER',
       id,
       { active: isActive, note: isActive ? 'Proveedor reactivado' : 'Proveedor desactivado' }
@@ -51,7 +51,7 @@ export async function createProviderAction(input: ProviderInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'PROVIDER',
       newProvider.id,
       { name: newProvider.name }
@@ -75,7 +75,7 @@ export async function updateProviderAction(id: string, input: ProviderInput) {
 
     await recordAuditLog(
       caller.id,
-      'UPDATE',
+      'ACTUALIZAR',
       'PROVIDER',
       id,
       { name: input.name }
@@ -105,7 +105,7 @@ export async function deleteProviderAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'PROVIDER',
       id,
       { note: 'Eliminación permanente' }

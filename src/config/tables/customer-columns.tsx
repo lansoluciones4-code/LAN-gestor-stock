@@ -21,17 +21,17 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
     },
     {
       header: 'Documento',
-      cellClassName: 'text-zinc-500 font-mono text-sm',
+      cellClassName: 'text-zinc-500 font-mono',
       cell: (c) => c.documentNumber || '--',
     },
     {
       header: 'Teléfono',
-      cellClassName: 'text-zinc-500 font-mono text-sm',
+      cellClassName: 'text-zinc-500 font-mono',
       cell: (c) => c.phone || '--',
     },
     {
       header: 'Email',
-      cellClassName: 'text-zinc-500 text-sm',
+      cellClassName: 'text-zinc-500',
       cell: (c) => c.email || '--',
     },
     {

@@ -39,7 +39,7 @@ export async function createSaleAction(input: SaleInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'SALE',
       result.id,
       { total: input.total, itemCount: input.items.length }
@@ -68,7 +68,7 @@ export async function deleteSaleAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'SALE',
       id,
       { note: 'Venta anulada. Stock restablecido.' }

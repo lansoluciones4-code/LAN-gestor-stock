@@ -28,7 +28,7 @@ export async function toggleDeviceActiveAction(id: string, isActive: boolean) {
 
     await recordAuditLog(
       caller.id,
-      isActive ? 'UPDATE' : 'DELETE',
+      isActive ? 'ACTUALIZAR' : 'ELIMINAR',
       'DEVICE',
       id,
       { active: isActive }
@@ -53,7 +53,7 @@ export async function createDeviceAction(input: DeviceInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'DEVICE',
       newDevice.id,
       { name: newDevice.name }
@@ -77,7 +77,7 @@ export async function updateDeviceAction(id: string, input: DeviceInput) {
 
     await recordAuditLog(
       caller.id,
-      'UPDATE',
+      'ACTUALIZAR',
       'DEVICE',
       id,
       { name: input.name }
@@ -109,7 +109,7 @@ export async function deleteDeviceAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'DEVICE',
       id,
       { note: 'Eliminación permanente' }

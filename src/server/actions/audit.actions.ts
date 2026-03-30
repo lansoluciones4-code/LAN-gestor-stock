@@ -5,13 +5,19 @@ import { auditLogRepository } from '@/server/repositories/audit-log.repository';
 import { auditLogDefSchema, type AuditLogDef } from '@/schemas/audit-log.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 
-export async function fetchAuditLogs(): Promise<AuditLogDef[]> {
+export async function fetchAuditLogs(options?: { 
+  page?: number; 
+  search?: string; 
+  startDate?: string; 
+  endDate?: string 
+}): Promise<AuditLogDef[]> {
   try {
-    // Only admins can see logs
     await verifyAuthOrAdmin(true);
-    const logs = await auditLogRepository.getAllLogs();
+    const logs = await auditLogRepository.getAllLogs({
+      ...options,
+      limit: 50
+    });
     
-    // Convert dates to ISO strings if needed or just parse them
     return z.array(auditLogDefSchema).parse(logs);
   } catch (error) {
     console.error('fetchAuditLogs error:', error);
