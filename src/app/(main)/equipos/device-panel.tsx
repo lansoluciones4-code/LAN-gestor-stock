@@ -25,12 +25,16 @@ import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useClientPagination } from '@/hooks/use-client-pagination';
+import { useSalesStore } from '@/stores/sales.store';
+import { useStatsStore } from '@/stores/stats.store';
 
 export function DevicePanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
   const { devices, setDevices, isLoaded } = useDevicesStore();
   const setProductsLoaded = useProductsStore((s) => s.setLoaded);
+  const setSalesLoaded = useSalesStore((s) => s.setLoaded);
+  const setStatsLoaded = useStatsStore((s) => s.setLoaded);
   
   const {
     isModalOpen, editingItem, openFormModal, closeFormModal,
@@ -58,7 +62,11 @@ export function DevicePanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => setProductsLoaded(false),
+    onAfterSuccess: () => {
+      setProductsLoaded(false);
+      setSalesLoaded(false);
+      setStatsLoaded(false);
+    },
   });
 
   useEffect(() => {
