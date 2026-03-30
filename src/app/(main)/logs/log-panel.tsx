@@ -62,29 +62,34 @@ export function LogPanel() {
     setIsPending(false);
   };
 
+  const isFirstRender = useRef(true);
+
   // Initial load
   useEffect(() => {
-    async function init() {
-      if (!isLoaded) {
-        setInitialLoading(true);
-        await loadData(true);
-        setInitialLoading(false);
-      } else {
-        setInitialLoading(false);
-      }
+    if (!isLoaded) {
+      loadData(true).finally(() => setInitialLoading(false));
+    } else {
+      setInitialLoading(false);
     }
-    init();
   }, []);
 
-  // Filter changes
+  // Filter changes - debounced
   useEffect(() => {
-    if (!initialLoading) {
-      const timer = setTimeout(() => {
-        loadData(true);
-      }, 500); // Debounce search
-      return () => clearTimeout(timer);
+    if (initialLoading) return;
+    
+    // Skip the very first execution on mount if we already have data and no filters
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (isLoaded && !search && !startDate && !endDate) {
+        return;
+      }
     }
-  }, [search, startDate, endDate]);
+
+    const timer = setTimeout(() => {
+      loadData(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, startDate, endDate, initialLoading]);
 
   // Pagination
   useEffect(() => {
