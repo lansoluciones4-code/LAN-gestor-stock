@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { type SaleDef } from '@/schemas/sale.schema';
-import { type CustomerDef } from '@/schemas/customer.schema';
-import { type ProductDef } from '@/schemas/product.schema';
 import { fetchSales } from '@/server/actions/sale.actions';
 import { fetchCustomers } from '@/server/actions/customer.actions';
 import { fetchProducts } from '@/server/actions/product.actions';
