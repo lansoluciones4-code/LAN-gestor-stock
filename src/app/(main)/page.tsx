@@ -16,16 +16,18 @@ import {
 } from 'lucide-react';
 import { fetchDashboardStats } from '@/server/actions/stats.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { useStatsStore } from '@/stores/stats.store';
+import { RefreshCcw } from 'lucide-react';
 
 export default function DashboardPage() {
   const [isPending, startTransition] = useTransition();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [stats, setStats] = useState<any>(null);
+  const { stats, setStats, isLoaded, setLoaded } = useStatsStore();
 
   const loadStats = (start?: string, end?: string) => {
     startTransition(async () => {
-      const res = await fetchDashboardStats(start, end);
+      const res = await fetchDashboardStats(start || startDate, end || endDate);
       if (res.success) {
         setStats(res.data);
       }
@@ -33,11 +35,14 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    loadStats();
-  }, []);
+    if (!isLoaded) {
+      loadStats();
+    }
+  }, [isLoaded]);
 
-  const handleFilter = () => {
-    loadStats(startDate, endDate);
+  const handleSync = () => {
+    setLoaded(false);
+    loadStats();
   };
 
   return (
@@ -55,16 +60,21 @@ export default function DashboardPage() {
            <DateRangePicker 
             startDate={startDate}
             endDate={endDate}
-            onStartChange={setStartDate}
-            onEndChange={setEndDate}
-            onClear={() => { setStartDate(''); setEndDate(''); loadStats(); }}
+            onStartChange={(v) => { setStartDate(v); setLoaded(false); }}
+            onEndChange={(v) => { setEndDate(v); setLoaded(false); }}
+            onClear={() => { setStartDate(''); setEndDate(''); setLoaded(false); }}
            />
            <button 
-                onClick={handleFilter} 
+                onClick={handleSync} 
                 disabled={isPending}
-                className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 shadow-sm flex items-center justify-center'
+                className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
            >
-             {isPending ? 'Calculating...' : 'Sincronizar Datos'}
+             {isPending ? 'Recalculando...' : (
+               <>
+                 <RefreshCcw className={`w-4 h-4 ${isPending ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                 Sincronizar Panel
+               </>
+             )}
            </button>
         </div>
       </div>

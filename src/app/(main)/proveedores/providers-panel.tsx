@@ -1,4 +1,5 @@
- 
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,11 +7,12 @@ import { Plus, Store, RefreshCcw } from 'lucide-react';
 import { providerSchema, type ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProvidersStore } from '@/stores/providers.store';
-import { fetchProviders } from '@/server/actions/provider.actions';
+import { useProductsStore } from '@/stores/products.store';
+import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { useClientPagination } from '@/hooks/use-client-pagination';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { useProviderActions } from '@/features/providers/hooks/useProviderActions';
+import { useEntityActions } from '@/hooks/use-entity-actions';
 import { DataTable } from '@/components/ui/data-table';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
@@ -22,6 +24,7 @@ export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
   const { providers, setProviders, isLoaded } = useProvidersStore();
+  const setProductsLoaded = useProductsStore((s) => s.setLoaded);
 
   const {
     isModalOpen, editingItem, openFormModal, closeFormModal,
@@ -33,14 +36,23 @@ export function ProvidersPanel() {
 
   const [showInactive, setShowInactive] = useState(false);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useProviderActions({
+  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<ProviderDef, ProviderInput>({
+    handlers: {
+      fetchData: () => fetchProviders(true),
+      createAction: createProviderAction,
+      updateAction: updateProviderAction,
+      deleteAction: deleteProviderAction,
+      toggleActiveAction: toggleProviderActiveAction,
+    },
+    setStoreData: setProviders,
     onSuccessMessage: (msg) => showGlobalMessage('success', msg),
     onErrorMessage: (msg) => showGlobalMessage('error', msg),
     closeFormModal,
     setServerError,
     setItemToDelete,
     editingItem,
-    showInactive
+    showInactive,
+    onAfterSuccess: () => setProductsLoaded(false),
   });
 
   useEffect(() => {
@@ -150,12 +162,12 @@ export function ProvidersPanel() {
           </div>
           <div>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Línea Telefónica Directa</label>
-            <input type='text' {...register('phone')} placeholder='Opcional...' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
+            <input type='text' {...register('phone')} placeholder='+54 9 11 1234-5678' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
             {errors.phone && <p className='text-red-500 text-xs mt-1.5'>{errors.phone.message}</p>}
           </div>
           <div>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Correo Electrónico Comercial</label>
-            <input type='email' {...register('email')} placeholder='Opcional...' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
+            <input type='email' {...register('email')} placeholder='ventas@distribuidora.com' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
             {errors.email && <p className='text-red-500 text-xs mt-1.5'>{errors.email.message}</p>}
           </div>
         </div>

@@ -23,7 +23,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
       </div>
       
       <div className='flex-1 overflow-auto p-4 sm:p-10 custom-scrollbar'>
-          <div id='print-area-wrapper' className='bg-white p-4 sm:p-12 border border-zinc-200 rounded-xl shadow-lg max-w-2xl mx-auto'>
+          <div id='print-area-wrapper' className='bg-white text-zinc-900 p-4 sm:p-12 border border-zinc-200 rounded-xl shadow-lg max-w-2xl mx-auto'>
               <div className='flex justify-between items-start mb-12 border-b-2 border-indigo-50 pb-8'>
                 <div>
                   <h2 className='text-3xl font-black text-indigo-600'>STOCK APP</h2>
@@ -57,14 +57,14 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 </thead>
                 <tbody className='divide-y divide-zinc-100'>
                   {sale.items?.map((item: any) => (
-                    <tr key={item.id} className='text-[13px]'>
+                    <tr key={item.id} className='text-[13px] text-zinc-900'>
                       <td className='py-5 font-bold text-zinc-900'>
                         {item.product?.device?.name}
                         <span className='block text-[10px] font-normal text-zinc-500 uppercase mt-0.5'>{item.product?.description}</span>
                       </td>
-                      <td className='py-5 text-center font-bold'>{item.quantity}</td>
-                      <td className='py-5 text-right'>${item.unitPrice.toLocaleString('es-AR')}</td>
-                      <td className='py-5 text-right font-black'>${item.subtotal.toLocaleString('es-AR')}</td>
+                      <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
+                      <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR')}</td>
+                      <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -73,7 +73,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
               <div className='flex justify-end pt-10 border-t-2 border-zinc-900'>
                 <div className='flex items-center gap-10'>
                   <span className='text-lg font-black uppercase text-zinc-900'>Total</span>
-                  <span className='text-3xl font-black text-indigo-700'>${sale.total.toLocaleString('es-AR')}</span>
+                  <span className='text-3xl font-black text-indigo-700 forced-color-black'>${sale.total.toLocaleString('es-AR')}</span>
                 </div>
               </div>
           </div>

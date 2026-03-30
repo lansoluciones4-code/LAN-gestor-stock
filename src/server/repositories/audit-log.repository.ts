@@ -4,13 +4,38 @@ import { auditLogs, users } from '@/lib/db/schema';
 import type { AuditLogInput } from '@/schemas/audit-log.schema';
 
 export class AuditLogRepository {
-  async getAllLogs() {
+  async getAllLogs(options?: { page?: number; limit?: number; search?: string; startDate?: string; endDate?: string }) {
+    const { page = 1, limit = 50, search, startDate, endDate } = options || {};
+    const offset = (page - 1) * limit;
+
     return await db.query.auditLogs.findMany({
+      where: (logs, { eq, and, or, like, gte, lte }) => {
+        const conditions = [];
+
+        if (search) {
+          const s = `%${search.toLowerCase()}%`;
+          conditions.push(or(
+            like(logs.action, s),
+            like(logs.entity, s),
+            like(logs.entityId, s)
+          ));
+        }
+
+        if (startDate) {
+          conditions.push(gte(logs.createdAt, new Date(startDate + 'T00:00:00')));
+        }
+        if (endDate) {
+          conditions.push(lte(logs.createdAt, new Date(endDate + 'T23:59:59')));
+        }
+
+        return conditions.length > 0 ? and(...conditions) : undefined;
+      },
       orderBy: [desc(auditLogs.createdAt)],
       with: {
         user: true,
       },
-      limit: 100,
+      limit: limit,
+      offset: offset,
     });
   }
 

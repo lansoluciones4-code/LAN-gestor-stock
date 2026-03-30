@@ -1,10 +1,11 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { type SaleDef } from '@/schemas/sale.schema';
 import { fetchSales } from '@/server/actions/sale.actions';
 import { fetchCustomers } from '@/server/actions/customer.actions';
 import { fetchProducts } from '@/server/actions/product.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
-
 import { SalesListView } from '@/features/sales/components/sales-list-view';
 import { SalesPOSView } from '@/features/sales/components/sales-pos-view';
 import { SalesPrintView } from '@/features/sales/components/sales-print-view';
@@ -14,6 +15,8 @@ import { ConfirmModal } from '@/components/ui/responsive-modal';
 import { useSalesStore } from '@/stores/sales.store';
 import { useProductsStore } from '@/stores/products.store';
 import { useCustomersStore } from '@/stores/customers.store';
+import { useEntityManager } from '@/hooks/use-entity-manager';
+
 export function SalesPanel() {
   const [view, setView] = useState<'list' | 'new' | 'print'>('list');
   const [initialLoading, setInitialLoading] = useState(true);
@@ -21,6 +24,12 @@ export function SalesPanel() {
   const { sales, setSales, isLoaded: salesLoaded } = useSalesStore();
   const { products, setProducts, isLoaded: prodsLoaded } = useProductsStore();
   const { customers, setCustomers, isLoaded: custLoaded } = useCustomersStore();
+
+  const {
+    itemToDelete, setItemToDelete,
+    globalMessage, showGlobalMessage,
+    search: searchTerm, setSearch: setSearchTerm
+  } = useEntityManager<SaleDef>();
 
   useEffect(() => {
     async function loadInitial() {
@@ -33,7 +42,7 @@ export function SalesPanel() {
       const promises = [];
       if (!salesLoaded) promises.push(fetchSales().then(setSales));
       if (!prodsLoaded) promises.push(fetchProducts().then(setProducts));
-      if (!custLoaded) promises.push(fetchCustomers(false).then(setCustomers));
+      if (!custLoaded) promises.push(fetchCustomers(true).then(setCustomers));
       
       await Promise.all(promises);
       setInitialLoading(false);
@@ -45,12 +54,9 @@ export function SalesPanel() {
   const displayProducts = products;
   const displayCustomers = customers;
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   
-  const [globalMessage, setGlobalMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
-  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [selectedSaleForPrint, setSelectedSaleForPrint] = useState<SaleDef | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
 
@@ -61,8 +67,8 @@ export function SalesPanel() {
   const cartProps = useCart();
   
   const { isPending, handleCreateSale, confirmDelete, loadData } = useSalesActions({
-    onSuccessMessage: (text) => { setGlobalMessage({ type: 'success', text }); setTimeout(() => setGlobalMessage(null), 4000); },
-    onErrorMessage: (text) => { setGlobalMessage({ type: 'error', text }); setTimeout(() => setGlobalMessage(null), 4000); },
+    onSuccessMessage: (text) => showGlobalMessage('success', text),
+    onErrorMessage: (text) => showGlobalMessage('error', text),
     setSales,
     setProducts,
     setCustomers,
@@ -94,7 +100,7 @@ export function SalesPanel() {
         onCancel={() => setView('list')}
         showMobileCart={showMobileCart}
         setShowMobileCart={setShowMobileCart}
-        setGlobalMessage={setGlobalMessage}
+        setGlobalMessage={(msg) => msg ? showGlobalMessage(msg.type, msg.text) : null}
       />
     );
   }

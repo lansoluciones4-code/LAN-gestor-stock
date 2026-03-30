@@ -21,13 +21,14 @@ export async function fetchCustomers(includeInactive = false): Promise<CustomerD
 
 export async function toggleCustomerActiveAction(id: string, isActive: boolean) {
   try {
+    console.log(`[CustomerAction] Iniciando cambio de estado de cliente a ${isActive ? 'activo' : 'inactivo'} (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true); // Only admin for status toggle
     await customerRepository.updateActiveStatus(id, isActive);
     revalidatePath('/clientes');
 
     await recordAuditLog(
       caller.id,
-      isActive ? 'UPDATE' : 'DELETE',
+      isActive ? 'ACTUALIZAR' : 'ELIMINAR',
       'CUSTOMER',
       id,
       { active: isActive }
@@ -41,6 +42,7 @@ export async function toggleCustomerActiveAction(id: string, isActive: boolean) 
 
 export async function createCustomerAction(input: CustomerInput) {
   try {
+    console.log(`[CustomerAction] Iniciando registro de nuevo cliente (${input.name})...`);
     const caller = await verifyAuthOrAdmin(false); // Vendors can create customers
     const parsed = customerSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
@@ -51,7 +53,7 @@ export async function createCustomerAction(input: CustomerInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'CUSTOMER',
       newCustomer.id,
       { name: newCustomer.name }
@@ -65,6 +67,7 @@ export async function createCustomerAction(input: CustomerInput) {
 
 export async function updateCustomerAction(id: string, input: CustomerInput) {
   try {
+    console.log(`[CustomerAction] Iniciando actualización de cliente (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(false);
     const parsed = customerSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
@@ -75,7 +78,7 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
 
     await recordAuditLog(
       caller.id,
-      'UPDATE',
+      'ACTUALIZAR',
       'CUSTOMER',
       id,
       { name: input.name }
@@ -89,11 +92,13 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
 
 export async function deleteCustomerAction(id: string) {
   try {
+    console.log(`[CustomerAction] Iniciando eliminación de cliente (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true); 
 
     // Check relations
     const hasRelations = await customerRepository.checkHasRelations(id);
     if (hasRelations) {
+      console.log(`[CustomerAction] Eliminación rechazada: el cliente (ID: ${id}) tiene operaciones asociadas.`);
       return { 
         success: false, 
         message: 'No se puede eliminar permanentemente: existe actividad vinculada a este cliente. Prueba desactivarlo.' 
@@ -105,14 +110,23 @@ export async function deleteCustomerAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'CUSTOMER',
       id,
       { note: 'Eliminación permanente' }
     );
 
+    console.log(`[CustomerAction] Cliente (ID: ${id}) eliminado exitosamente.`);
     return { success: true, message: 'Cliente eliminado permanentemente' };
   } catch (error: any) {
+    console.error(`[CustomerAction] Error al eliminar cliente:`, error);
+    
+    // Parse PostgreSQL FK Error just in case
+    const errorMsg = error.message?.toLowerCase() || '';
+    if (errorMsg.includes('23503') || errorMsg.includes('foreign key constraint') || errorMsg.includes('violates foreign key')) {
+      return { success: false, message: 'No se puede eliminar el cliente porque tiene registros vinculados (ej. historial o stock). Por favor, inactívalo.' };
+    }
+    
     return { success: false, message: 'Error al eliminar cliente de la base de datos.' };
   }
 }

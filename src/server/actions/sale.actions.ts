@@ -34,11 +34,12 @@ export async function createSaleAction(input: SaleInput) {
 
     const result = await saleRepository.createSale(caller.id, parsed.data);
     revalidatePath('/ventas');
-    revalidatePath('/productos'); // To refresh stock in inventory
+    revalidatePath('/productos');
+    revalidatePath('/clientes');
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'SALE',
       result.id,
       { total: input.total, itemCount: input.items.length }
@@ -67,7 +68,7 @@ export async function deleteSaleAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'SALE',
       id,
       { note: 'Venta anulada. Stock restablecido.' }

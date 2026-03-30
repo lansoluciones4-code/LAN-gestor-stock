@@ -30,7 +30,7 @@ export async function toggleUserActiveAction(id: string, isActive: boolean) {
 
     await recordAuditLog(
       caller.id,
-      isActive ? 'UPDATE' : 'DELETE',
+      isActive ? 'ACTUALIZAR' : 'ELIMINAR',
       'USER',
       id,
       { active: isActive }
@@ -53,7 +53,7 @@ export async function createUserAction(input: UserInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'USER',
       newUser.id,
       { username: newUser.username, role: newUser.role }
@@ -81,7 +81,7 @@ export async function updateUserAction(id: string, input: UserInput) {
 
     await recordAuditLog(
       caller.id,
-      'UPDATE',
+      'ACTUALIZAR',
       'USER',
       id,
       { username: input.username, role: input.role }
@@ -114,7 +114,7 @@ export async function deleteUserAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'USER',
       id,
       { note: 'Eliminación permanente' }

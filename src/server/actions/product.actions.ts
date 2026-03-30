@@ -53,7 +53,7 @@ export async function createProductAction(input: ProductInput) {
 
     await recordAuditLog(
       caller.id,
-      'CREATE',
+      'CREAR',
       'PRODUCT',
       newProduct.id,
       { 
@@ -81,7 +81,7 @@ export async function updateProductAction(id: string, input: ProductInput) {
 
     await recordAuditLog(
       caller.id,
-      'UPDATE',
+      'ACTUALIZAR',
       'PRODUCT',
       id,
       { 
@@ -115,7 +115,7 @@ export async function deleteProductAction(id: string) {
 
     await recordAuditLog(
       caller.id,
-      'DELETE',
+      'ELIMINAR',
       'PRODUCT',
       id
     );
@@ -139,7 +139,7 @@ export async function registerProductLossAction(productId: string, quantity: num
 
     await recordAuditLog(
       caller.id,
-      'LOSS',
+      'PÉRDIDA',
       'PRODUCT',
       productId,
       { quantity, reason }

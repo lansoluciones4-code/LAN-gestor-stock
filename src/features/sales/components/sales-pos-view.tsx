@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search } from 'lucide-react';
 import { Combobox } from '@/components/ui/combobox';
-import { CustomerModal } from '@/components/modals/customer-modal';
 import { Button } from '@/components/ui/button';
 import { type ProductDef } from '@/schemas/product.schema';
 import { type CustomerDef } from '@/schemas/customer.schema';
 import { type CartItem } from '../hooks/useCart';
+import { CustomerModal } from '@/components/modals/customer-modal';
 
 interface SalesPOSViewProps {
   products: ProductDef[];
@@ -104,7 +104,7 @@ export function SalesPOSView({
             <div>
               <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-2'>Cliente de la Operación</label>
               <Combobox 
-                options={customers.map(c => ({ id: c.id, name: c.name }))}
+                options={customers.map(c => ({ id: c.id, name: c.isActive ? c.name : `${c.name} (Inactivo)` }))}
                 value={selectedCustomerId}
                 onChange={setSelectedCustomerId}
                 placeholder="Buscar o registrar cliente..."
@@ -195,7 +195,7 @@ export function SalesPOSView({
                   <div className='space-y-2'>
                     <label className='text-[10px] font-black uppercase text-zinc-400 tracking-widest block'>Cliente de la Operación</label>
                     <Combobox 
-                      options={customers.map(c => ({ id: c.id, name: c.name }))}
+                      options={customers.map(c => ({ id: c.id, name: c.isActive ? c.name : `${c.name} (Inactivo)` }))}
                       value={selectedCustomerId}
                       onChange={setSelectedCustomerId}
                       placeholder="Buscar o registrar..."
@@ -218,7 +218,7 @@ export function SalesPOSView({
       <CustomerModal 
         isOpen={isCustomerModalOpen} 
         onClose={() => setIsCustomerModalOpen(false)} 
-        onSuccess={(newC) => {
+        onSuccess={(newC: CustomerDef) => {
           setCustomers([...customers, newC]);
           setSelectedCustomerId(newC.id);
           setGlobalMessage({ type: 'success', text: 'Cliente creado y seleccionado.' });

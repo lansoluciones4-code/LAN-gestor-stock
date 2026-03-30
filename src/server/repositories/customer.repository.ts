@@ -5,6 +5,7 @@ import type { CustomerInput } from '@/schemas/customer.schema';
 
 export class CustomerRepository {
   async getAllCustomers(includeInactive = false) {
+    console.log(`[CustomerRepository] Consultando clientes (includeInactive=${includeInactive})...`);
     return await db.query.customers.findMany({
       where: includeInactive ? undefined : eq(customers.isActive, true),
       orderBy: [desc(customers.createdAt)],
@@ -12,15 +13,22 @@ export class CustomerRepository {
   }
 
   async checkHasRelations(id: string) {
-    // Check if customer has products (or sales in future)
+    console.log(`[CustomerRepository] Verificando relaciones (FK) para cliente ID: ${id}...`);
     const productsList = await db.query.products.findMany({
       where: (p, { eq }) => eq(p.customerId, id),
       limit: 1,
     });
-    return productsList.length > 0;
+    
+    const salesList = await db.query.sales.findMany({
+      where: (s, { eq }) => eq(s.customerId, id),
+      limit: 1,
+    });
+    
+    return productsList.length > 0 || salesList.length > 0;
   }
 
   async updateActiveStatus(id: string, isActive: boolean) {
+    console.log(`[CustomerRepository] Actualizando status de cliente ID: ${id} a ${isActive}...`);
     const result = await db.update(customers)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(customers.id, id))
@@ -29,6 +37,7 @@ export class CustomerRepository {
   }
 
   async createCustomer(input: CustomerInput) {
+    console.log(`[CustomerRepository] Insertando nuevo cliente en BD: ${input.name}...`);
     const result = await db.insert(customers).values({
       name: input.name,
       phone: input.phone || null,
@@ -41,6 +50,7 @@ export class CustomerRepository {
   }
 
   async updateCustomer(id: string, input: CustomerInput) {
+    console.log(`[CustomerRepository] Actualizando datos de cliente ID: ${id}...`);
     const result = await db.update(customers).set({
       name: input.name,
       phone: input.phone || null,
@@ -55,6 +65,7 @@ export class CustomerRepository {
   }
 
   async deleteCustomer(id: string) {
+    console.log(`[CustomerRepository] Eliminando cliente ID: ${id} de BD...`);
     await db.delete(customers).where(eq(customers.id, id));
   }
 }
