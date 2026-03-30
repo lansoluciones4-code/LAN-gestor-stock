@@ -1,5 +1,4 @@
- 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, DollarSign, PackageOpen, PackageX, RefreshCcw } from 'lucide-react';
@@ -8,12 +7,13 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useProductsStore } from '@/stores/products.store';
 import { useDevicesStore } from '@/stores/devices.store';
 import { useProvidersStore } from '@/stores/providers.store';
-import { fetchProducts, fetchSelectorData } from '@/server/actions/product.actions';
-import { TableSkeleton } from '@/components/ui/table-skeleton';
-import { useClientPagination } from '@/hooks/use-client-pagination';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { useProductActions } from '@/features/products/hooks/useProductActions';
+import { useEntityActions } from '@/hooks/use-entity-actions';
+import { useClientPagination } from '@/hooks/use-client-pagination';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { DataTable } from '@/components/ui/data-table';
+import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction } from '@/server/actions/product.actions';
+import { useLogsStore } from '@/stores/logs.store';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
@@ -45,14 +45,48 @@ export function ProductsPanel() {
   const [maxPrice, setMaxPrice] = useState('');
   const [showZeroStock, setShowZeroStock] = useState(true);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleLoss } = useProductActions({
+  const [isPendingLocal, startTransition] = useTransition();
+  const [showInactive, setShowInactive] = useState(false);
+
+  const { isPending: isPendingAction, syncData, handleEditSubmit, handleDelete } = useEntityActions<ProductDef, ProductInput>({
+    handlers: {
+      fetchData: () => fetchProducts(),
+      createAction: createProductAction,
+      updateAction: updateProductAction,
+      deleteAction: deleteProductAction,
+    },
+    setStoreData: setProducts,
     onSuccessMessage: (msg) => showGlobalMessage('success', msg),
     onErrorMessage: (msg) => showGlobalMessage('error', msg),
     closeFormModal,
     setServerError,
     setItemToDelete,
     editingItem,
+    showInactive,
+    onAfterSuccess: () => {
+      useProvidersStore.getState().setLoaded(false);
+      useDevicesStore.getState().setLoaded(false);
+    }
   });
+
+  const isPending = isPendingAction || isPendingLocal;
+
+  const handleLoss = async (lossProduct: ProductDef, quantity: string, reason: string, onLossClose: () => void) => {
+    const qty = parseInt(quantity);
+    if (!qty || qty <= 0) return setServerError('La cantidad debe ser min1');
+    if (qty > (lossProduct.stock || 0)) return setServerError('Excede el stock disponible');
+    
+    setServerError(null);
+    startTransition(async () => {
+      const result = await registerProductLossAction(lossProduct.id, qty, reason);
+      if (!result.success) return setServerError(result.message);
+      
+      onLossClose();
+      showGlobalMessage('success', result.message);
+      useLogsStore.getState().setLoaded(false);
+      syncData();
+    });
+  };
 
   useEffect(() => {
     async function loadInitial() {

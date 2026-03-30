@@ -21,6 +21,7 @@ export async function fetchDevices(includeInactive = true, search?: string): Pro
 
 export async function toggleDeviceActiveAction(id: string, isActive: boolean) {
   try {
+    console.log(`[DeviceAction] Iniciando cambio de estado de equipo a ${isActive ? 'activo' : 'inactivo'} (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
     await deviceRepository.updateActiveStatus(id, isActive);
     revalidatePath('/equipos');
@@ -41,6 +42,7 @@ export async function toggleDeviceActiveAction(id: string, isActive: boolean) {
 
 export async function createDeviceAction(input: DeviceInput) {
   try {
+    console.log(`[DeviceAction] Iniciando creación de nuevo equipo (${input.name})...`);
     const caller = await verifyAuthOrAdmin(true);
     const parsed = deviceSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
@@ -65,6 +67,7 @@ export async function createDeviceAction(input: DeviceInput) {
 
 export async function updateDeviceAction(id: string, input: DeviceInput) {
   try {
+    console.log(`[DeviceAction] Iniciando actualización de equipo (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
     const parsed = deviceSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
@@ -88,11 +91,13 @@ export async function updateDeviceAction(id: string, input: DeviceInput) {
 
 export async function deleteDeviceAction(id: string) {
   try {
+    console.log(`[DeviceAction] Iniciando eliminación de equipo (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
     
     // Rule: Cannot delete if has products
     const hasProducts = await deviceRepository.checkHasRelations(id);
     if (hasProducts) {
+      console.log(`[DeviceAction] Eliminación rechazada: el equipo (ID: ${id}) tiene productos asociados.`);
       return { 
         success: false, 
         message: 'No se puede eliminar permanentemente: este equipo tiene productos asociados en el stock. Prueba desactivarlo.' 
@@ -110,8 +115,17 @@ export async function deleteDeviceAction(id: string) {
       { note: 'Eliminación permanente' }
     );
 
+    console.log(`[DeviceAction] Equipo (ID: ${id}) eliminado exitosamente.`);
     return { success: true, message: 'Equipo eliminado permanentemente' };
   } catch (error: any) {
+    console.error(`[DeviceAction] Error al eliminar equipo:`, error);
+    
+    // Parse PostgreSQL FK Error just in case
+    const errorMsg = error.message?.toLowerCase() || '';
+    if (errorMsg.includes('23503') || errorMsg.includes('foreign key constraint') || errorMsg.includes('violates foreign key')) {
+      return { success: false, message: 'No se puede eliminar el equipo porque tiene registros vinculados (ej. historial o stock). Por favor, inactívalo.' };
+    }
+    
     return { success: false, message: error.message || 'Error al eliminar equipo' };
   }
 }

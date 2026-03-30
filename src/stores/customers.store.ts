@@ -5,10 +5,12 @@ interface CustomersState {
   customers: CustomerDef[];
   isLoaded: boolean;
   setCustomers: (items: CustomerDef[]) => void;
+  setLoaded: (val: boolean) => void;
 }
 
 export const useCustomersStore = create<CustomersState>((set) => ({
   customers: [],
   isLoaded: false,
   setCustomers: (items: CustomerDef[]) => set({ customers: items, isLoaded: true }),
+  setLoaded: (val: boolean) => set({ isLoaded: val }),
 }));

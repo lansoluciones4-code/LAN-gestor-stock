@@ -1,6 +1,6 @@
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { sales, saleItems, products, devices } from '@/lib/db/schema';
+import { sales, saleItems, products, devices, customers } from '@/lib/db/schema';
 import type { SaleInput } from '@/schemas/sale.schema';
 
 export class SaleRepository {
@@ -72,6 +72,11 @@ export class SaleRepository {
           total: input.total.toString(), 
         })
         .returning();
+
+      // 2.5 Activate customer if provided (re-activate if inactive)
+      if (input.customerId) {
+        await tx.update(customers).set({ isActive: true }).where(eq(customers.id, input.customerId));
+      }
 
       // 3. Insert items AND update stock
       for (const item of input.items) {

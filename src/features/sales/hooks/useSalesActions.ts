@@ -8,6 +8,7 @@ import { fetchCustomers } from '@/server/actions/customer.actions';
 import { useProductsStore } from '@/stores/products.store';
 import { useProvidersStore } from '@/stores/providers.store';
 import { useDevicesStore } from '@/stores/devices.store';
+import { useLogsStore } from '@/stores/logs.store';
 
 interface UseSalesActionsProps {
   onSuccessMessage: (msg: string) => void;
@@ -71,6 +72,7 @@ export function useSalesActions({
         clearCart();
         closeMobileCart();
         navigateToList();
+        useLogsStore.getState().setLoaded(false);
         loadData();
       } else {
         onErrorMessage(result.message);
@@ -85,6 +87,7 @@ export function useSalesActions({
       const result = await deleteSaleAction(id);
       if (result.success) {
         onSuccessMessage(result.message);
+        useLogsStore.getState().setLoaded(false);
         loadData();
       } else {
         onErrorMessage(result.message);

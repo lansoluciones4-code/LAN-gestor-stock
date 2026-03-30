@@ -4,7 +4,6 @@ import { fetchSales } from '@/server/actions/sale.actions';
 import { fetchCustomers } from '@/server/actions/customer.actions';
 import { fetchProducts } from '@/server/actions/product.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
-
 import { SalesListView } from '@/features/sales/components/sales-list-view';
 import { SalesPOSView } from '@/features/sales/components/sales-pos-view';
 import { SalesPrintView } from '@/features/sales/components/sales-print-view';

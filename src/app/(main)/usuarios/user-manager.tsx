@@ -14,6 +14,8 @@ import {
   toggleUserActiveAction,
 } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
+import { useSalesStore } from '@/stores/sales.store';
+import { useLogsStore } from '@/stores/logs.store';
 
 
 export function UserManager({ initialData }: { initialData: UserDef[] }) {
@@ -94,6 +96,8 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
     closeModal();
     setGlobalMessage({ type: 'success', text: result.message });
     setTimeout(() => setGlobalMessage(null), 3000);
+    useSalesStore.getState().setLoaded(false);
+    useLogsStore.getState().setLoaded(false);
     loadData();
   };
 
@@ -107,6 +111,8 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
+      useSalesStore.getState().setLoaded(false);
+      useLogsStore.getState().setLoaded(false);
       loadData();
     }
   };
@@ -123,6 +129,8 @@ export function UserManager({ initialData }: { initialData: UserDef[] }) {
     } else {
       setGlobalMessage({ type: 'success', text: result.message });
       setTimeout(() => setGlobalMessage(null), 3000);
+      useSalesStore.getState().setLoaded(false);
+      useLogsStore.getState().setLoaded(false);
       loadData();
     }
   };

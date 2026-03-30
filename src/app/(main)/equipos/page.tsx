@@ -1,28 +1,16 @@
-import { Suspense } from 'react';
-import { fetchDevices } from '@/server/actions/device.actions';
-import { TableSkeleton } from '@/components/ui/table-skeleton';
-import { DeviceManager } from './device-manager';
+'use client';
+
+import { PageHeader } from '@/components/ui/page-header';
+import { DevicePanel } from './device-panel';
 
 export default function DevicesPage() {
   return (
     <div className='flex flex-col h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 overflow-hidden'>
-      <div className='flex justify-between items-center mb-6 shrink-0'>
-        <div>
-          <h1 className='text-3xl font-bold text-zinc-900 dark:text-zinc-100'>Equipos</h1>
-          <p className='text-zinc-500 dark:text-zinc-400 mt-1'>
-            Gestión administrativa de los modelos físicos que ingresan al catálogo.
-          </p>
-        </div>
-      </div>
-
-      <Suspense fallback={<TableSkeleton />}>
-        <DeviceManagerLoader />
-      </Suspense>
+      <PageHeader 
+        title="Equipos" 
+        description="Gestión administrativa de los modelos físicos que ingresan al catálogo." 
+      />
+      <DevicePanel />
     </div>
   );
-}
-
-async function DeviceManagerLoader() {
-  const initialData = await fetchDevices();
-  return <DeviceManager initialData={initialData} />;
 }
