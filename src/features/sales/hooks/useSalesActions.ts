@@ -8,6 +8,7 @@ import { fetchCustomers } from '@/server/actions/customer.actions';
 import { useProductsStore } from '@/stores/products.store';
 import { useProvidersStore } from '@/stores/providers.store';
 import { useDevicesStore } from '@/stores/devices.store';
+import { useCustomersStore } from '@/stores/customers.store';
 import { useLogsStore } from '@/stores/logs.store';
 
 interface UseSalesActionsProps {
@@ -50,6 +51,7 @@ export function useSalesActions({
       useProductsStore.getState().setLoaded(false);
       useProvidersStore.getState().setLoaded(false);
       useDevicesStore.getState().setLoaded(false);
+      useCustomersStore.getState().setLoaded(false);
     });
   };
 

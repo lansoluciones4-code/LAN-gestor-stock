@@ -42,7 +42,7 @@ export function SalesPanel() {
       const promises = [];
       if (!salesLoaded) promises.push(fetchSales().then(setSales));
       if (!prodsLoaded) promises.push(fetchProducts().then(setProducts));
-      if (!custLoaded) promises.push(fetchCustomers(false).then(setCustomers));
+      if (!custLoaded) promises.push(fetchCustomers(true).then(setCustomers));
       
       await Promise.all(promises);
       setInitialLoading(false);

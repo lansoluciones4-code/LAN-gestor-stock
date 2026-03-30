@@ -34,7 +34,8 @@ export async function createSaleAction(input: SaleInput) {
 
     const result = await saleRepository.createSale(caller.id, parsed.data);
     revalidatePath('/ventas');
-    revalidatePath('/productos'); // To refresh stock in inventory
+    revalidatePath('/productos');
+    revalidatePath('/clientes');
 
     await recordAuditLog(
       caller.id,
