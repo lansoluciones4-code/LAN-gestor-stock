@@ -1,4 +1,23 @@
 import { test, expect } from '@playwright/test';
+//How to run
+/*
+Instalar playwright en la carpeta raiz del proyecto:      npm init playwright@latest
+
+Ejecuta un archivo de pruebas específico en modo en todos los navegadores configurados:
+                                                          npx playwright test tests/providers.spec.ts
+
+Limita la ejecución de la prueba únicamente al motor de Google Chrome.
+                                                          npx playwright test tests/providers.spec.ts --project=chromium
+
+Ejecuta la prueba abriendo la ventana del navegador de forma visible para que veas qué está pasando.
+                                                          npx playwright test tests/providers.spec.ts --headed
+
+Muestra el reporte final en caso de éxito:                npx playwright show-report
+
+Abre el navegador y la herramienta que graba tus clics y tipeos, transformándolos en código TypeScript.
+                                                          npx playwright codegen http://localhost:3000
+*/
+
 
 /**
  * Suite de Pruebas E2E: Gestión de Proveedores
