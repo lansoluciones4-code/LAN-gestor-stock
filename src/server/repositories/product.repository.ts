@@ -5,10 +5,7 @@ import type { ProductInput } from '@/schemas/product.schema';
 
 export class ProductRepository {
   async checkHasRelations(id: string) {
-    const [item, loss] = await Promise.all([
-      db.query.saleItems.findFirst({ where: (items, { eq }) => eq(items.productId, id) }),
-      db.query.productLosses.findFirst({ where: (l, { eq }) => eq(l.productId, id) }),
-    ]);
+    const [item, loss] = await Promise.all([db.query.saleItems.findFirst({ where: (items, { eq }) => eq(items.productId, id) }), db.query.productLosses.findFirst({ where: (l, { eq }) => eq(l.productId, id) })]);
     return !!item || !!loss;
   }
 

@@ -50,7 +50,8 @@ export class UserRepository {
   }
 
   async updateActiveStatus(id: string, isActive: boolean) {
-    const result = await db.update(users)
+    const result = await db
+      .update(users)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(users.id, id))
       .returning();
@@ -59,7 +60,7 @@ export class UserRepository {
 
   async createUser(input: UserInput) {
     if (!input.password) throw new Error('La contraseña es obligatoria para nuevos usuarios');
-    
+
     // Check duplication
     const existing = await db.query.users.findFirst({
       where: eq(users.username, input.username),
@@ -68,17 +69,20 @@ export class UserRepository {
 
     const hashedPassword = await bcrypt.hash(input.password, 10);
 
-    const result = await db.insert(users).values({
-      username: input.username,
-      passwordHash: hashedPassword,
-      role: input.role,
-      isActive: true,
-    }).returning({
-      id: users.id,
-      username: users.username,
-      role: users.role
-    });
-    
+    const result = await db
+      .insert(users)
+      .values({
+        username: input.username,
+        passwordHash: hashedPassword,
+        role: input.role,
+        isActive: true,
+      })
+      .returning({
+        id: users.id,
+        username: users.username,
+        role: users.role,
+      });
+
     return result[0];
   }
 
@@ -99,14 +103,11 @@ export class UserRepository {
       updateSet.passwordHash = await bcrypt.hash(input.password, 10);
     }
 
-    const result = await db.update(users)
-      .set(updateSet)
-      .where(eq(users.id, id))
-      .returning({
-        id: users.id,
-        username: users.username,
-        role: users.role
-      });
+    const result = await db.update(users).set(updateSet).where(eq(users.id, id)).returning({
+      id: users.id,
+      username: users.username,
+      role: users.role,
+    });
 
     return result[0];
   }

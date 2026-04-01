@@ -11,15 +11,8 @@ const secretKey = new TextEncoder().encode(JWT_SECRET);
  * @param expiresIn - The expiration time of the token
  * @returns A promise that resolves to the token string
  */
-export async function signToken(
-  payload: UserSession,
-  expiresIn: string = '24h'
-): Promise<string> {
-  return new SignJWT({ ...payload })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime(expiresIn)
-    .sign(secretKey);
+export async function signToken(payload: UserSession, expiresIn: string = '24h'): Promise<string> {
+  return new SignJWT({ ...payload }).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime(expiresIn).sign(secretKey);
 }
 
 /**

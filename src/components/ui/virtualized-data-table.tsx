@@ -8,9 +8,8 @@ export interface ColumnDef<T> {
   headerClassName?: string;
   cellClassName?: string;
   cell: (item: T) => React.ReactNode;
-  hideRole?: string[]; 
+  hideRole?: string[];
 }
-
 
 interface VirtualizedDataTableProps<T> {
   columns: ColumnDef<T>[];
@@ -32,32 +31,41 @@ interface VirtualizedDataTableProps<T> {
  */
 const VirtuosoComponents: TableComponents<any> = {
   Scroller: React.forwardRef((props, ref) => (
-    <div {...props} ref={ref} className="relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar scroll-smooth" />
+    <div
+      {...props}
+      ref={ref}
+      className="relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar scroll-smooth"
+    />
   )),
   Table: (props) => (
-    <table {...props} className="w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400 border-separate border-spacing-0" />
+    <table
+      {...props}
+      className="w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400 border-separate border-spacing-0"
+    />
   ),
   TableHead: React.forwardRef((props, ref) => (
-    <thead {...props} ref={ref} className="sticky top-0 z-10 text-sm uppercase bg-zinc-50/95 dark:bg-zinc-800/95 backdrop-blur-sm text-zinc-500 dark:text-zinc-400 shadow-sm" />
+    <thead
+      {...props}
+      ref={ref}
+      className="sticky top-0 z-10 text-sm uppercase bg-zinc-50/95 dark:bg-zinc-800/95 backdrop-blur-sm text-zinc-500 dark:text-zinc-400 shadow-sm"
+    />
   )),
   TableRow: (props) => (
-    <tr {...props} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors group" />
+    <tr
+      {...props}
+      className="hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors group"
+    />
   ),
   TableBody: React.forwardRef((props, ref) => (
-    <tbody {...props} ref={ref} className="divide-y divide-zinc-200 dark:divide-zinc-800" />
+    <tbody
+      {...props}
+      ref={ref}
+      className="divide-y divide-zinc-200 dark:divide-zinc-800"
+    />
   )),
 };
 
-export function VirtualizedDataTable<T extends { id: string | number }>({
-  columns,
-  data,
-  isLoading,
-  emptyMessage = 'No se han encontrado resultados.',
-  hasMore,
-  onEndReached,
-  fixedItemHeight = 64,
-}: VirtualizedDataTableProps<T>) {
-  
+export function VirtualizedDataTable<T extends { id: string | number }>({ columns, data, isLoading, emptyMessage = 'No se han encontrado resultados.', hasMore, onEndReached, fixedItemHeight = 64 }: VirtualizedDataTableProps<T>) {
   const colSpanCount = columns.length;
 
   // Renderizador de fila para Virtuoso
@@ -65,7 +73,10 @@ export function VirtualizedDataTable<T extends { id: string | number }>({
     return (
       <>
         {columns.map((col, idx) => (
-          <TableCell key={`v-cell-${row.id}-${idx}`} className={col.cellClassName}>
+          <TableCell
+            key={`v-cell-${row.id}-${idx}`}
+            className={col.cellClassName}
+          >
             {col.cell(row)}
           </TableCell>
         ))}
@@ -78,7 +89,10 @@ export function VirtualizedDataTable<T extends { id: string | number }>({
     if (!hasMore) return null;
     return (
       <tr>
-        <TableCell colSpan={colSpanCount} className='text-center py-6'>
+        <TableCell
+          colSpan={colSpanCount}
+          className="text-center py-6"
+        >
           <div className="flex flex-col items-center gap-2">
             <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
             <div className="text-[10px] font-black text-indigo-500 uppercase tracking-widest animate-pulse">Sincronizando Historial...</div>
@@ -94,13 +108,21 @@ export function VirtualizedDataTable<T extends { id: string | number }>({
         <TableHeader>
           <tr>
             {columns.map((col, idx) => (
-              <TableHead key={`v-empty-h-${idx}`} className={col.headerClassName}>{col.header}</TableHead>
+              <TableHead
+                key={`v-empty-h-${idx}`}
+                className={col.headerClassName}
+              >
+                {col.header}
+              </TableHead>
             ))}
           </tr>
         </TableHeader>
         <TableBody>
           <tr>
-            <TableCell colSpan={colSpanCount} className='py-20 text-center opacity-60'>
+            <TableCell
+              colSpan={colSpanCount}
+              className="py-20 text-center opacity-60"
+            >
               {emptyMessage}
             </TableCell>
           </tr>
@@ -118,7 +140,10 @@ export function VirtualizedDataTable<T extends { id: string | number }>({
       fixedHeaderContent={() => (
         <tr>
           {columns.map((col, idx) => (
-            <TableHead key={`v-head-${idx}`} className={col.headerClassName}>
+            <TableHead
+              key={`v-head-${idx}`}
+              className={col.headerClassName}
+            >
               {col.header}
             </TableHead>
           ))}
@@ -127,7 +152,7 @@ export function VirtualizedDataTable<T extends { id: string | number }>({
       itemContent={rowContent}
       components={{
         ...VirtuosoComponents,
-        TableFoot: Footer
+        TableFoot: Footer,
       }}
       style={{ height: '100%', width: '100%' }}
     />

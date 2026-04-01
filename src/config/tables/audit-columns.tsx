@@ -9,13 +9,19 @@ interface ColumnActions {
 const getActionColor = (action: string) => {
   const a = action.toUpperCase();
   switch (a) {
-    case 'CREAR': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20';
+    case 'CREAR':
+      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20';
     case 'ACTUALIZAR':
-    case 'EDITAR': return 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20';
-    case 'ELIMINAR': return 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200 dark:border-rose-500/20';
-    case 'PÉRDIDA': return 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200 dark:border-orange-500/20';
-    case 'LOGIN': return 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
-    default: return 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800';
+    case 'EDITAR':
+      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20';
+    case 'ELIMINAR':
+      return 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200 dark:border-rose-500/20';
+    case 'PÉRDIDA':
+      return 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200 dark:border-orange-500/20';
+    case 'LOGIN':
+      return 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
+    default:
+      return 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800';
   }
 };
 
@@ -24,11 +30,9 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     {
       header: 'Fecha y Hora',
       cell: (log) => (
-        <div className='font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap'>
-          {new Date(log.createdAt).toLocaleDateString('es-AR')} 
-          <span className='text-indigo-600 dark:text-indigo-400 ml-1'>
-            {new Date(log.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
-          </span>
+        <div className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
+          {new Date(log.createdAt).toLocaleDateString('es-AR')}
+          <span className="text-indigo-600 dark:text-indigo-400 ml-1">{new Date(log.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       ),
     },
@@ -39,11 +43,7 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Acción',
-      cell: (log) => (
-        <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[11px] ${getActionColor(log.action)}`}>
-          {log.action}
-        </span>
-      ),
+      cell: (log) => <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[11px] ${getActionColor(log.action)}`}>{log.action}</span>,
     },
     {
       header: 'Entidad',
@@ -60,15 +60,15 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
       headerClassName: 'text-right font-bold',
       cellClassName: 'flex justify-end',
       cell: (log) => (
-        <button 
+        <button
           onClick={(e) => {
             e.stopPropagation();
             onView(log);
           }}
-          className='p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm'
-          title='Ver Detalle'
+          className="p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm"
+          title="Ver Detalle"
         >
-          <Eye className='w-4 h-4' />
+          <Eye className="w-4 h-4" />
         </button>
       ),
     },

@@ -20,7 +20,12 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CustomerInput>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CustomerInput>({
     resolver: zodResolver(customerSchema),
   });
 
@@ -48,10 +53,8 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
   const onSubmit = async (data: CustomerInput) => {
     setServerError(null);
     startTransition(async () => {
-      const action = editingItem 
-        ? updateCustomerAction(editingItem.id, data) 
-        : createCustomerAction(data);
-      
+      const action = editingItem ? updateCustomerAction(editingItem.id, data) : createCustomerAction(data);
+
       const result = await action;
 
       if (!result.success) {
@@ -70,57 +73,57 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
       isOpen={isOpen}
       onClose={onClose}
       title={editingItem ? 'Editar Ficha Cliente' : 'Nuevo Registro de Cliente'}
-      icon={<Users className='w-5 h-5 text-indigo-500'/>}
+      icon={<Users className="w-5 h-5 text-indigo-500" />}
       width="md"
       onSubmit={handleSubmit(onSubmit)}
       submitLabel={editingItem ? 'Actualizar Ficha' : 'Guardar Cliente'}
       isPending={isPending}
     >
-      {serverError && <div className='p-3 bg-red-50 text-red-600 text-sm font-bold uppercase rounded-lg border border-red-200 mb-6'>{serverError}</div>}
-      <div className='max-h-[60vh] overflow-y-auto px-1 space-y-4'>
+      {serverError && <div className="p-3 bg-red-50 text-red-600 text-sm font-bold uppercase rounded-lg border border-red-200 mb-6">{serverError}</div>}
+      <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
         <div>
-          <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Nombre Completo / Razón Social</label>
+          <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nombre Completo / Razón Social</label>
           <input
-            type='text'
+            type="text"
             {...register('name')}
             autoFocus
-            placeholder='Ej: Carlos Pérez Martínez'
+            placeholder="Ej: Carlos Pérez Martínez"
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
-          {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
+          {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name.message}</p>}
         </div>
 
         <div>
-          <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>DNI / CUIT</label>
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">DNI / CUIT</label>
           <input
-            type='text'
+            type="text"
             {...register('documentNumber')}
-            placeholder='Ej: 35.123.456 o 20-35123456-9'
+            placeholder="Ej: 35.123.456 o 20-35123456-9"
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.documentNumber ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
-          {errors.documentNumber && <p className='text-red-500 text-xs mt-1.5'>{errors.documentNumber.message}</p>}
+          {errors.documentNumber && <p className="text-red-500 text-xs mt-1.5">{errors.documentNumber.message}</p>}
         </div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Teléfono</label>
-            <input 
-              type='text' 
-              {...register('phone')} 
-              placeholder='+54 9 11 9876-5432' 
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} 
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Teléfono</label>
+            <input
+              type="text"
+              {...register('phone')}
+              placeholder="+54 9 11 9876-5432"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
             />
-            {errors.phone && <p className='text-red-500 text-xs mt-1.5'>{errors.phone.message}</p>}
+            {errors.phone && <p className="text-red-500 text-xs mt-1.5">{errors.phone.message}</p>}
           </div>
           <div>
-            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Email</label>
-            <input 
-              type='email' 
-              {...register('email')} 
-              placeholder='cliente@correo.com' 
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} 
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Email</label>
+            <input
+              type="email"
+              {...register('email')}
+              placeholder="cliente@correo.com"
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
             />
-            {errors.email && <p className='text-red-500 text-xs mt-1.5'>{errors.email.message}</p>}
+            {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
           </div>
         </div>
       </div>

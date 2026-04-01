@@ -28,7 +28,7 @@ async function seedStressTest() {
       const color = colors[Math.floor(Math.random() * colors.length)];
       const cap = storage[Math.floor(Math.random() * storage.length)];
       const cond = conditions[Math.floor(Math.random() * conditions.length)];
-      
+
       const purchasePrice = Math.floor(Math.random() * 500) + 200;
       const salePrice = Math.floor(purchasePrice * 1.3);
       const stock = Math.floor(Math.random() * 50) + 1;
@@ -48,7 +48,7 @@ async function seedStressTest() {
 
     console.log('--- TEST COMPLETADO CON ÉXITO ---');
     console.log('Ahora puedes entrar al panel de Productos y verificar la fluidez del scroll virtualizado.');
-    
+
     process.exit(0);
   } catch (error) {
     console.error('Error durante el seed:', error);

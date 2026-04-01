@@ -20,16 +20,12 @@ import { useEntityManager } from '@/hooks/use-entity-manager';
 export function SalesPanel() {
   const [view, setView] = useState<'list' | 'new' | 'print'>('list');
   const [initialLoading, setInitialLoading] = useState(true);
-  
+
   const { sales, setSales, isLoaded: salesLoaded } = useSalesStore();
   const { products, setProducts, isLoaded: prodsLoaded } = useProductsStore();
   const { customers, setCustomers, isLoaded: custLoaded } = useCustomersStore();
 
-  const {
-    itemToDelete, setItemToDelete,
-    globalMessage, showGlobalMessage,
-    search: searchTerm, setSearch: setSearchTerm
-  } = useEntityManager<SaleDef>();
+  const { itemToDelete, setItemToDelete, globalMessage, showGlobalMessage, search: searchTerm, setSearch: setSearchTerm } = useEntityManager<SaleDef>();
 
   useEffect(() => {
     async function loadInitial() {
@@ -43,7 +39,7 @@ export function SalesPanel() {
       if (!salesLoaded) promises.push(fetchSales().then(setSales));
       if (!prodsLoaded) promises.push(fetchProducts().then(setProducts));
       if (!custLoaded) promises.push(fetchCustomers(true).then(setCustomers));
-      
+
       await Promise.all(promises);
       setInitialLoading(false);
     }
@@ -56,16 +52,14 @@ export function SalesPanel() {
 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  
+
   const [selectedSaleForPrint, setSelectedSaleForPrint] = useState<SaleDef | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
 
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(
-    displayCustomers.find((c) => c.name.toLowerCase() === 'mostrador')?.id || displayCustomers[0]?.id || ''
-  );
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(displayCustomers.find((c) => c.name.toLowerCase() === 'mostrador')?.id || displayCustomers[0]?.id || '');
 
   const cartProps = useCart();
-  
+
   const { isPending, handleCreateSale, confirmDelete, loadData } = useSalesActions({
     onSuccessMessage: (text) => showGlobalMessage('success', text),
     onErrorMessage: (text) => showGlobalMessage('error', text),
@@ -75,20 +69,32 @@ export function SalesPanel() {
     setItemToDelete,
     clearCart: cartProps.clearCart,
     closeMobileCart: () => setShowMobileCart(false),
-    navigateToList: () => setView('list')
+    navigateToList: () => setView('list'),
   });
 
   if (initialLoading) {
-    return <div className="mt-8 animate-in fade-in duration-500"><TableSkeleton /></div>;
+    return (
+      <div className="mt-8 animate-in fade-in duration-500">
+        <TableSkeleton />
+      </div>
+    );
   }
 
   if (view === 'print' && selectedSaleForPrint) {
-    return <SalesPrintView sale={selectedSaleForPrint} onClose={() => { setSelectedSaleForPrint(null); setView('list'); }} />;
+    return (
+      <SalesPrintView
+        sale={selectedSaleForPrint}
+        onClose={() => {
+          setSelectedSaleForPrint(null);
+          setView('list');
+        }}
+      />
+    );
   }
 
   if (view === 'new') {
     return (
-      <SalesPOSView 
+      <SalesPOSView
         products={displayProducts}
         customers={displayCustomers}
         setCustomers={setCustomers}
@@ -100,23 +106,15 @@ export function SalesPanel() {
         onCancel={() => setView('list')}
         showMobileCart={showMobileCart}
         setShowMobileCart={setShowMobileCart}
-        setGlobalMessage={(msg) => msg ? showGlobalMessage(msg.type, msg.text) : null}
+        setGlobalMessage={(msg) => (msg ? showGlobalMessage(msg.type, msg.text) : null)}
       />
     );
   }
 
   return (
     <>
-      <div className='flex flex-col flex-1 h-full overflow-hidden'>
-        {globalMessage && (
-          <div className={`shrink-0 mb-4 p-4 rounded-lg border text-sm font-bold animate-in slide-in-from-top-2 duration-300 shadow-sm ${
-            globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'
-          }`}>
-            {globalMessage.text}
-          </div>
-        )}
-
-        <SalesListView 
+      <div className="flex flex-col flex-1 h-full overflow-hidden">
+        <SalesListView
           sales={displaySales}
           isPending={isPending}
           onSync={() => loadData(true)}
@@ -127,8 +125,12 @@ export function SalesPanel() {
           endDate={endDate}
           setEndDate={setEndDate}
           onNewSale={() => setView('new')}
-          onPrintRow={(sale) => { setSelectedSaleForPrint(sale); setView('print'); }}
+          onPrintRow={(sale) => {
+            setSelectedSaleForPrint(sale);
+            setView('print');
+          }}
           onDeleteRow={setItemToDelete}
+          globalMessage={globalMessage}
         />
       </div>
 

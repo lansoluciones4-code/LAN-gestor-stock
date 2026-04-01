@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Gestión de Proveedores (UI)', () => {
-
   // 1. PREPARACIÓN: Iniciamos sesión antes de cada prueba
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:3000/login');
@@ -37,5 +36,4 @@ test.describe('Gestión de Proveedores (UI)', () => {
     // Esperamos a que el formulario se cierre y el nuevo proveedor aparezca en la lista o tabla
     await expect(page.getByText(nombreProveedor)).toBeVisible();
   });
-
 });

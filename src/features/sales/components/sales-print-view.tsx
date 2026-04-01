@@ -4,79 +4,93 @@ import { Button } from '@/components/ui/button';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
   return (
-    <div className='flex flex-col h-full space-y-4 animate-in fade-in duration-300 overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-1'>
-      <div className='flex items-center justify-between sticky top-4 bg-white dark:bg-zinc-900 px-4 py-3 z-30 border-b border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl mx-2'>
-        <Button 
-          variant='secondary' 
-          size='sm' 
-          onClick={onClose} 
-          leftIcon={<ArrowLeft className='w-4 h-4'/>}
-          className='font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md'
+    <div className="flex flex-col h-full space-y-4 animate-in fade-in duration-300 overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-1">
+      <div className="flex items-center justify-between sticky top-4 bg-white dark:bg-zinc-900 px-4 py-3 z-30 border-b border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl mx-2">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onClose}
+          leftIcon={<ArrowLeft className="w-4 h-4" />}
+          className="font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md"
         >
           Volver
         </Button>
-        <div className='flex gap-2 shrink-0'>
-          <Button size='sm' variant='secondary' onClick={() => window.print()} leftIcon={<Printer className='w-4 h-4'/>}>
-             Imprimir Comprobante
+        <div className="flex gap-2 shrink-0">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => window.print()}
+            leftIcon={<Printer className="w-4 h-4" />}
+          >
+            Imprimir Comprobante
           </Button>
         </div>
       </div>
-      
-      <div className='flex-1 overflow-auto p-4 sm:p-10 custom-scrollbar'>
-          <div id='print-area-wrapper' className='bg-white text-zinc-900 p-4 sm:p-12 border border-zinc-200 rounded-xl shadow-lg max-w-2xl mx-auto'>
-              <div className='flex justify-between items-start mb-12 border-b-2 border-indigo-50 pb-8'>
-                <div>
-                  <h2 className='text-3xl font-black text-indigo-600'>STOCK APP</h2>
-                  <p className='text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1'>Registro Comercial</p>
-                </div>
-                <div className='text-right'>
-                  <div className='text-[11px] font-bold text-zinc-900 uppercase'>ID: {sale.id.substring(0,8).toUpperCase()}</div>
-                  <div className='text-[10px] text-zinc-500 font-medium'>{new Date(sale.createdAt).toLocaleDateString('es-AR')}</div>
-                </div>
-              </div>
 
-              <div className='grid grid-cols-2 gap-10 mb-16'>
-                  <div>
-                    <span className='text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1'>Cliente</span>
-                    <p className='text-sm font-bold text-zinc-800'>{sale.customer?.name || 'Consumidor Final'}</p>
-                  </div>
-                  <div className='text-right'>
-                    <span className='text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1'>Vendedor</span>
-                    <p className='text-sm font-bold text-zinc-800'>{sale.vendor?.username || 'SISTEMA'}</p>
-                  </div>
+      <div className="flex-1 overflow-auto p-4 sm:p-10 custom-scrollbar">
+        <div
+          id="print-area-wrapper"
+          className="bg-white text-zinc-900 p-4 sm:p-12 border border-zinc-200 rounded-xl shadow-lg max-w-2xl mx-auto"
+        >
+          <div className="flex justify-between items-start mb-12 border-b-2 border-indigo-50 pb-8">
+            <div>
+              <h2 className="text-3xl font-black text-indigo-600">STOCK APP</h2>
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1">Registro Comercial</p>
+            </div>
+            <div className="text-right">
+              <div className="text-[11px] font-bold text-zinc-900 uppercase">
+                ID:
+                {sale.id.substring(0, 8).toUpperCase()}
               </div>
-
-              <table className='w-full mb-16'>
-                <thead>
-                  <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
-                    <th className='py-5'>Producto</th>
-                    <th className='py-5 text-center'>Cant</th>
-                    <th className='py-5 text-right'>Precio</th>
-                    <th className='py-5 text-right'>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-zinc-100'>
-                  {sale.items?.map((item: any) => (
-                    <tr key={item.id} className='text-[13px] text-zinc-900'>
-                      <td className='py-5 font-bold text-zinc-900'>
-                        {item.product?.device?.name}
-                        <span className='block text-[10px] font-normal text-zinc-500 uppercase mt-0.5'>{item.product?.description}</span>
-                      </td>
-                      <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
-                      <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR')}</td>
-                      <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR')}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <div className='flex justify-end pt-10 border-t-2 border-zinc-900'>
-                <div className='flex items-center gap-10'>
-                  <span className='text-lg font-black uppercase text-zinc-900'>Total</span>
-                  <span className='text-3xl font-black text-indigo-700 forced-color-black'>${sale.total.toLocaleString('es-AR')}</span>
-                </div>
-              </div>
+              <div className="text-[10px] text-zinc-500 font-medium">{new Date(sale.createdAt).toLocaleDateString('es-AR')}</div>
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-10 mb-16">
+            <div>
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1">Cliente</span>
+              <p className="text-sm font-bold text-zinc-800">{sale.customer?.name || 'Consumidor Final'}</p>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1">Vendedor</span>
+              <p className="text-sm font-bold text-zinc-800">{sale.vendor?.username || 'SISTEMA'}</p>
+            </div>
+          </div>
+
+          <table className="w-full mb-16">
+            <thead>
+              <tr className="border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest">
+                <th className="py-5">Producto</th>
+                <th className="py-5 text-center">Cant</th>
+                <th className="py-5 text-right">Precio</th>
+                <th className="py-5 text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              {sale.items?.map((item: any) => (
+                <tr
+                  key={item.id}
+                  className="text-[13px] text-zinc-900"
+                >
+                  <td className="py-5 font-bold text-zinc-900">
+                    {item.product?.device?.name}
+                    <span className="block text-[10px] font-normal text-zinc-500 uppercase mt-0.5">{item.product?.description}</span>
+                  </td>
+                  <td className="py-5 text-center font-bold text-zinc-900">{item.quantity}</td>
+                  <td className="py-5 text-right text-zinc-900">${item.unitPrice.toLocaleString('es-AR')}</td>
+                  <td className="py-5 text-right font-black text-zinc-900">${item.subtotal.toLocaleString('es-AR')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="flex justify-end pt-10 border-t-2 border-zinc-900">
+            <div className="flex items-center gap-10">
+              <span className="text-lg font-black uppercase text-zinc-900">Total</span>
+              <span className="text-3xl font-black text-indigo-700 forced-color-black">${sale.total.toLocaleString('es-AR')}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

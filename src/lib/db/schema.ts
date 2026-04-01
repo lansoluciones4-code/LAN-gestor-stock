@@ -1,15 +1,4 @@
-import {
-  pgTable,
-  uuid,
-  varchar,
-  timestamp,
-  pgEnum,
-  numeric,
-  integer,
-  jsonb,
-  index,
-  boolean,
-} from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, pgEnum, numeric, integer, jsonb, index, boolean } from 'drizzle-orm/pg-core';
 import { sql, relations } from 'drizzle-orm';
 
 export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
@@ -82,11 +71,7 @@ export const products = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [
-    index('device_id_idx').on(table.deviceId),
-    index('provider_id_idx').on(table.providerId),
-    index('customer_id_idx').on(table.customerId),
-  ]
+  (table) => [index('device_id_idx').on(table.deviceId), index('provider_id_idx').on(table.providerId), index('customer_id_idx').on(table.customerId)]
 );
 
 export const sales = pgTable(
@@ -102,10 +87,7 @@ export const sales = pgTable(
     total: numeric('total', { precision: 10, scale: 2 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => [
-    index('sales_customer_id_idx').on(table.customerId),
-    index('sales_vendor_id_idx').on(table.vendorId),
-  ]
+  (table) => [index('sales_customer_id_idx').on(table.customerId), index('sales_vendor_id_idx').on(table.vendorId)]
 );
 
 export const saleItems = pgTable(
@@ -124,10 +106,7 @@ export const saleItems = pgTable(
     unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
-  (table) => [
-    index('sale_items_sale_id_idx').on(table.saleId),
-    index('sale_items_product_id_idx').on(table.productId),
-  ]
+  (table) => [index('sale_items_sale_id_idx').on(table.saleId), index('sale_items_product_id_idx').on(table.productId)]
 );
 
 export const auditLogs = pgTable(
@@ -144,10 +123,7 @@ export const auditLogs = pgTable(
     detail: jsonb('detail'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => [
-    index('audit_logs_user_id_idx').on(table.userId),
-    index('audit_logs_entity_idx').on(table.entity),
-  ]
+  (table) => [index('audit_logs_user_id_idx').on(table.userId), index('audit_logs_entity_idx').on(table.entity)]
 );
 
 export const productLosses = pgTable(
@@ -166,10 +142,7 @@ export const productLosses = pgTable(
     reason: varchar('reason', { length: 255 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => [
-    index('loss_product_id_idx').on(table.productId),
-    index('loss_user_id_idx').on(table.userId),
-  ]
+  (table) => [index('loss_product_id_idx').on(table.productId), index('loss_user_id_idx').on(table.userId)]
 );
 
 export const productsRelations = relations(products, ({ one, many }) => ({
@@ -247,4 +220,3 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
     references: [users.id],
   }),
 }));
-

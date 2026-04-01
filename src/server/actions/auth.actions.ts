@@ -96,10 +96,10 @@ export async function logSessionRestoredAction() {
   try {
     const user = await verifyAuthOrAdmin(false); // Validamos que el usuario tenga sesión
     if (user) {
-      await recordAuditLog(user.id, 'LOGIN', 'USER', user.id, { 
+      await recordAuditLog(user.id, 'LOGIN', 'USER', user.id, {
         method: 'cookie',
         username: user.username,
-        message: 'Sesión restaurada automáticamente' 
+        message: 'Sesión restaurada automáticamente',
       });
       return { success: true };
     }

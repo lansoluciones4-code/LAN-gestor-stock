@@ -22,24 +22,15 @@ interface UseEntityActionsProps<TDef, TInput> {
   onAfterSuccess?: () => void;
 }
 
-export function useEntityActions<TDef extends { id?: string, isActive?: boolean }, TInput>({
-  handlers,
-  setStoreData,
-  onSuccessMessage,
-  onErrorMessage,
-  closeFormModal,
-  setServerError,
-  setItemToDelete,
-  editingItem,
-  showInactive,
-  onAfterSuccess,
-}: UseEntityActionsProps<TDef, TInput>) {
+export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive, onAfterSuccess }: UseEntityActionsProps<TDef, TInput>) {
   const [isPending, startTransition] = useTransition();
 
   const syncData = async (manual = false) => {
     startTransition(async () => {
+      // Usamos el valor directamente para evitar cierres de función (closures) antiguos
       const resp = await handlers.fetchData(showInactive);
       setStoreData(resp);
+
       if (manual) {
         onSuccessMessage('Datos sincronizados con éxito.');
       }
@@ -56,9 +47,9 @@ export function useEntityActions<TDef extends { id?: string, isActive?: boolean 
       if (!handlers.createAction) return setServerError('Operación no soportada');
       result = await handlers.createAction(data);
     }
-    
+
     if (!result.success) return setServerError(result.message);
-    
+
     closeFormModal();
     onSuccessMessage(result.message);
     useLogsStore.getState().setLoaded(false);
@@ -71,9 +62,9 @@ export function useEntityActions<TDef extends { id?: string, isActive?: boolean 
     if (!handlers.deleteAction) return onErrorMessage('Operación no soportada');
 
     const result = await handlers.deleteAction(id);
-    
+
     if (!result.success) return onErrorMessage(result.message);
-    
+
     onSuccessMessage(result.message);
     useLogsStore.getState().setLoaded(false);
     onAfterSuccess?.();
@@ -82,7 +73,7 @@ export function useEntityActions<TDef extends { id?: string, isActive?: boolean 
 
   const handleToggleActive = async (item: TDef) => {
     if (!handlers.toggleActiveAction) return onErrorMessage('Operación no soportada');
-    
+
     const nextStatus = !item.isActive;
     const result = await handlers.toggleActiveAction(item.id!, nextStatus);
     if (!result.success) {

@@ -18,18 +18,19 @@ export class CustomerRepository {
       where: (p, { eq }) => eq(p.customerId, id),
       limit: 1,
     });
-    
+
     const salesList = await db.query.sales.findMany({
       where: (s, { eq }) => eq(s.customerId, id),
       limit: 1,
     });
-    
+
     return productsList.length > 0 || salesList.length > 0;
   }
 
   async updateActiveStatus(id: string, isActive: boolean) {
     console.log(`[CustomerRepository] Actualizando status de cliente ID: ${id} a ${isActive}...`);
-    const result = await db.update(customers)
+    const result = await db
+      .update(customers)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(customers.id, id))
       .returning();
@@ -38,29 +39,34 @@ export class CustomerRepository {
 
   async createCustomer(input: CustomerInput) {
     console.log(`[CustomerRepository] Insertando nuevo cliente en BD: ${input.name}...`);
-    const result = await db.insert(customers).values({
-      name: input.name,
-      phone: input.phone || null,
-      email: input.email || null,
-      documentNumber: input.documentNumber || null,
-      isActive: true,
-    }).returning();
-    
+    const result = await db
+      .insert(customers)
+      .values({
+        name: input.name,
+        phone: input.phone || null,
+        email: input.email || null,
+        documentNumber: input.documentNumber || null,
+        isActive: true,
+      })
+      .returning();
+
     return result[0];
   }
 
   async updateCustomer(id: string, input: CustomerInput) {
     console.log(`[CustomerRepository] Actualizando datos de cliente ID: ${id}...`);
-    const result = await db.update(customers).set({
-      name: input.name,
-      phone: input.phone || null,
-      email: input.email || null,
-      documentNumber: input.documentNumber || null,
-      updatedAt: sql`NOW()`,
-    })
-    .where(eq(customers.id, id))
-    .returning();
-    
+    const result = await db
+      .update(customers)
+      .set({
+        name: input.name,
+        phone: input.phone || null,
+        email: input.email || null,
+        documentNumber: input.documentNumber || null,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(customers.id, id))
+      .returning();
+
     return result[0];
   }
 

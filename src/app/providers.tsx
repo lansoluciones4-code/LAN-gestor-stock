@@ -6,7 +6,11 @@ import { SessionInitializer } from '@/components/auth/session-initializer';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+    >
       <SessionInitializer />
       {children}
     </ThemeProvider>
