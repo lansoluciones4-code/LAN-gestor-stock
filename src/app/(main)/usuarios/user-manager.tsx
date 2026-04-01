@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
-import { DataTable } from '@/components/ui/data-table';
+import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { type UserInput, type UserDef } from '@/schemas/user.schema';
 import {
   createUserAction,
@@ -23,7 +23,7 @@ import { useStatsStore } from '@/stores/stats.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { useClientPagination } from '@/hooks/use-client-pagination';
+
 
 import { UserModal } from '@/components/modals/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
@@ -88,7 +88,7 @@ export function UserManager() {
     return matchesSearch && matchesStatus;
   });
 
-  const { paginatedData, hasMore, elementRef } = useClientPagination(filteredUsers, 20);
+
 
   const handleEditClick = (item?: UserDef) => {
     openFormModal(item);
@@ -156,12 +156,10 @@ export function UserManager() {
           </div>
         )}
 
-        <DataTable 
+        <VirtualizedDataTable 
           columns={columns} 
-          data={paginatedData} 
+          data={filteredUsers} 
           isLoading={isPending} 
-          hasMore={hasMore} 
-          observerRef={elementRef} 
           emptyMessage="No se han encontrado usuarios con credenciales activas."
         />
 

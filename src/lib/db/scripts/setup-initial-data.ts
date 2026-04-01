@@ -1,5 +1,5 @@
-import { db } from './index';
-import { providers, customers, devices, products, sales, saleItems, auditLogs } from './schema';
+import { db } from '..';
+import { providers, customers, devices, products, sales, saleItems, auditLogs } from '../schema';
 
 async function setup() {
   console.log('--- Database Reset & Initial Data Setup ---');

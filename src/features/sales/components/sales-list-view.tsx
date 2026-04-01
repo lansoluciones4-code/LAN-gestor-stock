@@ -1,12 +1,12 @@
 import { Plus, RefreshCcw } from 'lucide-react';
 import { type SaleDef } from '@/schemas/sale.schema';
-import { DataTable } from '@/components/ui/data-table';
+import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { SearchBar } from '@/components/ui/search-bar';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth.store';
 import { getSalesColumns } from '@/config/tables/sales-columns';
-import { useClientPagination } from '@/hooks/use-client-pagination';
+
 
 interface SalesListViewProps {
   sales: SaleDef[];
@@ -51,7 +51,7 @@ export function SalesListView({
      return matchesSearch && matchesStart && matchesEnd;
   });
 
-  const { paginatedData, hasMore, elementRef } = useClientPagination(filteredSales, 20);
+
 
   const columns = getSalesColumns({
     role,
@@ -88,12 +88,10 @@ export function SalesListView({
         </div>
       </div>
 
-      <DataTable 
+      <VirtualizedDataTable 
         columns={columns} 
-        data={paginatedData} 
+        data={filteredSales} 
         isLoading={isPending} 
-        hasMore={hasMore} 
-        observerRef={elementRef} 
         emptyMessage="No hay operaciones que coincidan con los filtros."
       />
     </div>
