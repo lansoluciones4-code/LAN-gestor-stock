@@ -55,7 +55,7 @@ export class SaleRepository {
         const prod = await tx.query.products.findFirst({
           where: eq(products.id, item.productId),
           columns: { stock: true, id: true },
-          with: { device: { columns: { name: true } } }
+          with: { device: { columns: { name: true } } },
         });
 
         if (!prod || prod.stock < item.quantity) {
@@ -69,7 +69,7 @@ export class SaleRepository {
         .values({
           customerId: input.customerId,
           vendorId,
-          total: input.total.toString(), 
+          total: input.total.toString(),
         })
         .returning();
 

@@ -14,11 +14,7 @@ export class AuditLogRepository {
 
         if (search) {
           const s = `%${search.toLowerCase()}%`;
-          conditions.push(or(
-            like(logs.action, s),
-            like(logs.entity, s),
-            like(logs.entityId, s)
-          ));
+          conditions.push(or(like(logs.action, s), like(logs.entity, s), like(logs.entityId, s)));
         }
 
         if (startDate) {
@@ -41,8 +37,7 @@ export class AuditLogRepository {
 
   async getLogsByEntity(entity: string, entityId?: string) {
     return await db.query.auditLogs.findMany({
-      where: (logs, { eq, and }) => 
-        entityId ? and(eq(logs.entity, entity), eq(logs.entityId, entityId)) : eq(logs.entity, entity),
+      where: (logs, { eq, and }) => (entityId ? and(eq(logs.entity, entity), eq(logs.entityId, entityId)) : eq(logs.entity, entity)),
       orderBy: [desc(auditLogs.createdAt)],
       with: {
         user: true,

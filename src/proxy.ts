@@ -7,11 +7,7 @@ const publicPaths = ['/login', '/favicon.ico', '/api/public'];
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/__next') ||
-    pathname.match(/\.(png|jpg|jpeg|svg|css|js|ico)$/)
-  ) {
+  if (pathname.startsWith('/_next') || pathname.startsWith('/__next') || pathname.match(/\.(png|jpg|jpeg|svg|css|js|ico)$/)) {
     return NextResponse.next();
   }
 

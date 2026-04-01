@@ -4,9 +4,7 @@ import * as schema from './schema';
 import * as dotenv from 'dotenv';
 dotenv.config();
 const isProd = process.env.NODE_ENV === 'production';
-const connectionString = isProd 
-  ? process.env.DATABASE_URL! 
-  : (process.env.LOCAL_DATABASE_URL || 'postgresql://postgres:password@127.0.0.1:5432/stock_db');
+const connectionString = isProd ? process.env.DATABASE_URL! : process.env.LOCAL_DATABASE_URL || 'postgresql://postgres:password@127.0.0.1:5432/stock_db';
 
 const pool = new Pool({
   connectionString,

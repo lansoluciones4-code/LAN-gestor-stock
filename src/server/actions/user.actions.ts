@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { userRepository } from '@/server/repositories/user.repository';
@@ -26,15 +25,8 @@ export async function toggleUserActiveAction(id: string, isActive: boolean) {
       return { success: false, message: 'No puedes cambiar tu propio estado de actividad.' };
     }
     await userRepository.updateActiveStatus(id, isActive);
-    revalidatePath('/usuarios');
 
-    await recordAuditLog(
-      caller.id,
-      isActive ? 'ACTUALIZAR' : 'ELIMINAR',
-      'USER',
-      id,
-      { active: isActive }
-    );
+    await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, { active: isActive });
 
     return { success: true, message: `Usuario ${isActive ? 'activado' : 'desactivado'} exitosamente` };
   } catch (error: any) {
@@ -49,15 +41,8 @@ export async function createUserAction(input: UserInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const newUser = await userRepository.createUser(parsed.data);
-    revalidatePath('/usuarios');
 
-    await recordAuditLog(
-      caller.id,
-      'CREAR',
-      'USER',
-      newUser.id,
-      { username: newUser.username, role: newUser.role }
-    );
+    await recordAuditLog(caller.id, 'CREAR', 'USER', newUser.id, { username: newUser.username, role: newUser.role });
 
     return { success: true, message: 'Usuario registrado exitosamente' };
   } catch (error: any) {
@@ -77,15 +62,8 @@ export async function updateUserAction(id: string, input: UserInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     await userRepository.updateUser(id, parsed.data);
-    revalidatePath('/usuarios');
 
-    await recordAuditLog(
-      caller.id,
-      'ACTUALIZAR',
-      'USER',
-      id,
-      { username: input.username, role: input.role }
-    );
+    await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, { username: input.username, role: input.role });
 
     return { success: true, message: 'Usuario actualizado exitosamente' };
   } catch (error: any) {
@@ -103,22 +81,15 @@ export async function deleteUserAction(id: string) {
     // Check relations (audit logs)
     const hasRelations = await userRepository.checkHasRelations(id);
     if (hasRelations) {
-      return { 
-        success: false, 
-        message: 'No se puede eliminar permanentemente: este usuario tiene registros de auditoría asociados. Prueba desactivarlo.' 
+      return {
+        success: false,
+        message: 'No se puede eliminar permanentemente: este usuario tiene registros de auditoría asociados. Prueba desactivarlo.',
       };
     }
 
     await userRepository.deleteUser(id);
-    revalidatePath('/usuarios');
 
-    await recordAuditLog(
-      caller.id,
-      'ELIMINAR',
-      'USER',
-      id,
-      { note: 'Eliminación permanente' }
-    );
+    await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Eliminación permanente' });
 
     return { success: true, message: 'Usuario eliminado exitosamente' };
   } catch (error: any) {

@@ -15,11 +15,9 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
 
-      loginState: (user: UserSession) =>
-        set({ user, isAuthenticated: true }),
+      loginState: (user: UserSession) => set({ user, isAuthenticated: true }),
 
-      logoutState: () =>
-        set({ user: null, isAuthenticated: false }),
+      logoutState: () => set({ user: null, isAuthenticated: false }),
     }),
     {
       name: 'auth-storage', // Stored in localStorage for persistent UI across refreshes.

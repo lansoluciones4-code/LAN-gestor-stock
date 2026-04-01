@@ -7,45 +7,49 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { type CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
-import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetchCustomers, toggleCustomerActiveAction } from '@/server/actions/customer.actions';
+import { type UserInput, type UserDef } from '@/schemas/user.schema';
+import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
-import { useCustomersStore } from '@/stores/customers.store';
+import { useUsersStore } from '@/stores/users.store';
 import { useSalesStore } from '@/stores/sales.store';
+import { useLogsStore } from '@/stores/logs.store';
 import { useStatsStore } from '@/stores/stats.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
-import { getCustomerColumns } from '@/config/tables/customer-columns';
+import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 
-import { CustomerModal } from '@/components/modals/customer-modal';
+import { UserModal } from '@/components/modals/user-modal';
+import { ConfirmModal } from '@/components/ui/responsive-modal';
 
-export function CustomerPanel() {
+export function UserPanel() {
+  const currentUserId = useAuthStore((s) => s.user?.id);
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
-  const { customers, setCustomers, isLoaded } = useCustomersStore();
+  const { users, setUsers, isLoaded } = useUsersStore();
 
-  const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<CustomerDef>();
+  const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<UserDef>();
 
-  const [showInactive, setShowInactive] = useState(false);
+  const [showInactives, setShowInactives] = useState(false);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<CustomerDef, CustomerInput>({
+  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<UserDef, UserInput>({
     handlers: {
-      fetchData: fetchCustomers,
-      createAction: createCustomerAction,
-      updateAction: updateCustomerAction,
-      deleteAction: deleteCustomerAction,
-      toggleActiveAction: toggleCustomerActiveAction,
+      fetchData: fetchUsers,
+      createAction: createUserAction,
+      updateAction: updateUserAction,
+      deleteAction: deleteUserAction,
+      toggleActiveAction: toggleUserActiveAction,
     },
-    setStoreData: setCustomers,
+    setStoreData: setUsers,
     onSuccessMessage: (msg) => showGlobalMessage('success', msg),
     onErrorMessage: (msg) => showGlobalMessage('error', msg),
     closeFormModal,
     setServerError,
     setItemToDelete,
     editingItem,
-    showInactive,
+    showInactive: showInactives,
     onAfterSuccess: () => {
       useSalesStore.getState().setLoaded(false);
+      useLogsStore.getState().setLoaded(false);
       useStatsStore.getState().setLoaded(false);
     },
   });
@@ -57,41 +61,41 @@ export function CustomerPanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchCustomers(showInactive);
-      setCustomers(res);
+      const res = await fetchUsers(showInactives);
+      setUsers(res);
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded, setCustomers, showInactive]);
+  }, [isLoaded, setUsers, showInactives]);
 
-  const filteredCustomers = customers.filter((c) => {
+  const filteredUsers = users.filter((u) => {
     const term = search.toLowerCase();
-    const matchesSearch = c.name.toLowerCase().includes(term) || (c.email && c.email.toLowerCase().includes(term)) || (c.phone && c.phone.toLowerCase().includes(term)) || (c.documentNumber && c.documentNumber.toLowerCase().includes(term));
-    const matchesStatus = showInactive ? true : c.isActive;
+    const matchesSearch = u.username.toLowerCase().includes(term) || u.role.toLowerCase().includes(term);
+    const matchesStatus = showInactives ? true : u.isActive;
     return matchesSearch && matchesStatus;
   });
 
-  const handleEditClick = (item?: CustomerDef) => {
+  const handleEditClick = (item?: UserDef) => {
     openFormModal(item);
   };
 
-  const columns = getCustomerColumns({
+  const columns = getUserColumns({
+    currentUserId,
     role,
     onEdit: handleEditClick,
+    onDelete: (id) => setItemToDelete(id),
     onToggleActive: handleToggleActive,
   });
 
+  // Re-fetch when inactive filter changes
   useEffect(() => {
     if (!initialLoading) {
       syncData();
     }
-  }, [showInactive]);
+  }, [showInactives]);
 
-  const handleSuccess = (data: any) => {
-    useSalesStore.getState().setLoaded(false);
-    useStatsStore.getState().setLoaded(false);
-    showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');
-    syncData();
+  const handleModalSubmit = async (data: UserInput) => {
+    await handleEditSubmit(data);
   };
 
   return (
@@ -107,13 +111,13 @@ export function CustomerPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar clientes por nombre, mail o DNI..."
+                placeholder="Buscar usuarios por ID, nombre o rol..."
                 className="h-11"
               />
               <ToggleFilter
-                id="showInactive"
-                checked={showInactive}
-                onChange={setShowInactive}
+                id="showInactives"
+                checked={showInactives}
+                onChange={setShowInactives}
                 label="Ver Inactivos"
               />
             </div>
@@ -135,25 +139,37 @@ export function CustomerPanel() {
                 leftIcon={<Plus className="w-5 h-5" />}
                 className="h-11"
               >
-                Registrar Cliente
+                Crear Credencial
               </Button>
             </div>
           </div>
 
-          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>{globalMessage.text}</div>}
+          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
 
           <VirtualizedDataTable
             columns={columns}
-            data={filteredCustomers}
+            data={filteredUsers}
             isLoading={isPending}
-            emptyMessage="No se han encontrado clientes."
+            emptyMessage="No se han encontrado usuarios con credenciales activas."
           />
 
-          <CustomerModal
+          <UserModal
             isOpen={isModalOpen}
             onClose={closeFormModal}
             editingItem={editingItem}
-            onSuccess={handleSuccess}
+            onSubmit={handleModalSubmit}
+            isPending={isPending}
+            serverError={serverError}
+          />
+
+          <ConfirmModal
+            isOpen={!!itemToDelete}
+            onClose={() => setItemToDelete(null)}
+            onConfirm={() => handleDelete(itemToDelete as string)}
+            title="Eliminar Credencial"
+            description="Esta acción retirará todos los permisos de acceso de este usuario. Solo se recomienda si la cuenta nunca registró movimientos."
+            submitLabel="Eliminar Acceso"
+            isPending={isPending}
           />
         </>
       )}

@@ -21,12 +21,16 @@ export const saleSchema = createInsertSchema(sales, {
 })
   .pick({ customerId: true, total: true })
   .extend({
-    items: z.array(z.object({
-      productId: z.string().uuid(),
-      quantity: z.number().int().min(1),
-      unitPrice: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
-      subtotal: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
-    })).min(1, 'La venta debe tener al menos un producto'),
+    items: z
+      .array(
+        z.object({
+          productId: z.string().uuid(),
+          quantity: z.number().int().min(1),
+          unitPrice: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
+          subtotal: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
+        })
+      )
+      .min(1, 'La venta debe tener al menos un producto'),
   });
 
 export type SaleInput = z.infer<typeof saleSchema>;
@@ -39,17 +43,24 @@ export const saleDefSchema = createSelectSchema(sales).extend({
   createdAt: z.union([z.date(), z.string()]),
   customer: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
   vendor: z.object({ id: z.string(), username: z.string() }).optional().nullable(),
-  items: z.array(z.object({
-    id: z.string(),
-    quantity: z.number(),
-    unitPrice: z.preprocess((val) => parseFloat(val as string), z.number()),
-    subtotal: z.preprocess((val) => parseFloat(val as string), z.number()),
-    product: z.object({
-      id: z.string(),
-      description: z.string().nullable(),
-      device: z.object({ name: z.string() }).optional().nullable(),
-    }).optional().nullable(),
-  })).optional(),
+  items: z
+    .array(
+      z.object({
+        id: z.string(),
+        quantity: z.number(),
+        unitPrice: z.preprocess((val) => parseFloat(val as string), z.number()),
+        subtotal: z.preprocess((val) => parseFloat(val as string), z.number()),
+        product: z
+          .object({
+            id: z.string(),
+            description: z.string().nullable(),
+            device: z.object({ name: z.string() }).optional().nullable(),
+          })
+          .optional()
+          .nullable(),
+      })
+    )
+    .optional(),
 });
 
 export type SaleDef = z.infer<typeof saleDefSchema>;

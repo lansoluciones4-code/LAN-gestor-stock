@@ -1,5 +1,5 @@
 import { type CustomerDef } from '@/schemas/customer.schema';
-import { type ColumnDef } from '@/components/ui/data-table';
+import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 
 interface ColumnActions {
@@ -13,9 +13,9 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
     {
       header: 'Nombre / Cliente',
       cell: (c) => (
-        <div className='flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100'>
+        <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
           {c.name}
-          {!c.isActive && <span className='px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase'>Inactivo</span>}
+          {!c.isActive && <span className="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
         </div>
       ),
     },
@@ -41,16 +41,20 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
       cell: (c: CustomerDef) => (
         <>
           {role === 'admin' && (
-            <button 
-              onClick={() => onToggleActive(c)} 
-              className={`p-2 rounded-lg transition ${c.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`} 
+            <button
+              onClick={() => onToggleActive(c)}
+              className={`p-2 rounded-lg transition ${c.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`}
               title={c.isActive ? 'Desactivar' : 'Activar'}
             >
               <Plus className={`w-4 h-4 ${c.isActive ? 'rotate-45' : ''}`} />
             </button>
           )}
-          <button onClick={() => onEdit(c)} className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition' title='Editar Profile'>
-            <Edit className='w-4 h-4' />
+          <button
+            onClick={() => onEdit(c)}
+            className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
+            title="Editar Profile"
+          >
+            <Edit className="w-4 h-4" />
           </button>
         </>
       ),

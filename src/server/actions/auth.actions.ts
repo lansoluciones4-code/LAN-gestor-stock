@@ -6,6 +6,7 @@ import { loginSchema, LoginInput, Role } from '@/schemas/auth.schema';
 import { userRepository } from '@/server/repositories/user.repository';
 import { signToken } from '@/lib/auth/jwt';
 import { recordAuditLog } from '@/lib/audit-logs';
+import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 
 type LoginResult = {
   success: boolean;
@@ -85,4 +86,25 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
 export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete('session');
+}
+
+/**
+ * Registers an audit log when a session is restored via cookie (SPA initialization).
+ * Only logs if the session is valid and not already logged in this browser session.
+ */
+export async function logSessionRestoredAction() {
+  try {
+    const user = await verifyAuthOrAdmin(false); // Validamos que el usuario tenga sesión
+    if (user) {
+      await recordAuditLog(user.id, 'LOGIN', 'USER', user.id, {
+        method: 'cookie',
+        username: user.username,
+        message: 'Sesión restaurada automáticamente',
+      });
+      return { success: true };
+    }
+    return { success: false };
+  } catch (error) {
+    return { success: false };
+  }
 }

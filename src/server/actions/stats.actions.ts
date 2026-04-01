@@ -26,15 +26,15 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         where: and(gte(sales.createdAt, start), lte(sales.createdAt, end)),
         with: {
           vendor: true,
-          items: { with: { product: true } }
+          items: { with: { product: true } },
         },
       }),
       db.query.productLosses.findMany({
         where: and(gte(productLosses.createdAt, start), lte(productLosses.createdAt, end)),
         with: {
-          product: true
-        }
-      })
+          product: true,
+        },
+      }),
     ]);
 
     let totalRevenue = 0;
@@ -45,11 +45,11 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
 
     salesWithItems.forEach((s: any) => {
       totalRevenue += Number(s.total);
-      
+
       // Calculate COGS
       s.items.forEach((item: any) => {
         const purchasePrice = Number(item.product?.purchasePrice || 0);
-        totalCostOfGoodsSold += (purchasePrice * item.quantity);
+        totalCostOfGoodsSold += purchasePrice * item.quantity;
       });
 
       // Seller stats
@@ -65,7 +65,7 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
     // Calculate Losses Cost
     lossesWithProducts.forEach((l: any) => {
       const purchasePrice = Number(l.product?.purchasePrice || 0);
-      totalLossCost += (purchasePrice * (l.quantity || 0));
+      totalLossCost += purchasePrice * (l.quantity || 0);
     });
 
     // Net Profit = Revenue - COGS - Losses
@@ -73,9 +73,11 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
 
     // 3. Current Inventory Cost (Investment - actual physical stock)
     const allProducts = await db.select().from(products);
-    const currentInventoryCost = allProducts.reduce((acc: number, p: any) => acc + (Number(p.purchasePrice || 0) * (p.stock || 0)), 0);
+    const currentInventoryCost = allProducts.reduce((acc: number, p: any) => acc + Number(p.purchasePrice || 0) * (p.stock || 0), 0);
 
-    const topSellers = Object.values(sellerMap).sort((a, b) => b.total - a.total).slice(0, 5);
+    const topSellers = Object.values(sellerMap)
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
 
     return {
       success: true,
@@ -88,9 +90,8 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         totalLossCost,
         topSellers,
         salesCount: salesWithItems.length,
-      }
+      },
     };
-
   } catch (error) {
     console.error('fetchDashboardStats error:', error);
     return { success: false, message: 'Error al obtener estadísticas' };

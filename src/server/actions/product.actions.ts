@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { productRepository } from '@/server/repositories/product.repository';
@@ -15,10 +14,10 @@ import { recordAuditLog } from '@/lib/audit-logs';
 export async function fetchProducts(): Promise<ProductDef[]> {
   try {
     const products = await productRepository.getAllProducts();
-    const formatted = products.map(p => ({
+    const formatted = products.map((p) => ({
       ...p,
       salePrice: parseFloat(p.salePrice as any),
-      purchasePrice: parseFloat(p.purchasePrice as any)
+      purchasePrice: parseFloat(p.purchasePrice as any),
     }));
     return z.array(productDefSchema).parse(formatted);
   } catch (error) {
@@ -27,11 +26,11 @@ export async function fetchProducts(): Promise<ProductDef[]> {
   }
 }
 
-export async function fetchSelectorData(): Promise<{ devices: DeviceDef[], providers: ProviderDef[] }> {
+export async function fetchSelectorData(): Promise<{ devices: DeviceDef[]; providers: ProviderDef[] }> {
   try {
     const devicesList = await deviceRepository.getAllDevices(true);
     const providersList = await providerRepository.getAllProviders(true);
-    
+
     return {
       devices: z.array(deviceDefSchema).parse(devicesList),
       providers: z.array(providerDefSchema).parse(providersList),
@@ -49,20 +48,13 @@ export async function createProductAction(input: ProductInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const newProduct = await productRepository.createProduct(parsed.data);
-    revalidatePath('/productos');
 
-    await recordAuditLog(
-      caller.id,
-      'CREAR',
-      'PRODUCT',
-      newProduct.id,
-      { 
-        deviceId: parsed.data.deviceId,
-        stock: parsed.data.stock,
-        purchasePrice: parsed.data.purchasePrice,
-        salePrice: parsed.data.salePrice
-      }
-    );
+    await recordAuditLog(caller.id, 'CREAR', 'PRODUCT', newProduct.id, {
+      deviceId: parsed.data.deviceId,
+      stock: parsed.data.stock,
+      purchasePrice: parsed.data.purchasePrice,
+      salePrice: parsed.data.salePrice,
+    });
 
     return { success: true, message: 'Producto registrado exitosamente' };
   } catch (error: any) {
@@ -77,19 +69,12 @@ export async function updateProductAction(id: string, input: ProductInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     await productRepository.updateProduct(id, parsed.data);
-    revalidatePath('/productos');
 
-    await recordAuditLog(
-      caller.id,
-      'ACTUALIZAR',
-      'PRODUCT',
-      id,
-      { 
-        deviceId: parsed.data.deviceId,
-        stock: parsed.data.stock,
-        salePrice: parsed.data.salePrice
-      }
-    );
+    await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, {
+      deviceId: parsed.data.deviceId,
+      stock: parsed.data.stock,
+      salePrice: parsed.data.salePrice,
+    });
 
     return { success: true, message: 'Producto actualizado exitosamente' };
   } catch (error: any) {
@@ -100,25 +85,19 @@ export async function updateProductAction(id: string, input: ProductInput) {
 export async function deleteProductAction(id: string) {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    
+
     // Rule: Cannot delete if has sales
     const hasSales = await productRepository.checkHasRelations(id);
     if (hasSales) {
-      return { 
-        success: false, 
-        message: 'No se puede eliminar: este producto ya ha sido parte de una venta. Prueba bajar su stock a 0 si ya no lo quieres ofrecer.' 
+      return {
+        success: false,
+        message: 'No se puede eliminar: este producto ya ha sido parte de una venta. Prueba bajar su stock a 0 si ya no lo quieres ofrecer.',
       };
     }
 
     await productRepository.deleteProduct(id);
-    revalidatePath('/productos');
 
-    await recordAuditLog(
-      caller.id,
-      'ELIMINAR',
-      'PRODUCT',
-      id
-    );
+    await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id);
 
     return { success: true, message: 'Producto eliminado exitosamente' };
   } catch (error: any) {
@@ -135,20 +114,12 @@ export async function registerProductLossAction(productId: string, quantity: num
 
     await productRepository.registerLoss(productId, caller.id, quantity, reason);
 
-    revalidatePath('/productos');
-
-    await recordAuditLog(
-      caller.id,
-      'PÉRDIDA',
-      'PRODUCT',
-      productId,
-      { quantity, reason }
-    );
+    await recordAuditLog(caller.id, 'PÉRDIDA', 'PRODUCT', productId, { quantity, reason });
 
     return { success: true, message: 'Pérdida registrada exitosamente' };
   } catch (error: any) {
     console.error('Error in registerProductLossAction:', error);
-    
+
     // Check for specific DB errors or throw generic message
     const errorMsg = error.message?.toLowerCase() || '';
     if (errorMsg.includes('insufficient stock') || errorMsg.includes('check constraint')) {
@@ -157,8 +128,7 @@ export async function registerProductLossAction(productId: string, quantity: num
     if (errorMsg.includes('not found')) {
       return { success: false, message: 'El producto no existe' };
     }
-    
+
     return { success: false, message: 'No se pudo completar la operación. Por favor, verifica los datos e intenta de nuevo.' };
   }
 }
-

@@ -1,19 +1,22 @@
 import * as bcrypt from 'bcrypt';
-import { db } from './index';
-import { users, providers, customers, devices } from './schema';
+import { customers, devices, providers, users } from '../schema';
+import { db } from '..';
 
 async function seed() {
   console.log('Seeding database...');
 
   // 1. Create Admin User
   const passwordHash = await bcrypt.hash('admin', 10);
-  
-  const [adminUser] = await db.insert(users).values({
-    username: 'admin',
-    passwordHash: passwordHash,
-    role: 'admin',
-  }).returning();
-  
+
+  const [adminUser] = await db
+    .insert(users)
+    .values({
+      username: 'admin',
+      passwordHash: passwordHash,
+      role: 'admin',
+    })
+    .returning();
+
   console.log('Admin user created successfully.');
 
   // 2. Create Vendor User
@@ -32,12 +35,15 @@ async function seed() {
   console.log('Devices created.');
 
   // 4. Create initial providers
-  const [provider1] = await db.insert(providers).values({
-    name: 'Wholesale Tech Inc.',
-    phone: '+1 800-555-0199',
-    email: 'contact@wholesaletech.com',
-  }).returning();
-  
+  const [provider1] = await db
+    .insert(providers)
+    .values({
+      name: 'Wholesale Tech Inc.',
+      phone: '+1 800-555-0199',
+      email: 'contact@wholesaletech.com',
+    })
+    .returning();
+
   await db.insert(providers).values({
     name: 'Mayorista Mobile S.A.',
     phone: '+54 11-4444-5555',
@@ -52,7 +58,7 @@ async function seed() {
     email: '',
     documentNumber: '00000000',
   });
-  
+
   await db.insert(customers).values({
     name: 'Juan Perez',
     phone: '261-444-5555',
