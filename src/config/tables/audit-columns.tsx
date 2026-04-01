@@ -38,8 +38,12 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Operador',
-      cellClassName: 'font-bold text-zinc-700 dark:text-zinc-300 uppercase text-[12px]',
-      cell: (log) => log.user?.username || 'SISTEMA',
+      cellClassName: 'font-bold text-zinc-700 dark:text-zinc-300 uppercase text-[12px] max-w-[120px] truncate',
+      cell: (log) => (
+        <span title={log.user?.username || 'SISTEMA'}>
+          {log.user?.username || 'SISTEMA'}
+        </span>
+      ),
     },
     {
       header: 'Acción',
@@ -47,8 +51,12 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Entidad',
-      cellClassName: 'font-black uppercase text-zinc-400 tracking-widest text-[12px]',
-      cell: (log) => log.entity,
+      cellClassName: 'font-black uppercase text-zinc-400 tracking-widest text-[12px] max-w-[100px] truncate',
+      cell: (log) => (
+        <span title={log.entity}>
+          {log.entity}
+        </span>
+      ),
     },
     {
       header: 'Referencia',
