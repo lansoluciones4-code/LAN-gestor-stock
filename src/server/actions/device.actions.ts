@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { deviceRepository } from '@/server/repositories/device.repository';
@@ -24,7 +23,6 @@ export async function toggleDeviceActiveAction(id: string, isActive: boolean) {
     console.log(`[DeviceAction] Iniciando cambio de estado de equipo a ${isActive ? 'activo' : 'inactivo'} (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
     await deviceRepository.updateActiveStatus(id, isActive);
-    revalidatePath('/equipos');
 
     await recordAuditLog(
       caller.id,
@@ -48,8 +46,6 @@ export async function createDeviceAction(input: DeviceInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const newDevice = await deviceRepository.createDevice(parsed.data);
-    revalidatePath('/equipos');
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -73,7 +69,6 @@ export async function updateDeviceAction(id: string, input: DeviceInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     await deviceRepository.updateDevice(id, parsed.data);
-    revalidatePath('/equipos');
 
     await recordAuditLog(
       caller.id,
@@ -105,7 +100,6 @@ export async function deleteDeviceAction(id: string) {
     }
 
     await deviceRepository.deleteDevice(id);
-    revalidatePath('/equipos');
 
     await recordAuditLog(
       caller.id,

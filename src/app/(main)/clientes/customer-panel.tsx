@@ -18,6 +18,7 @@ import {
 import { useAuthStore } from '@/stores/auth.store';
 import { useCustomersStore } from '@/stores/customers.store';
 import { useSalesStore } from '@/stores/sales.store';
+import { useStatsStore } from '@/stores/stats.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -56,7 +57,10 @@ export function CustomerPanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => useSalesStore.getState().setLoaded(false),
+    onAfterSuccess: () => {
+      useSalesStore.getState().setLoaded(false);
+      useStatsStore.getState().setLoaded(false);
+    },
   });
 
   useEffect(() => {
@@ -103,6 +107,7 @@ export function CustomerPanel() {
 
   const handleSuccess = (data: any) => {
     useSalesStore.getState().setLoaded(false);
+    useStatsStore.getState().setLoaded(false);
     showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');
     syncData();
   };

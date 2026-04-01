@@ -22,6 +22,7 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
 import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
+import { useSalesStore } from '@/stores/sales.store';
 import { getProductColumns } from '@/config/tables/product-columns';
 
 export function ProductsPanel() {
@@ -70,6 +71,7 @@ export function ProductsPanel() {
       useProvidersStore.getState().setLoaded(false);
       useDevicesStore.getState().setLoaded(false);
       useStatsStore.getState().setLoaded(false);
+      useSalesStore.getState().setLoaded(false);
     }
   });
 
