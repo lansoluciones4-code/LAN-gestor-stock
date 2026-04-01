@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 
 
@@ -46,6 +47,11 @@ const CASOS_DE_VALIDACION = [
     descripcion: 'Debería respetar límites máximos de username',
     username: 'u'.repeat(51), password: 'password123',
     erroresEsperados: ['Usuario demasiado largo']
+  },
+  {
+    descripcion: 'Debería fallar por duplicado',
+    username: 'admin', password: 'password123',
+    erroresEsperados: ['El nombre de usuario ya está']
   }
 ];
 
@@ -87,6 +93,24 @@ test.describe.parallel('Gestión de Usuarios: Validaciones y Lógica', () => {
       await expect(btnRegistrar).toBeVisible();
     });
   }
+
+  test('Debería vaciar el formulario al cancelar', async ({ page }) => {
+    const inputUsername = page.getByRole('textbox', { name: UI.USERNAME });
+    const inputPassword = page.getByLabel(UI.PASSWORD).or(page.getByPlaceholder(UI.PASSWORD));
+
+    const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
+    const btnCancelar = page.getByRole('button', { name: 'Cancelar' });
+
+    await btnAgregar.click();
+    await inputUsername.fill('test_wipe');
+    await inputPassword.fill('password123');
+
+    await btnCancelar.click();
+
+    await btnAgregar.click();
+    await expect(inputUsername).toHaveValue('');
+    await expect(inputPassword).toHaveValue('');
+  });
 
   test('Debería transitar correctamente el ciclo de desactivación, reactivación y eliminación', async ({ page }) => {
     const username = 'testUser_logic';

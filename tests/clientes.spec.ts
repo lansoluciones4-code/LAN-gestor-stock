@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 
 
@@ -97,6 +98,30 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
       await expect(btnRegistrar).toBeVisible();
     });
   }
+
+  test('Debería vaciar el formulario al cancelar', async ({ page }) => {
+    const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
+    const inputTelefono = page.getByRole('textbox', { name: UI.TELEFONO });
+    const inputCorreo = page.getByRole('textbox', { name: UI.CORREO });
+    const inputDni = page.getByRole('textbox', { name: UI.DNI });
+
+    const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
+    const btnCancelar = page.getByRole('button', { name: 'Cancelar' });
+
+    await btnAgregar.click();
+    await inputNombre.fill('Test Wipe');
+    await inputTelefono.fill('123456789');
+    await inputCorreo.fill('test@wipe.com');
+    await inputDni.fill('11111111');
+
+    await btnCancelar.click();
+
+    await btnAgregar.click();
+    await expect(inputNombre).toHaveValue('');
+    await expect(inputTelefono).toHaveValue('');
+    await expect(inputCorreo).toHaveValue('');
+    await expect(inputDni).toHaveValue('');
+  });
 
   test('Debería transitar correctamente el ciclo de desactivación y reactivación', async ({ page }) => {
     const nombre = 'ClienteDesactivable';

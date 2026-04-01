@@ -16,6 +16,12 @@ Ejecuta un archivo de pruebas específico en todos los navegadores configurados:
 npx playwright test tests/nombre_del_archivo.spec.ts
 ```
 
+Ejecuta todos los archivos de pruebas en el directorio:
+
+```bash
+npx playwright test tests
+```
+
 Limita la ejecución de la prueba únicamente al motor de Google Chrome:
 
 ```bash

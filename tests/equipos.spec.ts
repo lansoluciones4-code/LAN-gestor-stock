@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 
 
@@ -68,6 +69,21 @@ test.describe.parallel('Gestión de Equipos: Validaciones y Lógica', () => {
       await expect(btnRegistrar).toBeVisible();
     });
   }
+
+  test('Debería vaciar el formulario al cancelar', async ({ page }) => {
+    const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
+
+    const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
+    const btnCancelar = page.getByRole('button', { name: 'Cancelar' });
+
+    await btnAgregar.click();
+    await inputNombre.fill('Test Wipe Eq');
+
+    await btnCancelar.click();
+
+    await btnAgregar.click();
+    await expect(inputNombre).toHaveValue('');
+  });
 
   test('Debería transitar correctamente el ciclo de desactivación, reactivación y eliminación', async ({ page }) => {
     const nombre = 'Equipo_Lógico';

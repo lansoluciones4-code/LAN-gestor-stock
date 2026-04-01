@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 
 
@@ -97,6 +98,28 @@ test.describe.parallel('Gestión de Proveedores: Validaciones y Lógica', () => 
       await expect(btnRegistrar).toBeVisible();
     });
   }
+
+  test('Debería vaciar el formulario al cancelar', async ({ page }) => {
+    const inputNombre = page.getByRole('textbox', { name: 'Ej: Accesorios del Sur SRL' });
+    const inputTelefono = page.getByRole('textbox', { name: '+54 9 11 1234-' });
+    const inputCorreo = page.getByRole('textbox', { name: 'ventas@distribuidora.com' });
+
+    const btnAgregar = page.getByRole('button', { name: 'Agregar Proveedor' });
+    const btnCancelar = page.getByRole('button', { name: 'Cancelar' });
+
+    await page.getByRole('link', { name: 'Proveedores' }).click(); // Optional routing if not already on the page, but earlier tests assume we are
+    await btnAgregar.click();
+    await inputNombre.fill('Wipe Provider');
+    await inputTelefono.fill('123456789');
+    await inputCorreo.fill('wipe@provider.com');
+
+    await btnCancelar.click();
+
+    await btnAgregar.click();
+    await expect(inputNombre).toHaveValue('');
+    await expect(inputTelefono).toHaveValue('');
+    await expect(inputCorreo).toHaveValue('');
+  });
 
   test('Debería transitar correctamente el ciclo de desactivación, reactivación y eliminación', async ({ page }) => {
     const nombre = 'ProveedorDesactivable';
