@@ -9,13 +9,12 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useProductsStore } from '@/stores/products.store';
 import { useDevicesStore } from '@/stores/devices.store';
 import { useProvidersStore } from '@/stores/providers.store';
+import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction } from '@/server/actions/product.actions';
-import { useLogsStore } from '@/stores/logs.store';
-import { useStatsStore } from '@/stores/stats.store';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
@@ -66,10 +65,7 @@ export function ProductsPanel() {
     editingItem,
     showInactive,
     onAfterSuccess: () => {
-      useProvidersStore.getState().setLoaded(false);
-      useDevicesStore.getState().setLoaded(false);
-      useStatsStore.getState().setLoaded(false);
-      useSalesStore.getState().setLoaded(false);
+      invalidateAllCaches();
     },
   });
 
@@ -87,8 +83,7 @@ export function ProductsPanel() {
 
       onLossClose();
       showGlobalMessage('success', result.message);
-      useLogsStore.getState().setLoaded(false);
-      useStatsStore.getState().setLoaded(false);
+      invalidateAllCaches();
       syncData();
     });
   };

@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Package, Users, Calendar, DollarSign, Activity, ArrowUpRight, User, Clock, Briefcase } from 'lucide-react';
 import { fetchDashboardStats } from '@/server/actions/stats.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { invalidateAllCaches } from '@/stores';
 import { useStatsStore } from '@/stores/stats.store';
 import { RefreshCcw } from 'lucide-react';
 
@@ -11,7 +12,7 @@ export default function DashboardPage() {
   const [isPending, startTransition] = useTransition();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const { stats, setStats, isLoaded, setLoaded } = useStatsStore();
+  const { stats, setStats, isLoaded } = useStatsStore();
 
   const loadStats = (start?: string, end?: string) => {
     startTransition(async () => {
@@ -29,7 +30,7 @@ export default function DashboardPage() {
   }, [isLoaded]);
 
   const handleSync = () => {
-    setLoaded(false);
+    invalidateAllCaches();
     loadStats();
   };
 
@@ -50,16 +51,16 @@ export default function DashboardPage() {
             endDate={endDate}
             onStartChange={(v) => {
               setStartDate(v);
-              setLoaded(false);
+              invalidateAllCaches();
             }}
             onEndChange={(v) => {
               setEndDate(v);
-              setLoaded(false);
+              invalidateAllCaches();
             }}
             onClear={() => {
               setStartDate('');
               setEndDate('');
-              setLoaded(false);
+              invalidateAllCaches();
             }}
           />
           <button

@@ -10,11 +10,12 @@ import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { type AuditLogDef } from '@/schemas/audit-log.schema';
 import { fetchAuditLogs } from '@/server/actions/audit.actions';
 import { useLogsStore } from '@/stores/logs.store';
+import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { getAuditColumns } from '@/config/tables/audit-columns';
 
 export function LogPanel() {
-  const { logs, setLogs, appendLogs, isLoaded, setLoaded } = useLogsStore();
+  const { logs, setLogs, appendLogs, isLoaded } = useLogsStore();
   const [initialLoading, setInitialLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const [page, setPage] = useState(1);
@@ -90,7 +91,7 @@ export function LogPanel() {
   }, [page]);
 
   const handleSync = async () => {
-    setLoaded(false);
+    invalidateAllCaches();
     await loadData(true);
     showGlobalMessage('success', 'Datos sincronizados con éxito.');
   };
