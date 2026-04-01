@@ -54,7 +54,14 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
       cellClassName: 'font-black uppercase text-zinc-400 tracking-widest text-[12px] max-w-[100px] truncate',
       cell: (log) => (
         <span title={log.entity}>
-          {log.entity}
+          {{
+            USER: 'USUARIO',
+            PROVIDER: 'PROVEEDOR',
+            PRODUCT: 'PRODUCTO',
+            CUSTOMER: 'CLIENTE',
+            DEVICE: 'EQUIPO',
+            SALE: 'VENTA',
+          }[log.entity] || log.entity}
         </span>
       ),
     },

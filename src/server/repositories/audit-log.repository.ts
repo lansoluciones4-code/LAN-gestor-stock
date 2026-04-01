@@ -1,6 +1,6 @@
 import { desc } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { auditLogs, users } from '@/lib/db/schema';
+import { auditLogs } from '@/lib/db/schema';
 import type { AuditLogInput } from '@/schemas/audit-log.schema';
 
 export class AuditLogRepository {

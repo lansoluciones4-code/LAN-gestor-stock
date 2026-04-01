@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { TableVirtuoso, type TableComponents } from 'react-virtuoso';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Table, TableHeader, TableBody, TableHead, TableCell } from '@/components/ui/table';
 export interface ColumnDef<T> {
   header: React.ReactNode;
   headerClassName?: string;
@@ -18,17 +18,9 @@ interface VirtualizedDataTableProps<T> {
   emptyMessage?: React.ReactNode;
   hasMore?: boolean;
   onEndReached?: () => void;
-  /**
-   * Altura aproximada de cada fila para el cálculo inicial.
-   * Por defecto 64px que es el promedio de tus tablas.
-   */
   fixedItemHeight?: number;
 }
 
-/**
- * Mapeo de componentes internos de Virtuoso para usar tus estilos de UI/Table.
- * Esto garantiza que visualmente el componente sea idéntico al DataTable estático.
- */
 const VirtuosoComponents: TableComponents<any> = {
   Scroller: React.forwardRef((props, ref) => (
     <div
@@ -68,7 +60,6 @@ const VirtuosoComponents: TableComponents<any> = {
 export function VirtualizedDataTable<T extends { id: string | number }>({ columns, data, isLoading, emptyMessage = 'No se han encontrado resultados.', hasMore, onEndReached, fixedItemHeight = 64 }: VirtualizedDataTableProps<T>) {
   const colSpanCount = columns.length;
 
-  // Renderizador de fila para Virtuoso
   const rowContent = (_index: number, row: T) => {
     return (
       <>
@@ -84,7 +75,6 @@ export function VirtualizedDataTable<T extends { id: string | number }>({ column
     );
   };
 
-  // Pie de tabla para Loading
   const Footer = () => {
     if (!hasMore) return null;
     return (
