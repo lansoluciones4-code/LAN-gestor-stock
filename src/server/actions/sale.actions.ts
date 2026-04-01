@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { saleRepository } from '@/server/repositories/sale.repository';
 import { saleSchema, saleDefSchema, type SaleInput, type SaleDef } from '@/schemas/sale.schema';
@@ -33,9 +32,6 @@ export async function createSaleAction(input: SaleInput) {
     if (!parsed.success) return { success: false, message: 'Datos de venta inválidos' };
 
     const result = await saleRepository.createSale(caller.id, parsed.data);
-    revalidatePath('/ventas');
-    revalidatePath('/productos');
-    revalidatePath('/clientes');
 
     await recordAuditLog(
       caller.id,
@@ -62,9 +58,6 @@ export async function deleteSaleAction(id: string) {
   try {
     const caller = await verifyAuthOrAdmin(true);
     await saleRepository.deleteSale(id);
-    
-    revalidatePath('/ventas');
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,

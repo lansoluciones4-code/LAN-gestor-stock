@@ -11,6 +11,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'StockApp',
   description: 'Manage technology store stock effectively',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({

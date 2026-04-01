@@ -77,7 +77,7 @@ export function SalesPOSView({
            <div className='flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-24 lg:pb-6 font-medium'>
              {filteredProducts.map(p => (
                <button 
-                key={p.id} 
+                 key={`pos-prod-${p.id}`} 
                 disabled={p.stock <= 0}
                 onClick={() => addToCart(p)}
                 className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
@@ -119,7 +119,7 @@ export function SalesPOSView({
           </div>
           <div className='flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar'>
             {cart.map(item => (
-              <div key={item.productId} className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm'>
+              <div key={`cart-item-${item.productId}`} className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm'>
                  <div className='flex justify-between items-start gap-2'>
                    <span className='text-xs font-bold uppercase leading-tight'>{item.name}</span>
                    <button onClick={() => removeFromCart(item.productId)} className='text-zinc-300 hover:text-red-500 transition-colors p-1'><Trash2 className='w-4 h-4' /></button>
@@ -175,7 +175,7 @@ export function SalesPOSView({
               </div>
               <div className='flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar'>
                  {cart.map(item => (
-                  <div key={item.productId} className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2'>
+                  <div key={`cart-mob-${item.productId}`} className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2'>
                      <div className='flex justify-between items-start'>
                        <span className='text-sm font-bold uppercase leading-tight'>{item.name}</span>
                        <button onClick={() => removeFromCart(item.productId)} className='text-red-500 p-1'><Trash2 className='w-4 h-4' /></button>

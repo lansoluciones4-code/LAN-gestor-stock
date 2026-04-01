@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { SearchBar } from '@/components/ui/search-bar';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { DataTable } from '@/components/ui/data-table';
+import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { type AuditLogDef } from '@/schemas/audit-log.schema';
 import { fetchAuditLogs } from '@/server/actions/audit.actions';
 import { useLogsStore } from '@/stores/logs.store';
@@ -29,16 +29,10 @@ export function LogPanel() {
     globalMessage, showGlobalMessage,
   } = useEntityManager<AuditLogDef>();
 
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastElementRef = useCallback((node: HTMLTableRowElement) => {
-    if (isPending) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage(prevPage => prevPage + 1);
-      }
-    });
-    if (node) observer.current.observe(node);
+  const onEndReached = useCallback(() => {
+    if (!isPending && hasMore) {
+      setPage(prevPage => prevPage + 1);
+    }
   }, [isPending, hasMore]);
 
   const loadData = async (reset = false) => {
@@ -178,12 +172,12 @@ export function LogPanel() {
           </div>
         )}
 
-        <DataTable 
+        <VirtualizedDataTable 
           columns={columns} 
           data={logs} 
           isLoading={isPending && page === 1} 
           hasMore={hasMore} 
-          observerRef={lastElementRef} 
+          onEndReached={onEndReached} 
           emptyMessage="No se han encontrado registros de auditoría."
         />
 

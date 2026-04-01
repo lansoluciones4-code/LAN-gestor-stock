@@ -8,6 +8,8 @@ import { providerSchema, type ProviderInput, type ProviderDef } from '@/schemas/
 import { useAuthStore } from '@/stores/auth.store';
 import { useProvidersStore } from '@/stores/providers.store';
 import { useProductsStore } from '@/stores/products.store';
+import { useSalesStore } from '@/stores/sales.store';
+import { useStatsStore } from '@/stores/stats.store';
 import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { useClientPagination } from '@/hooks/use-client-pagination';
@@ -52,7 +54,11 @@ export function ProvidersPanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => setProductsLoaded(false),
+    onAfterSuccess: () => {
+      setProductsLoaded(false);
+      useSalesStore.getState().setLoaded(false);
+      useStatsStore.getState().setLoaded(false);
+    },
   });
 
   useEffect(() => {

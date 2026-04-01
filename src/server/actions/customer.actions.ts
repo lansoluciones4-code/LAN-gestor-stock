@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { customerRepository } from '@/server/repositories/customer.repository';
@@ -24,7 +23,6 @@ export async function toggleCustomerActiveAction(id: string, isActive: boolean) 
     console.log(`[CustomerAction] Iniciando cambio de estado de cliente a ${isActive ? 'activo' : 'inactivo'} (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true); // Only admin for status toggle
     await customerRepository.updateActiveStatus(id, isActive);
-    revalidatePath('/clientes');
 
     await recordAuditLog(
       caller.id,
@@ -48,8 +46,6 @@ export async function createCustomerAction(input: CustomerInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const newCustomer = await customerRepository.createCustomer(parsed.data);
-    revalidatePath('/clientes');
-    revalidatePath('/ventas');
 
     await recordAuditLog(
       caller.id,
@@ -73,8 +69,6 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const updated = await customerRepository.updateCustomer(id, parsed.data);
-    revalidatePath('/clientes');
-    revalidatePath('/ventas');
 
     await recordAuditLog(
       caller.id,
@@ -106,7 +100,6 @@ export async function deleteCustomerAction(id: string) {
     }
 
     await customerRepository.deleteCustomer(id);
-    revalidatePath('/clientes');
 
     await recordAuditLog(
       caller.id,

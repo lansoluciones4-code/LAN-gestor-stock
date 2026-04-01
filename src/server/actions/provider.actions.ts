@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { providerRepository } from '@/server/repositories/provider.repository';
@@ -23,7 +22,6 @@ export async function toggleProviderActiveAction(id: string, isActive: boolean) 
   try {
     const caller = await verifyAuthOrAdmin(true);
     await providerRepository.updateActiveStatus(id, isActive);
-    revalidatePath('/proveedores');
 
     await recordAuditLog(
       caller.id,
@@ -46,8 +44,6 @@ export async function createProviderAction(input: ProviderInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const newProvider = await providerRepository.createProvider(parsed.data);
-    revalidatePath('/proveedores');
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -70,8 +66,6 @@ export async function updateProviderAction(id: string, input: ProviderInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     await providerRepository.updateProvider(id, parsed.data);
-    revalidatePath('/proveedores');
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -101,7 +95,6 @@ export async function deleteProviderAction(id: string) {
     }
 
     await providerRepository.deleteProvider(id);
-    revalidatePath('/proveedores');
 
     await recordAuditLog(
       caller.id,

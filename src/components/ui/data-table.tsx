@@ -34,7 +34,7 @@ export function DataTable<T extends { id: string | number }>({
       <TableHeader>
         <tr>
           {columns.map((col, idx) => (
-            <TableHead key={idx} className={col.headerClassName}>
+            <TableHead key={`col-head-${idx}`} className={col.headerClassName}>
               {col.header}
             </TableHead>
           ))}
@@ -42,9 +42,9 @@ export function DataTable<T extends { id: string | number }>({
       </TableHeader>
       <TableBody className={isLoading ? 'opacity-50 pointer-events-none' : ''}>
         {data.map((row) => (
-          <TableRow key={row.id}>
+          <TableRow key={`row-${row.id}`}>
             {columns.map((col, idx) => (
-              <TableCell key={idx} className={col.cellClassName}>
+              <TableCell key={`cell-${row.id}-${idx}`} className={col.cellClassName}>
                 {col.cell(row)}
               </TableCell>
             ))}

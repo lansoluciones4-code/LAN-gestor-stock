@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { productRepository } from '@/server/repositories/product.repository';
@@ -49,7 +48,6 @@ export async function createProductAction(input: ProductInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     const newProduct = await productRepository.createProduct(parsed.data);
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -77,7 +75,6 @@ export async function updateProductAction(id: string, input: ProductInput) {
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
     await productRepository.updateProduct(id, parsed.data);
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -111,7 +108,6 @@ export async function deleteProductAction(id: string) {
     }
 
     await productRepository.deleteProduct(id);
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
@@ -134,8 +130,6 @@ export async function registerProductLossAction(productId: string, quantity: num
     if (!reason.trim()) return { success: false, message: 'Debe especificar un motivo' };
 
     await productRepository.registerLoss(productId, caller.id, quantity, reason);
-
-    revalidatePath('/productos');
 
     await recordAuditLog(
       caller.id,
