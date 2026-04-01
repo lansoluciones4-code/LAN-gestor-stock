@@ -24,49 +24,39 @@ interface UseSalesActionsProps {
   navigateToList: () => void;
 }
 
-export function useSalesActions({
-  onSuccessMessage,
-  onErrorMessage,
-  setSales,
-  setProducts,
-  setCustomers,
-  setItemToDelete,
-  clearCart,
-  closeMobileCart,
-  navigateToList
-}: UseSalesActionsProps) {
+export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, setProducts, setCustomers, setItemToDelete, clearCart, closeMobileCart, navigateToList }: UseSalesActionsProps) {
   const [isPending, startTransition] = useTransition();
 
-  const loadData = async () => {
+  const loadData = async (manual = false) => {
     startTransition(async () => {
-      const [updatedS, updatedP, updatedC] = await Promise.all([
-        fetchSales(),
-        fetchProducts(),
-        fetchCustomers()
-      ]);
+      const [updatedS, updatedP, updatedC] = await Promise.all([fetchSales(), fetchProducts(), fetchCustomers()]);
       setSales(updatedS);
       setProducts(updatedP);
       setCustomers(updatedC);
-      
+
       // Invalidar stores externos para forzar re-fetch al navegar
       useProductsStore.getState().setLoaded(false);
       useProvidersStore.getState().setLoaded(false);
       useDevicesStore.getState().setLoaded(false);
       useCustomersStore.getState().setLoaded(false);
       useStatsStore.getState().setLoaded(false);
+
+      if (manual) {
+        onSuccessMessage('Datos sincronizados con éxito.');
+      }
     });
   };
 
   const handleCreateSale = async (selectedCustomerId: string, cart: any[], cartTotal: number) => {
     if (cart.length === 0 || !selectedCustomerId) return;
-    
+
     startTransition(async () => {
       const result = await createSaleAction({
         customerId: selectedCustomerId || undefined,
         items: cart.map(({ name, desc, max, ...rest }) => ({
           ...rest,
           unitPrice: rest.unitPrice.toString(),
-          subtotal: rest.subtotal.toString()
+          subtotal: rest.subtotal.toString(),
         })) as any,
         total: cartTotal.toString(),
       });

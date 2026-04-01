@@ -23,8 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='es' className={`${inter.variable} antialiased h-full`} suppressHydrationWarning>
-      <body className='font-sans min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100'>
+    <html
+      lang="es"
+      className={`${inter.variable} antialiased h-full`}
+      suppressHydrationWarning
+    >
+      <body className="font-sans min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
         <Providers>{children}</Providers>
       </body>
     </html>

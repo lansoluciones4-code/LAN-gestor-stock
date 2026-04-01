@@ -26,13 +26,7 @@ interface SalesPOSViewProps {
   setGlobalMessage: (msg: any) => void;
 }
 
-export function SalesPOSView({
-  products, customers, setCustomers,
-  cart, addToCart, removeFromCart, updateCartQty, cartTotal,
-  selectedCustomerId, setSelectedCustomerId,
-  isPending, onConfirmSale, onCancel,
-  showMobileCart, setShowMobileCart, setGlobalMessage
-}: SalesPOSViewProps) {
+export function SalesPOSView({ products, customers, setCustomers, cart, addToCart, removeFromCart, updateCartQty, cartTotal, selectedCustomerId, setSelectedCustomerId, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, setGlobalMessage }: SalesPOSViewProps) {
   const [saleSearch, setSaleSearch] = useState('');
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
@@ -43,111 +37,140 @@ export function SalesPOSView({
   });
 
   return (
-    <div className='flex flex-col h-full space-y-4 animate-in fade-in duration-300 relative overflow-hidden'>
-      <div className='flex items-center justify-between shrink-0 px-1'>
-        <Button 
-          variant='secondary' 
-          size='sm' 
-          onClick={onCancel} 
-          leftIcon={<ArrowLeft className='w-4 h-4'/>}
-          className='font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md'
+    <div className="flex flex-col h-full space-y-4 animate-in fade-in duration-300 relative overflow-hidden">
+      <div className="flex items-center justify-between shrink-0 px-1">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onCancel}
+          leftIcon={<ArrowLeft className="w-4 h-4" />}
+          className="font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md"
         >
           Volver Al Listado
         </Button>
-        <div className='flex items-center gap-2'>
-          <ShoppingCart className='w-5 h-5 text-indigo-600' />
-          <h2 className='text-lg font-bold'>Facturar Venta</h2>
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-lg font-bold">Facturar Venta</h2>
         </div>
       </div>
 
-      <div className='flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden'>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
         {/* List Products */}
-        <div className='lg:col-span-7 flex flex-col min-h-0 space-y-4 px-1'>
-           <div className='relative shrink-0'>
-              <Search className='absolute left-3 top-2.5 h-5 w-5 text-zinc-400' />
-              <input
-                type='text'
-                placeholder='Buscar productos...'
-                className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm h-11'
-                value={saleSearch}
-                onChange={(e) => setSaleSearch(e.target.value)}
-              />
-           </div>
-           
-           <div className='flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-24 lg:pb-6 font-medium'>
-             {filteredProducts.map(p => (
-               <button 
-                 key={`pos-prod-${p.id}`} 
+        <div className="lg:col-span-7 flex flex-col min-h-0 space-y-4 px-1">
+          <div className="relative shrink-0">
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              className="w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm h-11"
+              value={saleSearch}
+              onChange={(e) => setSaleSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-24 lg:pb-6 font-medium">
+            {filteredProducts.map((p) => (
+              <button
+                key={`pos-prod-${p.id}`}
                 disabled={p.stock <= 0}
                 onClick={() => addToCart(p)}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                  p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-indigo-500 hover:shadow-md'
-                }`}
-               >
-                 <div className='text-left'>
-                   <h4 className='font-bold text-zinc-900 dark:text-zinc-100 text-sm'>{p.device?.name}</h4>
-                   <p className='text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight'>{p.description || '--'}</p>
-                   <span className={`text-[10px] font-bold ${p.stock < 5 ? 'text-amber-500' : 'text-zinc-500'}`}>Disp: {p.stock}</span>
-                 </div>
-                 <div className='text-right'>
-                    <div className='text-lg font-black leading-none text-indigo-600'>${p.salePrice.toLocaleString('es-AR')}</div>
-                    <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>Agregar</div>
-                 </div>
-               </button>
-             ))}
-           </div>
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-indigo-500 hover:shadow-md'}`}
+              >
+                <div className="text-left">
+                  <h4 className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{p.device?.name}</h4>
+                  <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight">{p.description || '--'}</p>
+                  <span className={`text-[10px] font-bold ${p.stock < 5 ? 'text-amber-500' : 'text-zinc-500'}`}>
+                    Disp:
+                    {p.stock}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-black leading-none text-indigo-600">${p.salePrice.toLocaleString('es-AR')}</div>
+                  <div className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Agregar</div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Desktop Cart */}
-        <div className='hidden lg:flex lg:col-span-5 flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shrink-0 shadow-sm'>
-          <div className='p-5 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 space-y-4'>
+        <div className="hidden lg:flex lg:col-span-5 flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shrink-0 shadow-sm">
+          <div className="p-5 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 space-y-4">
             <div>
-              <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-2'>Cliente de la Operación</label>
-              <Combobox 
-                options={customers.map(c => ({ id: c.id, name: c.isActive ? c.name : `${c.name} (Inactivo)` }))}
+              <label className="block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-2">Cliente de la Operación</label>
+              <Combobox
+                options={customers
+                  .filter((c) => c.isActive)
+                  .map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                  }))}
                 value={selectedCustomerId}
                 onChange={setSelectedCustomerId}
-                placeholder="Buscar o registrar cliente..."
+                placeholder="Buscar o registrar..."
                 addNewLabel="+ Registrar Nuevo Cliente"
                 onAddNew={() => setIsCustomerModalOpen(true)}
               />
             </div>
           </div>
-          <div className='p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center'>
-            <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Items en Carrito</span>
-            <span className='bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded'>{cart.length}</span>
+          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center">
+            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Items en Carrito</span>
+            <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">{cart.length}</span>
           </div>
-          <div className='flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar'>
-            {cart.map(item => (
-              <div key={`cart-item-${item.productId}`} className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm'>
-                 <div className='flex justify-between items-start gap-2'>
-                   <span className='text-xs font-bold uppercase leading-tight'>{item.name}</span>
-                   <button onClick={() => removeFromCart(item.productId)} className='text-zinc-300 hover:text-red-500 transition-colors p-1'><Trash2 className='w-4 h-4' /></button>
-                 </div>
-                 <div className='flex justify-between items-center'>
-                    <div className='flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1 rounded border border-zinc-200 dark:border-zinc-800'>
-                      <button onClick={() => updateCartQty(item.productId, -1)} className='text-zinc-400 hover:text-zinc-800'><MinusCircle className='w-4 h-4'/></button>
-                      <span className='w-6 text-center text-xs font-bold'>{item.quantity}</span>
-                      <button onClick={() => updateCartQty(item.productId, 1)} className='text-zinc-400 hover:text-zinc-800'><PlusCircle className='w-4 h-4'/></button>
-                    </div>
-                    <span className='font-bold text-sm'>${item.subtotal.toLocaleString('es-AR')}</span>
-                 </div>
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+            {cart.map((item) => (
+              <div
+                key={`cart-item-${item.productId}`}
+                className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm"
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <span className="text-xs font-bold uppercase leading-tight">{item.name}</span>
+                  <button
+                    onClick={() => removeFromCart(item.productId)}
+                    className="text-zinc-300 hover:text-red-500 transition-colors p-1"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1 rounded border border-zinc-200 dark:border-zinc-800">
+                    <button
+                      onClick={() => updateCartQty(item.productId, -1)}
+                      className="text-zinc-400 hover:text-zinc-800"
+                    >
+                      <MinusCircle className="w-4 h-4" />
+                    </button>
+                    <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
+                    <button
+                      onClick={() => updateCartQty(item.productId, 1)}
+                      className="text-zinc-400 hover:text-zinc-800"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <span className="font-bold text-sm">${item.subtotal.toLocaleString('es-AR')}</span>
+                </div>
               </div>
             ))}
             {cart.length === 0 && (
-              <div className='py-20 text-center opacity-30 flex flex-col items-center gap-2'>
-                <ShoppingCart className='w-8 h-8' />
-                <p className='text-[10px] font-bold uppercase tracking-widest'>Esperando items...</p>
+              <div className="py-20 text-center opacity-30 flex flex-col items-center gap-2">
+                <ShoppingCart className="w-8 h-8" />
+                <p className="text-[10px] font-bold uppercase tracking-widest">Esperando items...</p>
               </div>
             )}
           </div>
-          <div className='p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl'>
-            <div className='flex justify-between items-center pt-2'>
-               <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
-               <span className='text-3xl text-emerald-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
+          <div className="p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl">
+            <div className="flex justify-between items-center pt-2">
+              <span className="text-[10px] text-zinc-400 uppercase font-black">Total Venta</span>
+              <span className="text-3xl text-emerald-600 font-black tracking-tighter">${cartTotal.toLocaleString('es-AR')}</span>
             </div>
-            <Button fullWidth onClick={onConfirmSale} size="lg" disabled={cart.length === 0 || !selectedCustomerId || isPending}>
-               {isPending ? 'Procesando...' : 'Finalizar y Facturar'}
+            <Button
+              fullWidth
+              onClick={onConfirmSale}
+              size="lg"
+              disabled={cart.length === 0 || !selectedCustomerId || isPending}
+            >
+              {isPending ? 'Procesando...' : 'Finalizar y Facturar'}
             </Button>
           </div>
         </div>
@@ -155,69 +178,104 @@ export function SalesPOSView({
 
       {/* Mobile UI elements */}
       {cart.length > 0 && !showMobileCart && (
-         <button 
+        <button
           onClick={() => setShowMobileCart(true)}
-          className='lg:hidden fixed bottom-6 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-2xl z-40'
-         >
-            <div className='relative'>
-              <ShoppingCart className='w-6 h-6' />
-              <span className='absolute -top-2 -right-2 bg-red-500 text-[10px] font-bold px-1.5 rounded-full border-2 border-white'>{cart.length}</span>
-            </div>
-         </button>
+          className="lg:hidden fixed bottom-6 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-2xl z-40"
+        >
+          <div className="relative">
+            <ShoppingCart className="w-6 h-6" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-[10px] font-bold px-1.5 rounded-full border-2 border-white">{cart.length}</span>
+          </div>
+        </button>
       )}
 
       {showMobileCart && (
-        <div className='lg:hidden fixed inset-0 z-50 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200'>
-           <div className='absolute bottom-0 inset-x-0 bg-white dark:bg-zinc-900 rounded-t-2xl shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-300'>
-              <div className='p-4 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-800 rounded-t-2xl'>
-                 <h3 className='font-bold flex items-center gap-2'><ShoppingCart className='w-4 h-4' /> Carrito</h3>
-                 <button onClick={() => setShowMobileCart(false)} className='p-2 text-zinc-400'><X className='w-6 h-6'/></button>
-              </div>
-              <div className='flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar'>
-                 {cart.map(item => (
-                  <div key={`cart-mob-${item.productId}`} className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2'>
-                     <div className='flex justify-between items-start'>
-                       <span className='text-sm font-bold uppercase leading-tight'>{item.name}</span>
-                       <button onClick={() => removeFromCart(item.productId)} className='text-red-500 p-1'><Trash2 className='w-4 h-4' /></button>
-                     </div>
-                     <div className='flex justify-between items-center'>
-                        <div className='flex items-center gap-3 bg-white dark:bg-zinc-900 p-1.5 rounded-lg border border-zinc-200'>
-                          <button onClick={() => updateCartQty(item.productId, -1)} className='text-zinc-500'><MinusCircle className='w-5 h-5'/></button>
-                          <span className='w-8 text-center text-sm font-bold'>{item.quantity}</span>
-                          <button onClick={() => updateCartQty(item.productId, 1)} className='text-zinc-500'><PlusCircle className='w-5 h-5'/></button>
-                        </div>
-                        <span className='font-black text-base'>${item.subtotal.toLocaleString('es-AR')}</span>
-                     </div>
+        <div className="lg:hidden fixed inset-0 z-50 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="absolute bottom-0 inset-x-0 bg-white dark:bg-zinc-900 rounded-t-2xl shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-300">
+            <div className="p-4 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-800 rounded-t-2xl">
+              <h3 className="font-bold flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4" /> Carrito
+              </h3>
+              <button
+                onClick={() => setShowMobileCart(false)}
+                className="p-2 text-zinc-400"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+              {cart.map((item) => (
+                <div
+                  key={`cart-mob-${item.productId}`}
+                  className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2"
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-bold uppercase leading-tight">{item.name}</span>
+                    <button
+                      onClick={() => removeFromCart(item.productId)}
+                      className="text-red-500 p-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                ))}
-              </div>
-              <div className='p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-12 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'>
-                  <div className='space-y-2'>
-                    <label className='text-[10px] font-black uppercase text-zinc-400 tracking-widest block'>Cliente de la Operación</label>
-                    <Combobox 
-                      options={customers.map(c => ({ id: c.id, name: c.isActive ? c.name : `${c.name} (Inactivo)` }))}
-                      value={selectedCustomerId}
-                      onChange={setSelectedCustomerId}
-                      placeholder="Buscar o registrar..."
-                      addNewLabel="+ Registrar Nuevo Cliente"
-                      onAddNew={() => setIsCustomerModalOpen(true)}
-                    />
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3 bg-white dark:bg-zinc-900 p-1.5 rounded-lg border border-zinc-200">
+                      <button
+                        onClick={() => updateCartQty(item.productId, -1)}
+                        className="text-zinc-500"
+                      >
+                        <MinusCircle className="w-5 h-5" />
+                      </button>
+                      <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                      <button
+                        onClick={() => updateCartQty(item.productId, 1)}
+                        className="text-zinc-500"
+                      >
+                        <PlusCircle className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <span className="font-black text-base">${item.subtotal.toLocaleString('es-AR')}</span>
                   </div>
-                  <div className='flex justify-between items-center pt-2'>
-                    <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
-                    <span className='text-emerald-600 text-3xl font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
-                  </div>
-                  <Button fullWidth onClick={onConfirmSale} size="lg" disabled={cart.length === 0 || !selectedCustomerId || isPending}>
-                     {isPending ? 'Procesando...' : 'Confirmar Venta'}
-                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-12 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest block">Cliente de la Operación</label>
+                <Combobox
+                  options={customers
+                    .filter((c) => c.isActive)
+                    .map((c) => ({
+                      id: c.id,
+                      name: c.name,
+                    }))}
+                  value={selectedCustomerId}
+                  onChange={setSelectedCustomerId}
+                  placeholder="Buscar o registrar..."
+                  addNewLabel="+ Registrar Nuevo Cliente"
+                  onAddNew={() => setIsCustomerModalOpen(true)}
+                />
               </div>
-           </div>
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-[10px] text-zinc-400 uppercase font-black">Total Venta</span>
+                <span className="text-emerald-600 text-3xl font-black tracking-tighter">${cartTotal.toLocaleString('es-AR')}</span>
+              </div>
+              <Button
+                fullWidth
+                onClick={onConfirmSale}
+                size="lg"
+                disabled={cart.length === 0 || !selectedCustomerId || isPending}
+              >
+                {isPending ? 'Procesando...' : 'Confirmar Venta'}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
-      <CustomerModal 
-        isOpen={isCustomerModalOpen} 
-        onClose={() => setIsCustomerModalOpen(false)} 
+      <CustomerModal
+        isOpen={isCustomerModalOpen}
+        onClose={() => setIsCustomerModalOpen(false)}
         onSuccess={(newC: CustomerDef) => {
           setCustomers([...customers, newC]);
           setSelectedCustomerId(newC.id);

@@ -7,10 +7,7 @@ export class DeviceRepository {
   async getAllDevices(includeInactive = false, search?: string) {
     console.log(`[DeviceRepository] Consultando equipos (includeInactive=${includeInactive}, search=${search || 'none'})...`);
     return await db.query.devices.findMany({
-      where: and(
-        includeInactive ? undefined : eq(devices.isActive, true),
-        search ? ilike(devices.name, `%${search}%`) : undefined
-      ),
+      where: and(includeInactive ? undefined : eq(devices.isActive, true), search ? ilike(devices.name, `%${search}%`) : undefined),
       orderBy: [desc(devices.createdAt)],
     });
   }
@@ -26,7 +23,8 @@ export class DeviceRepository {
 
   async updateActiveStatus(id: string, isActive: boolean) {
     console.log(`[DeviceRepository] Actualizando status de equipo ID: ${id} a ${isActive}...`);
-    const result = await db.update(devices)
+    const result = await db
+      .update(devices)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(devices.id, id))
       .returning();
@@ -42,10 +40,7 @@ export class DeviceRepository {
 
   async createDevice(input: DeviceInput) {
     console.log(`[DeviceRepository] Insertando nuevo equipo en BD: ${input.name}...`);
-    const result = await db
-      .insert(devices)
-      .values({ name: input.name, isActive: true })
-      .returning();
+    const result = await db.insert(devices).values({ name: input.name, isActive: true }).returning();
     return result[0];
   }
 
@@ -53,7 +48,7 @@ export class DeviceRepository {
     console.log(`[DeviceRepository] Actualizando datos de equipo ID: ${id}...`);
     const result = await db
       .update(devices)
-      .set({ 
+      .set({
         name: input.name,
         updatedAt: sql`NOW()`,
       })

@@ -20,7 +20,8 @@ export class ProviderRepository {
   }
 
   async updateActiveStatus(id: string, isActive: boolean) {
-    const result = await db.update(providers)
+    const result = await db
+      .update(providers)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(providers.id, id))
       .returning();
@@ -28,25 +29,30 @@ export class ProviderRepository {
   }
 
   async createProvider(input: ProviderInput) {
-    const result = await db.insert(providers).values({
-      name: input.name,
-      phone: input.phone || null,
-      email: input.email || null,
-      isActive: true,
-    }).returning();
+    const result = await db
+      .insert(providers)
+      .values({
+        name: input.name,
+        phone: input.phone || null,
+        email: input.email || null,
+        isActive: true,
+      })
+      .returning();
     return result[0];
   }
 
   async updateProvider(id: string, input: ProviderInput) {
-    const result = await db.update(providers).set({
-      name: input.name,
-      phone: input.phone || null,
-      email: input.email || null,
-      updatedAt: sql`NOW()`,
-    })
-    .where(eq(providers.id, id))
-    .returning();
-    
+    const result = await db
+      .update(providers)
+      .set({
+        name: input.name,
+        phone: input.phone || null,
+        email: input.email || null,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(providers.id, id))
+      .returning();
+
     return result[0];
   }
 

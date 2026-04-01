@@ -1,19 +1,9 @@
 import { type DeviceDef } from '@/schemas/device.schema';
-import { type ColumnDef } from '@/components/ui/data-table';
+import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export function getDeviceColumns({
-  role,
-  onEdit,
-  onToggleActive,
-  onDelete,
-}: {
-  role?: string;
-  onEdit: (item: DeviceDef) => void;
-  onToggleActive: (item: DeviceDef) => void;
-  onDelete: (id: string) => void;
-}): ColumnDef<DeviceDef>[] {
+export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { role?: string; onEdit: (item: DeviceDef) => void; onToggleActive: (item: DeviceDef) => void; onDelete: (id: string) => void }): ColumnDef<DeviceDef>[] {
   const isSuper = role === 'admin';
 
   return [
@@ -22,11 +12,7 @@ export function getDeviceColumns({
       cell: (row: DeviceDef) => (
         <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
           {row.name}
-          {!row.isActive && (
-            <span className="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">
-              Inactivo
-            </span>
-          )}
+          {!row.isActive && <span className="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
         </div>
       ),
     },
@@ -40,11 +26,7 @@ export function getDeviceColumns({
               <>
                 <button
                   onClick={() => onToggleActive(row)}
-                  className={`p-2 rounded-lg transition ${
-                    row.isActive
-                      ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10'
-                      : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
-                  }`}
+                  className={`p-2 rounded-lg transition ${row.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`}
                   title={row.isActive ? 'Desactivar' : 'Activar'}
                 >
                   <Plus className={`w-4 h-4 ${row.isActive ? 'rotate-45' : ''}`} />

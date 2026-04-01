@@ -27,13 +27,7 @@ export function ProvidersPanel() {
   const { providers, setProviders, isLoaded } = useProvidersStore();
   const setProductsLoaded = useProductsStore((s) => s.setLoaded);
 
-  const {
-    isModalOpen, editingItem, openFormModal, closeFormModal,
-    itemToDelete, setItemToDelete,
-    serverError, setServerError,
-    globalMessage, showGlobalMessage,
-    search, setSearch
-  } = useEntityManager<ProviderDef>();
+  const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<ProviderDef>();
 
   const [showInactive, setShowInactive] = useState(false);
 
@@ -76,7 +70,12 @@ export function ProvidersPanel() {
 
   const displayProviders = providers;
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProviderInput>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProviderInput>({
     resolver: zodResolver(providerSchema),
   });
 
@@ -86,8 +85,6 @@ export function ProvidersPanel() {
     const matchesStatus = showInactive ? true : p.isActive;
     return matchesSearch && matchesStatus;
   });
-
-
 
   const handleEditClick = (item?: ProviderDef) => {
     openFormModal(item);
@@ -106,86 +103,114 @@ export function ProvidersPanel() {
   });
 
   return (
-    <div className='flex flex-col flex-1 h-full overflow-hidden'>
+    <div className="flex flex-col flex-1 h-full overflow-hidden">
       {initialLoading ? (
-        <div className="mt-8 animate-in fade-in duration-500"><TableSkeleton /></div>
+        <div className="mt-8 animate-in fade-in duration-500">
+          <TableSkeleton />
+        </div>
       ) : (
-      <>
-      <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
-        <div className='flex flex-col sm:flex-row gap-2 flex-1'>
-          <SearchBar 
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-            placeholder='Buscar distribuidor por nombre, teléfono o email...'
+        <>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
+            <div className="flex flex-col sm:flex-row gap-2 flex-1">
+              <SearchBar
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar distribuidor por nombre, teléfono o email..."
+              />
+              <ToggleFilter
+                id="showInactive"
+                checked={showInactive}
+                onChange={setShowInactive}
+                label="Ver Inactivos"
+              />
+            </div>
+
+            {role === 'admin' && (
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => syncData(true)}
+                  disabled={isPending}
+                  title="Sincronizar Datos"
+                >
+                  <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => handleEditClick()}
+                  leftIcon={<Plus className="w-5 h-5" />}
+                >
+                  Agregar Proveedor
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+
+          <VirtualizedDataTable
+            columns={columns}
+            data={filteredProviders}
+            isLoading={isPending}
+            emptyMessage="No se han encontrado proveedores."
           />
-          <ToggleFilter id='showInactive' checked={showInactive} onChange={setShowInactive} label='Ver Inactivos' />
-        </div>
 
-        {role === 'admin' && (
-          <div className='flex items-center gap-2 sm:gap-4'>
-            <Button variant="secondary" size="icon" onClick={() => syncData()} disabled={isPending} title="Sincronizar Datos">
-              <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button variant="primary" onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />}>
-              Agregar Proveedor
-            </Button>
-          </div>
-        )}
-      </div>
+          <ResponsiveModal
+            isOpen={isModalOpen}
+            onClose={closeFormModal}
+            title={editingItem ? 'Editar Proveedor' : 'Nuevo Proveedor Local'}
+            icon={<Store className="w-5 h-5 text-indigo-500" />}
+            width="md"
+            onSubmit={handleSubmit(handleEditSubmit)}
+            submitLabel={editingItem ? 'Actualizar Firma' : 'Registrar Proveedor'}
+            isPending={isPending}
+          >
+            {serverError && <div className="p-3 bg-red-50 text-red-600 text-sm font-bold uppercase rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Razón Social / Identificador</label>
+                <input
+                  type="text"
+                  {...register('name')}
+                  placeholder="Ej: Accesorios del Sur SRL"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
+                />
+                {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name.message}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Línea Telefónica Directa</label>
+                <input
+                  type="text"
+                  {...register('phone')}
+                  placeholder="+54 9 11 1234-5678"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
+                />
+                {errors.phone && <p className="text-red-500 text-xs mt-1.5">{errors.phone.message}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Correo Electrónico Comercial</label>
+                <input
+                  type="email"
+                  {...register('email')}
+                  placeholder="ventas@distribuidora.com"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
+                />
+                {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
+              </div>
+            </div>
+          </ResponsiveModal>
 
-      {globalMessage && (
-        <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>
-          {globalMessage.text}
-        </div>
-      )}
-
-      <VirtualizedDataTable 
-        columns={columns} 
-        data={filteredProviders} 
-        isLoading={isPending} 
-        emptyMessage="No se han encontrado proveedores."
-      />
-
-      <ResponsiveModal
-        isOpen={isModalOpen}
-        onClose={closeFormModal}
-        title={editingItem ? 'Editar Proveedor' : 'Nuevo Proveedor Local'}
-        icon={<Store className='w-5 h-5 text-indigo-500'/>}
-        width="md"
-        onSubmit={handleSubmit(handleEditSubmit)}
-        submitLabel={editingItem ? 'Actualizar Firma' : 'Registrar Proveedor'}
-        isPending={isPending}
-      >
-        {serverError && <div className='p-3 bg-red-50 text-red-600 text-sm font-bold uppercase rounded-lg border border-red-200 mb-6'>{serverError}</div>}
-        <div className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Razón Social / Identificador</label>
-            <input type='text' {...register('name')} placeholder='Ej: Accesorios del Sur SRL' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
-            {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Línea Telefónica Directa</label>
-            <input type='text' {...register('phone')} placeholder='+54 9 11 1234-5678' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
-            {errors.phone && <p className='text-red-500 text-xs mt-1.5'>{errors.phone.message}</p>}
-          </div>
-          <div>
-            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Correo Electrónico Comercial</label>
-            <input type='email' {...register('email')} placeholder='ventas@distribuidora.com' className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
-            {errors.email && <p className='text-red-500 text-xs mt-1.5'>{errors.email.message}</p>}
-          </div>
-        </div>
-      </ResponsiveModal>
-
-      <ConfirmModal
-        isOpen={!!itemToDelete}
-        onClose={() => setItemToDelete(null)}
-        onConfirm={() => handleDelete(itemToDelete as string)}
-        title="Eliminar Firma Proveedor"
-        description="Esta acción es permanente y eliminará el registro físico de la base de datos. Solo recomendado si lo creaste por error y aún no tiene productos asociados."
-        submitLabel="Desvincular"
-        isPending={isPending}
-      />
-      </>
+          <ConfirmModal
+            isOpen={!!itemToDelete}
+            onClose={() => setItemToDelete(null)}
+            onConfirm={() => handleDelete(itemToDelete as string)}
+            title="Eliminar Firma Proveedor"
+            description="Esta acción es permanente y eliminará el registro físico de la base de datos. Solo recomendado si lo creaste por error y aún no tiene productos asociados."
+            submitLabel="Desvincular"
+            isPending={isPending}
+          />
+        </>
       )}
     </div>
   );

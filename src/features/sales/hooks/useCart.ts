@@ -20,11 +20,7 @@ export function useCart() {
       const existing = prev.find((i) => i.productId === product.id);
       if (existing) {
         if (existing.quantity >= product.stock) return prev;
-        return prev.map((i) =>
-          i.productId === product.id 
-            ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * i.unitPrice } 
-            : i
-        );
+        return prev.map((i) => (i.productId === product.id ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * i.unitPrice } : i));
       }
       return [
         ...prev,
@@ -35,8 +31,8 @@ export function useCart() {
           subtotal: product.salePrice,
           name: `${product.device?.name || 'Equipo'}`,
           desc: product.description || '',
-          max: product.stock
-        }
+          max: product.stock,
+        },
       ];
     });
   };
@@ -68,6 +64,6 @@ export function useCart() {
     removeFromCart,
     updateCartQty,
     clearCart,
-    cartTotal
+    cartTotal,
   };
 }

@@ -20,26 +20,14 @@ interface ComboboxProps {
   className?: string;
 }
 
-export function Combobox({
-  options,
-  value,
-  onChange,
-  placeholder = 'Seleccionar...',
-  searchPlaceholder = 'Buscar...',
-  emptyMessage = 'No se encontraron resultados.',
-  addNewLabel,
-  onAddNew,
-  className = '',
-}: ComboboxProps) {
+export function Combobox({ options, value, onChange, placeholder = 'Seleccionar...', searchPlaceholder = 'Buscar...', emptyMessage = 'No se encontraron resultados.', addNewLabel, onAddNew, className = '' }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.id === value);
 
-  const filteredOptions = options.filter((opt) =>
-    opt.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredOptions = options.filter((opt) => opt.name.toLowerCase().includes(search.toLowerCase()));
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,15 +40,16 @@ export function Combobox({
   }, []);
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
+    <div
+      className={`relative ${className}`}
+      ref={containerRef}
+    >
       <button
         type="button"
         onClick={() => setOpen(!open)}
         className="flex h-10 w-full items-center justify-between rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
       >
-        <span className="truncate">
-          {selectedOption ? selectedOption.name : placeholder}
-        </span>
+        <span className="truncate">{selectedOption ? selectedOption.name : placeholder}</span>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </button>
 
@@ -82,12 +71,8 @@ export function Combobox({
             )}
           </div>
           <div className="overflow-y-auto max-h-[200px] custom-scrollbar border-b border-zinc-100 dark:border-zinc-800">
-            {filteredOptions.length === 0 && !addNewLabel && (
-              <div className="py-6 text-center text-sm text-zinc-500">
-                {emptyMessage}
-              </div>
-            )}
-            
+            {filteredOptions.length === 0 && !addNewLabel && <div className="py-6 text-center text-sm text-zinc-500">{emptyMessage}</div>}
+
             {filteredOptions.map((opt) => (
               <button
                 key={opt.id}
@@ -99,11 +84,7 @@ export function Combobox({
                   setSearch('');
                 }}
               >
-                <Check
-                  className={`mr-2 h-4 w-4 ${
-                    value === opt.id ? 'opacity-100' : 'opacity-0'
-                  } text-indigo-500`}
-                />
+                <Check className={`mr-2 h-4 w-4 ${value === opt.id ? 'opacity-100' : 'opacity-0'} text-indigo-500`} />
                 <span className="truncate">{opt.name}</span>
               </button>
             ))}

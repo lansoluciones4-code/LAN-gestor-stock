@@ -10,17 +10,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg' | 'icon';
 }
 
-export function Button({ 
-  children, 
-  variant = 'primary', 
-  fullWidth = false, 
-  leftIcon, 
-  size = 'md',
-  className = '', 
-  ...props 
-}: ButtonProps) {
+export function Button({ children, variant = 'primary', fullWidth = false, leftIcon, size = 'md', className = '', ...props }: ButtonProps) {
   const baseStyles = 'flex items-center justify-center rounded-lg transition-colors shadow-sm whitespace-nowrap';
-  
+
   const sizes = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2.5 text-base',
@@ -41,7 +33,7 @@ export function Button({
       className={`${baseStyles} ${sizes[size]} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
       {...props}
     >
-      {leftIcon && <span className='mr-2'>{leftIcon}</span>}
+      {leftIcon && <span className="mr-2">{leftIcon}</span>}
       {children}
     </button>
   );
