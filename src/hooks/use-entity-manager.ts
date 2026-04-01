@@ -22,9 +22,7 @@ export function useEntityManager<T>() {
 
   const closeFormModal = () => {
     setIsModalOpen(false);
-    // Note: No reseteamos editingItem aquí de inmediato para evitar flashes
-    // en la UI mientras la ventana se esconde (fadeout).
-    // El desarrollador resetea el form mediante hook-form de todos modos.
+    // Note: No reseteamos editingItem aquí de inmediato para evitar flashes en la UI mientras la ventana se esconde (fadeout).
   };
 
   const showGlobalMessage = (type: 'success' | 'error', text: string) => {

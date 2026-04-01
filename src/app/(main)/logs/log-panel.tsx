@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { History, X, RefreshCcw, Search, Calendar } from 'lucide-react';
+import { History, X, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { SearchBar } from '@/components/ui/search-bar';
@@ -16,6 +16,7 @@ import { getAuditColumns } from '@/config/tables/audit-columns';
 
 export function LogPanel() {
   const { logs, setLogs, appendLogs, isLoaded } = useLogsStore();
+
   const [initialLoading, setInitialLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const [page, setPage] = useState(1);
@@ -56,7 +57,6 @@ export function LogPanel() {
 
   const isFirstRender = useRef(true);
 
-  // Initial load
   useEffect(() => {
     if (!isLoaded) {
       loadData(true).finally(() => setInitialLoading(false));
@@ -65,7 +65,6 @@ export function LogPanel() {
     }
   }, []);
 
-  // Filter changes - debounced
   useEffect(() => {
     if (initialLoading) return;
 
@@ -83,7 +82,6 @@ export function LogPanel() {
     return () => clearTimeout(timer);
   }, [search, startDate, endDate, initialLoading]);
 
-  // Pagination
   useEffect(() => {
     if (page > 1 && !initialLoading) {
       loadData(false);
@@ -106,7 +104,6 @@ export function LogPanel() {
     showGlobalMessage('success', 'Datos sincronizados con éxito.');
   };
 
-
   const columns = getAuditColumns({
     onView: setSelectedLog,
   });
@@ -124,7 +121,7 @@ export function LogPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por acción, entidad o ID..."
+                placeholder="Buscar por acción, usuario, entidad o ID..."
                 className="h-11"
               />
               <div className="flex items-center">
