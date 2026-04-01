@@ -7,7 +7,7 @@ import { Users } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { customerSchema, type CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
 import { createCustomerAction, updateCustomerAction } from '@/server/actions/customer.actions';
-import { useLogsStore } from '@/stores/logs.store';
+import { invalidateAllCaches } from '@/stores';
 
 interface CustomerModalProps {
   isOpen: boolean;
@@ -62,7 +62,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
         return;
       }
 
-      useLogsStore.getState().setLoaded(false);
+      invalidateAllCaches();
       onSuccess(result.data || ({ ...data, id: editingItem?.id } as CustomerDef));
       onClose();
     });

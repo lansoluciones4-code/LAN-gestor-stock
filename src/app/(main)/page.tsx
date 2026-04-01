@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Package, Users, Calendar, DollarSign, Activity, ArrowUpRight, User, Clock, Briefcase } from 'lucide-react';
 import { fetchDashboardStats } from '@/server/actions/stats.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { invalidateAllCaches } from '@/stores';
 import { useStatsStore } from '@/stores/stats.store';
 import { RefreshCcw } from 'lucide-react';
 
@@ -11,7 +12,7 @@ export default function DashboardPage() {
   const [isPending, startTransition] = useTransition();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const { stats, setStats, isLoaded, setLoaded } = useStatsStore();
+  const { stats, setStats, isLoaded } = useStatsStore();
 
   const loadStats = (start?: string, end?: string) => {
     startTransition(async () => {
@@ -29,7 +30,7 @@ export default function DashboardPage() {
   }, [isLoaded]);
 
   const handleSync = () => {
-    setLoaded(false);
+    invalidateAllCaches();
     loadStats();
   };
 
@@ -50,16 +51,16 @@ export default function DashboardPage() {
             endDate={endDate}
             onStartChange={(v) => {
               setStartDate(v);
-              setLoaded(false);
+              invalidateAllCaches();
             }}
             onEndChange={(v) => {
               setEndDate(v);
-              setLoaded(false);
+              invalidateAllCaches();
             }}
             onClear={() => {
               setStartDate('');
               setEndDate('');
-              setLoaded(false);
+              invalidateAllCaches();
             }}
           />
           <button
@@ -176,9 +177,9 @@ export default function DashboardPage() {
                   >
                     <td className="px-8 py-5 flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 font-bold">{seller.username[0].toUpperCase()}</div>
-                      <div>
-                        <p className="font-bold text-zinc-900 dark:text-zinc-100">{seller.username}</p>
-                        <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">Responsable de Ventas</p>
+                      <div className="min-w-0">
+                        <p className="font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px]" title={seller.username}>{seller.username}</p>
+                        <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter truncate max-w-[180px]">Responsable de Ventas</p>
                       </div>
                     </td>
                     <td className="px-8 py-5 text-center font-black text-[17px] text-zinc-700 dark:text-zinc-300">{seller.count}</td>

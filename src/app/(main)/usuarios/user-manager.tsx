@@ -11,6 +11,7 @@ import { type UserInput, type UserDef } from '@/schemas/user.schema';
 import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUsersStore } from '@/stores/users.store';
+import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -24,7 +25,7 @@ export function UserManager() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
 
   const currentUser = useAuthStore((s) => s.user);
-  const { users, setUsers, isLoaded, setLoaded } = useUsersStore();
+  const { users, setUsers, isLoaded } = useUsersStore();
 
   const { itemToDelete, setItemToDelete, editingItem, openFormModal, closeFormModal, globalMessage, showGlobalMessage, serverError, setServerError } = useEntityManager<UserDef>();
 
@@ -44,6 +45,9 @@ export function UserManager() {
     setItemToDelete,
     editingItem,
     showInactive: showInactives,
+    onAfterSuccess: () => {
+      invalidateAllCaches();
+    },
   });
 
   const columns = getUserColumns({
@@ -62,12 +66,11 @@ export function UserManager() {
         setInitialLoading(true);
         const data = await fetchUsers(showInactives);
         setUsers(data);
-        setLoaded(true);
       }
       setInitialLoading(false);
     }
     load();
-  }, [isLoaded, showInactives, setUsers, setLoaded]);
+  }, [isLoaded, showInactives, setUsers]);
 
   const filteredUsers = users.filter((u) => {
     const term = search.toLowerCase();

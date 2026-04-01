@@ -22,12 +22,24 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
     },
     {
       header: 'Cliente',
-      cellClassName: 'text-zinc-500',
-      cell: (s) => s.customer?.name || 'Consumidor Final',
+      cellClassName: 'text-zinc-500 max-w-[150px] truncate',
+      cell: (s) => (
+        <span title={s.customer?.name || 'Consumidor Final'}>
+          {s.customer?.name || 'Consumidor Final'}
+        </span>
+      ),
     },
     {
       header: 'Vendedor',
-      cell: (s) => <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[13px] font-bold rounded uppercase">{s.vendor?.username || 'Sistema'}</span>,
+      cellClassName: 'max-w-[120px] truncate',
+      cell: (s) => (
+        <span 
+          className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[13px] font-bold rounded uppercase truncate block w-fit"
+          title={s.vendor?.username || 'Sistema'}
+        >
+          {s.vendor?.username || 'Sistema'}
+        </span>
+      ),
     },
     {
       header: 'Total',

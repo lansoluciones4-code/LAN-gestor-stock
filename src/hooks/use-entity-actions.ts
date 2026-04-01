@@ -1,5 +1,5 @@
 import { useTransition } from 'react';
-import { useLogsStore } from '@/stores/logs.store';
+import { invalidateAllCaches } from '@/stores';
 
 interface EntityActionHandlers<TDef, TInput> {
   fetchData: (showInactive: boolean) => Promise<TDef[]>;
@@ -52,7 +52,7 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
 
     closeFormModal();
     onSuccessMessage(result.message);
-    useLogsStore.getState().setLoaded(false);
+    invalidateAllCaches();
     onAfterSuccess?.();
     syncData();
   };
@@ -66,7 +66,7 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     if (!result.success) return onErrorMessage(result.message);
 
     onSuccessMessage(result.message);
-    useLogsStore.getState().setLoaded(false);
+    invalidateAllCaches();
     onAfterSuccess?.();
     syncData();
   };
@@ -80,7 +80,7 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
       onErrorMessage(result.message);
     } else {
       onSuccessMessage(result.message);
-      useLogsStore.getState().setLoaded(false);
+      invalidateAllCaches();
       onAfterSuccess?.();
       syncData();
     }

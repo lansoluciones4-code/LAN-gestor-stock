@@ -7,9 +7,7 @@ import { Plus, Store, RefreshCcw } from 'lucide-react';
 import { providerSchema, type ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProvidersStore } from '@/stores/providers.store';
-import { useProductsStore } from '@/stores/products.store';
-import { useSalesStore } from '@/stores/sales.store';
-import { useStatsStore } from '@/stores/stats.store';
+import { invalidateAllCaches } from '@/stores';
 import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
@@ -25,7 +23,6 @@ export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
   const { providers, setProviders, isLoaded } = useProvidersStore();
-  const setProductsLoaded = useProductsStore((s) => s.setLoaded);
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<ProviderDef>();
 
@@ -48,9 +45,7 @@ export function ProvidersPanel() {
     editingItem,
     showInactive,
     onAfterSuccess: () => {
-      setProductsLoaded(false);
-      useSalesStore.getState().setLoaded(false);
-      useStatsStore.getState().setLoaded(false);
+      invalidateAllCaches();
     },
   });
 

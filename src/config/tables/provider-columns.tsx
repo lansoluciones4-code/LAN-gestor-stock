@@ -13,10 +13,11 @@ export function getProviderColumns({ role, onEdit, onToggleActive, onDelete }: C
   return [
     {
       header: 'Empresa / Mayorista',
+      cellClassName: 'max-w-[200px]',
       cell: (p) => (
-        <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
-          {p.name}
-          {!p.isActive && <span className="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
+        <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0" title={p.name}>
+          <span className="truncate">{p.name}</span>
+          {!p.isActive && <span className="shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
         </div>
       ),
     },
@@ -27,8 +28,12 @@ export function getProviderColumns({ role, onEdit, onToggleActive, onDelete }: C
     },
     {
       header: 'Correo',
-      cellClassName: 'text-zinc-500',
-      cell: (p) => p.email || '---',
+      cellClassName: 'text-zinc-500 max-w-[150px] truncate',
+      cell: (p) => (
+        <span title={p.email || '---'}>
+          {p.email || '---'}
+        </span>
+      ),
     },
     ...(role === 'admin'
       ? [
