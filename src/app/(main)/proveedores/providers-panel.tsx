@@ -123,7 +123,7 @@ export function ProvidersPanel() {
 
         {role === 'admin' && (
           <div className='flex items-center gap-2 sm:gap-4'>
-            <Button variant="secondary" size="icon" onClick={() => syncData()} disabled={isPending} title="Sincronizar Datos">
+            <Button variant="secondary" size="icon" onClick={() => syncData(true)} disabled={isPending} title="Sincronizar Datos">
               <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
             </Button>
             <Button variant="primary" onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />}>

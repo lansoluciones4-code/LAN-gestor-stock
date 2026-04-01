@@ -36,10 +36,13 @@ export function useEntityActions<TDef extends { id?: string, isActive?: boolean 
 }: UseEntityActionsProps<TDef, TInput>) {
   const [isPending, startTransition] = useTransition();
 
-  const syncData = async () => {
+  const syncData = async (manual = false) => {
     startTransition(async () => {
       const resp = await handlers.fetchData(showInactive);
       setStoreData(resp);
+      if (manual) {
+        onSuccessMessage('Datos sincronizados con éxito.');
+      }
     });
   };
 

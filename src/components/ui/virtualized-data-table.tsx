@@ -3,7 +3,14 @@
 import * as React from 'react';
 import { TableVirtuoso, type TableComponents } from 'react-virtuoso';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { type ColumnDef } from './data-table';
+export interface ColumnDef<T> {
+  header: React.ReactNode;
+  headerClassName?: string;
+  cellClassName?: string;
+  cell: (item: T) => React.ReactNode;
+  hideRole?: string[]; 
+}
+
 
 interface VirtualizedDataTableProps<T> {
   columns: ColumnDef<T>[];

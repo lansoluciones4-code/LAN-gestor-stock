@@ -95,7 +95,7 @@ export function LogPanel() {
   const handleSync = async () => {
     setLoaded(false);
     await loadData(true);
-    showGlobalMessage('success', 'Registros actualizados desde el servidor.');
+    showGlobalMessage('success', 'Datos sincronizados con éxito.');
   };
 
   const getHumanReadableDescription = (log: AuditLogDef) => {

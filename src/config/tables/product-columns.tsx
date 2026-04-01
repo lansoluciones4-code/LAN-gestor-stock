@@ -1,5 +1,5 @@
 import { type ProductDef } from '@/schemas/product.schema';
-import { type ColumnDef } from '@/components/ui/data-table';
+import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { PackageX, Edit, Trash2 } from 'lucide-react';
 
 interface ColumnActions {

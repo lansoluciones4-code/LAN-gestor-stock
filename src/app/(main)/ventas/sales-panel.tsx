@@ -119,7 +119,7 @@ export function SalesPanel() {
         <SalesListView 
           sales={displaySales}
           isPending={isPending}
-          onSync={loadData}
+          onSync={() => loadData(true)}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           startDate={startDate}

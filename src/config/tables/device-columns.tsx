@@ -1,5 +1,5 @@
 import { type DeviceDef } from '@/schemas/device.schema';
-import { type ColumnDef } from '@/components/ui/data-table';
+import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

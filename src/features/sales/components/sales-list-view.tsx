@@ -78,7 +78,7 @@ export function SalesListView({
             onEndChange={setEndDate}
           />
 
-          <Button variant="secondary" size="icon" onClick={onSync} disabled={isPending} title="Sincronizar">
+          <Button variant="secondary" size="icon" onClick={() => onSync()} disabled={isPending} title="Sincronizar">
             <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
           </Button>
 

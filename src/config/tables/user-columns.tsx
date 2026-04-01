@@ -1,5 +1,5 @@
 import { type UserDef } from '@/schemas/user.schema';
-import { type ColumnDef } from '@/components/ui/data-table';
+import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 
 interface ColumnActions {

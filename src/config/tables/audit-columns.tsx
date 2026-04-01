@@ -1,5 +1,5 @@
 import { type AuditLogDef } from '@/schemas/audit-log.schema';
-import { type ColumnDef } from '@/components/ui/data-table';
+import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Eye } from 'lucide-react';
 
 interface ColumnActions {

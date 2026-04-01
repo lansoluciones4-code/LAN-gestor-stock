@@ -190,7 +190,7 @@ export function ProductsPanel() {
         {role === 'admin' && (
           <div className='flex items-center gap-2 sm:gap-4'>
             <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' />
-            <Button variant="secondary" size="icon" onClick={syncData} disabled={isPending} title="Sincronizar" className='h-11 w-11'>
+            <Button variant="secondary" size="icon" onClick={() => syncData(true)} disabled={isPending} title="Sincronizar" className='h-11 w-11'>
               <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
             </Button>
             <Button variant="primary" onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11'>

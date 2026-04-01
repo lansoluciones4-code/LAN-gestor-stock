@@ -37,7 +37,7 @@ export function useSalesActions({
 }: UseSalesActionsProps) {
   const [isPending, startTransition] = useTransition();
 
-  const loadData = async () => {
+  const loadData = async (manual = false) => {
     startTransition(async () => {
       const [updatedS, updatedP, updatedC] = await Promise.all([
         fetchSales(),
@@ -54,6 +54,10 @@ export function useSalesActions({
       useDevicesStore.getState().setLoaded(false);
       useCustomersStore.getState().setLoaded(false);
       useStatsStore.getState().setLoaded(false);
+
+      if (manual) {
+        onSuccessMessage('Ventas y catálogo sincronizados con éxito.');
+      }
     });
   };
 
