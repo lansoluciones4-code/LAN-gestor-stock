@@ -121,7 +121,7 @@ export function LogPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por acción, entidad o ID..."
+                placeholder="Buscar por acción, usuario, entidad o ID..."
                 className="h-11"
               />
               <div className="flex items-center">

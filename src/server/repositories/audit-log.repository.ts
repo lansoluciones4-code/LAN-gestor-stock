@@ -1,6 +1,6 @@
-import { desc } from 'drizzle-orm';
+import { desc, ilike, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { auditLogs } from '@/lib/db/schema';
+import { auditLogs, users } from '@/lib/db/schema';
 import type { AuditLogInput } from '@/schemas/audit-log.schema';
 
 export class AuditLogRepository {
@@ -9,12 +9,47 @@ export class AuditLogRepository {
     const offset = (page - 1) * limit;
 
     return await db.query.auditLogs.findMany({
-      where: (logs, { eq, and, or, like, gte, lte }) => {
+      where: (logs) => {
         const conditions = [];
 
         if (search) {
-          const s = `%${search.toLowerCase()}%`;
-          conditions.push(or(like(logs.action, s), like(logs.entity, s), like(logs.entityId, s)));
+          const s = `%${search}%`;
+          
+          // Map Spanish entity names to technical values for searching (allowing partial matches)
+          const entityMapping = [
+            { label: 'usuario', value: 'USER' },
+            { label: 'proveedor', value: 'PROVIDER' },
+            { label: 'producto', value: 'PRODUCT' },
+            { label: 'cliente', value: 'CUSTOMER' },
+            { label: 'equipo', value: 'DEVICE' },
+            { label: 'venta', value: 'SALE' },
+          ];
+          
+          const searchLower = search.toLowerCase().trim();
+          const matchingEntities = entityMapping
+            .filter(m => m.label.includes(searchLower))
+            .map(m => m.value);
+
+          const searchConditions = [
+            ilike(logs.action, s),
+            ilike(logs.entity, s),
+            ilike(logs.username, s),
+            sql`${logs.entityId}::text ilike ${s}`,
+            // Subquery to match username in users table
+            exists(
+              db.select({ id: users.id })
+                .from(users)
+                .where(and(eq(users.id, logs.userId), ilike(users.username, s)))
+            )
+          ];
+
+          if (matchingEntities.length > 0) {
+            const entCond = or(...matchingEntities.map(val => eq(logs.entity, val)));
+            if (entCond) searchConditions.push(entCond);
+          }
+
+          const cond = or(...searchConditions);
+          if (cond) conditions.push(cond);
         }
 
         if (startDate) {
