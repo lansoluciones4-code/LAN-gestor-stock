@@ -345,8 +345,8 @@ export function ProductsPanel() {
             {serverError && <div className="p-3 mb-4 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">{serverError}</div>}
             <div className="p-3 mb-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg">
               <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">Producto</p>
-              <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                {lossProduct?.device?.name} -{lossProduct?.description}
+              <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate" title={`${lossProduct?.device?.name} - ${lossProduct?.description}`}>
+                {lossProduct?.device?.name} - {lossProduct?.description}
               </p>
               <p className="text-xs text-zinc-500 mt-1">
                 Stock actual:
