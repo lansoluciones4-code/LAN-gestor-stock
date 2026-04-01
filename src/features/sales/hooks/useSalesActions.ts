@@ -5,12 +5,7 @@ import { type ProductDef } from '@/schemas/product.schema';
 import { createSaleAction, deleteSaleAction, fetchSales } from '@/server/actions/sale.actions';
 import { fetchProducts } from '@/server/actions/product.actions';
 import { fetchCustomers } from '@/server/actions/customer.actions';
-import { useProductsStore } from '@/stores/products.store';
-import { useProvidersStore } from '@/stores/providers.store';
-import { useDevicesStore } from '@/stores/devices.store';
-import { useCustomersStore } from '@/stores/customers.store';
-import { useLogsStore } from '@/stores/logs.store';
-import { useStatsStore } from '@/stores/stats.store';
+import { invalidateAllCaches } from '@/stores';
 
 interface UseSalesActionsProps {
   onSuccessMessage: (msg: string) => void;
@@ -34,12 +29,8 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       setProducts(updatedP);
       setCustomers(updatedC);
 
-      // Invalidar stores externos para forzar re-fetch al navegar
-      useProductsStore.getState().setLoaded(false);
-      useProvidersStore.getState().setLoaded(false);
-      useDevicesStore.getState().setLoaded(false);
-      useCustomersStore.getState().setLoaded(false);
-      useStatsStore.getState().setLoaded(false);
+      // Invalidar todos los stores para asegurar consistencia
+      invalidateAllCaches();
 
       if (manual) {
         onSuccessMessage('Datos sincronizados con éxito.');
@@ -66,7 +57,7 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
         clearCart();
         closeMobileCart();
         navigateToList();
-        useLogsStore.getState().setLoaded(false);
+        invalidateAllCaches();
         loadData();
       } else {
         onErrorMessage(result.message);
@@ -81,7 +72,7 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       const result = await deleteSaleAction(id);
       if (result.success) {
         onSuccessMessage(result.message);
-        useLogsStore.getState().setLoaded(false);
+        invalidateAllCaches();
         loadData();
       } else {
         onErrorMessage(result.message);

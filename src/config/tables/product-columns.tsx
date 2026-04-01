@@ -13,11 +13,16 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete }: ColumnActi
   return [
     {
       header: 'Equipo y Detalle',
+      cellClassName: 'max-w-[250px]',
       cell: (p) => (
-        <>
-          <div className="font-bold text-zinc-900 dark:text-zinc-100">{p.device?.name || '---'}</div>
-          <div className="text-xs text-zinc-500 mt-0.5">{p.description}</div>
-        </>
+        <div className="flex flex-col min-w-0">
+          <div className="font-bold text-zinc-900 dark:text-zinc-100 truncate" title={p.device?.name || '---'}>
+            {p.device?.name || '---'}
+          </div>
+          <div className="text-xs text-zinc-500 mt-0.5 truncate" title={p.description || ''}>
+            {p.description || 'Sin detalle'}
+          </div>
+        </div>
       ),
     },
     {
@@ -40,8 +45,12 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete }: ColumnActi
       : []),
     {
       header: 'Proveedor',
-      cellClassName: 'text-zinc-500',
-      cell: (p) => p.provider?.name || '---',
+      cellClassName: 'text-zinc-500 max-w-[150px] truncate',
+      cell: (p) => (
+        <span title={p.provider?.name || '---'}>
+          {p.provider?.name || '---'}
+        </span>
+      ),
     },
     ...(role === 'admin'
       ? [

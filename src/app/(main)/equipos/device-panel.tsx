@@ -14,21 +14,16 @@ import { deviceSchema, type DeviceInput, type DeviceDef } from '@/schemas/device
 import { createDeviceAction, updateDeviceAction, deleteDeviceAction, fetchDevices, toggleDeviceActiveAction } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useDevicesStore } from '@/stores/devices.store';
-import { useProductsStore } from '@/stores/products.store';
+import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 
-import { useSalesStore } from '@/stores/sales.store';
-import { useStatsStore } from '@/stores/stats.store';
 
 export function DevicePanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
   const { devices, setDevices, isLoaded } = useDevicesStore();
-  const setProductsLoaded = useProductsStore((s) => s.setLoaded);
-  const setSalesLoaded = useSalesStore((s) => s.setLoaded);
-  const setStatsLoaded = useStatsStore((s) => s.setLoaded);
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<DeviceDef>();
 
@@ -51,9 +46,7 @@ export function DevicePanel() {
     editingItem,
     showInactive,
     onAfterSuccess: () => {
-      setProductsLoaded(false);
-      setSalesLoaded(false);
-      setStatsLoaded(false);
+      invalidateAllCaches();
     },
   });
 
