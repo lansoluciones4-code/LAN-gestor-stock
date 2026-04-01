@@ -1,8 +1,17 @@
+import { useEffect } from 'react';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { type SaleDef } from '@/schemas/sale.schema';
 import { Button } from '@/components/ui/button';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
     <div className="flex flex-col h-full space-y-4 animate-in fade-in duration-300 overflow-hidden bg-zinc-50 dark:bg-zinc-950 px-1">
       <div className="flex items-center justify-between sticky top-4 bg-white dark:bg-zinc-900 px-4 py-3 z-30 border-b border-zinc-200 dark:border-zinc-800 shadow-sm rounded-xl mx-2">

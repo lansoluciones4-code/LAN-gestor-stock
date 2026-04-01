@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search } from 'lucide-react';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,14 @@ interface SalesPOSViewProps {
 export function SalesPOSView({ products, customers, setCustomers, cart, addToCart, removeFromCart, updateCartQty, cartTotal, selectedCustomerId, setSelectedCustomerId, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, setGlobalMessage }: SalesPOSViewProps) {
   const [saleSearch, setSaleSearch] = useState('');
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
 
   const filteredProducts = products.filter((p) => {
     if (p.stock <= 0) return false;
@@ -76,9 +84,9 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 onClick={() => addToCart(p)}
                 className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-indigo-500 hover:shadow-md'}`}
               >
-                <div className="text-left">
-                  <h4 className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{p.device?.name}</h4>
-                  <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight">{p.description || '--'}</p>
+                <div className="text-left min-w-0 flex-1 mr-4">
+                  <h4 className="font-bold text-zinc-900 dark:text-zinc-100 text-sm truncate" title={p.device?.name}>{p.device?.name}</h4>
+                  <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight truncate" title={p.description || '--'}>{p.description || '--'}</p>
                   <span className={`text-[10px] font-bold ${p.stock < 5 ? 'text-amber-500' : 'text-zinc-500'}`}>
                     Disp:
                     {p.stock}
@@ -123,8 +131,8 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 key={`cart-item-${item.productId}`}
                 className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm"
               >
-                <div className="flex justify-between items-start gap-2">
-                  <span className="text-xs font-bold uppercase leading-tight">{item.name}</span>
+                <div className="flex justify-between items-start gap-2 overflow-hidden">
+                  <span className="text-xs font-bold uppercase leading-tight truncate" title={item.name}>{item.name}</span>
                   <button
                     onClick={() => removeFromCart(item.productId)}
                     className="text-zinc-300 hover:text-red-500 transition-colors p-1"
@@ -209,8 +217,8 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                   key={`cart-mob-${item.productId}`}
                   className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2"
                 >
-                  <div className="flex justify-between items-start">
-                    <span className="text-sm font-bold uppercase leading-tight">{item.name}</span>
+                  <div className="flex justify-between items-start overflow-hidden">
+                    <span className="text-sm font-bold uppercase leading-tight truncate" title={item.name}>{item.name}</span>
                     <button
                       onClick={() => removeFromCart(item.productId)}
                       className="text-red-500 p-1"

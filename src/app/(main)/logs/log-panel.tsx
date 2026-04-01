@@ -90,56 +90,22 @@ export function LogPanel() {
     }
   }, [page]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedLog(null);
+    };
+    if (selectedLog) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedLog]);
+
   const handleSync = async () => {
     invalidateAllCaches();
     await loadData(true);
     showGlobalMessage('success', 'Datos sincronizados con éxito.');
   };
 
-  const getHumanReadableDescription = (log: AuditLogDef) => {
-    const detail = log.detail as any;
-    const entityNames: Record<string, string> = {
-      USER: 'Usuario',
-      PROVIDER: 'Proveedor',
-      PRODUCT: 'Producto',
-      CUSTOMER: 'Cliente',
-      DEVICE: 'Equipo',
-      SALE: 'Venta',
-    };
-
-    const entityLabel = entityNames[log.entity] || log.entity;
-    const name = detail?.name || detail?.username || '';
-
-    const action = log.action.toUpperCase();
-    if (action === 'LOGIN') return `${log.user?.username || 'Sistema'} inició sesión en la plataforma.`;
-
-    let actionText = '';
-    switch (action) {
-      case 'CREAR':
-        actionText = 'Registró';
-        break;
-      case 'ACTUALIZAR':
-      case 'EDITAR':
-        actionText = 'Actualizó';
-        break;
-      case 'ELIMINAR':
-        actionText = 'Eliminó';
-        break;
-      case 'PÉRDIDA':
-        actionText = 'Registró pérdida de';
-        break;
-      default:
-        actionText = 'Operó sobre';
-    }
-
-    if (log.entity === 'SALE' && action === 'CREAR') return `Venta generada por $${(detail?.total || 0).toLocaleString('es-AR')}.`;
-    if (log.entity === 'SALE' && action === 'ELIMINAR') return `Anulación de venta ID ${log.entityId?.substring(0, 8) || '--'}. Stock revertido.`;
-    if (log.entity === 'PRODUCT' && action === 'CREAR') return `Alta de stock para ${detail?.description || 'equipo'}. Unidades: ${detail?.stock || 0}.`;
-    if (action === 'PÉRDIDA') return `Pérdida registrada: ${detail?.quantity || 0} unidades por "${detail?.reason || 'sin motivo'}".`;
-
-    if (name) return `${actionText} ${entityLabel.toLowerCase()} "${name}".`;
-    return `${actionText} ${entityLabel.toLowerCase()} (Ref ID: ${log.entityId?.substring(0, 8) || '--'}).`;
-  };
 
   const columns = getAuditColumns({
     onView: setSelectedLog,
@@ -210,16 +176,12 @@ export function LogPanel() {
                   </h3>
                   <button
                     onClick={() => setSelectedLog(null)}
-                    className="p-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    className="p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="p-6 overflow-y-auto custom-scrollbar space-y-6">
-                  <div className="p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-inner">
-                    <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">Detalle Descriptivo</h4>
-                    <p className="text-base font-bold text-zinc-900 dark:text-zinc-100 leading-tight">{getHumanReadableDescription(selectedLog)}</p>
-                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div className="space-y-0.5">
                       <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Fecha y Hora Exacta</span> <span className="font-bold text-zinc-700 dark:text-zinc-300">{new Date(selectedLog.createdAt).toLocaleString('es-AR')}</span>
@@ -245,7 +207,7 @@ export function LogPanel() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Estructura de Datos (Inmutable)</h4>
+                    <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Estructura de Datos</h4>
                     <div className="bg-zinc-900 dark:bg-zinc-950 p-4 rounded-lg border border-zinc-800 font-mono text-[11px] text-indigo-300 overflow-x-auto whitespace-pre custom-scrollbar">{JSON.stringify(selectedLog.detail, null, 2)}</div>
                   </div>
                 </div>
