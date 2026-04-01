@@ -1,22 +1,5 @@
 import { test, expect } from '@playwright/test';
-//How to run
-/*
-Instalar playwright en la carpeta raiz del proyecto:      npm init playwright@latest
 
-Ejecuta un archivo de pruebas específico en modo en todos los navegadores configurados:
-                                                          npx playwright test tests/providers.spec.ts
-
-Limita la ejecución de la prueba únicamente al motor de Google Chrome.
-                                                          npx playwright test tests/providers.spec.ts --project=chromium
-
-Ejecuta la prueba abriendo la ventana del navegador de forma visible para que veas qué está pasando.
-                                                          npx playwright test tests/providers.spec.ts --headed
-
-Muestra el reporte final en caso de éxito:                npx playwright show-report
-
-Abre el navegador y la herramienta que graba tus clics y tipeos, transformándolos en código TypeScript.
-                                                          npx playwright codegen http://localhost:3000
-*/
 
 
 /**
@@ -70,10 +53,10 @@ const CASOS_DE_VALIDACION = [
   },
   {
     descripcion: 'Debería respetar los límites de longitud máxima de los campos',
-    nombre: 'erroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadosaaaaa', 
-    telefono: '1234567891234567890012345678901', 
+    nombre: 'erroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadosaaaaa',
+    telefono: '1234567891234567890012345678901',
     correo: 'erroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsper@algo.com',
-    erroresEsperados: ['Nombre demasiado largo', 'Número de teléfono demasiado', 'Too big: expected string to']
+    erroresEsperados: ['Nombre demasiado largo', 'Número de teléfono demasiado', 'Correo demasiado largo'] //TODO can change
   }
 ];
 
@@ -145,7 +128,7 @@ test.describe.parallel('Gestión de Proveedores: Validaciones y Lógica', () => 
     await btnVerInactivos.click();
     const filaInactiva = page.getByRole('row').filter({ hasText: nombre });
     await expect(filaInactiva).toBeVisible({ timeout: 15000 });
-    
+
     await filaInactiva.getByRole('button', { name: 'Activar' }).click();
     await expect(filaInactiva).toBeVisible({ timeout: 15000 });
 
@@ -153,7 +136,7 @@ test.describe.parallel('Gestión de Proveedores: Validaciones y Lógica', () => 
     await btnVerInactivos.click();
     const filaReactivada = page.getByRole('row').filter({ hasText: nombre });
     await expect(filaReactivada).toBeVisible({ timeout: 15000 });
-    
+
     await filaReactivada.getByRole('button', { name: 'Eliminar' }).click();
     await page.getByRole('button', { name: 'Desvincular' }).click();
     await expect(filaReactivada).toBeHidden({ timeout: 15000 });
@@ -189,19 +172,19 @@ test.describe.serial('Gestión de Proveedores: Ciclo de Vida CRUD', () => {
 
   test('Debería listar únicamente al proveedor creado al utilizar la búsqueda', async ({ page }) => {
     const inputBusqueda = page.getByRole('textbox', { name: 'Buscar distribuidor por' });
-    
+
     await inputBusqueda.fill(proveedorTest.nombreOriginal);
     await expect(page.getByText(proveedorTest.nombreOriginal)).toBeVisible();
-    
+
     // Contamos cabecera + 1 fila de resultados correspondiente a la búsqueda
     const filasTabla = page.getByRole('row');
-    await expect(filasTabla).toHaveCount(2); 
+    await expect(filasTabla).toHaveCount(2);
   });
 
   test('Debería editar exitosamente los datos del proveedor previamente creado', async ({ page }) => {
     const filaOriginal = page.getByRole('row').filter({ hasText: proveedorTest.nombreOriginal });
     const btnEditar = filaOriginal.getByRole('button', { name: 'Editar' });
-    
+
     const inputNombre = page.getByRole('textbox', { name: 'Ej: Accesorios del Sur SRL' });
     const inputTelefono = page.getByRole('textbox', { name: '+54 9 11 1234-' });
     const inputCorreo = page.getByRole('textbox', { name: 'ventas@distribuidora.com' });
