@@ -12,10 +12,9 @@ import { useSalesStore } from '@/stores/sales.store';
 import { useStatsStore } from '@/stores/stats.store';
 import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
-import { useClientPagination } from '@/hooks/use-client-pagination';
+import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
-import { DataTable } from '@/components/ui/data-table';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
@@ -88,7 +87,7 @@ export function ProvidersPanel() {
     return matchesSearch && matchesStatus;
   });
 
-  const { paginatedData, hasMore, elementRef } = useClientPagination(filteredProviders, 20);
+
 
   const handleEditClick = (item?: ProviderDef) => {
     openFormModal(item);
@@ -140,12 +139,10 @@ export function ProvidersPanel() {
         </div>
       )}
 
-      <DataTable 
+      <VirtualizedDataTable 
         columns={columns} 
-        data={paginatedData} 
+        data={filteredProviders} 
         isLoading={isPending} 
-        hasMore={hasMore} 
-        observerRef={elementRef} 
         emptyMessage="No se han encontrado proveedores."
       />
 

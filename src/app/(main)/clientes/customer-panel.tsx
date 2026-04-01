@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
-import { DataTable } from '@/components/ui/data-table';
+import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { type CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
 import {
   createCustomerAction,
@@ -22,7 +22,7 @@ import { useStatsStore } from '@/stores/stats.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { useClientPagination } from '@/hooks/use-client-pagination';
+
 
 import { CustomerModal } from '@/components/modals/customer-modal';
 
@@ -87,7 +87,7 @@ export function CustomerPanel() {
     return matchesSearch && matchesStatus;
   });
 
-  const { paginatedData, hasMore, elementRef } = useClientPagination(filteredCustomers, 20);
+
 
   const handleEditClick = (item?: CustomerDef) => {
     openFormModal(item);
@@ -155,12 +155,10 @@ export function CustomerPanel() {
           </div>
         )}
 
-        <DataTable 
+        <VirtualizedDataTable 
           columns={columns} 
-          data={paginatedData} 
+          data={filteredCustomers} 
           isLoading={isPending} 
-          hasMore={hasMore} 
-          observerRef={elementRef} 
           emptyMessage="No se han encontrado clientes."
         />
 

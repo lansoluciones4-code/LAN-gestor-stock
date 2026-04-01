@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
-import { db } from './index';
-import { users, providers, customers, devices } from './schema';
+import { customers, devices, providers, users } from '../schema';
+import { db } from '..';
 
 async function seed() {
   console.log('Seeding database...');

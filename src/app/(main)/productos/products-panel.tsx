@@ -11,9 +11,8 @@ import { useDevicesStore } from '@/stores/devices.store';
 import { useProvidersStore } from '@/stores/providers.store';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
-import { useClientPagination } from '@/hooks/use-client-pagination';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
-import { DataTable } from '@/components/ui/data-table';
+import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction } from '@/server/actions/product.actions';
 import { useLogsStore } from '@/stores/logs.store';
 import { useStatsStore } from '@/stores/stats.store';
@@ -136,7 +135,7 @@ export function ProductsPanel() {
     );
   });
 
-  const { paginatedData, hasMore, elementRef } = useClientPagination(filteredProducts, 20);
+
 
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
@@ -207,12 +206,10 @@ export function ProductsPanel() {
         </div>
       )}
 
-      <DataTable 
+      <VirtualizedDataTable 
         columns={columns} 
-        data={paginatedData} 
+        data={filteredProducts} 
         isLoading={isPending} 
-        hasMore={hasMore} 
-        observerRef={elementRef} 
         emptyMessage="No se han encontrado productos coincidentes."
       />
 
