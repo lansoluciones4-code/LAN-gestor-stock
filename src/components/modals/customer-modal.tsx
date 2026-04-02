@@ -97,6 +97,12 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
           <input
             type="text"
             {...register('documentNumber')}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9\-\.]/g, '');
+              e.target.value = val;
+              // Llamamos al onChange de register manualmente para que react-hook-form se entere del cambio
+              register('documentNumber').onChange(e);
+            }}
             placeholder="Ej: 35.123.456 o 20-35123456-9"
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.documentNumber ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />

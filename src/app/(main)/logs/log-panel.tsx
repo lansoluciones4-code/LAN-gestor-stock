@@ -20,7 +20,7 @@ export function LogPanel() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(logs.length === 0 || logs.length >= 50);
   const [selectedLog, setSelectedLog] = useState<AuditLogDef | null>(null);
 
   const [startDate, setStartDate] = useState('');
@@ -62,9 +62,11 @@ export function LogPanel() {
     if (!isLoaded) {
       loadData(true).finally(() => setInitialLoading(false));
     } else {
+      // Sincronizar estado de paginación con la caché para evitar que la tabla dispare fetch de pág 2 si no hay más
+      setHasMore(logs.length > 0 && logs.length % 50 === 0);
       setInitialLoading(false);
     }
-  }, [isLoaded]);
+  }, [isLoaded, logs.length]);
 
   // Filter changes - debounced
   useEffect(() => {
