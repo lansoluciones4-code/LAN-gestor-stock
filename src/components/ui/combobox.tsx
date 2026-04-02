@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Search, X, Plus } from 'lucide-react';
 
 interface Option {
   id: string;
@@ -71,6 +71,20 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
             )}
           </div>
           <div className="overflow-y-auto max-h-[200px] custom-scrollbar border-b border-zinc-100 dark:border-zinc-800">
+            {addNewLabel && (
+              <button
+                type="button"
+                className="flex w-full items-center py-2.5 px-3 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shrink-0 border-b border-zinc-50 dark:border-zinc-800/50"
+                onClick={() => {
+                  onAddNew?.();
+                  setOpen(false);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {addNewLabel}
+              </button>
+            )}
+
             {filteredOptions.length === 0 && !addNewLabel && <div className="py-6 text-center text-sm text-zinc-500">{emptyMessage}</div>}
 
             {filteredOptions.map((opt) => (
@@ -89,20 +103,6 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
               </button>
             ))}
           </div>
-
-          {addNewLabel && (
-            <button
-              type="button"
-              className="flex w-full items-center py-2.5 px-3 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shrink-0"
-              onClick={() => {
-                onAddNew?.();
-                setOpen(false);
-              }}
-            >
-              <Search className="mr-2 h-4 w-4 opacity-0" />
-              {addNewLabel}
-            </button>
-          )}
         </div>
       )}
     </div>

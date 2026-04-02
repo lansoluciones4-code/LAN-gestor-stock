@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
@@ -62,20 +62,28 @@ export function UserPanel() {
     loadInitial();
   }, [isLoaded]);
 
-  const filteredUsers = users.filter((u) => {
-    const term = normalizeString(search);
-    
-    // Convert DB roles to Spanish display names for searching
-    const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
-    
-    const matchesSearch = 
-      normalizeString(u.username).includes(term) || 
-      normalizeString(u.role).includes(term) ||
-      normalizeString(roleDisplay).includes(term);
+  const filteredUsers = useMemo(() => {
+    return users
+      .filter((u) => {
+        const term = normalizeString(search);
+        
+        // Convert DB roles to Spanish display names for searching
+        const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
+        
+        const matchesSearch = 
+          normalizeString(u.username).includes(term) || 
+          normalizeString(u.role).includes(term) ||
+          normalizeString(roleDisplay).includes(term);
 
-    const matchesStatus = showInactives ? true : u.isActive;
-    return matchesSearch && matchesStatus;
-  });
+        const matchesStatus = showInactives ? true : u.isActive;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        return 0;
+      });
+  }, [users, search, showInactives]);
 
   const handleEditClick = (item?: UserDef) => {
     openFormModal(item);

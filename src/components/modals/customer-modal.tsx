@@ -12,7 +12,7 @@ import { invalidateAllCaches } from '@/stores';
 interface CustomerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (data: CustomerDef) => void;
+  onSuccess: (data: CustomerDef, message?: string) => void;
   editingItem?: CustomerDef | null;
 }
 
@@ -62,8 +62,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
         return;
       }
 
-      invalidateAllCaches();
-      onSuccess(result.data || ({ ...data, id: editingItem?.id } as CustomerDef));
+      onSuccess(result.data as CustomerDef, (result as any).message);
       onClose();
     });
   };

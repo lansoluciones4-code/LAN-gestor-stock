@@ -6,7 +6,7 @@ import { Table, TableHeader, TableBody, TableHead, TableCell } from '@/component
 export interface ColumnDef<T> {
   header: React.ReactNode;
   headerClassName?: string;
-  cellClassName?: string;
+  cellClassName?: string | ((item: T) => string);
   cell: (item: T) => React.ReactNode;
   hideRole?: string[];
 }
@@ -63,14 +63,17 @@ export function VirtualizedDataTable<T extends { id: string | number }>({ column
   const rowContent = (_index: number, row: T) => {
     return (
       <>
-        {columns.map((col, idx) => (
-          <TableCell
-            key={`v-cell-${row.id}-${idx}`}
-            className={col.cellClassName}
-          >
-            {col.cell(row)}
-          </TableCell>
-        ))}
+        {columns.map((col, idx) => {
+          const className = typeof col.cellClassName === 'function' ? col.cellClassName(row) : col.cellClassName;
+          return (
+            <TableCell
+              key={`v-cell-${row.id}-${idx}`}
+              className={className}
+            >
+              {col.cell(row)}
+            </TableCell>
+          );
+        })}
       </>
     );
   };
