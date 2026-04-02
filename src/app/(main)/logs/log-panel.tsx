@@ -57,36 +57,38 @@ export function LogPanel() {
 
   const isFirstRender = useRef(true);
 
+  // 1. Carga inicial: Solo si no hay datos en el store
   useEffect(() => {
     if (!isLoaded) {
       loadData(true).finally(() => setInitialLoading(false));
     } else {
       setInitialLoading(false);
     }
-  }, []);
+  }, [isLoaded]);
 
+  // 2. Filtros y Búsqueda: Solo después de la carga inicial y cuando los filtros cambian
   useEffect(() => {
     if (initialLoading) return;
 
-    // Skip the very first execution on mount if we already have data and no filters
+    // Saltamos la ejecución de búsqueda automática en el primer render si no hay filtros activos
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      if (isLoaded && !search && !startDate && !endDate) {
-        return;
-      }
+      if (!search && !startDate && !endDate) return;
     }
 
     const timer = setTimeout(() => {
       loadData(true);
     }, 500);
+
     return () => clearTimeout(timer);
   }, [search, startDate, endDate, initialLoading]);
 
+  // 3. Paginación: Solo cuando cambia la página manualmente
   useEffect(() => {
     if (page > 1 && !initialLoading) {
       loadData(false);
     }
-  }, [page]);
+  }, [page, initialLoading]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
