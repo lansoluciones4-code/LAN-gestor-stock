@@ -5,31 +5,28 @@ import type { CustomerInput } from '@/schemas/customer.schema';
 
 export class CustomerRepository {
   async getAllCustomers(includeInactive = false) {
-    console.log(`[CustomerRepository] Consultando clientes (includeInactive=${includeInactive})...`);
     return await db.query.customers.findMany({
       where: includeInactive ? undefined : eq(customers.isActive, true),
       orderBy: [desc(customers.createdAt)],
     });
   }
 
-  async checkHasRelations(id: string) {
-    console.log(`[CustomerRepository] Verificando relaciones (FK) para cliente ID: ${id}...`);
-    const productsList = await db.query.products.findMany({
-      where: (p, { eq }) => eq(p.customerId, id),
+  async checkHasRelations(id: string, dbtx: any = db) {
+    const productsList = await dbtx.query.products.findMany({
+      where: (p: any, { eq }: any) => eq(p.customerId, id),
       limit: 1,
     });
 
-    const salesList = await db.query.sales.findMany({
-      where: (s, { eq }) => eq(s.customerId, id),
+    const salesList = await dbtx.query.sales.findMany({
+      where: (s: any, { eq }: any) => eq(s.customerId, id),
       limit: 1,
     });
 
     return productsList.length > 0 || salesList.length > 0;
   }
 
-  async updateActiveStatus(id: string, isActive: boolean) {
-    console.log(`[CustomerRepository] Actualizando status de cliente ID: ${id} a ${isActive}...`);
-    const result = await db
+  async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
+    const result = await dbtx
       .update(customers)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(customers.id, id))
@@ -37,9 +34,33 @@ export class CustomerRepository {
     return result[0];
   }
 
-  async createCustomer(input: CustomerInput) {
-    console.log(`[CustomerRepository] Insertando nuevo cliente en BD: ${input.name}...`);
-    const result = await db
+  async createCustomer(input: CustomerInput, dbtx: any = db) {
+    if (input.documentNumber) {
+      const existing = await dbtx.query.customers.findFirst({
+        where: sql`${customers.documentNumber} ILIKE ${input.documentNumber}`,
+      });
+
+      if (existing) {
+        if (existing.isActive) {
+          throw new Error(`Ya existe un cliente con el documento ${input.documentNumber}.`);
+        }
+        // Reactivate
+        const result = await dbtx
+          .update(customers)
+          .set({
+            name: input.name,
+            phone: input.phone || null,
+            email: input.email || null,
+            isActive: true,
+            updatedAt: sql`NOW()`,
+          })
+          .where(eq(customers.id, existing.id))
+          .returning();
+        return { ...result[0], wasInactive: true };
+      }
+    }
+
+    const result = await dbtx
       .insert(customers)
       .values({
         name: input.name,
@@ -53,9 +74,18 @@ export class CustomerRepository {
     return result[0];
   }
 
-  async updateCustomer(id: string, input: CustomerInput) {
-    console.log(`[CustomerRepository] Actualizando datos de cliente ID: ${id}...`);
-    const result = await db
+  async updateCustomer(id: string, input: CustomerInput, dbtx: any = db) {
+    if (input.documentNumber) {
+      const existing = await dbtx.query.customers.findFirst({
+        where: sql`${customers.documentNumber} ILIKE ${input.documentNumber}`,
+      });
+
+      if (existing && existing.id !== id) {
+        throw new Error(`El número de documento ${input.documentNumber} ya está registrado en otro cliente.`);
+      }
+    }
+
+    const result = await dbtx
       .update(customers)
       .set({
         name: input.name,
@@ -70,9 +100,8 @@ export class CustomerRepository {
     return result[0];
   }
 
-  async deleteCustomer(id: string) {
-    console.log(`[CustomerRepository] Eliminando cliente ID: ${id} de BD...`);
-    await db.delete(customers).where(eq(customers.id, id));
+  async deleteCustomer(id: string, dbtx: any = db) {
+    await dbtx.delete(customers).where(eq(customers.id, id));
   }
 }
 

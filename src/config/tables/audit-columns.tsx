@@ -68,12 +68,13 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     {
       header: 'Referencia',
       headerClassName: 'w-[280px] font-bold',
-      cellClassName: 'w-[280px] font-bold text-zinc-500 font-mono text-[15px] truncate',
+      cellClassName: 'w-[280px] font-bold text-[15px] truncate',
       cell: (log) => {
         const name = log.product?.device?.name || 
                      log.customer?.name || 
                      log.provider?.name || 
                      log.device?.name || 
+                     log.targetUser?.username ||
                      (log.sale ? `$${log.sale.total}` : null);
 
         const displayName = name || log.entityId?.substring(0, 8).toUpperCase() || '--';

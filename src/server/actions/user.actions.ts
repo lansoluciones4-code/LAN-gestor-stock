@@ -6,6 +6,8 @@ import { userSchema, userDefSchema, UserInput, type UserDef } from '@/schemas/us
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
+import { db } from '@/lib/db';
+
 export async function fetchUsers(includeInactive = false): Promise<UserDef[]> {
   try {
     await verifyAuthOrAdmin(true);
@@ -23,11 +25,12 @@ export async function toggleUserActiveAction(id: string, isActive: boolean) {
     if (caller.id === id) {
       return { success: false, message: 'No puedes cambiar tu propio estado de actividad.' };
     }
-    await userRepository.updateActiveStatus(id, isActive);
 
-    await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, { active: isActive });
-
-    return { success: true, message: `Usuario ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+    return await db.transaction(async (tx) => {
+      await userRepository.updateActiveStatus(id, isActive, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, { active: isActive }, tx);
+      return { success: true, message: `Usuario ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al cambiar estado del usuario' };
   }
@@ -39,11 +42,22 @@ export async function createUserAction(input: UserInput) {
     const parsed = userSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    const newUser = await userRepository.createUser(parsed.data);
+    return await db.transaction(async (tx) => {
+      const result = await userRepository.createUser(parsed.data, tx);
 
-    await recordAuditLog(caller.id, 'CREAR', 'USER', newUser.id, { username: newUser.username, role: newUser.role });
+      await recordAuditLog(caller.id, 'CREAR', 'USER', result.id, {
+        username: result.username,
+        role: result.role,
+        note: (result as any).wasInactive ? 'Usuario reactivado' : 'Nuevo registro',
+      }, tx);
 
-    return { success: true, message: 'Usuario registrado exitosamente' };
+      return {
+        success: true,
+        message: (result as any).wasInactive
+          ? 'El usuario ya existía (inactivo) y ha sido reactivado con los nuevos datos'
+          : 'Usuario registrado exitosamente',
+      };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al guardar usuario' };
   }
@@ -60,11 +74,11 @@ export async function updateUserAction(id: string, input: UserInput) {
     const parsed = userSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    await userRepository.updateUser(id, parsed.data);
-
-    await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, { username: input.username, role: input.role });
-
-    return { success: true, message: 'Usuario actualizado exitosamente' };
+    return await db.transaction(async (tx) => {
+      await userRepository.updateUser(id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, { username: input.username, role: input.role }, tx);
+      return { success: true, message: 'Usuario actualizado exitosamente' };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al actualizar usuario' };
   }
@@ -77,20 +91,19 @@ export async function deleteUserAction(id: string) {
       return { success: false, message: 'No puedes Auto-Inmolarte (Eliminar tu propia cuenta).' };
     }
 
-    // Check relations (audit logs)
-    const hasRelations = await userRepository.checkHasRelations(id);
-    if (hasRelations) {
-      return {
-        success: false,
-        message: 'No se puede eliminar permanentemente: este usuario tiene registros de auditoría asociados. Prueba desactivarlo.',
-      };
-    }
+    return await db.transaction(async (tx) => {
+      // Check relations (audit logs)
+      const hasRelations = await userRepository.checkHasRelations(id, tx);
+      if (hasRelations) {
+        throw new Error(
+          'No se puede eliminar permanentemente: este usuario tiene registros de auditoría asociados. Prueba desactivarlo.'
+        );
+      }
 
-    await userRepository.deleteUser(id);
-
-    await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Eliminación permanente' });
-
-    return { success: true, message: 'Usuario eliminado exitosamente' };
+      await userRepository.deleteUser(id, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Eliminación permanente' }, tx);
+      return { success: true, message: 'Usuario eliminado exitosamente' };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al eliminar usuario' };
   }

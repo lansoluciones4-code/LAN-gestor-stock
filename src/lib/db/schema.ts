@@ -44,7 +44,7 @@ export const customers = pgTable('customers', {
   name: varchar('name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 30 }),
   email: varchar('email', { length: 100 }),
-  documentNumber: varchar('document_number', { length: 20 }),
+  documentNumber: varchar('document_number', { length: 20 }).unique(),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -242,5 +242,9 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   sale: one(sales, {
     fields: [auditLogs.entityId],
     references: [sales.id],
+  }),
+  targetUser: one(users, {
+    fields: [auditLogs.entityId],
+    references: [users.id],
   }),
 }));

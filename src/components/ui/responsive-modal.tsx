@@ -31,6 +31,7 @@ export function ResponsiveModal({ isOpen, onClose, title, icon, children, width 
         <form
           onSubmit={onSubmit}
           className="flex flex-col"
+          noValidate
         >
           <ModalContent>{children}</ModalContent>
           <ModalFooter>

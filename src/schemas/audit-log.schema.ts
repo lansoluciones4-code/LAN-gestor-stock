@@ -49,6 +49,13 @@ export const auditLogDefSchema = createSelectSchema(auditLogs).extend({
     })
     .optional()
     .nullable(),
+  targetUser: z
+    .object({
+      id: z.string(),
+      username: z.string(),
+    })
+    .optional()
+    .nullable(),
 });
 
 export type AuditLogDef = z.infer<typeof auditLogDefSchema>;

@@ -1,7 +1,7 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { db } from '@/lib/db';
 import { deviceRepository } from '@/server/repositories/device.repository';
 import { deviceSchema, deviceDefSchema, DeviceInput, type DeviceDef } from '@/schemas/device.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
@@ -20,30 +20,38 @@ export async function fetchDevices(includeInactive = true, search?: string): Pro
 
 export async function toggleDeviceActiveAction(id: string, isActive: boolean) {
   try {
-    console.log(`[DeviceAction] Iniciando cambio de estado de equipo a ${isActive ? 'activo' : 'inactivo'} (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
-    await deviceRepository.updateActiveStatus(id, isActive);
-
-    await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'DEVICE', id, { active: isActive });
-
-    return { success: true, message: `Equipo ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+    
+    return await db.transaction(async (tx) => {
+      await deviceRepository.updateActiveStatus(id, isActive, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'DEVICE', id, { active: isActive }, tx);
+      return { success: true, message: `Equipo ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al cambiar estado del equipo' };
   }
 }
 
-export async function createDeviceAction(input: DeviceInput) {
+export async function createDeviceAction(input: DeviceInput): Promise<{ success: true; message: string } | { success: false; message: string }> {
   try {
-    console.log(`[DeviceAction] Iniciando creación de nuevo equipo (${input.name})...`);
     const caller = await verifyAuthOrAdmin(true);
     const parsed = deviceSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    const newDevice = await deviceRepository.createDevice(parsed.data);
+    return await db.transaction(async (tx) => {
+      const result = await deviceRepository.createDevice(parsed.data, tx);
+      const wasInactive = (result as any).wasInactive;
 
-    await recordAuditLog(caller.id, 'CREAR', 'DEVICE', newDevice.id, { name: newDevice.name });
+      await recordAuditLog(caller.id, 'CREAR', 'DEVICE', result.id, { 
+        name: result.name,
+        note: wasInactive ? 'Equipo reactivado' : 'Nuevo registro' 
+      }, tx);
 
-    return { success: true, message: 'Equipo creado exitosamente' };
+      return { 
+        success: true, 
+        message: wasInactive ? 'El equipo ya existía (inactivo) y ha sido reactivado' : 'Equipo creado exitosamente' 
+      };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al crear equipo' };
   }
@@ -51,16 +59,15 @@ export async function createDeviceAction(input: DeviceInput) {
 
 export async function updateDeviceAction(id: string, input: DeviceInput) {
   try {
-    console.log(`[DeviceAction] Iniciando actualización de equipo (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
     const parsed = deviceSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    await deviceRepository.updateDevice(id, parsed.data);
-
-    await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, { name: input.name });
-
-    return { success: true, message: 'Equipo actualizado exitosamente' };
+    return await db.transaction(async (tx) => {
+      await deviceRepository.updateDevice(id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, { name: input.name }, tx);
+      return { success: true, message: 'Equipo actualizado exitosamente' };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al actualizar equipo' };
   }
@@ -68,32 +75,26 @@ export async function updateDeviceAction(id: string, input: DeviceInput) {
 
 export async function deleteDeviceAction(id: string) {
   try {
-    console.log(`[DeviceAction] Iniciando eliminación de equipo (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
 
-    // Rule: Cannot delete if has products
-    const hasProducts = await deviceRepository.checkHasRelations(id);
-    if (hasProducts) {
-      console.log(`[DeviceAction] Eliminación rechazada: el equipo (ID: ${id}) tiene productos asociados.`);
-      return {
-        success: false,
-        message: 'No se puede eliminar permanentemente: este equipo tiene productos asociados en el stock. Prueba desactivarlo.',
-      };
-    }
+    return await db.transaction(async (tx) => {
+      // Check relations
+      const hasProducts = await deviceRepository.checkHasRelations(id, tx);
+      if (hasProducts) {
+        throw new Error('No se puede eliminar permanentemente: este equipo tiene productos asociados en el stock. Prueba desactivarlo.');
+      }
 
-    await deviceRepository.deleteDevice(id);
-
-    await recordAuditLog(caller.id, 'ELIMINAR', 'DEVICE', id, { note: 'Eliminación permanente' });
-
-    console.log(`[DeviceAction] Equipo (ID: ${id}) eliminado exitosamente.`);
-    return { success: true, message: 'Equipo eliminado permanentemente' };
+      await deviceRepository.deleteDevice(id, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'DEVICE', id, { note: 'Eliminación permanente' }, tx);
+      return { success: true, message: 'Equipo eliminado permanentemente' };
+    });
   } catch (error: any) {
     console.error('[DeviceAction] Error al eliminar equipo:', error);
 
-    // Parse PostgreSQL FK Error just in case
+    // Parse PostgreSQL FK Error
     const errorMsg = error.message?.toLowerCase() || '';
     if (errorMsg.includes('23503') || errorMsg.includes('foreign key constraint') || errorMsg.includes('violates foreign key')) {
-      return { success: false, message: 'No se puede eliminar el equipo porque tiene registros vinculados (ej. historial o stock). Por favor, inactívalo.' };
+      return { success: false, message: 'No se puede eliminar el equipo porque tiene registros vinculados. Por favor, inactívalo.' };
     }
 
     return { success: false, message: error.message || 'Error al eliminar equipo' };

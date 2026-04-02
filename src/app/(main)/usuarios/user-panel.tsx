@@ -63,7 +63,14 @@ export function UserPanel() {
 
   const filteredUsers = users.filter((u) => {
     const term = search.toLowerCase();
-    const matchesSearch = u.username.toLowerCase().includes(term) || u.role.toLowerCase().includes(term);
+    
+    // Convert DB roles to Spanish display names for searching
+    const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
+    
+    const matchesSearch = u.username.toLowerCase().includes(term) || 
+                         u.role.toLowerCase().includes(term) ||
+                         roleDisplay.includes(term);
+
     const matchesStatus = showInactives ? true : u.isActive;
     return matchesSearch && matchesStatus;
   });

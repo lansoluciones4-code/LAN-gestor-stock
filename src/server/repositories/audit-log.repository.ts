@@ -67,6 +67,12 @@ export class AuditLogRepository {
                 .from(devices)
                 .where(and(eq(devices.id, logs.entityId), ilike(devices.name, s)))
             ),
+            // Match Target User Name
+            exists(
+              db.select({ id: users.id })
+                .from(users)
+                .where(and(eq(users.id, logs.entityId), ilike(users.username, s)))
+            ),
           ];
 
           if (matchingEntities.length > 0) {
@@ -95,6 +101,7 @@ export class AuditLogRepository {
         provider: { columns: { id: true, name: true } },
         device: { columns: { id: true, name: true } },
         sale: { columns: { id: true, total: true } },
+        targetUser: { columns: { id: true, username: true } },
       },
       limit: limit,
       offset: offset,
@@ -112,12 +119,13 @@ export class AuditLogRepository {
         provider: { columns: { id: true, name: true } },
         device: { columns: { id: true, name: true } },
         sale: { columns: { id: true, total: true } },
+        targetUser: { columns: { id: true, username: true } },
       },
     });
   }
 
-  async createLog(input: AuditLogInput) {
-    const result = await db
+  async createLog(input: AuditLogInput, dbtx: any = db) {
+    const result = await dbtx
       .insert(auditLogs)
       .values({
         userId: input.userId,

@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { db } from '@/lib/db';
 import { saleRepository } from '@/server/repositories/sale.repository';
 import { saleSchema, saleDefSchema, type SaleInput, type SaleDef } from '@/schemas/sale.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
@@ -31,15 +32,17 @@ export async function createSaleAction(input: SaleInput) {
     const parsed = saleSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos de venta inválidos' };
 
-    const result = await saleRepository.createSale(caller.id, parsed.data);
+    return await db.transaction(async (tx) => {
+      const result = await saleRepository.createSale(caller.id, parsed.data, tx);
 
-    await recordAuditLog(caller.id, 'CREAR', 'SALE', result.id, { total: input.total, itemCount: input.items.length });
+      await recordAuditLog(caller.id, 'CREAR', 'SALE', result.id, { total: input.total, itemCount: input.items.length }, tx);
 
-    return {
-      success: true,
-      message: 'Venta realizada con éxito',
-      id: result.id,
-    };
+      return {
+        success: true,
+        message: 'Venta realizada con éxito',
+        id: result.id,
+      };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al procesar la venta' };
   }
@@ -51,11 +54,12 @@ export async function createSaleAction(input: SaleInput) {
 export async function deleteSaleAction(id: string) {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    await saleRepository.deleteSale(id);
-
-    await recordAuditLog(caller.id, 'ELIMINAR', 'SALE', id, { note: 'Venta anulada. Stock restablecido.' });
-
-    return { success: true, message: 'Venta anulada y stock restablecido.' };
+    
+    return await db.transaction(async (tx) => {
+      await saleRepository.deleteSale(id, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'SALE', id, { note: 'Venta anulada. Stock restablecido.' }, tx);
+      return { success: true, message: 'Venta anulada y stock restablecido.' };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al anular la venta' };
   }
