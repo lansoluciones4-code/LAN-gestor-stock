@@ -15,7 +15,7 @@ const UI = {
   // Botones y Búsqueda
   BTN_AGREGAR_NUEVO: 'Crear Credencial', // Ej: 'Agregar Usuario'
   BTN_REGISTRAR: 'Confirmar Credencial', // Ej: 'Guardar' / 'Registrar Usuario'
-  BUSQUEDA: 'Buscar usuarios por ID,', // Ej: 'Buscar por usuario'
+  BUSQUEDA: 'Buscar usuarios por nombre o', // Ej: 'Buscar por usuario'
 
   // Botones comunes
   BTN_EDITAR: 'Editar Seguridad',
@@ -51,6 +51,11 @@ const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería fallar por duplicado',
     username: 'admin', password: 'password123',
+    erroresEsperados: ['El nombre de usuario ya está']
+  },
+  {
+    descripcion: 'Debería fallar por duplicado (case insensitive)',
+    username: 'aDmIn', password: 'password123',
     erroresEsperados: ['El nombre de usuario ya está']
   }
 ];
@@ -142,15 +147,6 @@ test.describe.parallel('Gestión de Usuarios: Validaciones y Lógica', () => {
 
     await filaInactiva.getByRole('button', { name: UI.BTN_ACTIVAR }).click();
     await expect(filaInactiva).toBeVisible({ timeout: 15000 });
-
-    // Eliminación
-    await btnVerInactivos.click();
-    const filaReactivada = page.getByRole('row').filter({ hasText: username });
-    await expect(filaReactivada).toBeVisible({ timeout: 15000 });
-
-    await filaReactivada.getByRole('button', { name: UI.BTN_ELIMINAR }).click();
-    await page.getByRole('button', { name: UI.BTN_DESVINCULAR }).click();
-    await expect(filaReactivada).toBeHidden({ timeout: 15000 });
   });
 });
 
@@ -211,14 +207,23 @@ test.describe.serial('Gestión de Usuarios: Ciclo de Vida CRUD', () => {
     await expect(page.getByText(testEntity.usernameEditado)).toBeVisible();
   });
 
-  test('Debería eliminar físicamente al usuario', async ({ page }) => {
+  test('Debería desactivar y eliminar al usuario', async ({ page }) => {
+    const btnVerInactivos = page.getByText(UI.BTN_VER_INACTIVOS);
     const fila = page.getByRole('row').filter({ hasText: testEntity.usernameEditado });
     const btnEliminar = fila.getByRole('button', { name: UI.BTN_ELIMINAR });
     const btnConfirmar = page.getByRole('button', { name: UI.BTN_DESVINCULAR });
 
+    await expect(fila).toBeVisible();
+    await fila.getByRole('button', { name: UI.BTN_DESACTIVAR }).click();
+    await expect(fila).toBeHidden();
+
+    await btnVerInactivos.click();
+    const filaInactiva = page.getByRole('row').filter({ hasText: testEntity.usernameEditado });
+    await expect(filaInactiva).toBeVisible();
+
     await btnEliminar.click();
     await btnConfirmar.click();
 
-    await expect(fila).toBeHidden({ timeout: 15000 });
+    await expect(fila).toBeHidden();
   });
 });

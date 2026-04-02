@@ -1,5 +1,6 @@
+import * as bcrypt from 'bcrypt';
 import { db } from '..';
-import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses } from '../schema';
+import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses, users } from '../schema';
 
 async function setup() {
   console.log('--- Database Reset & Initial Data Setup ---');
@@ -15,6 +16,7 @@ async function setup() {
     await db.delete(devices);
     await db.delete(providers);
     await db.delete(customers);
+    await db.delete(users);
 
     console.log('Database cleaned.');
 
@@ -77,6 +79,22 @@ async function setup() {
       },
     ]);
     console.log('3 default providers created.');
+
+    console.log('Creating initial users...');
+    const adminPasswordHash = await bcrypt.hash('admin', 10);
+    await db.insert(users).values({
+      username: 'admin',
+      passwordHash: adminPasswordHash,
+      role: 'admin',
+    });
+
+    const vendorPasswordHash = await bcrypt.hash('vendedor', 10);
+    await db.insert(users).values({
+      username: 'vendedor',
+      passwordHash: vendorPasswordHash,
+      role: 'vendedor',
+    });
+    console.log('Initial users created.');
 
     console.log('Initial data setup finished successfully.');
     process.exit(0);
