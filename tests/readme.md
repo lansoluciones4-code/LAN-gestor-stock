@@ -10,6 +10,11 @@ npm init playwright@latest
 
 ## Comandos de Ejecución
 
+Correr antes de cada prueba, no todas lo necesitan, pero es mejor prevenir.
+```bash
+npm run db:reset-data
+```
+
 Ejecuta un archivo de pruebas específico en todos los navegadores configurados:
 
 ```bash
