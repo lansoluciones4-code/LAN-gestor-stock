@@ -42,8 +42,8 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     });
   };
 
-  const handleCreateSale = async (selectedCustomerId: string, cart: any[], cartTotal: number) => {
-    if (cart.length === 0 || !selectedCustomerId) return;
+  const handleCreateSale = async (selectedCustomerId: string, cart: any[], cartTotal: number, payments: any[]) => {
+    if (cart.length === 0 || !selectedCustomerId || payments.length === 0) return;
 
     startTransition(async () => {
       const result = await createSaleAction({
@@ -54,6 +54,10 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
           subtotal: rest.subtotal.toString(),
         })) as any,
         total: cartTotal.toString(),
+        payments: payments.map((p) => ({
+          ...p,
+          amount: p.amount.toString(),
+        })),
       });
 
       if (result.success) {

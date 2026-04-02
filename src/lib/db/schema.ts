@@ -2,6 +2,7 @@ import { pgTable, uuid, varchar, timestamp, pgEnum, numeric, integer, jsonb, ind
 import { sql, relations } from 'drizzle-orm';
 
 export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
+export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia']);
 
 export const users = pgTable('users', {
   id: uuid('id')
@@ -144,6 +145,22 @@ export const productLosses = pgTable(
   (table) => [index('loss_product_id_idx').on(table.productId), index('loss_user_id_idx').on(table.userId)]
 );
 
+export const salePayments = pgTable(
+  'sale_payments',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    saleId: uuid('sale_id')
+      .notNull()
+      .references(() => sales.id),
+    type: paymentTypeEnum('type').notNull(),
+    amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('sale_payments_sale_id_idx').on(table.saleId)]
+);
+
 export const productsRelations = relations(products, ({ one, many }) => ({
   device: one(devices, {
     fields: [products.deviceId],
@@ -171,6 +188,7 @@ export const salesRelations = relations(sales, ({ one, many }) => ({
     references: [users.id],
   }),
   items: many(saleItems),
+  payments: many(salePayments),
 }));
 
 export const productLossesRelations = relations(productLosses, ({ one }) => ({
@@ -245,5 +263,12 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   targetUser: one(users, {
     fields: [auditLogs.entityId],
     references: [users.id],
+  }),
+}));
+
+export const salePaymentsRelations = relations(salePayments, ({ one }) => ({
+  sale: one(sales, {
+    fields: [salePayments.saleId],
+    references: [sales.id],
   }),
 }));

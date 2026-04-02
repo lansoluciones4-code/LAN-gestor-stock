@@ -14,6 +14,16 @@ export const saleItemSchema = createInsertSchema(saleItems, {
 export type SaleItemInput = z.infer<typeof saleItemSchema>;
 
 /**
+ * Sale Payment Schema
+ */
+export const salePaymentSchema = z.object({
+  type: z.enum(['efectivo', 'transferencia']),
+  amount: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Monto válido').transform(Number).pipe(z.number().min(0, 'El monto no puede ser negativo')),
+});
+
+export type SalePaymentInput = z.infer<typeof salePaymentSchema>;
+
+/**
  * Sale Input Schema
  */
 export const saleSchema = createInsertSchema(sales, {
@@ -31,6 +41,10 @@ export const saleSchema = createInsertSchema(sales, {
         })
       )
       .min(1, 'La venta debe tener al menos un producto'),
+    payments: z
+      .array(salePaymentSchema)
+      .min(1, 'Debe especificar al menos un método de pago')
+      .max(2, 'Solo se permiten hasta dos métodos de pago'),
   });
 
 export type SaleInput = z.infer<typeof saleSchema>;
@@ -58,6 +72,15 @@ export const saleDefSchema = createSelectSchema(sales).extend({
           })
           .optional()
           .nullable(),
+      })
+    )
+    .optional(),
+  payments: z
+    .array(
+      z.object({
+        id: z.string(),
+        type: z.string(),
+        amount: z.preprocess((val) => parseFloat(val as string), z.number()),
       })
     )
     .optional(),

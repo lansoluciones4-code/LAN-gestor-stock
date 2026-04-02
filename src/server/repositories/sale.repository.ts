@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { sales, saleItems, products, customers } from '@/lib/db/schema';
+import { sales, saleItems, products, customers, salePayments } from '@/lib/db/schema';
 import type { SaleInput } from '@/schemas/sale.schema';
 
 export class SaleRepository {
@@ -25,6 +25,7 @@ export class SaleRepository {
             },
           },
         },
+        payments: true,
       },
     });
   }
@@ -44,6 +45,7 @@ export class SaleRepository {
             },
           },
         },
+        payments: true,
       },
     });
   }
@@ -106,6 +108,17 @@ export class SaleRepository {
         throw new Error(`Stock insuficiente para el producto ID ${item.productId} (pudo haber sido vendido mientras procesabas).`);
       }
     }
+    
+    // 4. Insert payments
+    if (input.payments && input.payments.length > 0) {
+      for (const p of input.payments) {
+        await dbtx.insert(salePayments).values({
+          saleId: sale.id,
+          type: p.type as any,
+          amount: p.amount.toString(),
+        });
+      }
+    }
 
     return sale;
   }
@@ -131,6 +144,7 @@ export class SaleRepository {
 
     // 2. Delete entries
     await dbtx.delete(saleItems).where(eq(saleItems.saleId, id));
+    await dbtx.delete(salePayments).where(eq(salePayments.saleId, id));
     await dbtx.delete(sales).where(eq(sales.id, id));
   }
 }

@@ -93,10 +93,24 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
             </tbody>
           </table>
 
-          <div className="flex justify-end pt-10 border-t-2 border-zinc-900">
-            <div className="flex items-center gap-10">
+          <div className="flex flex-col gap-8 pt-8 border-t-2 border-zinc-900 mt-8">
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Información de Pago</span>
+              <div className="flex flex-col gap-1">
+                {sale.payments?.map((p: any, i: number) => (
+                  <div key={i} className="flex justify-between items-center text-[11px] font-bold text-zinc-700">
+                    <span className="uppercase">{p.type}</span>
+                    <span>${p.amount.toLocaleString('es-AR')}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-end items-center gap-10">
               <span className="text-lg font-black uppercase text-zinc-900">Total</span>
-              <span className="text-3xl font-black text-indigo-700 forced-color-black">${sale.total.toLocaleString('es-AR')}</span>
+              <span className="text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300">
+                ${sale.total.toLocaleString('es-AR')}
+              </span>
             </div>
           </div>
         </div>

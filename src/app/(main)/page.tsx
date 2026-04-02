@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase } from 'lucide-react';
+import { TrendingUp, TrendingDown, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, CreditCard, Banknote } from 'lucide-react';
 import { fetchDashboardStats } from '@/server/actions/stats.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { invalidateAllCaches } from '@/stores';
@@ -81,7 +81,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 shrink-0">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 shrink-0">
         <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg">
@@ -104,6 +104,28 @@ export default function DashboardPage() {
           </div>
           <span className="text-[10px] font-black uppercase text-indigo-500 tracking-widest leading-none">Ganancia Real</span>
           <span className="text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1">${stats?.netProfit?.toLocaleString('es-AR') || '0'}</span>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col hover:border-emerald-500/50 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
+              <Banknote className="w-5 h-5 text-emerald-600" />
+            </div>
+            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">EFECTIVO</span>
+          </div>
+          <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none">Pagos Recibidos</span>
+          <span className="text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1">${stats?.cashRevenue?.toLocaleString('es-AR') || '0'}</span>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col hover:border-blue-500/50 transition-colors">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+              <CreditCard className="w-5 h-5 text-blue-600" />
+            </div>
+            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">TRANSFERENCIA</span>
+          </div>
+          <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none">Pagos Recibidos</span>
+          <span className="text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1">${stats?.transferRevenue?.toLocaleString('es-AR') || '0'}</span>
         </div>
 
         <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col">
@@ -202,7 +224,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Informative Grid */}
-        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-4 gap-6 px-2 pb-6">
+        <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-5 gap-6 px-2 pb-6">
           <div className="bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700">
             <div className="flex items-center gap-3 mb-4">
               <Clock className="w-5 h-5 text-indigo-500" />
@@ -240,6 +262,16 @@ export default function DashboardPage() {
             </div>
             <p className="text-xs text-zinc-500 leading-relaxed font-medium">
               El capital total actualmente retenido en stock físico (mercadería disponible) asciende a <strong>${stats?.currentInventoryCost?.toLocaleString('es-AR')}</strong>.
+            </p>
+          </div>
+
+          <div className="bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700">
+            <div className="flex items-center gap-3 mb-4">
+              <DollarSign className="w-5 h-5 text-emerald-500" />
+              <h4 className="font-bold text-sm">Flujo de Caja</h4>
+            </div>
+            <p className="text-xs text-zinc-500 leading-relaxed font-medium">
+              Segmentación de cobros: <strong>${stats?.cashRevenue?.toLocaleString('es-AR')}</strong> en efectivo y <strong>${stats?.transferRevenue?.toLocaleString('es-AR')}</strong> vía transferencia.
             </p>
           </div>
         </div>

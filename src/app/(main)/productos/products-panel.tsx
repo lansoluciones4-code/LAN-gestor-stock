@@ -132,7 +132,7 @@ export function ProductsPanel() {
         const matchesSearch =
           normalizeString(p.device?.name).includes(term) ||
           normalizeString(p.description).includes(term) ||
-          normalizeString(p.provider?.name).includes(term);
+          (role === 'admin' ? normalizeString(p.provider?.name).includes(term) : false);
         return matchesSearch && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
       })
       .sort((a, b) => {
@@ -181,7 +181,7 @@ export function ProductsPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar productos por equipo, descripción o proveedor"
+                placeholder={role === 'admin' ? "Buscar por equipo, descripción o proveedor" : "Buscar por equipo o descripción"}
                 className="h-11"
               />
               <div className="flex items-center gap-2">
@@ -207,14 +207,15 @@ export function ProductsPanel() {
                 </div>
               </div>
             </div>
-            {role === 'admin' && (
               <div className="flex items-center gap-2 sm:gap-4">
-                <ToggleFilter
-                  id="showZeroStock"
-                  checked={showZeroStock}
-                  onChange={setShowZeroStock}
-                  label="Ver sin stock"
-                />
+                {role === 'admin' && (
+                  <ToggleFilter
+                    id="showZeroStock"
+                    checked={showZeroStock}
+                    onChange={setShowZeroStock}
+                    label="Ver sin stock"
+                  />
+                )}
                 <Button
                   variant="secondary"
                   size="icon"
@@ -234,7 +235,6 @@ export function ProductsPanel() {
                   Ingresar Stock
                 </Button>
               </div>
-            )}
           </div>
 
           {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
@@ -261,23 +261,25 @@ export function ProductsPanel() {
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Modelo / Equipo</label>
                 <Combobox
-                  options={devices.map((d) => ({ id: d.id, name: d.name }))}
+                  options={devices.filter(d => d.isActive).map((d) => ({ id: d.id, name: d.name }))}
                   value={selectedDeviceId}
                   onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
                   placeholder="Seleccionar Equipo"
                 />
                 {errors.deviceId && <p className="text-red-500 text-xs mt-1.5">{errors.deviceId.message}</p>}
               </div>
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Proveedor Entrante</label>
-                <Combobox
-                  options={suppliers.map((s) => ({ id: s.id, name: s.name }))}
-                  value={selectedProviderId}
-                  onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
-                  placeholder="Seleccionar Proveedor"
-                />
-                {errors.providerId && <p className="text-red-500 text-xs mt-1.5">{errors.providerId.message}</p>}
-              </div>
+              {role === 'admin' && (
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Proveedor Entrante</label>
+                  <Combobox
+                    options={suppliers.filter(s => s.isActive).map((s) => ({ id: s.id, name: s.name }))}
+                    value={selectedProviderId}
+                    onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
+                    placeholder="Seleccionar Proveedor"
+                  />
+                  {errors.providerId && <p className="text-red-500 text-xs mt-1.5">{errors.providerId.message}</p>}
+                </div>
+              )}
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-sm font-medium mb-1.5">Descripción Física (Color, Memoria)</label>
                 <input

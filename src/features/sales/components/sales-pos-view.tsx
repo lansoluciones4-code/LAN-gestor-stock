@@ -24,19 +24,31 @@ interface SalesPOSViewProps {
   showMobileCart: boolean;
   setShowMobileCart: (v: boolean) => void;
   setGlobalMessage: (msg: any) => void;
+  isPaymentModalOpen: boolean;
+  setIsPaymentModalOpen: (v: boolean) => void;
 }
 
-export function SalesPOSView({ products, customers, setCustomers, cart, addToCart, removeFromCart, updateCartQty, cartTotal, selectedCustomerId, setSelectedCustomerId, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, setGlobalMessage }: SalesPOSViewProps) {
+export function SalesPOSView({ products, customers, setCustomers, cart, addToCart, removeFromCart, updateCartQty, cartTotal, selectedCustomerId, setSelectedCustomerId, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, setGlobalMessage, isPaymentModalOpen, setIsPaymentModalOpen }: SalesPOSViewProps) {
   const [saleSearch, setSaleSearch] = useState('');
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCancel();
+      if (e.key === 'Escape') {
+        if (isCustomerModalOpen) {
+          setIsCustomerModalOpen(false);
+          return;
+        }
+        if (isPaymentModalOpen) {
+          setIsPaymentModalOpen(false);
+          return;
+        }
+        onCancel();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onCancel]);
+  }, [onCancel, isPaymentModalOpen, setIsPaymentModalOpen, isCustomerModalOpen]);
 
   const filteredProducts = products.filter((p) => {
     if (p.stock <= 0) return false;

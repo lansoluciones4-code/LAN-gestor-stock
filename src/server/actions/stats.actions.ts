@@ -22,6 +22,7 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
           with: {
             vendor: true,
             items: { with: { product: true } },
+            payments: true,
           },
         }),
         tx.query.productLosses.findMany({
@@ -45,6 +46,8 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       // 3. Process Sales (Revenue, COGS, Seller Stats)
       let totalRevenue = 0;
       let totalCostOfGoodsSold = 0;
+      let cashRevenue = 0;
+      let transferRevenue = 0;
       const sellerMap: Record<string, { username: string; total: number; count: number }> = {};
 
       salesWithItems.forEach((s: any) => {
@@ -55,6 +58,14 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
           const purchasePrice = Number(item.product?.purchasePrice || 0);
           totalCostOfGoodsSold += purchasePrice * item.quantity;
         });
+
+        // Payments Breakdown
+        if (s.payments && (s.payments as any[]).length > 0) {
+          (s.payments as any[]).forEach((p) => {
+            if (p.type === 'efectivo') cashRevenue += Number(p.amount);
+            if (p.type === 'transferencia') transferRevenue += Number(p.amount);
+          });
+        }
 
         // Top Sellers
         const vendorId = s.vendorId || 'sistema';
@@ -88,6 +99,8 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         totalLossCost,
         topSellers,
         salesCount: salesWithItems.length,
+        cashRevenue,
+        transferRevenue,
       };
     });
 

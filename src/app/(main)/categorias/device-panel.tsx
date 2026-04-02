@@ -144,7 +144,7 @@ export function DevicePanel() {
                   leftIcon={<Plus className="w-5 h-5" />}
                   className="h-11"
                 >
-                  Agregar Equipo
+                  Agregar Categoría
                 </Button>
               </div>
             )}
@@ -162,7 +162,7 @@ export function DevicePanel() {
           <ResponsiveModal
             isOpen={isModalOpen}
             onClose={closeFormModal}
-            title={editingItem ? 'Actualizar Equipo' : 'Nuevo Modelo en Catálogo'}
+            title={editingItem ? 'Actualizar Categoría' : 'Nueva Categoría en Catálogo'}
             icon={<MonitorSmartphone className="w-5 h-5 text-indigo-500" />}
             width="sm"
             onSubmit={handleSubmit(handleEditSubmit)}

@@ -11,6 +11,7 @@ import { SalesPOSView } from '@/features/sales/components/sales-pos-view';
 import { SalesPrintView } from '@/features/sales/components/sales-print-view';
 import { useCart } from '@/features/sales/hooks/useCart';
 import { useSalesActions } from '@/features/sales/hooks/useSalesActions';
+import { SalePaymentModal } from '@/features/sales/components/sale-payment-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
 import { useSalesStore } from '@/stores/sales.store';
 import { useProductsStore } from '@/stores/products.store';
@@ -55,6 +56,7 @@ export function SalesPanel() {
 
   const [selectedSaleForPrint, setSelectedSaleForPrint] = useState<SaleDef | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
 
@@ -104,20 +106,37 @@ export function SalesPanel() {
 
   if (view === 'new') {
     return (
-      <SalesPOSView
-        products={displayProducts}
-        customers={displayCustomers}
-        setCustomers={setCustomers}
-        {...cartProps}
-        selectedCustomerId={selectedCustomerId}
-        setSelectedCustomerId={setSelectedCustomerId}
-        isPending={isPending}
-        onConfirmSale={() => handleCreateSale(selectedCustomerId, cartProps.cart, cartProps.cartTotal)}
-        onCancel={() => setView('list')}
-        showMobileCart={showMobileCart}
-        setShowMobileCart={setShowMobileCart}
-        setGlobalMessage={(msg) => (msg ? showGlobalMessage(msg.type, msg.text) : null)}
-      />
+      <>
+        <SalesPOSView
+          products={displayProducts}
+          customers={displayCustomers}
+          setCustomers={setCustomers}
+          {...cartProps}
+          selectedCustomerId={selectedCustomerId}
+          setSelectedCustomerId={setSelectedCustomerId}
+          isPending={isPending}
+          onConfirmSale={() => setIsPaymentModalOpen(true)}
+          onCancel={() => {
+            setIsPaymentModalOpen(false);
+            setView('list');
+          }}
+          showMobileCart={showMobileCart}
+          setShowMobileCart={setShowMobileCart}
+          setGlobalMessage={(msg) => (msg ? showGlobalMessage(msg.type, msg.text) : null)}
+          isPaymentModalOpen={isPaymentModalOpen}
+          setIsPaymentModalOpen={setIsPaymentModalOpen}
+        />
+        <SalePaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          total={cartProps.cartTotal}
+          isPending={isPending}
+          onConfirm={(payments) => {
+            handleCreateSale(selectedCustomerId, cartProps.cart, cartProps.cartTotal, payments);
+            setIsPaymentModalOpen(false);
+          }}
+        />
+      </>
     );
   }
 

@@ -50,6 +50,13 @@
       "when": 1775143219067,
       "tag": "0006_special_johnny_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1775152498083,
+      "tag": "0007_dapper_roulette",
+      "breakpoints": true
     }
   ]
 }

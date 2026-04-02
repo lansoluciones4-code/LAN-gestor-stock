@@ -2,7 +2,7 @@
 
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X } from 'lucide-react';
@@ -11,21 +11,22 @@ import { useAuthStore } from '@/stores/auth.store';
 import { logoutAction } from '@/server/actions/auth.actions';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Productos', href: '/productos', icon: Package },
-  { name: 'Ventas', href: '/ventas', icon: Briefcase },
-  { name: 'Clientes', href: '/clientes', icon: Users },
-  { name: 'Proveedores', href: '/proveedores', icon: Users },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['admin'] },
+  { name: 'Productos', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
+  { name: 'Ventas', href: '/ventas', icon: Briefcase, roles: ['admin', 'vendedor'] },
+  { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
+  { name: 'Proveedores', href: '/proveedores', icon: Users, roles: ['admin'] },
 ];
 
 const adminNavigation = [
-  { name: 'Equipos', href: '/equipos', icon: MonitorSmartphone },
-  { name: 'Usuarios', href: '/usuarios', icon: UserCog },
-  { name: 'Auditoría', href: '/logs', icon: ShieldAlert },
+  { name: 'Categorias', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
+  { name: 'Usuarios', href: '/usuarios', icon: UserCog, roles: ['admin'] },
+  { name: 'Auditoría', href: '/logs', icon: ShieldAlert, roles: ['admin'] },
 ];
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -37,13 +38,21 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   // Prevent hydration mismatch on themes
   useEffect(() => setMounted(true), []);
 
+  useEffect(() => {
+    if (mounted && user?.role === 'vendedor' && pathname === '/') {
+      router.push('/productos');
+    }
+  }, [mounted, user, pathname, router]);
+
   const handleLogout = async () => {
     await logoutAction();
     logoutState();
     window.location.href = '/login';
   };
 
-  const navLinks = user?.role === 'admin' ? [...navigation, ...adminNavigation] : navigation;
+  const navLinks = [...navigation, ...adminNavigation].filter(item =>
+    item.roles.includes(user?.role || 'vendedor')
+  );
 
   const SidebarContent = () => (
     <div className="flex h-full w-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors relative">
@@ -52,7 +61,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
             <Package className="text-white w-5 h-5" />
           </div>
-          <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100 uppercase">StockApp</span>
+          <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100">PhoneCenter</span>
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(false)}
