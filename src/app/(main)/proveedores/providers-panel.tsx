@@ -31,7 +31,7 @@ export function ProvidersPanel() {
 
   const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<ProviderDef, ProviderInput>({
     handlers: {
-      fetchData: () => fetchProviders(true),
+      fetchData: () => fetchProviders(),
       createAction: createProviderAction,
       updateAction: updateProviderAction,
       deleteAction: deleteProviderAction,
@@ -54,7 +54,7 @@ export function ProvidersPanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchProviders(true);
+      const res = await fetchProviders();
       setProviders(res);
       setInitialLoading(false);
     }

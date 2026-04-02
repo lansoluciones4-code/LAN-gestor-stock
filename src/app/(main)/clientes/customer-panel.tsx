@@ -52,7 +52,7 @@ export function CustomerPanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchCustomers(showInactive);
+      const res = await fetchCustomers();
       setCustomers(res);
       setInitialLoading(false);
     }
@@ -80,11 +80,6 @@ export function CustomerPanel() {
     onToggleActive: handleToggleActive,
   });
 
-  useEffect(() => {
-    if (!initialLoading) {
-      syncData();
-    }
-  }, [showInactive]);
 
   const handleSuccess = (data: any) => {
     showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');

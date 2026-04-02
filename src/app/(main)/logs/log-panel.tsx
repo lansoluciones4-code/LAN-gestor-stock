@@ -55,21 +55,36 @@ export function LogPanel() {
     setIsPending(false);
   };
 
+  const isFirstRender = useRef(true);
+  
+  // Initial load
   useEffect(() => {
-    if (isLoaded && !search && !startDate && !endDate) {
+    if (!isLoaded) {
+      loadData(true).finally(() => setInitialLoading(false));
+    } else {
       setInitialLoading(false);
-      return; 
+    }
+  }, [isLoaded]);
+
+  // Filter changes - debounced
+  useEffect(() => {
+    if (initialLoading) return;
+
+    // Skip the very first execution on mount if we already have data and no filters
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (isLoaded && !search && !startDate && !endDate) {
+        return;
+      }
     }
 
-    const delay = isLoaded ? 500 : 0;
-    
     const timer = setTimeout(() => {
-      loadData(true).finally(() => setInitialLoading(false));
-    }, delay);
-
+      loadData(true);
+    }, 500);
     return () => clearTimeout(timer);
-  }, [search, startDate, endDate, isLoaded]);
+  }, [search, startDate, endDate, initialLoading]);
 
+  // Pagination
   useEffect(() => {
     if (page > 1 && !initialLoading) {
       loadData(false);
