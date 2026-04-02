@@ -1,5 +1,5 @@
 import { db } from '..';
-import { providers, customers, devices, products, sales, saleItems, auditLogs } from '../schema';
+import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses } from '../schema';
 
 async function setup() {
   console.log('--- Database Reset & Initial Data Setup ---');
@@ -10,6 +10,7 @@ async function setup() {
     await db.delete(auditLogs);
     await db.delete(saleItems);
     await db.delete(sales);
+    await db.delete(productLosses);
     await db.delete(products);
     await db.delete(devices);
     await db.delete(providers);
