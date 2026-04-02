@@ -56,3 +56,9 @@ CÓMO LOS CLIENTES NO PUEDEN SER ELIMINADOS FÍSICAMENTE (solo tienen baja lógi
 npm run db:reset-data
 ```
 PARA VOLVER LA BASE DE DATOS AL ESTADO INICIAL ANTES DE VOLVER A CORRER ESTE TEST DE MANERA LIMPIA.
+
+### Productos (`clientes.spec.ts`)
+Correr antes de cada prueba
+```bash
+npm run db:reset-data
+```
