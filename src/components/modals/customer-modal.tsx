@@ -62,6 +62,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
         return;
       }
 
+      invalidateAllCaches();
       onSuccess(result.data as CustomerDef, (result as any).message);
       onClose();
     });
