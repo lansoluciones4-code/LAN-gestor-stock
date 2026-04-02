@@ -166,7 +166,7 @@ export function DevicePanel() {
             submitLabel={editingItem ? 'Fichar Equipo' : 'Fichar Equipo'}
             isPending={isPending}
           >
-            {serverError && <div className="p-4 bg-red-50 text-red-600 text-sm font-bold rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            {serverError && <div className="p-4 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200 mb-6">{serverError}</div>}
             <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
               <div>
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nombre / Modelo / Marca</label>

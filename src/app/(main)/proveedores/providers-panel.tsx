@@ -158,7 +158,7 @@ export function ProvidersPanel() {
             submitLabel={editingItem ? 'Actualizar Firma' : 'Registrar Proveedor'}
             isPending={isPending}
           >
-            {serverError && <div className="p-3 bg-red-50 text-red-600 text-sm font-bold rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            {serverError && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200 mb-6">{serverError}</div>}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Razón Social / Identificador</label>
