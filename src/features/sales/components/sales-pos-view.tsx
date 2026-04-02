@@ -284,11 +284,17 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
       <CustomerModal
         isOpen={isCustomerModalOpen}
         onClose={() => setIsCustomerModalOpen(false)}
-        onSuccess={(newC: CustomerDef) => {
-          setCustomers([...customers, newC]);
+        onSuccess={(newC: CustomerDef, message?: string) => {
+          // Robust update: If id exists (reactivation case), replace it. Otherwise append.
+          const exists = customers.some((c) => c.id === newC.id);
+          const updatedList = exists
+            ? customers.map((c) => (c.id === newC.id ? newC : c))
+            : [...customers, newC];
+          
+          setCustomers(updatedList);
           setSelectedCustomerId(newC.id);
-          setGlobalMessage({ type: 'success', text: 'Cliente creado y seleccionado.' });
-          setTimeout(() => setGlobalMessage(null), 3000);
+          setGlobalMessage({ type: 'success', text: message || 'Cliente registrado y seleccionado.' });
+          setTimeout(() => setGlobalMessage(null), 4000);
         }}
       />
     </div>
