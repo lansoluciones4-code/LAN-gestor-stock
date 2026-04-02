@@ -18,6 +18,7 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
 import { getProviderColumns } from '@/config/tables/provider-columns';
+import { normalizeString } from '@/lib/utils';
 
 export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -72,8 +73,11 @@ export function ProvidersPanel() {
   });
 
   const filteredProviders = displayProviders.filter((p) => {
-    const term = search.toLowerCase();
-    const matchesSearch = p.name.toLowerCase().includes(term) || (p.email && p.email.toLowerCase().includes(term)) || (p.phone && p.phone.toLowerCase().includes(term));
+    const term = normalizeString(search);
+    const matchesSearch =
+      normalizeString(p.name).includes(term) ||
+      normalizeString(p.email).includes(term) ||
+      normalizeString(p.phone).includes(term);
     const matchesStatus = showInactive ? true : p.isActive;
     return matchesSearch && matchesStatus;
   });

@@ -15,7 +15,7 @@ import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-
+import { normalizeString } from '@/lib/utils';
 import { CustomerModal } from '@/components/modals/customer-modal';
 
 export function CustomerPanel() {
@@ -60,8 +60,12 @@ export function CustomerPanel() {
   }, [isLoaded]);
 
   const filteredCustomers = customers.filter((c) => {
-    const term = search.toLowerCase();
-    const matchesSearch = c.name.toLowerCase().includes(term) || (c.email && c.email.toLowerCase().includes(term)) || (c.phone && c.phone.toLowerCase().includes(term)) || (c.documentNumber && c.documentNumber.toLowerCase().includes(term));
+    const term = normalizeString(search);
+    const matchesSearch =
+      normalizeString(c.name).includes(term) ||
+      normalizeString(c.email).includes(term) ||
+      normalizeString(c.phone).includes(term) ||
+      normalizeString(c.documentNumber).includes(term);
     const matchesStatus = showInactive ? true : c.isActive;
     return matchesSearch && matchesStatus;
   });

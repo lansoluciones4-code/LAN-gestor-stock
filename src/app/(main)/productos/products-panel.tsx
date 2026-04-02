@@ -22,6 +22,7 @@ import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
 import { useSalesStore } from '@/stores/sales.store';
 import { getProductColumns } from '@/config/tables/product-columns';
+import { normalizeString } from '@/lib/utils';
 
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -125,10 +126,14 @@ export function ProductsPanel() {
   const selectedProviderId = watch('providerId');
 
   const filteredProducts = displayProducts.filter((p) => {
-    const term = search.toLowerCase();
+    const term = normalizeString(search);
     const min = parseFloat(minPrice) || 0;
     const max = parseFloat(maxPrice) || Infinity;
-    return (p.device?.name?.toLowerCase().includes(term) || p.description?.toLowerCase().includes(term) || p.provider?.name?.toLowerCase().includes(term)) && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
+    const matchesSearch =
+      normalizeString(p.device?.name).includes(term) ||
+      normalizeString(p.description).includes(term) ||
+      normalizeString(p.provider?.name).includes(term);
+    return matchesSearch && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
   });
 
   const handleEditClick = (item?: ProductDef) => {

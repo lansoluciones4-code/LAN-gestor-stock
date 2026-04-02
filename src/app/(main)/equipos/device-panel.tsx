@@ -18,6 +18,7 @@ import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
+import { normalizeString } from '@/lib/utils';
 
 
 export function DevicePanel() {
@@ -71,8 +72,8 @@ export function DevicePanel() {
   });
 
   const filteredDevices = devices.filter((d) => {
-    const term = search.toLowerCase();
-    const matchesSearch = d.name.toLowerCase().includes(term);
+    const term = normalizeString(search);
+    const matchesSearch = normalizeString(d.name).includes(term);
     const matchesStatus = showInactive ? true : d.isActive;
     return matchesSearch && matchesStatus;
   });

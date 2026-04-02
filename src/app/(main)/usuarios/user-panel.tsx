@@ -14,6 +14,7 @@ import { useUsersStore } from '@/stores/users.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
+import { normalizeString } from '@/lib/utils';
 
 import { UserModal } from '@/components/modals/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
@@ -62,14 +63,15 @@ export function UserPanel() {
   }, [isLoaded]);
 
   const filteredUsers = users.filter((u) => {
-    const term = search.toLowerCase();
+    const term = normalizeString(search);
     
     // Convert DB roles to Spanish display names for searching
     const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
     
-    const matchesSearch = u.username.toLowerCase().includes(term) || 
-                         u.role.toLowerCase().includes(term) ||
-                         roleDisplay.includes(term);
+    const matchesSearch = 
+      normalizeString(u.username).includes(term) || 
+      normalizeString(u.role).includes(term) ||
+      normalizeString(roleDisplay).includes(term);
 
     const matchesStatus = showInactives ? true : u.isActive;
     return matchesSearch && matchesStatus;

@@ -6,6 +6,7 @@ import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth.store';
 import { getSalesColumns } from '@/config/tables/sales-columns';
+import { normalizeString } from '@/lib/utils';
 
 interface SalesListViewProps {
   sales: SaleDef[];
@@ -27,8 +28,10 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
   const role = useAuthStore((s) => s.user?.role);
 
   const filteredSales = sales.filter((s) => {
-    const term = searchTerm.toLowerCase();
-    const matchesSearch = (s.customer?.name || 'Consumidor Final').toLowerCase().includes(term) || (s.vendor?.username || '').toLowerCase().includes(term);
+    const term = normalizeString(searchTerm);
+    const matchesSearch =
+      normalizeString(s.customer?.name || 'Consumidor Final').includes(term) ||
+      normalizeString(s.vendor?.username || '').includes(term);
     const saleTime = new Date(s.createdAt).getTime();
 
     let matchesStart = true;

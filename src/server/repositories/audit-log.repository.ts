@@ -1,7 +1,8 @@
 import { desc, ilike, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { auditLogs, users, products, customers, providers, devices, sales } from '@/lib/db/schema';
-import type { AuditLogInput } from '@/schemas/audit-log.schema';
+import { auditLogDefSchema, type AuditLogInput } from '@/schemas/audit-log.schema';
+import { normalizeString } from '@/lib/utils';
 
 export class AuditLogRepository {
   async getAllLogs(options?: { page?: number; limit?: number; search?: string; startDate?: string; endDate?: string }) {
@@ -13,9 +14,7 @@ export class AuditLogRepository {
         const conditions = [];
 
         if (search) {
-          const s = `%${search}%`;
-          
-          // Map Spanish entity names to technical values for searching (allowing partial matches)
+          // Map Spanish entity names to technical values
           const entityMapping = [
             { label: 'usuario', value: 'USER' },
             { label: 'proveedor', value: 'PROVIDER' },
@@ -24,60 +23,80 @@ export class AuditLogRepository {
             { label: 'equipo', value: 'DEVICE' },
             { label: 'venta', value: 'SALE' },
           ];
+
+          // Map Action labels for better searchability
+          const actionMapping = [
+            { label: 'pérdida', value: 'PÉRDIDA' },
+            { label: 'creación', value: 'CREAR' },
+            { label: 'edición', value: 'ACTUALIZAR' },
+            { label: 'borrado', value: 'ELIMINAR' },
+            { label: 'baja', value: 'ELIMINAR' },
+          ];
           
-          const searchLower = search.toLowerCase().trim();
+          const searchNormalized = normalizeString(search);
+          const s = `%${searchNormalized}%`;
+          
           const matchingEntities = entityMapping
-            .filter(m => m.label.includes(searchLower))
+            .filter(m => normalizeString(m.label).includes(searchNormalized))
+            .map(m => m.value);
+
+          const matchingActions = actionMapping
+            .filter(m => normalizeString(m.label).includes(searchNormalized))
             .map(m => m.value);
 
           const searchConditions = [
-            ilike(logs.action, s),
-            ilike(logs.entity, s),
-            ilike(logs.username, s),
+            sql`unaccent(${logs.action}) ilike unaccent(${s})`,
+            sql`unaccent(${logs.entity}) ilike unaccent(${s})`,
+            sql`unaccent(${logs.username}) ilike unaccent(${s})`,
             sql`${logs.id}::text ilike ${s}`,
             sql`${logs.entityId}::text ilike ${s}`,
             // Match operator username
             exists(
               db.select({ id: users.id })
                 .from(users)
-                .where(and(eq(users.id, logs.userId), ilike(users.username, s)))
+                .where(and(eq(users.id, logs.userId), sql`unaccent(${users.username}) ilike unaccent(${s})`))
             ),
             // Match Product Name via Device
             exists(
               db.select({ id: products.id })
                 .from(products)
                 .innerJoin(devices, eq(products.deviceId, devices.id))
-                .where(and(eq(products.id, logs.entityId), ilike(devices.name, s)))
+                .where(and(eq(products.id, logs.entityId), sql`unaccent(${devices.name}) ilike unaccent(${s})`))
             ),
             // Match Customer Name
             exists(
               db.select({ id: customers.id })
                 .from(customers)
-                .where(and(eq(customers.id, logs.entityId), ilike(customers.name, s)))
+                .where(and(eq(customers.id, logs.entityId), sql`unaccent(${customers.name}) ilike unaccent(${s})`))
             ),
             // Match Provider Name
             exists(
               db.select({ id: providers.id })
                 .from(providers)
-                .where(and(eq(providers.id, logs.entityId), ilike(providers.name, s)))
+                .where(and(eq(providers.id, logs.entityId), sql`unaccent(${providers.name}) ilike unaccent(${s})`))
             ),
             // Match Device Name
             exists(
               db.select({ id: devices.id })
                 .from(devices)
-                .where(and(eq(devices.id, logs.entityId), ilike(devices.name, s)))
+                .where(and(eq(devices.id, logs.entityId), sql`unaccent(${devices.name}) ilike unaccent(${s})`))
             ),
             // Match Target User Name
             exists(
               db.select({ id: users.id })
                 .from(users)
-                .where(and(eq(users.id, logs.entityId), ilike(users.username, s)))
+                .where(and(eq(users.id, logs.entityId), sql`unaccent(${users.username}) ilike unaccent(${s})`))
             ),
           ];
 
           if (matchingEntities.length > 0) {
             const entCond = or(...matchingEntities.map(val => eq(logs.entity, val)));
             if (entCond) searchConditions.push(entCond);
+          }
+
+          if (matchingActions.length > 0) {
+            const actCond = or(...matchingActions.map(val => eq(logs.action, val)));
+            if (actCond) searchConditions.push(actCond);
           }
 
           const cond = or(...searchConditions);
