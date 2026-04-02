@@ -9,9 +9,9 @@ export const productSchema = createInsertSchema(products, {
   deviceId: z.string().trim().min(1, 'Debes seleccionar un equipo válido'),
   providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
   description: z.string().trim().max(255, 'La descripción es demasiado larga').optional(),
-  purchasePrice: z.number().min(0, 'El precio de compra no puede ser negativo'),
-  salePrice: z.number().min(0, 'El precio de venta no puede ser negativo'),
-  stock: z.number().int('El stock debe ser un número entero').min(0, 'El stock no puede ser negativo'),
+  purchasePrice: z.number({ message: 'Precio o unidades válidas' }).min(0, 'El precio de compra no puede ser negativo'),
+  salePrice: z.number({ message: 'Precio o unidades válidas' }).min(0, 'El precio de venta no puede ser negativo'),
+  stock: z.number({ message: 'Precio o unidades válidas' }).int('El stock debe ser un número entero').min(0, 'El stock no puede ser negativo'),
 })
   .pick({ deviceId: true, providerId: true, description: true, purchasePrice: true, salePrice: true, stock: true })
   .extend({
