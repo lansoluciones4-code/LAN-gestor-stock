@@ -223,4 +223,40 @@ test.describe.serial('Gestión de Productos: Ciclo de Vida CRUD y Mermas', () =>
     await expect(filaNueva).toBeHidden({ timeout: 15000 });
   });
 
+  test('Debería filtrar por precio correctamente buscando Redmi Note 13', async ({ page }) => {
+    // 1. Crear Primer Redmi con precio 100
+    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
+    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
+    await page.getByRole('button', { name: 'Redmi Note 12', exact: true }).click();
+    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_PROVEEDOR }).click();
+    await page.getByRole('button', { name: TEST_DATA.PROVEEDOR }).first().click();
+
+    const descBarato = 'Redmi Barato';
+    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(descBarato);
+    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('100');
+    await page.locator(UI.INPUT_PRECIO_VENTA).fill('200');
+    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('1');
+    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
+
+    // 2. Crear Segundo Redmi con precio 500
+    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
+    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
+    await page.getByRole('button', { name: 'Redmi Note 13', exact: true }).click();
+    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_PROVEEDOR }).click();
+    await page.getByRole('button', { name: TEST_DATA.PROVEEDOR }).first().click();
+
+    const descCaro = 'Redmi Caro';
+    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(descCaro);
+    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('500');
+    await page.locator(UI.INPUT_PRECIO_VENTA).fill('1000');
+    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('1');
+    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
+
+    // 3. Filtrar por precio. Establecemos Min = 600 para que solo aparezca el Caro
+    await page.getByPlaceholder('Min').fill('600');
+
+    // 4. Validar que solo se vea el caro
+    await expect(page.getByRole('row').filter({ hasText: 'Redmi Note 13' })).toBeVisible();
+    await expect(page.getByRole('row').filter({ hasText: 'Redmi Note 12' })).toBeHidden();
+  });
 });
