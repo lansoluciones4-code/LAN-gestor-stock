@@ -1,7 +1,7 @@
-import { desc, ilike, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
+import { desc, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { auditLogs, users, products, customers, providers, devices, sales } from '@/lib/db/schema';
-import { auditLogDefSchema, type AuditLogInput } from '@/schemas/audit-log.schema';
+import { auditLogs, users, products, customers, providers, devices } from '@/lib/db/schema';
+import { type AuditLogInput } from '@/schemas/audit-log.schema';
 import { normalizeString } from '@/lib/utils';
 
 export class AuditLogRepository {

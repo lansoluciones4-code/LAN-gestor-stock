@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { sales, saleItems, products, devices, customers } from '@/lib/db/schema';
+import { sales, saleItems, products, customers } from '@/lib/db/schema';
 import type { SaleInput } from '@/schemas/sale.schema';
 
 export class SaleRepository {

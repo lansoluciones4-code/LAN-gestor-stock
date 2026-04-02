@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { eq, sql } from 'drizzle-orm';
 import { devices, products, providers } from '../schema';
 import { db } from '..';
 

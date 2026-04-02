@@ -1,4 +1,4 @@
-import { desc, eq, sql, ilike, asc } from 'drizzle-orm';
+import { desc, eq, sql, ilike } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { providers } from '@/lib/db/schema';
 import type { ProviderInput } from '@/schemas/provider.schema';

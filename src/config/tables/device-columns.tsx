@@ -1,7 +1,6 @@
 import { type DeviceDef } from '@/schemas/device.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { role?: string; onEdit: (item: DeviceDef) => void; onToggleActive: (item: DeviceDef) => void; onDelete: (id: string) => void }): ColumnDef<DeviceDef>[] {
   const isSuper = role === 'admin';

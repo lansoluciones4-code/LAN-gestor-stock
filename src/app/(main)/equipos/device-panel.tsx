@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Trash2, X, MonitorSmartphone, RefreshCcw } from 'lucide-react';
+import { Plus, MonitorSmartphone, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
@@ -14,7 +14,6 @@ import { deviceSchema, type DeviceInput, type DeviceDef } from '@/schemas/device
 import { createDeviceAction, updateDeviceAction, deleteDeviceAction, fetchDevices, toggleDeviceActiveAction } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useDevicesStore } from '@/stores/devices.store';
-import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
