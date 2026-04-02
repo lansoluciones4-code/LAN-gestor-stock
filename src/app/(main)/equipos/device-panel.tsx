@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, MonitorSmartphone, RefreshCcw } from 'lucide-react';
@@ -70,12 +70,20 @@ export function DevicePanel() {
     resolver: zodResolver(deviceSchema),
   });
 
-  const filteredDevices = devices.filter((d) => {
-    const term = normalizeString(search);
-    const matchesSearch = normalizeString(d.name).includes(term);
-    const matchesStatus = showInactive ? true : d.isActive;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredDevices = useMemo(() => {
+    return devices
+      .filter((d) => {
+        const term = normalizeString(search);
+        const matchesSearch = normalizeString(d.name).includes(term);
+        const matchesStatus = showInactive ? true : d.isActive;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        return 0;
+      });
+  }, [devices, search, showInactive]);
 
   const handleEditClick = (item?: DeviceDef) => {
     openFormModal(item);

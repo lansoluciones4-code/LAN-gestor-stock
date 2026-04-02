@@ -260,7 +260,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                   value={selectedCustomerId}
                   onChange={setSelectedCustomerId}
                   placeholder="Buscar o registrar..."
-                  addNewLabel="+ Registrar Nuevo Cliente"
+                  addNewLabel="Registrar Nuevo Cliente"
                   onAddNew={() => setIsCustomerModalOpen(true)}
                 />
               </div>

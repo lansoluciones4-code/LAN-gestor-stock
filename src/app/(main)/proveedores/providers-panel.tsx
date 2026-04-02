@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Store, RefreshCcw } from 'lucide-react';
@@ -71,15 +71,23 @@ export function ProvidersPanel() {
     resolver: zodResolver(providerSchema),
   });
 
-  const filteredProviders = displayProviders.filter((p) => {
-    const term = normalizeString(search);
-    const matchesSearch =
-      normalizeString(p.name).includes(term) ||
-      normalizeString(p.email).includes(term) ||
-      normalizeString(p.phone).includes(term);
-    const matchesStatus = showInactive ? true : p.isActive;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredProviders = useMemo(() => {
+    return displayProviders
+      .filter((p) => {
+        const term = normalizeString(search);
+        const matchesSearch =
+          normalizeString(p.name).includes(term) ||
+          normalizeString(p.email).includes(term) ||
+          normalizeString(p.phone).includes(term);
+        const matchesStatus = showInactive ? true : p.isActive;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        return 0;
+      });
+  }, [displayProviders, search, showInactive]);
 
   const handleEditClick = (item?: ProviderDef) => {
     openFormModal(item);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
@@ -58,16 +58,24 @@ export function CustomerPanel() {
     loadInitial();
   }, [isLoaded]);
 
-  const filteredCustomers = customers.filter((c) => {
-    const term = normalizeString(search);
-    const matchesSearch =
-      normalizeString(c.name).includes(term) ||
-      normalizeString(c.email).includes(term) ||
-      normalizeString(c.phone).includes(term) ||
-      normalizeString(c.documentNumber).includes(term);
-    const matchesStatus = showInactive ? true : c.isActive;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredCustomers = useMemo(() => {
+    return customers
+      .filter((c) => {
+        const term = normalizeString(search);
+        const matchesSearch =
+          normalizeString(c.name).includes(term) ||
+          normalizeString(c.email).includes(term) ||
+          normalizeString(c.phone).includes(term) ||
+          normalizeString(c.documentNumber).includes(term);
+        const matchesStatus = showInactive ? true : c.isActive;
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (a.isActive && !b.isActive) return -1;
+        if (!a.isActive && b.isActive) return 1;
+        return 0;
+      });
+  }, [customers, search, showInactive]);
 
   const handleEditClick = (item?: CustomerDef) => {
     openFormModal(item);

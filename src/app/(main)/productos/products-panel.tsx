@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useMemo, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, DollarSign, PackageOpen, PackageX, RefreshCcw } from 'lucide-react';
@@ -42,7 +42,6 @@ export function ProductsPanel() {
   const [showZeroStock, setShowZeroStock] = useState(true);
 
   const [isPendingLocal, startTransition] = useTransition();
-  const [showInactive, setShowInactive] = useState(false);
 
   const {
     isPending: isPendingAction,
@@ -63,7 +62,7 @@ export function ProductsPanel() {
     setServerError,
     setItemToDelete,
     editingItem,
-    showInactive,
+    showInactive: false,
   });
 
   const isPending = isPendingAction || isPendingLocal;
@@ -124,16 +123,25 @@ export function ProductsPanel() {
   const selectedDeviceId = watch('deviceId');
   const selectedProviderId = watch('providerId');
 
-  const filteredProducts = displayProducts.filter((p) => {
-    const term = normalizeString(search);
-    const min = parseFloat(minPrice) || 0;
-    const max = parseFloat(maxPrice) || Infinity;
-    const matchesSearch =
-      normalizeString(p.device?.name).includes(term) ||
-      normalizeString(p.description).includes(term) ||
-      normalizeString(p.provider?.name).includes(term);
-    return matchesSearch && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
-  });
+  const filteredProducts = useMemo(() => {
+    return displayProducts
+      .filter((p) => {
+        const term = normalizeString(search);
+        const min = parseFloat(minPrice) || 0;
+        const max = parseFloat(maxPrice) || Infinity;
+        const matchesSearch =
+          normalizeString(p.device?.name).includes(term) ||
+          normalizeString(p.description).includes(term) ||
+          normalizeString(p.provider?.name).includes(term);
+        return matchesSearch && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
+      })
+      .sort((a, b) => {
+        // Priority: has stock vs no stock
+        if (a.stock > 0 && b.stock === 0) return -1;
+        if (a.stock === 0 && b.stock > 0) return 1;
+        return 0;
+      });
+  }, [displayProducts, search, minPrice, maxPrice, showZeroStock]);
 
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
