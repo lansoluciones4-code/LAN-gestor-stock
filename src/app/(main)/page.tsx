@@ -35,7 +35,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-8 animate-in fade-in duration-500 overflow-y-auto pr-2 custom-scrollbar pb-10">
+    <div className="flex flex-col h-full space-y-8 animate-in fade-in duration-500 overflow-y-auto pr-2 custom-scrollbar pb-10 outline-none ring-0 focus:ring-0 focus-visible:ring-0" tabIndex={-1}>
       {/* Header & Filter */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 shrink-0">
         <div>

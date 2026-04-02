@@ -69,13 +69,15 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete }: ColumnActi
               <PackageX className="w-4 h-4" />
             </button>
           )}
-          <button
-            onClick={() => onEdit(p)}
-            className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition"
-            title={role === 'admin' ? "Editar" : "Ingresar Stock"}
-          >
-            <Edit className="w-4 h-4" />
-          </button>
+          {role === 'admin' ? (
+            <button
+              onClick={() => onEdit(p)}
+              className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition"
+              title="Editar"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+          ) : null}
           <button
             onClick={() => onDelete(p.id!)}
             className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition"

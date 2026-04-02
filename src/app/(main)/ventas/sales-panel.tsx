@@ -142,7 +142,7 @@ export function SalesPanel() {
 
   return (
     <>
-      <div className="flex flex-col flex-1 h-full overflow-hidden">
+      <div className="flex flex-col flex-1 h-full overflow-hidden outline-none" tabIndex={-1}>
         <SalesListView
           sales={displaySales}
           isPending={isPending}

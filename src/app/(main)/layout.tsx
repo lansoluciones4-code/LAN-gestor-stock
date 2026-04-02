@@ -137,7 +137,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Main Column */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden outline-none" tabIndex={-1}>
         {/* Top Header */}
         <header className="shrink-0 h-16 flex items-center justify-between px-4 lg:px-8 transition-colors bg-transparent border-none no-print">
           <button
@@ -161,8 +161,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Dynamic Route Content */}
-        <main className="flex-1 relative overflow-hidden focus:outline-none flex flex-col">
-          <div className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col">{children}</div>
+        <main className="flex-1 relative overflow-hidden outline-none ring-0 focus:ring-0 focus-visible:ring-0 flex flex-col" tabIndex={-1}>
+          <div className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col outline-none ring-0 focus:ring-0 focus-visible:ring-0">
+            {children}
+          </div>
         </main>
       </div>
 

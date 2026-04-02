@@ -169,7 +169,7 @@ export function ProductsPanel() {
   });
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className="flex flex-col flex-1 h-full overflow-hidden outline-none" tabIndex={-1}>
       {initialLoading ? (
         <div className="mt-8 animate-in fade-in duration-500">
           <TableSkeleton />
@@ -261,7 +261,9 @@ export function ProductsPanel() {
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Modelo / Equipo</label>
                 <Combobox
-                  options={devices.filter(d => d.isActive).map((d) => ({ id: d.id, name: d.name }))}
+                  options={devices
+                    .filter((d) => d.isActive || d.id === editingItem?.deviceId)
+                    .map((d) => ({ id: d.id, name: d.name }))}
                   value={selectedDeviceId}
                   onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
                   placeholder="Seleccionar Equipo"
@@ -272,7 +274,9 @@ export function ProductsPanel() {
                 <div className="col-span-1 md:col-span-2">
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Proveedor Entrante</label>
                   <Combobox
-                    options={suppliers.filter(s => s.isActive).map((s) => ({ id: s.id, name: s.name }))}
+                    options={suppliers
+                      .filter((s) => s.isActive || s.id === editingItem?.providerId)
+                      .map((s) => ({ id: s.id, name: s.name }))}
                     value={selectedProviderId}
                     onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
                     placeholder="Seleccionar Proveedor"
