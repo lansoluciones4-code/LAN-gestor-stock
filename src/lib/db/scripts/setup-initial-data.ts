@@ -56,6 +56,7 @@ async function setup() {
     await db.insert(customers).values({
       name: 'Mostrador',
       phone: '00000000',
+      email: 'mail@mail.com',
       documentNumber: '00000000',
     });
     console.log('Customer "Mostrador" created.');

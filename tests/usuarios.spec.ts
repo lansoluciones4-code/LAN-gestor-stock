@@ -9,6 +9,7 @@ const UI = {
   // Placeholders / Labels
   USERNAME: 'Ej: juan.perez', // Ej: 'Nombre de usuario'
   PASSWORD: 'Escribe una contraseña segura', // Ej: 'Contraseña'
+  EDIT_PASSWORD: '******',
   OPCION_ROL_VENDEDOR: 'vendedor', // Value o texto visible de la opción Vendedor
   OPCION_ROL_ADMIN: 'admin', // Value o texto visible de la opción Admin
 
@@ -122,6 +123,7 @@ test.describe.parallel('Gestión de Usuarios: Validaciones y Lógica', () => {
 
     const inputUsername = page.getByRole('textbox', { name: UI.USERNAME });
     const inputPassword = page.getByLabel(UI.PASSWORD).or(page.getByPlaceholder(UI.PASSWORD));
+    const editPassword = page.getByLabel(UI.EDIT_PASSWORD).or(page.getByPlaceholder(UI.EDIT_PASSWORD));
 
     const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
     const btnRegistrar = page.getByRole('button', { name: UI.BTN_REGISTRAR });
@@ -147,6 +149,30 @@ test.describe.parallel('Gestión de Usuarios: Validaciones y Lógica', () => {
 
     await filaInactiva.getByRole('button', { name: UI.BTN_ACTIVAR }).click();
     await expect(filaInactiva).toBeVisible({ timeout: 15000 });
+
+    // Aprovechamos testUser_logic para probar validaciones en modo Edición
+    const btnEditar = filaInactiva.getByRole('button', { name: UI.BTN_EDITAR });
+    const btnActualizar = page.getByRole('button', { name: UI.BTN_ACTUALIZAR });
+    const btnCancelar = page.getByRole('button', { name: 'Cancelar' });
+
+    // Filtramos el caso de contraseña obligatoria, ya que en edición dejarla en blanco es válido (no la modifica)
+    const CASOS_EDICION = CASOS_DE_VALIDACION.filter(caso => caso.descripcion !== 'Debería requerir contraseña');
+
+    for (const caso of CASOS_EDICION) {
+      await btnEditar.click();
+
+      if (caso.username !== undefined) await inputUsername.fill(caso.username);
+      if (caso.password !== undefined) await editPassword.fill(caso.password);
+      else await editPassword.fill(''); // Borra la pass explícitamente si viene en blanco
+
+      await btnActualizar.click();
+
+      for (const errorTexto of caso.erroresEsperados) {
+        await expect(page.getByText(errorTexto)).toBeVisible();
+      }
+
+      await btnCancelar.click();
+    }
   });
 });
 
