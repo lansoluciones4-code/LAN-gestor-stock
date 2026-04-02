@@ -7,7 +7,6 @@ import { Plus, Store, RefreshCcw } from 'lucide-react';
 import { providerSchema, type ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProvidersStore } from '@/stores/providers.store';
-import { invalidateAllCaches } from '@/stores';
 import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
@@ -31,7 +30,7 @@ export function ProvidersPanel() {
 
   const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<ProviderDef, ProviderInput>({
     handlers: {
-      fetchData: () => fetchProviders(true),
+      fetchData: () => fetchProviders(),
       createAction: createProviderAction,
       updateAction: updateProviderAction,
       deleteAction: deleteProviderAction,
@@ -54,7 +53,7 @@ export function ProvidersPanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchProviders(true);
+      const res = await fetchProviders();
       setProviders(res);
       setInitialLoading(false);
     }

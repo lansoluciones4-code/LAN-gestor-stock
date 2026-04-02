@@ -11,7 +11,6 @@ import { type CustomerInput, type CustomerDef } from '@/schemas/customer.schema'
 import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetchCustomers, toggleCustomerActiveAction } from '@/server/actions/customer.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useCustomersStore } from '@/stores/customers.store';
-import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -52,7 +51,7 @@ export function CustomerPanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchCustomers(showInactive);
+      const res = await fetchCustomers();
       setCustomers(res);
       setInitialLoading(false);
     }
@@ -80,11 +79,6 @@ export function CustomerPanel() {
     onToggleActive: handleToggleActive,
   });
 
-  useEffect(() => {
-    if (!initialLoading) {
-      syncData();
-    }
-  }, [showInactive]);
 
   const handleSuccess = (data: any) => {
     showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');

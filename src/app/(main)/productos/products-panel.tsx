@@ -20,7 +20,6 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
 import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
-import { useSalesStore } from '@/stores/sales.store';
 import { getProductColumns } from '@/config/tables/product-columns';
 import { normalizeString } from '@/lib/utils';
 

@@ -1,6 +1,6 @@
-import { desc, eq, sql, ilike, asc } from 'drizzle-orm';
+import { desc, eq, sql, ilike } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { users, auditLogs } from '@/lib/db/schema';
+import { users } from '@/lib/db/schema';
 import * as bcrypt from 'bcrypt';
 import type { UserInput } from '@/schemas/user.schema';
 
@@ -27,9 +27,8 @@ export class UserRepository {
     });
   }
 
-  async getAllUsers(includeInactive = false) {
+  async getAllUsers() {
     return await db.query.users.findMany({
-      where: includeInactive ? undefined : eq(users.isActive, true),
       columns: {
         id: true,
         username: true,
@@ -38,7 +37,7 @@ export class UserRepository {
         createdAt: true,
         updatedAt: true,
       },
-      orderBy: includeInactive ? [asc(users.isActive), desc(users.createdAt)] : [desc(users.createdAt)],
+      orderBy: [desc(users.createdAt)],
     });
   }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Package, Users, Calendar, DollarSign, Activity, ArrowUpRight, User, Clock, Briefcase } from 'lucide-react';
+import { TrendingUp, TrendingDown, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase } from 'lucide-react';
 import { fetchDashboardStats } from '@/server/actions/stats.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { invalidateAllCaches } from '@/stores';

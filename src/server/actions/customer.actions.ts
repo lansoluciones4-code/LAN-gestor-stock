@@ -7,10 +7,10 @@ import { customerSchema, customerDefSchema, CustomerInput, type CustomerDef } fr
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
-export async function fetchCustomers(includeInactive = false): Promise<CustomerDef[]> {
+export async function fetchCustomers(): Promise<CustomerDef[]> {
   try {
     await verifyAuthOrAdmin(false); // Vendors can see customers
-    const customersList = await customerRepository.getAllCustomers(includeInactive);
+    const customersList = await customerRepository.getAllCustomers();
     return z.array(customerDefSchema).parse(customersList);
   } catch (error) {
     console.error('fetchCustomers error:', error);

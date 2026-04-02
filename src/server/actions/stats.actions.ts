@@ -2,8 +2,8 @@
 
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { db } from '@/lib/db';
-import { sales, products, saleItems, productLosses } from '@/lib/db/schema';
-import { sum, count, gte, lte, and, eq } from 'drizzle-orm';
+import { sales, products, productLosses } from '@/lib/db/schema';
+import { gte, lte, and } from 'drizzle-orm';
 
 export async function fetchDashboardStats(startDate?: string, endDate?: string) {
   try {
@@ -12,85 +12,88 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
     const start = startDate ? new Date(startDate + 'T00:00:00') : new Date(0);
     const end = endDate ? new Date(endDate + 'T23:59:59') : new Date();
 
-    // 1. Snapshot: Items in Depo & Models count
-    const productStats = await db
-      .select({
-        totalStock: sum(products.stock),
-        countModels: count(products.id),
-      })
-      .from(products);
+    // Use transaction for cross-query consistency (snapshot isolation)
+    const result = await db.transaction(async (tx) => {
+      // 1. Fetch data in parallel
+      const [allProducts, salesWithItems, lossesWithProducts] = await Promise.all([
+        tx.select().from(products),
+        tx.query.sales.findMany({
+          where: and(gte(sales.createdAt, start), lte(sales.createdAt, end)),
+          with: {
+            vendor: true,
+            items: { with: { product: true } },
+          },
+        }),
+        tx.query.productLosses.findMany({
+          where: and(gte(productLosses.createdAt, start), lte(productLosses.createdAt, end)),
+          with: {
+            product: true,
+          },
+        }),
+      ]);
 
-    // 2. Fetch Sales in range with their items to calculate Net Profit
-    const [salesWithItems, lossesWithProducts] = await Promise.all([
-      db.query.sales.findMany({
-        where: and(gte(sales.createdAt, start), lte(sales.createdAt, end)),
-        with: {
-          vendor: true,
-          items: { with: { product: true } },
-        },
-      }),
-      db.query.productLosses.findMany({
-        where: and(gte(productLosses.createdAt, start), lte(productLosses.createdAt, end)),
-        with: {
-          product: true,
-        },
-      }),
-    ]);
+      // 2. Process Products Stats (One pass overhead)
+      let totalEquipos = 0;
+      let totalModels = allProducts.length;
+      let currentInventoryCost = 0;
 
-    let totalRevenue = 0;
-    let totalCostOfGoodsSold = 0;
-    let totalLossCost = 0;
-
-    const sellerMap: Record<string, { username: string; total: number; count: number }> = {};
-
-    salesWithItems.forEach((s: any) => {
-      totalRevenue += Number(s.total);
-
-      // Calculate COGS
-      s.items.forEach((item: any) => {
-        const purchasePrice = Number(item.product?.purchasePrice || 0);
-        totalCostOfGoodsSold += purchasePrice * item.quantity;
+      allProducts.forEach((p) => {
+        totalEquipos += Number(p.stock || 0);
+        currentInventoryCost += Number(p.purchasePrice || 0) * Number(p.stock || 0);
       });
 
-      // Seller stats
-      const vendorId = s.vendorId || 'sistema';
-      const username = s.vendor?.username || 'Sistema';
-      if (!sellerMap[vendorId]) {
-        sellerMap[vendorId] = { username, total: 0, count: 0 };
-      }
-      sellerMap[vendorId].total += Number(s.total);
-      sellerMap[vendorId].count += 1;
-    });
+      // 3. Process Sales (Revenue, COGS, Seller Stats)
+      let totalRevenue = 0;
+      let totalCostOfGoodsSold = 0;
+      const sellerMap: Record<string, { username: string; total: number; count: number }> = {};
 
-    // Calculate Losses Cost
-    lossesWithProducts.forEach((l: any) => {
-      const purchasePrice = Number(l.product?.purchasePrice || 0);
-      totalLossCost += purchasePrice * (l.quantity || 0);
-    });
+      salesWithItems.forEach((s: any) => {
+        totalRevenue += Number(s.total);
 
-    // Net Profit = Revenue - COGS - Losses
-    const netProfit = totalRevenue - totalCostOfGoodsSold - totalLossCost;
+        // COGS
+        s.items.forEach((item: any) => {
+          const purchasePrice = Number(item.product?.purchasePrice || 0);
+          totalCostOfGoodsSold += purchasePrice * item.quantity;
+        });
 
-    // 3. Current Inventory Cost (Investment - actual physical stock)
-    const allProducts = await db.select().from(products);
-    const currentInventoryCost = allProducts.reduce((acc: number, p: any) => acc + Number(p.purchasePrice || 0) * (p.stock || 0), 0);
+        // Top Sellers
+        const vendorId = s.vendorId || 'sistema';
+        const username = s.vendor?.username || 'Sistema';
+        if (!sellerMap[vendorId]) {
+          sellerMap[vendorId] = { username, total: 0, count: 0 };
+        }
+        sellerMap[vendorId].total += Number(s.total);
+        sellerMap[vendorId].count += 1;
+      });
 
-    const topSellers = Object.values(sellerMap)
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 5);
+      // 4. Process Losses
+      let totalLossCost = 0;
+      lossesWithProducts.forEach((l: any) => {
+        const purchasePrice = Number(l.product?.purchasePrice || 0);
+        totalLossCost += purchasePrice * (l.quantity || 0);
+      });
 
-    return {
-      success: true,
-      data: {
-        totalEquipos: Number(productStats[0]?.totalStock || 0),
-        totalModels: Number(productStats[0]?.countModels || 0),
+      // 5. Final Calculations
+      const netProfit = totalRevenue - totalCostOfGoodsSold - totalLossCost;
+      const topSellers = Object.values(sellerMap)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 5);
+
+      return {
+        totalEquipos,
+        totalModels,
         totalRevenue,
         currentInventoryCost,
         netProfit,
         totalLossCost,
         topSellers,
         salesCount: salesWithItems.length,
-      },
+      };
+    });
+
+    return {
+      success: true,
+      data: result,
     };
   } catch (error) {
     console.error('fetchDashboardStats error:', error);

@@ -8,10 +8,10 @@ import { recordAuditLog } from '@/lib/audit-logs';
 
 import { db } from '@/lib/db';
 
-export async function fetchUsers(includeInactive = false): Promise<UserDef[]> {
+export async function fetchUsers(): Promise<UserDef[]> {
   try {
     await verifyAuthOrAdmin(true);
-    const usersList = await userRepository.getAllUsers(includeInactive);
+    const usersList = await userRepository.getAllUsers();
     return z.array(userDefSchema).parse(usersList);
   } catch (error) {
     console.error('fetchUsers error:', error);

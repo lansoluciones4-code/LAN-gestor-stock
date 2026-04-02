@@ -55,7 +55,7 @@ export function UserPanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchUsers(showInactives);
+      const res = await fetchUsers();
       setUsers(res);
       setInitialLoading(false);
     }
@@ -89,12 +89,6 @@ export function UserPanel() {
     onToggleActive: handleToggleActive,
   });
 
-  // Re-fetch when inactive filter changes
-  useEffect(() => {
-    if (!initialLoading) {
-      syncData();
-    }
-  }, [showInactives]);
 
   const handleModalSubmit = async (data: UserInput) => {
     await handleEditSubmit(data);

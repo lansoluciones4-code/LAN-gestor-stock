@@ -1,6 +1,6 @@
 import { type CustomerDef } from '@/schemas/customer.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 
 interface ColumnActions {
   role?: string;

@@ -4,9 +4,8 @@ import { customers } from '@/lib/db/schema';
 import type { CustomerInput } from '@/schemas/customer.schema';
 
 export class CustomerRepository {
-  async getAllCustomers(includeInactive = false) {
+  async getAllCustomers() {
     return await db.query.customers.findMany({
-      where: includeInactive ? undefined : eq(customers.isActive, true),
       orderBy: [desc(customers.createdAt)],
     });
   }

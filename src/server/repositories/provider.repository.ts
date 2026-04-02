@@ -1,13 +1,12 @@
-import { desc, eq, sql, ilike, asc } from 'drizzle-orm';
+import { desc, eq, sql, ilike } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { providers } from '@/lib/db/schema';
 import type { ProviderInput } from '@/schemas/provider.schema';
 
 export class ProviderRepository {
-  async getAllProviders(includeInactive = false) {
+  async getAllProviders() {
     return await db.query.providers.findMany({
-      where: includeInactive ? undefined : eq(providers.isActive, true),
-      orderBy: includeInactive ? [asc(providers.isActive), desc(providers.createdAt)] : [desc(providers.createdAt)],
+      orderBy: [desc(providers.createdAt)],
     });
   }
 

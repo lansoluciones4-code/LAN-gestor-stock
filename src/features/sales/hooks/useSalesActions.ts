@@ -29,7 +29,7 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       const [updatedS, updatedP, updatedC] = await Promise.all([
         fetchSales(),
         fetchProducts(),
-        fetchCustomers(true)
+        fetchCustomers()
       ]);
       
       setSales(updatedS);
