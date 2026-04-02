@@ -55,7 +55,7 @@ export function DevicePanel() {
         return;
       }
       setInitialLoading(true);
-      const res = await fetchDevices(showInactive);
+      const res = await fetchDevices();
       setDevices(res);
       setInitialLoading(false);
     }
@@ -94,11 +94,6 @@ export function DevicePanel() {
     onDelete: setItemToDelete,
   });
 
-  useEffect(() => {
-    if (!initialLoading) {
-      syncData();
-    }
-  }, [showInactive]);
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden">
@@ -120,7 +115,7 @@ export function DevicePanel() {
                 id="showInactive"
                 checked={showInactive}
                 onChange={setShowInactive}
-                label="Inactivos"
+                label="Ver Inactivos"
               />
             </div>
 

@@ -7,10 +7,10 @@ import { deviceSchema, deviceDefSchema, DeviceInput, type DeviceDef } from '@/sc
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
-export async function fetchDevices(includeInactive = true, search?: string): Promise<DeviceDef[]> {
+export async function fetchDevices(): Promise<DeviceDef[]> {
   try {
     await verifyAuthOrAdmin(false);
-    const devicesList = await deviceRepository.getAllDevices(includeInactive, search);
+    const devicesList = await deviceRepository.getAllDevices();
     return z.array(deviceDefSchema).parse(devicesList);
   } catch (error) {
     console.error('fetchDevices error:', error);

@@ -29,9 +29,9 @@ export const providers = pgTable('providers', {
   id: uuid('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  name: varchar('name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 30 }),
-  email: varchar('email', { length: 100 }),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+  phone: varchar('phone', { length: 30 }).notNull().default(''),
+  email: varchar('email', { length: 100 }).notNull().default(''),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -42,9 +42,9 @@ export const customers = pgTable('customers', {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar('name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 30 }),
-  email: varchar('email', { length: 100 }),
-  documentNumber: varchar('document_number', { length: 20 }).unique(),
+  phone: varchar('phone', { length: 30 }).notNull().default(''),
+  email: varchar('email', { length: 100 }).notNull().default(''),
+  documentNumber: varchar('document_number', { length: 20 }).notNull().default('').unique(),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -63,7 +63,7 @@ export const products = pgTable(
       .notNull()
       .references(() => providers.id),
     customerId: uuid('customer_id').references(() => customers.id),
-    description: varchar('description', { length: 255 }),
+    description: varchar('description', { length: 255 }).notNull().default(''),
     purchasePrice: numeric('purchase_price', { precision: 10, scale: 2 }).notNull(),
     salePrice: numeric('sale_price', { precision: 10, scale: 2 }).notNull(),
     stock: integer('stock').default(1).notNull(),

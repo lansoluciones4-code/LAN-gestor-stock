@@ -4,10 +4,9 @@ import { devices } from '@/lib/db/schema';
 import type { DeviceInput } from '@/schemas/device.schema';
 
 export class DeviceRepository {
-  async getAllDevices(includeInactive = false, search?: string) {
+  async getAllDevices() {
     return await db.query.devices.findMany({
-      where: and(includeInactive ? undefined : eq(devices.isActive, true), search ? ilike(devices.name, `%${search}%`) : undefined),
-      orderBy: includeInactive ? [asc(devices.isActive), desc(devices.createdAt)] : [desc(devices.createdAt)],
+      orderBy: [desc(devices.createdAt)],
     });
   }
 
