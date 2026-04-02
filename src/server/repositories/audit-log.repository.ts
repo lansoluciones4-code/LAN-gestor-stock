@@ -1,6 +1,6 @@
 import { desc, ilike, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { auditLogs, users } from '@/lib/db/schema';
+import { auditLogs, users, products, customers, providers, devices, sales } from '@/lib/db/schema';
 import type { AuditLogInput } from '@/schemas/audit-log.schema';
 
 export class AuditLogRepository {
@@ -34,13 +34,45 @@ export class AuditLogRepository {
             ilike(logs.action, s),
             ilike(logs.entity, s),
             ilike(logs.username, s),
+            sql`${logs.id}::text ilike ${s}`,
             sql`${logs.entityId}::text ilike ${s}`,
-            // Subquery to match username in users table
+            // Match operator username
             exists(
               db.select({ id: users.id })
                 .from(users)
                 .where(and(eq(users.id, logs.userId), ilike(users.username, s)))
-            )
+            ),
+            // Match Product Name via Device
+            exists(
+              db.select({ id: products.id })
+                .from(products)
+                .innerJoin(devices, eq(products.deviceId, devices.id))
+                .where(and(eq(products.id, logs.entityId), ilike(devices.name, s)))
+            ),
+            // Match Customer Name
+            exists(
+              db.select({ id: customers.id })
+                .from(customers)
+                .where(and(eq(customers.id, logs.entityId), ilike(customers.name, s)))
+            ),
+            // Match Provider Name
+            exists(
+              db.select({ id: providers.id })
+                .from(providers)
+                .where(and(eq(providers.id, logs.entityId), ilike(providers.name, s)))
+            ),
+            // Match Device Name
+            exists(
+              db.select({ id: devices.id })
+                .from(devices)
+                .where(and(eq(devices.id, logs.entityId), ilike(devices.name, s)))
+            ),
+            // Match Target User Name
+            exists(
+              db.select({ id: users.id })
+                .from(users)
+                .where(and(eq(users.id, logs.entityId), ilike(users.username, s)))
+            ),
           ];
 
           if (matchingEntities.length > 0) {
@@ -63,7 +95,13 @@ export class AuditLogRepository {
       },
       orderBy: [desc(auditLogs.createdAt)],
       with: {
-        user: true,
+        user: { columns: { id: true, username: true } },
+        product: { with: { device: { columns: { name: true } } }, columns: { id: true } },
+        customer: { columns: { id: true, name: true } },
+        provider: { columns: { id: true, name: true } },
+        device: { columns: { id: true, name: true } },
+        sale: { columns: { id: true, total: true } },
+        targetUser: { columns: { id: true, username: true } },
       },
       limit: limit,
       offset: offset,
@@ -75,13 +113,19 @@ export class AuditLogRepository {
       where: (logs, { eq, and }) => (entityId ? and(eq(logs.entity, entity), eq(logs.entityId, entityId)) : eq(logs.entity, entity)),
       orderBy: [desc(auditLogs.createdAt)],
       with: {
-        user: true,
+        user: { columns: { id: true, username: true } },
+        product: { with: { device: { columns: { name: true } } }, columns: { id: true } },
+        customer: { columns: { id: true, name: true } },
+        provider: { columns: { id: true, name: true } },
+        device: { columns: { id: true, name: true } },
+        sale: { columns: { id: true, total: true } },
+        targetUser: { columns: { id: true, username: true } },
       },
     });
   }
 
-  async createLog(input: AuditLogInput) {
-    const result = await db
+  async createLog(input: AuditLogInput, dbtx: any = db) {
+    const result = await dbtx
       .insert(auditLogs)
       .values({
         userId: input.userId,

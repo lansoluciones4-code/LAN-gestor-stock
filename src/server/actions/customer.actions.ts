@@ -1,7 +1,7 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { db } from '@/lib/db';
 import { customerRepository } from '@/server/repositories/customer.repository';
 import { customerSchema, customerDefSchema, CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
@@ -20,47 +20,55 @@ export async function fetchCustomers(includeInactive = false): Promise<CustomerD
 
 export async function toggleCustomerActiveAction(id: string, isActive: boolean) {
   try {
-    console.log(`[CustomerAction] Iniciando cambio de estado de cliente a ${isActive ? 'activo' : 'inactivo'} (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true); // Only admin for status toggle
-    await customerRepository.updateActiveStatus(id, isActive);
-
-    await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'CUSTOMER', id, { active: isActive });
-
-    return { success: true, message: `Cliente ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+    
+    return await db.transaction(async (tx) => {
+      await customerRepository.updateActiveStatus(id, isActive, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'CUSTOMER', id, { active: isActive }, tx);
+      return { success: true, message: `Cliente ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al cambiar estado del cliente' };
   }
 }
 
-export async function createCustomerAction(input: CustomerInput) {
+export async function createCustomerAction(input: CustomerInput): Promise<{ success: true; message: string; data: CustomerDef } | { success: false; message: string }> {
   try {
-    console.log(`[CustomerAction] Iniciando registro de nuevo cliente (${input.name})...`);
     const caller = await verifyAuthOrAdmin(false); // Vendors can create customers
     const parsed = customerSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    const newCustomer = await customerRepository.createCustomer(parsed.data);
+    return await db.transaction(async (tx) => {
+      const result = await customerRepository.createCustomer(parsed.data, tx);
+      const wasInactive = (result as any).wasInactive;
 
-    await recordAuditLog(caller.id, 'CREAR', 'CUSTOMER', newCustomer.id, { name: newCustomer.name });
+      await recordAuditLog(caller.id, 'CREAR', 'CUSTOMER', result.id, { 
+        name: result.name,
+        note: wasInactive ? 'Cliente reactivado (DNI duplicado)' : 'Nuevo registro'
+      }, tx);
 
-    return { success: true, message: 'Cliente registrado exitosamente', data: newCustomer };
+      return { 
+        success: true, 
+        message: wasInactive ? 'El cliente ya existía (inactivo) y ha sido reactivado con los nuevos datos' : 'Cliente registrado exitosamente', 
+        data: result as CustomerDef 
+      };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al guardar cliente' };
   }
 }
 
-export async function updateCustomerAction(id: string, input: CustomerInput) {
+export async function updateCustomerAction(id: string, input: CustomerInput): Promise<{ success: true; message: string; data: CustomerDef } | { success: false; message: string }> {
   try {
-    console.log(`[CustomerAction] Iniciando actualización de cliente (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(false);
     const parsed = customerSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    const updated = await customerRepository.updateCustomer(id, parsed.data);
-
-    await recordAuditLog(caller.id, 'ACTUALIZAR', 'CUSTOMER', id, { name: input.name });
-
-    return { success: true, message: 'Cliente actualizado exitosamente', data: updated };
+    return await db.transaction(async (tx) => {
+      const updated = await customerRepository.updateCustomer(id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'CUSTOMER', id, { name: input.name }, tx);
+      return { success: true, message: 'Cliente actualizado exitosamente', data: updated as CustomerDef };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al actualizar cliente' };
   }
@@ -68,34 +76,28 @@ export async function updateCustomerAction(id: string, input: CustomerInput) {
 
 export async function deleteCustomerAction(id: string) {
   try {
-    console.log(`[CustomerAction] Iniciando eliminación de cliente (ID: ${id})...`);
     const caller = await verifyAuthOrAdmin(true);
 
-    // Check relations
-    const hasRelations = await customerRepository.checkHasRelations(id);
-    if (hasRelations) {
-      console.log(`[CustomerAction] Eliminación rechazada: el cliente (ID: ${id}) tiene operaciones asociadas.`);
-      return {
-        success: false,
-        message: 'No se puede eliminar permanentemente: existe actividad vinculada a este cliente. Prueba desactivarlo.',
-      };
-    }
+    return await db.transaction(async (tx) => {
+      // Check relations
+      const hasRelations = await customerRepository.checkHasRelations(id, tx);
+      if (hasRelations) {
+        throw new Error('No se puede eliminar permanentemente: existe actividad vinculada a este cliente. Prueba desactivarlo.');
+      }
 
-    await customerRepository.deleteCustomer(id);
-
-    await recordAuditLog(caller.id, 'ELIMINAR', 'CUSTOMER', id, { note: 'Eliminación permanente' });
-
-    console.log(`[CustomerAction] Cliente (ID: ${id}) eliminado exitosamente.`);
-    return { success: true, message: 'Cliente eliminado permanentemente' };
+      await customerRepository.deleteCustomer(id, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'CUSTOMER', id, { note: 'Eliminación permanente' }, tx);
+      return { success: true, message: 'Cliente eliminado permanentemente' };
+    });
   } catch (error: any) {
     console.error('[CustomerAction] Error al eliminar cliente:', error);
 
-    // Parse PostgreSQL FK Error just in case
+    // Parse PostgreSQL FK Error
     const errorMsg = error.message?.toLowerCase() || '';
     if (errorMsg.includes('23503') || errorMsg.includes('foreign key constraint') || errorMsg.includes('violates foreign key')) {
-      return { success: false, message: 'No se puede eliminar el cliente porque tiene registros vinculados (ej. historial o stock). Por favor, inactívalo.' };
+      return { success: false, message: 'No se puede eliminar el cliente porque tiene registros vinculados. Por favor, inactívalo.' };
     }
 
-    return { success: false, message: 'Error al eliminar cliente de la base de datos.' };
+    return { success: false, message: error.message || 'Error al eliminar cliente de la base de datos.' };
   }
 }

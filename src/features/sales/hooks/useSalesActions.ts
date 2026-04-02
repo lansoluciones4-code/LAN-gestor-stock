@@ -24,13 +24,17 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
 
   const loadData = async (manual = false) => {
     startTransition(async () => {
-      const [updatedS, updatedP, updatedC] = await Promise.all([fetchSales(), fetchProducts(), fetchCustomers()]);
+      invalidateAllCaches();
+
+      const [updatedS, updatedP, updatedC] = await Promise.all([
+        fetchSales(),
+        fetchProducts(),
+        fetchCustomers(true)
+      ]);
+      
       setSales(updatedS);
       setProducts(updatedP);
       setCustomers(updatedC);
-
-      // Invalidar todos los stores para asegurar consistencia
-      invalidateAllCaches();
 
       if (manual) {
         onSuccessMessage('Datos sincronizados con éxito.');
@@ -57,7 +61,6 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
         clearCart();
         closeMobileCart();
         navigateToList();
-        invalidateAllCaches();
         loadData();
       } else {
         onErrorMessage(result.message);
@@ -72,7 +75,6 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       const result = await deleteSaleAction(id);
       if (result.success) {
         onSuccessMessage(result.message);
-        invalidateAllCaches();
         loadData();
       } else {
         onErrorMessage(result.message);

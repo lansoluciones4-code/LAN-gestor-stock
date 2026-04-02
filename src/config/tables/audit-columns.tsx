@@ -38,7 +38,7 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Operador',
-      cellClassName: 'font-bold text-zinc-700 dark:text-zinc-300 uppercase text-[12px] max-w-[120px] truncate',
+      cellClassName: 'font-bold text-zinc-700 dark:text-zinc-300 uppercase text-[15px] max-w-[120px] truncate',
       cell: (log) => (
         <span title={log.user?.username || 'SISTEMA'}>
           {log.user?.username || 'SISTEMA'}
@@ -47,11 +47,11 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Acción',
-      cell: (log) => <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[11px] ${getActionColor(log.action)}`}>{log.action}</span>,
+      cell: (log) => <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[13px] ${getActionColor(log.action)}`}>{log.action}</span>,
     },
     {
       header: 'Entidad',
-      cellClassName: 'font-black uppercase text-zinc-400 tracking-widest text-[12px] max-w-[100px] truncate',
+      cellClassName: 'font-black uppercase text-zinc-400 tracking-widest text-[14px] max-w-[100px] truncate',
       cell: (log) => (
         <span title={log.entity}>
           {{
@@ -67,8 +67,25 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Referencia',
-      cellClassName: 'font-bold text-zinc-500 font-mono',
-      cell: (log) => log.entityId?.substring(0, 8).toUpperCase() || '--',
+      headerClassName: 'w-[280px] font-bold',
+      cellClassName: 'w-[280px] font-bold text-[15px] truncate',
+      cell: (log) => {
+        const name = log.product?.device?.name || 
+                     log.customer?.name || 
+                     log.provider?.name || 
+                     log.device?.name || 
+                     log.targetUser?.username ||
+                     (log.sale ? `$${log.sale.total}` : null);
+
+        const displayName = name || log.entityId?.substring(0, 8).toUpperCase() || '--';
+        const fullTitle = name ? `${name} (${log.entityId})` : log.entityId || '--';
+
+        return (
+          <span title={fullTitle}>
+            {displayName}
+          </span>
+        );
+      },
     },
     {
       header: 'Acciones',

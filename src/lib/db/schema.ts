@@ -44,7 +44,7 @@ export const customers = pgTable('customers', {
   name: varchar('name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 30 }),
   email: varchar('email', { length: 100 }),
-  documentNumber: varchar('document_number', { length: 20 }),
+  documentNumber: varchar('document_number', { length: 20 }).unique(),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -159,6 +159,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [customers.id],
   }),
   losses: many(productLosses),
+  logs: many(auditLogs),
 }));
 
 export const salesRelations = relations(sales, ({ one, many }) => ({
@@ -203,20 +204,47 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const devicesRelations = relations(devices, ({ many }) => ({
   products: many(products),
+  logs: many(auditLogs),
 }));
 
 export const providersRelations = relations(providers, ({ many }) => ({
   products: many(products),
+  logs: many(auditLogs),
 }));
 
 export const customersRelations = relations(customers, ({ many }) => ({
   products: many(products),
   sales: many(sales),
+  logs: many(auditLogs),
 }));
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   user: one(users, {
     fields: [auditLogs.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [auditLogs.entityId],
+    references: [products.id],
+  }),
+  customer: one(customers, {
+    fields: [auditLogs.entityId],
+    references: [customers.id],
+  }),
+  provider: one(providers, {
+    fields: [auditLogs.entityId],
+    references: [providers.id],
+  }),
+  device: one(devices, {
+    fields: [auditLogs.entityId],
+    references: [devices.id],
+  }),
+  sale: one(sales, {
+    fields: [auditLogs.entityId],
+    references: [sales.id],
+  }),
+  targetUser: one(users, {
+    fields: [auditLogs.entityId],
     references: [users.id],
   }),
 }));

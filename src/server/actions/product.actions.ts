@@ -1,7 +1,7 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { db } from '@/lib/db';
 import { productRepository } from '@/server/repositories/product.repository';
 import { deviceRepository } from '@/server/repositories/device.repository';
 import { providerRepository } from '@/server/repositories/provider.repository';
@@ -47,16 +47,18 @@ export async function createProductAction(input: ProductInput) {
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    const newProduct = await productRepository.createProduct(parsed.data);
+    return await db.transaction(async (tx) => {
+      const newProduct = await productRepository.createProduct(parsed.data, tx);
 
-    await recordAuditLog(caller.id, 'CREAR', 'PRODUCT', newProduct.id, {
-      deviceId: parsed.data.deviceId,
-      stock: parsed.data.stock,
-      purchasePrice: parsed.data.purchasePrice,
-      salePrice: parsed.data.salePrice,
+      await recordAuditLog(caller.id, 'CREAR', 'PRODUCT', newProduct.id, {
+        deviceId: parsed.data.deviceId,
+        stock: parsed.data.stock,
+        purchasePrice: parsed.data.purchasePrice,
+        salePrice: parsed.data.salePrice,
+      }, tx);
+
+      return { success: true, message: 'Producto registrado exitosamente' };
     });
-
-    return { success: true, message: 'Producto registrado exitosamente' };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al guardar producto' };
   }
@@ -68,15 +70,17 @@ export async function updateProductAction(id: string, input: ProductInput) {
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return { success: false, message: 'Datos inválidos' };
 
-    await productRepository.updateProduct(id, parsed.data);
+    return await db.transaction(async (tx) => {
+      await productRepository.updateProduct(id, parsed.data, tx);
 
-    await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, {
-      deviceId: parsed.data.deviceId,
-      stock: parsed.data.stock,
-      salePrice: parsed.data.salePrice,
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, {
+        deviceId: parsed.data.deviceId,
+        stock: parsed.data.stock,
+        salePrice: parsed.data.salePrice,
+      }, tx);
+
+      return { success: true, message: 'Producto actualizado exitosamente' };
     });
-
-    return { success: true, message: 'Producto actualizado exitosamente' };
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al actualizar producto' };
   }
@@ -86,20 +90,18 @@ export async function deleteProductAction(id: string) {
   try {
     const caller = await verifyAuthOrAdmin(true);
 
-    // Rule: Cannot delete if has sales
-    const hasSales = await productRepository.checkHasRelations(id);
-    if (hasSales) {
-      return {
-        success: false,
-        message: 'No se puede eliminar: este producto ya ha sido parte de una venta. Prueba bajar su stock a 0 si ya no lo quieres ofrecer.',
-      };
-    }
+    return await db.transaction(async (tx) => {
+      // Rule: Cannot delete if has sales or losses
+      const hasRelations = await productRepository.checkHasRelations(id, tx);
+      if (hasRelations) {
+        throw new Error('No se puede eliminar: este producto ya ha sido parte de una venta o tiene pérdidas registradas.');
+      }
 
-    await productRepository.deleteProduct(id);
+      await productRepository.deleteProduct(id, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id, undefined, tx);
 
-    await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id);
-
-    return { success: true, message: 'Producto eliminado exitosamente' };
+      return { success: true, message: 'Producto eliminado exitosamente' };
+    });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al eliminar producto' };
   }
@@ -112,23 +114,15 @@ export async function registerProductLossAction(productId: string, quantity: num
     if (quantity <= 0) return { success: false, message: 'La cantidad debe ser mayor a 0' };
     if (!reason.trim()) return { success: false, message: 'Debe especificar un motivo' };
 
-    await productRepository.registerLoss(productId, caller.id, quantity, reason);
+    return await db.transaction(async (tx) => {
+      await productRepository.registerLoss(productId, caller.id, quantity, reason, tx);
 
-    await recordAuditLog(caller.id, 'PÉRDIDA', 'PRODUCT', productId, { quantity, reason });
+      await recordAuditLog(caller.id, 'PÉRDIDA', 'PRODUCT', productId, { quantity, reason }, tx);
 
-    return { success: true, message: 'Pérdida registrada exitosamente' };
+      return { success: true, message: 'Pérdida registrada exitosamente' };
+    });
   } catch (error: any) {
     console.error('Error in registerProductLossAction:', error);
-
-    // Check for specific DB errors or throw generic message
-    const errorMsg = error.message?.toLowerCase() || '';
-    if (errorMsg.includes('insufficient stock') || errorMsg.includes('check constraint')) {
-      return { success: false, message: 'No hay stock suficiente disponible para este producto' };
-    }
-    if (errorMsg.includes('not found')) {
-      return { success: false, message: 'El producto no existe' };
-    }
-
-    return { success: false, message: 'No se pudo completar la operación. Por favor, verifica los datos e intenta de nuevo.' };
+    return { success: false, message: error.message || 'No se pudo completar la operación.' };
   }
 }

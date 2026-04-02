@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 type GlobalMessage = { type: 'error' | 'success'; text: string } | null;
 
@@ -13,6 +13,7 @@ export function useEntityManager<T>() {
 
   // Para mensajes globales de éxito / fallo temporales en el panel (Top level message)
   const [globalMessage, setGlobalMessage] = useState<GlobalMessage>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const openFormModal = (item?: T) => {
     setServerError(null);
@@ -22,13 +23,28 @@ export function useEntityManager<T>() {
 
   const closeFormModal = () => {
     setIsModalOpen(false);
-    // Note: No reseteamos editingItem aquí de inmediato para evitar flashes en la UI mientras la ventana se esconde (fadeout).
   };
 
   const showGlobalMessage = (type: 'success' | 'error', text: string) => {
+    // Si hay un timeout corriendo de un mensaje anterior, lo detenemos para que no borre el nuevo mensaje antes de tiempo
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
     setGlobalMessage({ type, text });
-    setTimeout(() => setGlobalMessage(null), 3500);
+    
+    timeoutRef.current = setTimeout(() => {
+      setGlobalMessage(null);
+      timeoutRef.current = null;
+    }, 4500); 
   };
+
+  // Limpiar timeout al desmontar
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   return {
     isModalOpen,

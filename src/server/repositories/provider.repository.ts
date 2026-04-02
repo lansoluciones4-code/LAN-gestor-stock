@@ -1,4 +1,4 @@
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql, ilike, asc } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { providers } from '@/lib/db/schema';
 import type { ProviderInput } from '@/schemas/provider.schema';
@@ -7,20 +7,20 @@ export class ProviderRepository {
   async getAllProviders(includeInactive = false) {
     return await db.query.providers.findMany({
       where: includeInactive ? undefined : eq(providers.isActive, true),
-      orderBy: [desc(providers.createdAt)],
+      orderBy: includeInactive ? [asc(providers.isActive), desc(providers.createdAt)] : [desc(providers.createdAt)],
     });
   }
 
-  async checkHasRelations(id: string) {
-    const productsList = await db.query.products.findMany({
-      where: (p, { eq }) => eq(p.providerId, id),
+  async checkHasRelations(id: string, dbtx: any = db) {
+    const productsList = await dbtx.query.products.findMany({
+      where: (p: any, { eq }: any) => eq(p.providerId, id),
       limit: 1,
     });
     return productsList.length > 0;
   }
 
-  async updateActiveStatus(id: string, isActive: boolean) {
-    const result = await db
+  async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
+    const result = await dbtx
       .update(providers)
       .set({ isActive, updatedAt: sql`NOW()` })
       .where(eq(providers.id, id))
@@ -28,8 +28,32 @@ export class ProviderRepository {
     return result[0];
   }
 
-  async createProvider(input: ProviderInput) {
-    const result = await db
+  async createProvider(input: ProviderInput, dbtx: any = db) {
+    // Check for existing (case-insensitive)
+    const existing = await dbtx.query.providers.findFirst({
+      where: ilike(providers.name, input.name),
+    });
+
+    if (existing) {
+      if (existing.isActive) {
+        throw new Error('Ya existe un proveedor registrado con ese nombre.');
+      }
+      // Reactivate
+      const result = await dbtx
+        .update(providers)
+        .set({
+          name: input.name, // Update casing
+          phone: input.phone || null,
+          email: input.email || null,
+          isActive: true,
+          updatedAt: sql`NOW()`,
+        })
+        .where(eq(providers.id, existing.id))
+        .returning();
+      return { ...result[0], wasInactive: true };
+    }
+
+    const result = await dbtx
       .insert(providers)
       .values({
         name: input.name,
@@ -41,8 +65,17 @@ export class ProviderRepository {
     return result[0];
   }
 
-  async updateProvider(id: string, input: ProviderInput) {
-    const result = await db
+  async updateProvider(id: string, input: ProviderInput, dbtx: any = db) {
+    // Check duplication ignoring self
+    const existing = await dbtx.query.providers.findFirst({
+      where: ilike(providers.name, input.name),
+    });
+
+    if (existing && existing.id !== id) {
+      throw new Error('El nombre de proveedor ya está en uso por otro registro.');
+    }
+
+    const result = await dbtx
       .update(providers)
       .set({
         name: input.name,
@@ -56,8 +89,8 @@ export class ProviderRepository {
     return result[0];
   }
 
-  async deleteProvider(id: string) {
-    await db.delete(providers).where(eq(providers.id, id));
+  async deleteProvider(id: string, dbtx: any = db) {
+    await dbtx.delete(providers).where(eq(providers.id, id));
   }
 }
 

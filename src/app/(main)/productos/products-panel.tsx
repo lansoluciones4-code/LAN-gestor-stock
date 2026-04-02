@@ -64,16 +64,13 @@ export function ProductsPanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => {
-      invalidateAllCaches();
-    },
   });
 
   const isPending = isPendingAction || isPendingLocal;
 
   const handleLoss = async (lossProduct: ProductDef, quantity: string, reason: string, onLossClose: () => void) => {
     const qty = parseInt(quantity);
-    if (!qty || qty <= 0) return setServerError('La cantidad debe ser min1');
+    if (!qty || qty <= 0) return setServerError('La cantidad debe ser al menos 1');
     if (qty > (lossProduct.stock || 0)) return setServerError('Excede el stock disponible');
 
     setServerError(null);
@@ -247,7 +244,7 @@ export function ProductsPanel() {
             submitLabel="Confirmar Inventario"
             isPending={isPending}
           >
-            {serverError && <div className="p-4 bg-red-50 text-red-600 text-sm font-bold uppercase rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            {serverError && <div className="p-4 bg-red-50 text-red-600 text-sm font-bold rounded-lg border border-red-200 mb-6">{serverError}</div>}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Modelo / Equipo</label>

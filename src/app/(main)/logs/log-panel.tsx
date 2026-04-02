@@ -121,7 +121,7 @@ export function LogPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por acción, usuario, entidad o ID..."
+                placeholder="Buscar por acción, usuario, entidad, nombre o IDs..."
                 className="h-11"
               />
               <div className="flex items-center">
@@ -184,7 +184,7 @@ export function LogPanel() {
                       <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Fecha y Hora Exacta</span> <span className="font-bold text-zinc-700 dark:text-zinc-300">{new Date(selectedLog.createdAt).toLocaleString('es-AR')}</span>
                     </div>
                     <div className="space-y-0.5">
-                      <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">ID de Auditoría</span> <span className="text-xs opacity-60 font-mono">{selectedLog.id}</span>
+                      <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">ID de Auditoría</span> <span className="text-xs opacity-90 font-mono">{selectedLog.id}</span>
                     </div>
                     <div className="space-y-0.5">
                       <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Entidad Afectada</span>{' '}
@@ -200,7 +200,17 @@ export function LogPanel() {
                       </span>
                     </div>
                     <div className="space-y-0.5">
-                      <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">ID de Referencia</span> <span className="text-xs font-bold font-mono text-zinc-500">{selectedLog.entityId || '--'}</span>
+                      <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Entidad Específica</span>
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                        {selectedLog.product?.device?.name || 
+                         selectedLog.customer?.name || 
+                         selectedLog.provider?.name || 
+                         selectedLog.device?.name || 
+                         (selectedLog.sale ? `VENTA $${selectedLog.sale.total}` : '--')}
+                      </span>
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">ID de Referencia</span> <span className="text-[12px] font-mono text-zinc-500 break-all">{selectedLog.entityId || '--'}</span>
                     </div>
                   </div>
                   <div className="space-y-4">
