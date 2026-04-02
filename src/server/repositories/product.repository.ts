@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { products, devices, providers, saleItems, productLosses } from '@/lib/db/schema';
+import { products, productLosses } from '@/lib/db/schema';
 import type { ProductInput } from '@/schemas/product.schema';
 
 export class ProductRepository {

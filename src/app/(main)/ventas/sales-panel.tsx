@@ -56,7 +56,17 @@ export function SalesPanel() {
   const [selectedSaleForPrint, setSelectedSaleForPrint] = useState<SaleDef | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
 
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>(displayCustomers.find((c) => c.name.toLowerCase() === 'mostrador')?.id || displayCustomers[0]?.id || '');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+
+  useEffect(() => {
+    if (view === 'new' && !selectedCustomerId && displayCustomers.length > 0) {
+      const activeCustomers = displayCustomers.filter(c => c.isActive);
+      if (activeCustomers.length > 0) {
+        const defaultCust = activeCustomers.find(c => c.name.toLowerCase() === 'mostrador') || activeCustomers[0];
+        setSelectedCustomerId(defaultCust.id);
+      }
+    }
+  }, [view, displayCustomers, selectedCustomerId]);
 
   const cartProps = useCart();
 
@@ -124,7 +134,10 @@ export function SalesPanel() {
           setStartDate={setStartDate}
           endDate={endDate}
           setEndDate={setEndDate}
-          onNewSale={() => setView('new')}
+          onNewSale={() => {
+            setSelectedCustomerId('');
+            setView('new');
+          }}
           onPrintRow={(sale) => {
             setSelectedSaleForPrint(sale);
             setView('print');

@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, sql, asc } from 'drizzle-orm';
+import { desc, eq, ilike, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { devices } from '@/lib/db/schema';
 import type { DeviceInput } from '@/schemas/device.schema';

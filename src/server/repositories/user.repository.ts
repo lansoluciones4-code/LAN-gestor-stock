@@ -1,6 +1,6 @@
-import { desc, eq, sql, ilike, asc } from 'drizzle-orm';
+import { desc, eq, sql, ilike } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { users, auditLogs } from '@/lib/db/schema';
+import { users } from '@/lib/db/schema';
 import * as bcrypt from 'bcrypt';
 import type { UserInput } from '@/schemas/user.schema';
 
