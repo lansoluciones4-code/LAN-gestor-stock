@@ -80,7 +80,6 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
                   setOpen(false);
                 }}
               >
-                <Plus className="mr-2 h-4 w-4" />
                 {addNewLabel}
               </button>
             )}
