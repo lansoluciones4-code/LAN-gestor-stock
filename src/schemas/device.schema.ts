@@ -6,7 +6,7 @@ import { devices } from '@/lib/db/schema';
  * Input Schema for creating/updating devices.
  */
 export const deviceSchema = createInsertSchema(devices, {
-  name: z.string().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede exceder los 100 caracteres'),
+  name: z.string().trim().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede exceder los 100 caracteres'),
 })
   .pick({ name: true })
   .extend({

@@ -7,13 +7,13 @@ import { users } from '@/lib/db/schema';
  * Built from the DB schema but limited to UI-allowed fields.
  */
 export const userSchema = createInsertSchema(users, {
-  username: z.string().min(3, 'El usuario debe tener al menos 3 caracteres').max(50, 'Usuario demasiado largo'),
+  username: z.string().trim().min(3, 'El usuario debe tener al menos 3 caracteres').max(50, 'Usuario demasiado largo'),
   role: z.enum(['admin', 'vendedor']),
 })
   .pick({ username: true, role: true })
   .extend({
     id: z.string().optional(),
-    password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres').optional().or(z.literal('')),
+    password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres').optional().or(z.literal('')),
   });
 
 export type UserInput = z.infer<typeof userSchema>;

@@ -17,7 +17,7 @@ export type SaleItemInput = z.infer<typeof saleItemSchema>;
  * Sale Input Schema
  */
 export const saleSchema = createInsertSchema(sales, {
-  total: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
+  total: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El total es requerido')),
 })
   .pick({ customerId: true, total: true })
   .extend({
@@ -26,8 +26,8 @@ export const saleSchema = createInsertSchema(sales, {
         z.object({
           productId: z.string().uuid(),
           quantity: z.number().int().min(1),
-          unitPrice: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
-          subtotal: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string()),
+          unitPrice: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El precio es requerido')),
+          subtotal: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El subtotal es requerido')),
         })
       )
       .min(1, 'La venta debe tener al menos un producto'),
