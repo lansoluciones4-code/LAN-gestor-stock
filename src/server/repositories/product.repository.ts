@@ -1,4 +1,4 @@
-import { desc, eq, sql, gt } from 'drizzle-orm';
+import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { products, devices, providers, saleItems, productLosses } from '@/lib/db/schema';
 import type { ProductInput } from '@/schemas/product.schema';
@@ -48,13 +48,18 @@ export class ProductRepository {
     if (!product) throw new Error('Producto no encontrado');
     if (product.stock < quantity) throw new Error('Stock insuficiente para registrar pérdida');
 
-    await dbtx
+    const updated = await dbtx
       .update(products)
       .set({
-        stock: product.stock - quantity,
+        stock: sql`${products.stock} - ${quantity}`,
         updatedAt: sql`NOW()`,
       })
-      .where(eq(products.id, productId));
+      .where(and(eq(products.id, productId), gte(products.stock, quantity)))
+      .returning();
+
+    if (updated.length === 0) {
+      throw new Error('Stock insuficiente para registrar la pérdida.');
+    }
 
     return true;
   }

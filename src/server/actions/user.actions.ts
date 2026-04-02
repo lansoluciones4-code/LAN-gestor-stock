@@ -92,17 +92,29 @@ export async function deleteUserAction(id: string) {
     }
 
     return await db.transaction(async (tx) => {
-      // Check relations (audit logs)
-      const hasRelations = await userRepository.checkHasRelations(id, tx);
-      if (hasRelations) {
+      const user = await userRepository.getUserById(id, tx);
+      if (!user) throw new Error('Usuario no encontrado');
+
+      // Rule 1: Only inactive users can be deleted
+      if (user.isActive) {
+        throw new Error('Primero debes desactivar al usuario para poder eliminarlo.');
+      }
+
+      // Rule 2: Cannot delete users with history (logs)
+      const hasLogs = await userRepository.checkHasRelations(id, tx);
+      if (hasLogs) {
         throw new Error(
-          'No se puede eliminar permanentemente: este usuario tiene registros de auditoría asociados. Prueba desactivarlo.'
+          'No se puede eliminar de la base de datos a un usuario que posee historial de registros asociados. ' +
+            'Este usuario ya forma parte de la historia del sistema. ' +
+            'Simplemente mantenlo desactivado.'
         );
       }
 
       await userRepository.deleteUser(id, tx);
-      await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Eliminación permanente' }, tx);
-      return { success: true, message: 'Usuario eliminado exitosamente' };
+      
+      await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Usuario eliminado permanentemente (sin historial previo).' }, tx);
+      
+      return { success: true, message: 'Usuario eliminado permanentemente de la base de datos.' };
     });
   } catch (error: any) {
     return { success: false, message: error.message || 'Error al eliminar usuario' };

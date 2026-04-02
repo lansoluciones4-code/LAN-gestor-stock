@@ -29,6 +29,20 @@
       "when": 1774627884769,
       "tag": "0003_woozy_senator_kelly",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775095414828,
+      "tag": "0004_woozy_blizzard",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1775095726726,
+      "tag": "0005_lean_red_hulk",
+      "breakpoints": true
     }
   ]
 }

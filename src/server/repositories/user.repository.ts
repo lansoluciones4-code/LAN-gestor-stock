@@ -1,6 +1,6 @@
 import { desc, eq, sql, ilike, asc } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
+import { users, auditLogs } from '@/lib/db/schema';
 import * as bcrypt from 'bcrypt';
 import type { UserInput } from '@/schemas/user.schema';
 
@@ -21,6 +21,12 @@ export class UserRepository {
     });
   }
 
+  async getUserById(id: string, dbtx: any = db) {
+    return await dbtx.query.users.findFirst({
+      where: (u: any, { eq }: any) => eq(u.id, id),
+    });
+  }
+
   async getAllUsers(includeInactive = false) {
     return await db.query.users.findMany({
       where: includeInactive ? undefined : eq(users.isActive, true),
@@ -37,12 +43,11 @@ export class UserRepository {
   }
 
   async checkHasRelations(id: string, dbtx: any = db) {
-    // Check if user has audit logs
-    const logsList = await dbtx.query.auditLogs.findMany({
+    // Check ONLY if the user was the operator (performer) of any action
+    const performedLog = await dbtx.query.auditLogs.findFirst({
       where: (l: any, { eq }: any) => eq(l.userId, id),
-      limit: 1,
     });
-    return logsList.length > 0;
+    return !!performedLog;
   }
 
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
@@ -136,6 +141,9 @@ export class UserRepository {
     return result[0];
   }
 
+  /**
+   * Deletes a user from the database.
+   */
   async deleteUser(id: string, dbtx: any = db) {
     await dbtx.delete(users).where(eq(users.id, id));
   }

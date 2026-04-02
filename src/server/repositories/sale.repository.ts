@@ -1,4 +1,4 @@
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { sales, saleItems, products, devices, customers } from '@/lib/db/schema';
 import type { SaleInput } from '@/schemas/sale.schema';
@@ -87,13 +87,24 @@ export class SaleRepository {
         subtotal: item.subtotal.toString(),
       });
 
-      await dbtx
+      // Atomic Update with Stock Validation (Concurrency safe)
+      const updated = await dbtx
         .update(products)
         .set({
           stock: sql`${products.stock} - ${item.quantity}`,
           updatedAt: sql`NOW()`,
         })
-        .where(eq(products.id, item.productId));
+        .where(
+          and(
+            eq(products.id, item.productId),
+            gte(products.stock, item.quantity)
+          )
+        )
+        .returning();
+
+      if (updated.length === 0) {
+        throw new Error(`Stock insuficiente para el producto ID ${item.productId} (pudo haber sido vendido mientras procesabas).`);
+      }
     }
 
     return sale;
