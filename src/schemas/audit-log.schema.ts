@@ -11,7 +11,41 @@ export const auditLogDefSchema = createSelectSchema(auditLogs).extend({
     .object({
       id: z.string(),
       username: z.string(),
-      role: z.string(),
+    })
+    .optional()
+    .nullable(),
+  product: z
+    .object({
+      id: z.string(),
+      device: z.object({ name: z.string() }).optional(),
+    })
+    .optional()
+    .nullable(),
+  customer: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional()
+    .nullable(),
+  provider: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional()
+    .nullable(),
+  device: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional()
+    .nullable(),
+  sale: z
+    .object({
+      id: z.string(),
+      total: z.string(),
     })
     .optional()
     .nullable(),

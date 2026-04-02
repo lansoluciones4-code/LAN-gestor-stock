@@ -44,9 +44,6 @@ export function ProvidersPanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => {
-      invalidateAllCaches();
-    },
   });
 
   useEffect(() => {

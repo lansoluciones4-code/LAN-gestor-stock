@@ -159,6 +159,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [customers.id],
   }),
   losses: many(productLosses),
+  logs: many(auditLogs),
 }));
 
 export const salesRelations = relations(sales, ({ one, many }) => ({
@@ -203,20 +204,43 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const devicesRelations = relations(devices, ({ many }) => ({
   products: many(products),
+  logs: many(auditLogs),
 }));
 
 export const providersRelations = relations(providers, ({ many }) => ({
   products: many(products),
+  logs: many(auditLogs),
 }));
 
 export const customersRelations = relations(customers, ({ many }) => ({
   products: many(products),
   sales: many(sales),
+  logs: many(auditLogs),
 }));
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   user: one(users, {
     fields: [auditLogs.userId],
     references: [users.id],
+  }),
+  product: one(products, {
+    fields: [auditLogs.entityId],
+    references: [products.id],
+  }),
+  customer: one(customers, {
+    fields: [auditLogs.entityId],
+    references: [customers.id],
+  }),
+  provider: one(providers, {
+    fields: [auditLogs.entityId],
+    references: [providers.id],
+  }),
+  device: one(devices, {
+    fields: [auditLogs.entityId],
+    references: [devices.id],
+  }),
+  sale: one(sales, {
+    fields: [auditLogs.entityId],
+    references: [sales.id],
   }),
 }));

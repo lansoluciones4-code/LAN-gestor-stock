@@ -64,9 +64,6 @@ export function ProductsPanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => {
-      invalidateAllCaches();
-    },
   });
 
   const isPending = isPendingAction || isPendingLocal;

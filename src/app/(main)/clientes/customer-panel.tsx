@@ -43,9 +43,6 @@ export function CustomerPanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => {
-      invalidateAllCaches();
-    },
   });
 
   useEffect(() => {
@@ -60,7 +57,7 @@ export function CustomerPanel() {
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded, setCustomers, showInactive]);
+  }, [isLoaded]);
 
   const filteredCustomers = customers.filter((c) => {
     const term = search.toLowerCase();
@@ -86,7 +83,6 @@ export function CustomerPanel() {
   }, [showInactive]);
 
   const handleSuccess = (data: any) => {
-    invalidateAllCaches();
     showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');
     syncData();
   };

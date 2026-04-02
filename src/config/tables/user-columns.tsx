@@ -31,7 +31,7 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
     },
     {
       header: 'Rol / Nivel',
-      cell: (u) => <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${u.role === 'admin' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/10 dark:text-amber-400 dark:border-amber-900/30' : 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/10 dark:text-indigo-400 dark:border-indigo-900/30'}`}>{u.role === 'admin' ? 'Administrador' : 'Vendedor'}</span>,
+      cell: (u) => <span className={`px-2.5 py-1 rounded-full text-[13px] font-black uppercase tracking-widest border ${u.role === 'admin' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/10 dark:text-amber-400 dark:border-amber-900/30' : 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/10 dark:text-indigo-400 dark:border-indigo-900/30'}`}>{u.role === 'admin' ? 'Administrador' : 'Vendedor'}</span>,
     },
     {
       header: 'Acciones',

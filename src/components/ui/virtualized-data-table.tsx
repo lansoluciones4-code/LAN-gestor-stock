@@ -32,7 +32,7 @@ const VirtuosoComponents: TableComponents<any> = {
   Table: (props) => (
     <table
       {...props}
-      className="w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400 border-separate border-spacing-0"
+      className="w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400 border-separate border-spacing-0 table-fixed"
     />
   ),
   TableHead: React.forwardRef((props, ref) => (

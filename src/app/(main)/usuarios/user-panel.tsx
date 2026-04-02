@@ -11,7 +11,6 @@ import { type UserInput, type UserDef } from '@/schemas/user.schema';
 import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUsersStore } from '@/stores/users.store';
-import { invalidateAllCaches } from '@/stores';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -22,6 +21,7 @@ import { ConfirmModal } from '@/components/ui/responsive-modal';
 export function UserPanel() {
   const currentUserId = useAuthStore((s) => s.user?.id);
   const role = useAuthStore((s) => s.user?.role);
+  
   const [initialLoading, setInitialLoading] = useState(true);
   const { users, setUsers, isLoaded } = useUsersStore();
 
@@ -45,9 +45,6 @@ export function UserPanel() {
     setItemToDelete,
     editingItem,
     showInactive: showInactives,
-    onAfterSuccess: () => {
-      invalidateAllCaches();
-    },
   });
 
   useEffect(() => {
@@ -62,7 +59,7 @@ export function UserPanel() {
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded, setUsers, showInactives]);
+  }, [isLoaded]);
 
   const filteredUsers = users.filter((u) => {
     const term = search.toLowerCase();
@@ -107,7 +104,7 @@ export function UserPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar usuarios por ID, nombre o rol..."
+                placeholder="Buscar usuarios por nombre o rol..."
                 className="h-11"
               />
               <ToggleFilter

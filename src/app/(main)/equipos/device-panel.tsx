@@ -45,9 +45,6 @@ export function DevicePanel() {
     setItemToDelete,
     editingItem,
     showInactive,
-    onAfterSuccess: () => {
-      invalidateAllCaches();
-    },
   });
 
   useEffect(() => {
@@ -62,7 +59,7 @@ export function DevicePanel() {
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded, setDevices, showInactive]);
+  }, [isLoaded]);
 
   const {
     register,

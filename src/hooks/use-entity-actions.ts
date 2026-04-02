@@ -19,14 +19,16 @@ interface UseEntityActionsProps<TDef, TInput> {
   setItemToDelete: (val: string | null) => void;
   editingItem: TDef | (TDef & { id: string }) | null;
   showInactive: boolean;
-  onAfterSuccess?: () => void;
 }
 
-export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive, onAfterSuccess }: UseEntityActionsProps<TDef, TInput>) {
+export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive }: UseEntityActionsProps<TDef, TInput>) {
   const [isPending, startTransition] = useTransition();
 
   const syncData = async (manual = false) => {
     startTransition(async () => {
+      if (manual) {
+        invalidateAllCaches();
+      }
       // Usamos el valor directamente para evitar cierres de función (closures) antiguos
       const resp = await handlers.fetchData(showInactive);
       setStoreData(resp);
@@ -53,7 +55,6 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     closeFormModal();
     onSuccessMessage(result.message);
     invalidateAllCaches();
-    onAfterSuccess?.();
     syncData();
   };
 
@@ -67,7 +68,6 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
 
     onSuccessMessage(result.message);
     invalidateAllCaches();
-    onAfterSuccess?.();
     syncData();
   };
 
@@ -81,7 +81,6 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     } else {
       onSuccessMessage(result.message);
       invalidateAllCaches();
-      onAfterSuccess?.();
       syncData();
     }
   };

@@ -1,6 +1,5 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { userRepository } from '@/server/repositories/user.repository';
 import { userSchema, userDefSchema, UserInput, type UserDef } from '@/schemas/user.schema';
