@@ -40,7 +40,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
   const validateAndAdd = () => {
     const numAmount = Number(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
+    if (isNaN(numAmount) || numAmount < 0 || (numAmount === 0 && total > 0)) {
       setError('Monto inválido');
       return;
     }

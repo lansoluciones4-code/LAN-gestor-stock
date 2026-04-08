@@ -43,7 +43,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
         >
           <div className="flex justify-between items-start mb-12 border-b-2 border-indigo-50 pb-8">
             <div>
-              <h2 className="text-3xl font-black text-indigo-600">STOCK APP</h2>
+              <h2 className="text-3xl font-black text-indigo-600">PHONE CENTER</h2>
               <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1">Registro Comercial</p>
             </div>
             <div className="text-right">
@@ -93,12 +93,12 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
             </tbody>
           </table>
 
-          <div className="flex flex-col gap-8 pt-8 border-t-2 border-zinc-900 mt-8">
-            <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-start pt-8 border-t-2 border-zinc-900 mt-8 gap-8">
+            <div className="flex flex-col gap-2 flex-1">
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Información de Pago</span>
               <div className="flex flex-col gap-1">
                 {sale.payments?.map((p: any, i: number) => (
-                  <div key={i} className="flex justify-between items-center text-[11px] font-bold text-zinc-700">
+                  <div key={i} className="flex justify-between items-center text-[11px] font-bold text-zinc-700 max-w-[200px]">
                     <span className="uppercase">{p.type}</span>
                     <span>${p.amount.toLocaleString('es-AR')}</span>
                   </div>
@@ -106,11 +106,33 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
               </div>
             </div>
             
-            <div className="flex justify-end items-center gap-10">
-              <span className="text-lg font-black uppercase text-zinc-900">Total</span>
-              <span className="text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300">
-                ${sale.total.toLocaleString('es-AR')}
-              </span>
+            <div className="flex flex-col items-end gap-2 flex-1 min-w-[250px]">
+              {((sale.discountAmount ?? 0) > 0 || (sale.discountPercentage ?? 0) > 0) && (
+                <>
+                  <div className="flex justify-between w-full text-xs font-bold text-zinc-500 border-b border-zinc-100 pb-2">
+                    <span className="uppercase tracking-widest">Subtotal</span>
+                    <span>${(sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0).toLocaleString('es-AR')}</span>
+                  </div>
+                  {sale.discountPercentage! > 0 && (
+                    <div className="flex justify-between w-full text-[11px] font-bold text-emerald-600 mt-1">
+                      <span className="uppercase">Descuento ({sale.discountPercentage}%)</span>
+                      <span>-${((sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0) * (sale.discountPercentage! / 100)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+                  {sale.discountAmount! > 0 && (
+                    <div className="flex justify-between w-full text-[11px] font-bold text-emerald-600">
+                      <span className="uppercase">Descuento en Monto</span>
+                      <span>-${sale.discountAmount?.toLocaleString('es-AR')}</span>
+                    </div>
+                  )}
+                </>
+              )}
+              <div className="flex justify-between w-full items-center mt-2">
+                <span className="text-xl font-black uppercase text-zinc-900 pt-2">Total</span>
+                <span className="text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300">
+                  ${sale.total.toLocaleString('es-AR')}
+                </span>
+              </div>
             </div>
           </div>
         </div>

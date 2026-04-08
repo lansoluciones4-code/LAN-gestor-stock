@@ -1,42 +1,29 @@
 import 'dotenv/config';
-import pg from 'pg';
-import fs from 'fs';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { Client } from 'pg';
 import path from 'path';
 
 async function manualMigrate() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error('DATABASE_URL not set');
+  const connectionString = process.env.LOCAL_DATABASE_URL || process.env.DATABASE_URL;
+  if (!connectionString) throw new Error('No se encontró DATABASE_URL o LOCAL_DATABASE_URL en el entorno');
 
-  const client = new pg.Client({ connectionString });
+  console.log(`Conectando localmente...`);
+  
+  // Create a connection for migrations
+  const client = new Client({ connectionString });
   await client.connect();
+  const db = drizzle(client);
 
   try {
-    console.log('--- Manual Migration ---');
-    console.log('Reading migration files...');
-    
+    console.log('--- Corriendo Migraciones Oficiales de Drizzle ---');
     const migrationsDir = path.join(process.cwd(), 'src/lib/db/migrations');
-    const files = fs.readdirSync(migrationsDir)
-      .filter(f => f.endsWith('.sql'))
-      .sort(); // Sort by name (0000, 0001, ...)
-
-    for (const file of files) {
-      console.log(`Running ${file}...`);
-      const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8');
-      await client.query(sql);
-    }
-
-    console.log('✅ All migrations applied manually.');
     
-    // Verify tables
-    const res = await client.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public'
-    `);
-    console.log('Tables created:', res.rows.map(r => r.table_name).join(', '));
-
+    await migrate(db, { migrationsFolder: migrationsDir });
+    
+    console.log('✅ Migraciones aplicadas correctamente.');
   } catch (err) {
-    console.error('❌ Migration failed:', err);
+    console.error('❌ Error al correr las migraciones:', err);
   } finally {
     await client.end();
   }
