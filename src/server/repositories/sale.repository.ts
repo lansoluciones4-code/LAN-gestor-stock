@@ -71,6 +71,8 @@ export class SaleRepository {
         customerId: input.customerId,
         vendorId,
         total: input.total.toString(),
+        discountAmount: input.discountAmount ? input.discountAmount.toString() : '0',
+        discountPercentage: input.discountPercentage ? input.discountPercentage.toString() : '0',
       })
       .returning();
 

@@ -85,6 +85,8 @@ export const sales = pgTable(
       .notNull()
       .references(() => users.id),
     total: numeric('total', { precision: 10, scale: 2 }).notNull(),
+    discountAmount: numeric('discount_amount', { precision: 10, scale: 2 }).default('0').notNull(),
+    discountPercentage: numeric('discount_percentage', { precision: 5, scale: 2 }).default('0').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [index('sales_customer_id_idx').on(table.customerId), index('sales_vendor_id_idx').on(table.vendorId)]

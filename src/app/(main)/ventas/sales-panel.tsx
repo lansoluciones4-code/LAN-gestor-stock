@@ -12,6 +12,7 @@ import { SalesPrintView } from '@/features/sales/components/sales-print-view';
 import { useCart } from '@/features/sales/hooks/useCart';
 import { useSalesActions } from '@/features/sales/hooks/useSalesActions';
 import { SalePaymentModal } from '@/features/sales/components/sale-payment-modal';
+import { SaleDiscountModal } from '@/features/sales/components/sale-discount-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
 import { useSalesStore } from '@/stores/sales.store';
 import { useProductsStore } from '@/stores/products.store';
@@ -57,6 +58,8 @@ export function SalesPanel() {
   const [selectedSaleForPrint, setSelectedSaleForPrint] = useState<SaleDef | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
+  const [currentDiscounts, setCurrentDiscounts] = useState({ amount: 0, percentage: 0 });
 
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
 
@@ -115,24 +118,36 @@ export function SalesPanel() {
           selectedCustomerId={selectedCustomerId}
           setSelectedCustomerId={setSelectedCustomerId}
           isPending={isPending}
-          onConfirmSale={() => setIsPaymentModalOpen(true)}
+          onConfirmSale={() => setIsDiscountModalOpen(true)}
           onCancel={() => {
+            setIsDiscountModalOpen(false);
             setIsPaymentModalOpen(false);
             setView('list');
           }}
           showMobileCart={showMobileCart}
           setShowMobileCart={setShowMobileCart}
           setGlobalMessage={(msg) => (msg ? showGlobalMessage(msg.type, msg.text) : null)}
-          isPaymentModalOpen={isPaymentModalOpen}
-          setIsPaymentModalOpen={setIsPaymentModalOpen}
+          isPaymentModalOpen={isPaymentModalOpen || isDiscountModalOpen}
+          setIsPaymentModalOpen={setIsPaymentModalOpen} // Also need to pass this for escape key closing or just ignore it
+        />
+        <SaleDiscountModal
+          isOpen={isDiscountModalOpen}
+          onClose={() => setIsDiscountModalOpen(false)}
+          subtotal={cartProps.cartTotal}
+          onConfirm={(discounts) => {
+            setCurrentDiscounts(discounts);
+            setIsDiscountModalOpen(false);
+            setIsPaymentModalOpen(true);
+          }}
         />
         <SalePaymentModal
           isOpen={isPaymentModalOpen}
           onClose={() => setIsPaymentModalOpen(false)}
-          total={cartProps.cartTotal}
+          total={cartProps.cartTotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount}
           isPending={isPending}
           onConfirm={(payments) => {
-            handleCreateSale(selectedCustomerId, cartProps.cart, cartProps.cartTotal, payments);
+            const finalTotal = cartProps.cartTotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount;
+            handleCreateSale(selectedCustomerId, cartProps.cart, finalTotal, payments, currentDiscounts);
             setIsPaymentModalOpen(false);
           }}
         />
