@@ -58,8 +58,8 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     <div className="flex h-full w-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors relative">
       <div className="p-6 flex items-center justify-between shrink-0">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
-            <Package className="text-white w-5 h-5" />
+          <div className="w-12 h-12 bg-white border border-zinc-200 shadow-sm rounded-lg flex items-center justify-center mr-3 overflow-hidden">
+            <img src="/icon.ico" alt="PhoneCenter" className="w-10 h-10 object-contain" />
           </div>
           <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100">PhoneCenter</span>
         </div>
