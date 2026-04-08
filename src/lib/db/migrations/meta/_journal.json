@@ -57,6 +57,13 @@
       "when": 1775152498083,
       "tag": "0007_dapper_roulette",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775608883653,
+      "tag": "0008_good_rick_jones",
+      "breakpoints": true
     }
   ]
 }

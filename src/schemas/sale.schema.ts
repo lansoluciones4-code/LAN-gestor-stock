@@ -28,8 +28,10 @@ export type SalePaymentInput = z.infer<typeof salePaymentSchema>;
  */
 export const saleSchema = createInsertSchema(sales, {
   total: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El total es requerido')),
+  discountAmount: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().optional().default('0')),
+  discountPercentage: z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().optional().default('0')),
 })
-  .pick({ customerId: true, total: true })
+  .pick({ customerId: true, total: true, discountAmount: true, discountPercentage: true })
   .extend({
     items: z
       .array(
@@ -54,6 +56,8 @@ export type SaleInput = z.infer<typeof saleSchema>;
  */
 export const saleDefSchema = createSelectSchema(sales).extend({
   total: z.preprocess((val) => parseFloat(val as string), z.number()),
+  discountAmount: z.preprocess((val) => parseFloat(val as string || '0'), z.number()),
+  discountPercentage: z.preprocess((val) => parseFloat(val as string || '0'), z.number()),
   createdAt: z.union([z.date(), z.string()]),
   customer: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
   vendor: z.object({ id: z.string(), username: z.string() }).optional().nullable(),

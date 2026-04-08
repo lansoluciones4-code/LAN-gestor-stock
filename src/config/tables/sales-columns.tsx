@@ -61,6 +61,18 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
       ),
     },
     {
+      header: 'Desc.',
+      headerClassName: 'text-right',
+      cellClassName: 'text-right whitespace-nowrap',
+      cell: (s) => (
+        <div className="flex flex-col items-end gap-0.5 text-[14px] font-bold">
+          {s.discountPercentage > 0 && <span className="text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">-{s.discountPercentage}%</span>}
+          {s.discountAmount > 0 && <span className="text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">-${s.discountAmount.toLocaleString('es-AR')}</span>}
+          {s.discountPercentage === 0 && s.discountAmount === 0 && <span className="text-zinc-300 dark:text-zinc-700">--</span>}
+        </div>
+      ),
+    },
+    {
       header: 'Total',
       headerClassName: 'text-right',
       cellClassName: 'text-right font-black text-zinc-900 dark:text-zinc-100',

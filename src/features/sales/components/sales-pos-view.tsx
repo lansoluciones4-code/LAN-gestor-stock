@@ -190,7 +190,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
               size="lg"
               disabled={cart.length === 0 || !selectedCustomerId || isPending}
             >
-              {isPending ? 'Procesando...' : 'Finalizar y Facturar'}
+              {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
             </Button>
           </div>
         </div>
@@ -286,7 +286,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 size="lg"
                 disabled={cart.length === 0 || !selectedCustomerId || isPending}
               >
-                {isPending ? 'Procesando...' : 'Confirmar Venta'}
+                {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
               </Button>
             </div>
           </div>
