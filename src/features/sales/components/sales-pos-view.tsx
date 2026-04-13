@@ -76,16 +76,33 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
         {/* List Products */}
-        <div className="lg:col-span-7 flex flex-col min-h-0 space-y-4 px-1">
-          <div className="relative shrink-0">
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-zinc-400" />
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              className="w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm h-11"
-              value={saleSearch}
-              onChange={(e) => setSaleSearch(e.target.value)}
-            />
+        <div className="lg:col-span-7 flex flex-col min-h-0 space-y-4 px-1 pt-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 shrink-0 pb-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                className="w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm h-10"
+                value={saleSearch}
+                onChange={(e) => setSaleSearch(e.target.value)}
+              />
+            </div>
+            <div className="w-full">
+              <Combobox
+                options={customers
+                  .filter((c) => c.isActive)
+                  .map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                  }))}
+                value={selectedCustomerId}
+                onChange={setSelectedCustomerId}
+                placeholder="Cliente de la operación..."
+                addNewLabel="+ Nuevo Cliente"
+                onAddNew={() => setIsCustomerModalOpen(true)}
+              />
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-24 lg:pb-6 font-medium">
@@ -115,33 +132,15 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
 
         {/* Desktop Cart */}
         <div className="hidden lg:flex lg:col-span-5 flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shrink-0 shadow-sm">
-          <div className="p-5 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 space-y-4">
-            <div>
-              <label className="block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-2">Cliente de la Operación</label>
-              <Combobox
-                options={customers
-                  .filter((c) => c.isActive)
-                  .map((c) => ({
-                    id: c.id,
-                    name: c.name,
-                  }))}
-                value={selectedCustomerId}
-                onChange={setSelectedCustomerId}
-                placeholder="Buscar o registrar..."
-                addNewLabel="+ Registrar Nuevo Cliente"
-                onAddNew={() => setIsCustomerModalOpen(true)}
-              />
-            </div>
-          </div>
-          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center">
+          <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center shrink-0">
             <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Items en Carrito</span>
             <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">{cart.length}</span>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-2 custom-scrollbar">
             {cart.map((item) => (
               <div
                 key={`cart-item-${item.productId}`}
-                className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm"
+                className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0"
               >
                 <div className="flex justify-between items-start gap-2 overflow-hidden">
                   <span className="text-xs font-bold uppercase leading-tight truncate" title={item.name}>{item.name}</span>
@@ -173,13 +172,13 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
               </div>
             ))}
             {cart.length === 0 && (
-              <div className="py-20 text-center opacity-30 flex flex-col items-center gap-2">
+              <div className="py-10 text-center opacity-30 flex flex-col items-center gap-2">
                 <ShoppingCart className="w-8 h-8" />
                 <p className="text-[10px] font-bold uppercase tracking-widest">Esperando items...</p>
               </div>
             )}
           </div>
-          <div className="p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl">
+          <div className="p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl shrink-0">
             <div className="flex justify-between items-center pt-2">
               <span className="text-[10px] text-zinc-400 uppercase font-black">Total Venta</span>
               <span className="text-3xl text-emerald-600 font-black tracking-tighter">${cartTotal.toLocaleString('es-AR')}</span>
@@ -212,7 +211,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
       {showMobileCart && (
         <div className="lg:hidden fixed inset-0 z-50 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="absolute bottom-0 inset-x-0 bg-white dark:bg-zinc-900 rounded-t-2xl shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-300">
-            <div className="p-4 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-800 rounded-t-2xl">
+            <div className="p-4 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-800 rounded-t-2xl shrink-0">
               <h3 className="font-bold flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" /> Carrito
               </h3>
@@ -223,11 +222,11 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 custom-scrollbar">
               {cart.map((item) => (
                 <div
                   key={`cart-mob-${item.productId}`}
-                  className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2"
+                  className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0"
                 >
                   <div className="flex justify-between items-start overflow-hidden">
                     <span className="text-sm font-bold uppercase leading-tight truncate" title={item.name}>{item.name}</span>
@@ -259,23 +258,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 </div>
               ))}
             </div>
-            <div className="p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-12 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest block">Cliente de la Operación</label>
-                <Combobox
-                  options={customers
-                    .filter((c) => c.isActive)
-                    .map((c) => ({
-                      id: c.id,
-                      name: c.name,
-                    }))}
-                  value={selectedCustomerId}
-                  onChange={setSelectedCustomerId}
-                  placeholder="Buscar o registrar..."
-                  addNewLabel="Registrar Nuevo Cliente"
-                  onAddNew={() => setIsCustomerModalOpen(true)}
-                />
-              </div>
+            <div className="p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-12 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] shrink-0">
               <div className="flex justify-between items-center pt-2">
                 <span className="text-[10px] text-zinc-400 uppercase font-black">Total Venta</span>
                 <span className="text-emerald-600 text-3xl font-black tracking-tighter">${cartTotal.toLocaleString('es-AR')}</span>

@@ -29,12 +29,20 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
   return [
     {
       header: 'Fecha y Hora',
-      cell: (log) => (
-        <div className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
-          {new Date(log.createdAt).toLocaleDateString('es-AR')}
-          <span className="text-indigo-600 dark:text-indigo-400 ml-1">{new Date(log.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
-        </div>
-      ),
+      cell: (log) => {
+        const date = new Date(log.createdAt);
+        const dateString = date.toLocaleDateString('es-AR');
+        const timeString = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+        return (
+          <div className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap truncate">
+            {dateString}
+            <span title={timeString} className="text-indigo-600 dark:text-indigo-400 ml-1">
+              {timeString}
+            </span>
+          </div>
+        );
+      },
     },
     {
       header: 'Operador',
