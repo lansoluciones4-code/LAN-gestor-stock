@@ -1,15 +1,16 @@
 import { type ProductDef } from '@/schemas/product.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
-import { PackageX, Edit, Trash2 } from 'lucide-react';
+import { PackageX, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 
 interface ColumnActions {
   role?: string;
   onLoss: (p: ProductDef) => void;
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
+  onToggleVisibility: (p: ProductDef) => void;
 }
 
-export function getProductColumns({ role, onLoss, onEdit, onDelete }: ColumnActions): ColumnDef<ProductDef>[] {
+export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisibility }: ColumnActions): ColumnDef<ProductDef>[] {
   return [
     {
       header: 'Equipo y Detalle',
@@ -60,6 +61,15 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete }: ColumnActi
       cellClassName: 'flex gap-2 justify-end',
       cell: (p: ProductDef) => (
         <>
+          {role === 'admin' && (
+            <button
+              onClick={() => onToggleVisibility(p)}
+              className={`p-2 rounded-lg transition ${p.showOnLanding ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-500/10' : 'text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10'}`}
+              title={p.showOnLanding ? 'Ocultar en Landing' : 'Mostrar en Landing'}
+            >
+              {p.showOnLanding ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </button>
+          )}
           {role === 'admin' && (
             <button
               onClick={() => onLoss(p)}
