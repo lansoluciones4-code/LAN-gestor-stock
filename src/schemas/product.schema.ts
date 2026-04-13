@@ -15,6 +15,7 @@ export const productSchema = createInsertSchema(products)
     purchasePrice: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades válidas').transform(Number).pipe(z.number().min(0, 'El precio de compra no puede ser negativo')),
     salePrice: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades válidas').transform(Number).pipe(z.number().min(0, 'El precio de venta no puede ser negativo')),
     stock: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades válidas').transform(v => Math.floor(Number(v))).pipe(z.number().min(0, 'El stock no puede ser negativo')),
+    showOnLanding: z.boolean().default(true),
   });
 
 export type ProductInput = z.infer<typeof productSchema>;
@@ -26,6 +27,7 @@ export type ProductInput = z.infer<typeof productSchema>;
 export const productDefSchema = createSelectSchema(products).extend({
   purchasePrice: z.number(),
   salePrice: z.number(),
+  showOnLanding: z.boolean(),
   device: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
   provider: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
   createdAt: z.union([z.date(), z.string()]),
