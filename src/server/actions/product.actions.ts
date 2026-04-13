@@ -126,3 +126,35 @@ export async function registerProductLossAction(productId: string, quantity: num
     return { success: false, message: error.message || 'No se pudo completar la operación.' };
   }
 }
+
+export async function fetchLandingProducts(): Promise<ProductDef[]> {
+  try {
+    const products = await productRepository.getLandingProducts();
+    const formatted = products.map((p) => ({
+      ...p,
+      salePrice: parseFloat(p.salePrice as any),
+      purchasePrice: parseFloat(p.purchasePrice as any),
+    }));
+    return z.array(productDefSchema).parse(formatted);
+  } catch (error) {
+    console.error('fetchLandingProducts error:', error);
+    return [];
+  }
+}
+
+export async function toggleProductVisibilityAction(id: string, isVisible: boolean) {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+    
+    return await db.transaction(async (tx) => {
+      await productRepository.toggleVisibility(id, isVisible, tx);
+
+      await recordAuditLog(caller.id, 'ACTUALIZAR_VISIBILIDAD_LANDING', 'PRODUCT', id, { showOnLanding: isVisible }, tx);
+
+      return { success: true, message: `Producto ${isVisible ? 'visible' : 'oculto'} en landing page` };
+    });
+  } catch (error: any) {
+    return { success: false, message: error.message || 'Error al cambiar visibilidad' };
+  }
+}
+

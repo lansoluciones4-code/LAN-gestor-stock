@@ -99,6 +99,28 @@ export class ProductRepository {
   async deleteProduct(id: string, dbtx: any = db) {
     await dbtx.delete(products).where(eq(products.id, id));
   }
+
+  async getLandingProducts() {
+    return await db.query.products.findMany({
+      where: (products, { eq, and }) => eq(products.showOnLanding, true),
+      with: {
+        device: true,
+      },
+      orderBy: [desc(products.stock), desc(products.createdAt)],
+    });
+  }
+
+  async toggleVisibility(id: string, isVisible: boolean, dbtx: any = db) {
+    const result = await dbtx
+      .update(products)
+      .set({
+        showOnLanding: isVisible,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(products.id, id))
+      .returning();
+    return result[0];
+  }
 }
 
 export const productRepository = new ProductRepository();

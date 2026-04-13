@@ -68,6 +68,7 @@ export const products = pgTable(
     purchasePrice: numeric('purchase_price', { precision: 10, scale: 2 }).notNull(),
     salePrice: numeric('sale_price', { precision: 10, scale: 2 }).notNull(),
     stock: integer('stock').default(1).notNull(),
+    showOnLanding: boolean('show_on_landing').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

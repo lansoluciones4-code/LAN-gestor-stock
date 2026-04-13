@@ -14,7 +14,7 @@ import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction } from '@/server/actions/product.actions';
+import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/server/actions/product.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
@@ -78,6 +78,17 @@ export function ProductsPanel() {
       if (!result.success) return setServerError(result.message);
 
       onLossClose();
+      showGlobalMessage('success', result.message);
+      invalidateAllCaches();
+      syncData();
+    });
+  };
+
+  const handleToggleVisibility = async (p: ProductDef) => {
+    startTransition(async () => {
+      const result = await toggleProductVisibilityAction(p.id!, !p.showOnLanding);
+      if (!result.success) return showGlobalMessage('error', result.message);
+      
       showGlobalMessage('success', result.message);
       invalidateAllCaches();
       syncData();
@@ -166,6 +177,7 @@ export function ProductsPanel() {
     onLoss: handleLossOpen,
     onEdit: handleEditClick,
     onDelete: setItemToDelete,
+    onToggleVisibility: handleToggleVisibility,
   });
 
   return (

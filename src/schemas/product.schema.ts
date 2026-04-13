@@ -26,6 +26,7 @@ export type ProductInput = z.infer<typeof productSchema>;
 export const productDefSchema = createSelectSchema(products).extend({
   purchasePrice: z.number(),
   salePrice: z.number(),
+  showOnLanding: z.boolean(),
   device: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
   provider: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
   createdAt: z.union([z.date(), z.string()]),

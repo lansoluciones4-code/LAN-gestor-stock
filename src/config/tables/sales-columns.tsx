@@ -12,13 +12,21 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
   return [
     {
       header: 'Fecha de Emisión',
-      cellClassName: 'whitespace-nowrap font-bold text-zinc-900 dark:text-zinc-100',
-      cell: (s) => (
-        <>
-          {new Date(s.createdAt).toLocaleDateString('es-AR')}
-          <span className="text-indigo-600 dark:text-indigo-400 ml-1 font-bold">{new Date(s.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
-        </>
-      ),
+      cellClassName: 'whitespace-nowrap font-bold text-zinc-900 dark:text-zinc-100 truncate',
+      cell: (s) => {
+        const date = new Date(s.createdAt);
+        const dateString = date.toLocaleDateString('es-AR');
+        const timeString = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+        return (
+          <>
+            {dateString}
+            <span title={timeString} className="text-indigo-600 dark:text-indigo-400 ml-1 font-bold">
+              {timeString}
+            </span>
+          </>
+        );
+      },
     },
     {
       header: 'Cliente',
