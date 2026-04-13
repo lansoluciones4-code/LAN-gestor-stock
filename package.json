@@ -9,6 +9,9 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:verify": "tsx src/lib/db/scripts/sync-db.ts",
+    "db:push:local": "tsx src/lib/db/scripts/sync-db.ts local",
+    "db:push:prod": "tsx src/lib/db/scripts/sync-db.ts prod",
     "db:seed": "tsx src/lib/db/scripts/seed.ts",
     "db:reset-data": "tsx src/lib/db/scripts/setup-initial-data.ts",
     "db:stress-test": "tsx src/lib/db/scripts/seed-stress-test.ts"
