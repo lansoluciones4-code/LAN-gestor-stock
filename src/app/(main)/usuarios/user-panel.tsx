@@ -65,16 +65,18 @@ export function UserPanel() {
   const filteredUsers = useMemo(() => {
     return users
       .filter((u) => {
-        const term = normalizeString(search);
+        const terms = normalizeString(search).split(/\s+/);
         
         // Convert DB roles to Spanish display names for searching
         const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
         
-        const matchesSearch = 
-          normalizeString(u.username).includes(term) || 
-          normalizeString(u.role).includes(term) ||
-          normalizeString(roleDisplay).includes(term);
+        const combinedText = [
+          normalizeString(u.username),
+          normalizeString(u.role),
+          normalizeString(roleDisplay)
+        ].join(' ');
 
+        const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactives ? true : u.isActive;
         return matchesSearch && matchesStatus;
       })

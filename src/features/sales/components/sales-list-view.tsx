@@ -28,10 +28,13 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
   const role = useAuthStore((s) => s.user?.role);
 
   const filteredSales = sales.filter((s) => {
-    const term = normalizeString(searchTerm);
-    const matchesSearch =
-      normalizeString(s.customer?.name || 'Consumidor Final').includes(term) ||
-      normalizeString(s.vendor?.username || '').includes(term);
+    const terms = normalizeString(searchTerm).split(/\s+/);
+    const combinedText = [
+      normalizeString(s.customer?.name || 'Consumidor Final'),
+      normalizeString(s.vendor?.username || '')
+    ].join(' ');
+    
+    const matchesSearch = terms.every(word => combinedText.includes(word));
     const saleTime = new Date(s.createdAt).getTime();
 
     let matchesStart = true;

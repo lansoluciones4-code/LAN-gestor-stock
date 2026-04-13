@@ -61,12 +61,15 @@ export function CustomerPanel() {
   const filteredCustomers = useMemo(() => {
     return customers
       .filter((c) => {
-        const term = normalizeString(search);
-        const matchesSearch =
-          normalizeString(c.name).includes(term) ||
-          normalizeString(c.email).includes(term) ||
-          normalizeString(c.phone).includes(term) ||
-          normalizeString(c.documentNumber).includes(term);
+        const terms = normalizeString(search).split(/\s+/);
+        const combinedText = [
+          normalizeString(c.name),
+          normalizeString(c.email),
+          normalizeString(c.phone),
+          normalizeString(c.documentNumber)
+        ].join(' ');
+        
+        const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactive ? true : c.isActive;
         return matchesSearch && matchesStatus;
       })

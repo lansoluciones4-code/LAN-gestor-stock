@@ -73,8 +73,9 @@ export function DevicePanel() {
   const filteredDevices = useMemo(() => {
     return devices
       .filter((d) => {
-        const term = normalizeString(search);
-        const matchesSearch = normalizeString(d.name).includes(term);
+        const terms = normalizeString(search).split(/\s+/);
+        const combinedText = normalizeString(d.name);
+        const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactive ? true : d.isActive;
         return matchesSearch && matchesStatus;
       })
