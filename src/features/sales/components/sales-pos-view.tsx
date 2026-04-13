@@ -52,8 +52,12 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
 
   const filteredProducts = products.filter((p) => {
     if (p.stock <= 0) return false;
-    const term = saleSearch.toLowerCase();
-    return p.device?.name.toLowerCase().includes(term) || (p.description && p.description.toLowerCase().includes(term));
+    if (!saleSearch) return true;
+    
+    const terms = saleSearch.toLowerCase().trim().split(/\s+/);
+    const combinedText = `${p.device?.name || ''} ${p.description || ''}`.toLowerCase();
+    
+    return terms.every(word => combinedText.includes(word));
   });
 
   return (
