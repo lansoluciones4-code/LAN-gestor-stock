@@ -137,13 +137,17 @@ export function ProductsPanel() {
   const filteredProducts = useMemo(() => {
     return displayProducts
       .filter((p) => {
-        const term = normalizeString(search);
+        const terms = normalizeString(search).split(/\s+/);
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
-        const matchesSearch =
-          normalizeString(p.device?.name).includes(term) ||
-          normalizeString(p.description).includes(term) ||
-          (role === 'admin' ? normalizeString(p.provider?.name).includes(term) : false);
+        
+        const combinedText = [
+          normalizeString(p.device?.name),
+          normalizeString(p.description),
+          role === 'admin' ? normalizeString(p.provider?.name) : ''
+        ].join(' ');
+
+        const matchesSearch = terms.every(word => combinedText.includes(word));
         return matchesSearch && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
       })
       .sort((a, b) => {

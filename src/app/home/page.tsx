@@ -36,14 +36,14 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
   return (
     <div className="min-h-screen bg-[#FBFBFD] dark:bg-black selection:bg-indigo-500/30">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-zinc-900 dark:text-white">
+      <section className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-tight text-zinc-900 dark:text-white leading-tight">
             Diseñados para brillar.
             <br className="hidden md:block" />
-            <span className="text-zinc-500 dark:text-zinc-400">Protección superior.</span>
+            <span className="block sm:inline text-zinc-500 dark:text-zinc-400"> Protección superior.</span>
           </h1>
-          <p className="text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium">
+          <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium px-2">
             Nuestra cuidadosa selección de accesorios para tus dispositivos Apple fusiona 
             estética minimalista con durabilidad de grado premium.
           </p>
@@ -51,24 +51,24 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
       </section>
 
       {/* Grid Section */}
-      <section className="max-w-7xl mx-auto px-6 pb-32">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 md:pb-32">
         {orderedProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {currentItems.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
             
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-16 text-sm font-medium">
+              <div className="flex flex-wrap justify-center items-center gap-2 mt-12 md:mt-16 text-sm font-medium">
                 <Link 
                   href={`/home?page=${Math.max(1, page - 1)}`} 
                   className={`px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${page === 1 ? 'pointer-events-none opacity-40' : 'hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors text-zinc-700 dark:text-zinc-300'}`}
                 >
                   Anterior
                 </Link>
-                <div className="flex gap-1 mx-2 sm:mx-4">
+                <div className="flex flex-wrap justify-center gap-1 mx-1 sm:mx-4">
                   {Array.from({ length: totalPages }).map((_, i) => {
                     const pageNum = i + 1;
                     const isActive = page === pageNum;

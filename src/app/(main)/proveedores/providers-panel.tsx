@@ -74,11 +74,14 @@ export function ProvidersPanel() {
   const filteredProviders = useMemo(() => {
     return displayProviders
       .filter((p) => {
-        const term = normalizeString(search);
-        const matchesSearch =
-          normalizeString(p.name).includes(term) ||
-          normalizeString(p.email).includes(term) ||
-          normalizeString(p.phone).includes(term);
+        const terms = normalizeString(search).split(/\s+/);
+        const combinedText = [
+          normalizeString(p.name),
+          normalizeString(p.email),
+          normalizeString(p.phone)
+        ].join(' ');
+        
+        const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactive ? true : p.isActive;
         return matchesSearch && matchesStatus;
       })

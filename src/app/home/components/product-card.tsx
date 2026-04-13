@@ -30,7 +30,7 @@ export function ProductCard({ product }: { product: ProductDef }) {
         isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''
       }`}
     >
-      <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden p-6">
+      <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden p-4 sm:p-6">
         {!imageError ? (
           <img
             src={imagePath}
@@ -40,29 +40,29 @@ export function ProductCard({ product }: { product: ProductDef }) {
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600">
-            <Package className="w-16 h-16 stroke-[1.5] mb-4" />
-            <span className="text-xs font-medium tracking-widest uppercase">Pronto</span>
+            <Package className="w-10 h-10 sm:w-16 sm:h-16 stroke-[1.5] mb-2 sm:mb-4" />
+            <span className="text-[10px] sm:text-xs font-medium tracking-widest uppercase">Pronto</span>
           </div>
         )}
 
         {isOutOfStock && (
           <div className="absolute inset-x-0 bottom-4 flex justify-center">
-            <span className="bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md text-white text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
+            <span className="bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full uppercase tracking-wider">
               Agotado
             </span>
           </div>
         )}
       </div>
 
-      <div className="flex flex-col flex-1 p-6 text-center">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-2">
+      <div className="flex flex-col flex-1 p-4 sm:p-6 text-center">
+        <h3 className="text-sm sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1.5 sm:mb-2 line-clamp-1">
           {deviceName}
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-4 leading-relaxed flex-1">
+        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 md:line-clamp-3 mb-3 sm:mb-4 leading-relaxed flex-1">
           {product.description || 'Diseñado con precisión para ofrecer la mejor experiencia y protección para tu dispositivo.'}
         </p>
         <div className="mt-auto">
-          <span className="text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+          <span className="text-base sm:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
             ${product.salePrice.toLocaleString('es-AR')}
           </span>
         </div>
