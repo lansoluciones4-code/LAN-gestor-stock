@@ -6,7 +6,7 @@ description: 'Prompt and workflow for generating conventional commit messages us
 ### Instructions
 
 ```xml
-	<description>This file contains a prompt template for generating conventional commit messages. It provides instructions, examples, and formatting guidelines to help users write standardized, descriptive commit messages in accordance with the Conventional Commits specification.</description>
+	<description>This file contains a prompt template for generating conventional commit messages. It provides instructions, examples, and formatting guidelines to help users write standardized, descriptive commit messages in accordance with the Conventional Commits specification. IMPORTANT: All generated commit messages MUST ALWAYS be written in English, regardless of the user's prompt language.</description>
 ```
 
 ### Workflow
@@ -54,10 +54,11 @@ git commit -m "type(scope): description"
 
 ```xml
 <validation>
+	<language>All commit messages MUST strictly be written in English.</language>
 	<type>Must be one of the allowed types. See <reference>https://www.conventionalcommits.org/en/v1.0.0/#specification</reference></type>
-	<scope>Optional, but recommended for clarity.</scope>
-	<description>Required. Use the imperative mood (e.g., "add", not "added").</description>
-	<body>Optional. Use for additional context.</body>
+	<scope>Optional, but recommended for clarity. Written in English.</scope>
+	<description>Required. Use the imperative mood in English (e.g., "add", not "added").</description>
+	<body>Optional. Use for additional context in English.</body>
 	<footer>Use for breaking changes or issue references.</footer>
 </validation>
 ```
