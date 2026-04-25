@@ -13,6 +13,7 @@ import { useLogsStore } from '@/stores/logs.store';
 import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { getAuditColumns } from '@/config/tables/audit-columns';
+import { TEST_IDS } from '@/constants/test-ids';
 
 export function LogPanel() {
   const { logs, setLogs, appendLogs, isLoaded } = useLogsStore();
@@ -56,7 +57,7 @@ export function LogPanel() {
   };
 
   const isFirstRender = useRef(true);
-  
+
   // Initial load
   useEffect(() => {
     if (!isLoaded) {
@@ -128,6 +129,7 @@ export function LogPanel() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar por acción, usuario, entidad, nombre o IDs..."
                 className="h-11"
+                data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <div className="flex items-center">
                 <DateRangePicker
@@ -139,6 +141,7 @@ export function LogPanel() {
                     setStartDate('');
                     setEndDate('');
                   }}
+                  data-testid={TEST_IDS.logPanel.inputFiltroFecha}
                 />
               </div>
             </div>
@@ -151,6 +154,7 @@ export function LogPanel() {
                 disabled={isPending}
                 title="Sincronizar"
                 className="h-11 w-11"
+                data-testid={TEST_IDS.general.btnSincronizar}
               >
                 <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
               </Button>
@@ -207,11 +211,11 @@ export function LogPanel() {
                     <div className="space-y-0.5">
                       <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Entidad Específica</span>
                       <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                        {selectedLog.product?.device?.name || 
-                         selectedLog.customer?.name || 
-                         selectedLog.provider?.name || 
-                         selectedLog.device?.name || 
-                         (selectedLog.sale ? `VENTA $${selectedLog.sale.total}` : '--')}
+                        {selectedLog.product?.device?.name ||
+                          selectedLog.customer?.name ||
+                          selectedLog.provider?.name ||
+                          selectedLog.device?.name ||
+                          (selectedLog.sale ? `VENTA $${selectedLog.sale.total}` : '--')}
                       </span>
                     </div>
                     <div className="space-y-0.5">

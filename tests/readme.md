@@ -12,6 +12,11 @@ npm init playwright@latest
 
 Correr antes de cada prueba, no todas lo necesitan, pero es mejor prevenir.
 ```bash
+npm run db:reset-data-hard
+```
+
+Tambien se puede correr una version menos agresiva de este comando, que no reinicia la tabla de usuarios para evitar la sesion inválida.
+```bash
 npm run db:reset-data
 ```
 
@@ -51,19 +56,4 @@ Abre el navegador y la herramienta que graba tus clics y tipeos, transformándol
 
 ```bash
 npx playwright codegen http://localhost:3000
-```
-
-## Notas Específicas por Entidad
-
-### Clientes (`clientes.spec.ts`)
-CÓMO LOS CLIENTES NO PUEDEN SER ELIMINADOS FÍSICAMENTE (solo tienen baja lógica), SE DEBE USAR EL COMANDO:
-```bash
-npm run db:reset-data
-```
-PARA VOLVER LA BASE DE DATOS AL ESTADO INICIAL ANTES DE VOLVER A CORRER ESTE TEST DE MANERA LIMPIA.
-
-### Productos (`clientes.spec.ts`)
-Correr antes de cada prueba
-```bash
-npm run db:reset-data
 ```

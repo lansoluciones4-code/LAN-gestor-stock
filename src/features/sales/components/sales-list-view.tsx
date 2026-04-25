@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth.store';
 import { getSalesColumns } from '@/config/tables/sales-columns';
 import { normalizeString } from '@/lib/utils';
+import { TEST_IDS } from '@/constants/test-ids';
 
 interface SalesListViewProps {
   sales: SaleDef[];
@@ -33,7 +34,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
       normalizeString(s.customer?.name || 'Consumidor Final'),
       normalizeString(s.vendor?.username || '')
     ].join(' ');
-    
+
     const matchesSearch = terms.every(word => combinedText.includes(word));
     const saleTime = new Date(s.createdAt).getTime();
 
@@ -66,6 +67,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Filtrar ventas por cliente o vendedor..."
+            data-testid={TEST_IDS.general.inputBusquedaTabla}
           />
         </div>
 
@@ -75,6 +77,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
             endDate={endDate}
             onStartChange={setStartDate}
             onEndChange={setEndDate}
+            data-testid={TEST_IDS.ventas.inputFiltroFecha}
           />
 
           <Button
@@ -83,6 +86,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
             onClick={() => onSync()}
             disabled={isPending}
             title="Sincronizar"
+            data-testid={TEST_IDS.general.btnSincronizar}
           >
             <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
           </Button>
@@ -91,6 +95,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
             variant="primary"
             onClick={onNewSale}
             leftIcon={<Plus className="w-5 h-5" />}
+            data-testid={TEST_IDS.general.btnAgregar}
           >
             Nueva Venta
           </Button>

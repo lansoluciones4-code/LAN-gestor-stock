@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { fetchLandingProducts } from '@/server/actions/product.actions';
 import { ProductCard } from './components/product-card';
+import { TEST_IDS } from '@/constants/test-ids';
 
 export const metadata: Metadata = {
   title: 'Phone Center - Catalogo',
@@ -44,7 +45,7 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
             <span className="block sm:inline text-zinc-500 dark:text-zinc-400"> Protección superior.</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium px-2">
-            Nuestra cuidadosa selección de accesorios para tus dispositivos Apple fusiona 
+            Nuestra cuidadosa selección de accesorios para tus dispositivos Apple fusiona
             estética minimalista con durabilidad de grado premium.
           </p>
         </div>
@@ -59,12 +60,13 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
-            
+
             {totalPages > 1 && (
               <div className="flex flex-wrap justify-center items-center gap-2 mt-12 md:mt-16 text-sm font-medium">
-                <Link 
-                  href={`/home?page=${Math.max(1, page - 1)}`} 
+                <Link
+                  href={`/home?page=${Math.max(1, page - 1)}`}
                   className={`px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${page === 1 ? 'pointer-events-none opacity-40' : 'hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors text-zinc-700 dark:text-zinc-300'}`}
+                  data-testid={TEST_IDS.landing.btnAnteriorPag}
                 >
                   Anterior
                 </Link>
@@ -73,8 +75,8 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
                     const pageNum = i + 1;
                     const isActive = page === pageNum;
                     return (
-                      <Link 
-                        key={pageNum} 
+                      <Link
+                        key={pageNum}
                         href={`/home?page=${pageNum}`}
                         className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${isActive ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-sm' : 'hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400'}`}
                       >
@@ -83,9 +85,10 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
                     )
                   })}
                 </div>
-                <Link 
-                  href={`/home?page=${Math.min(totalPages, page + 1)}`} 
+                <Link
+                  href={`/home?page=${Math.min(totalPages, page + 1)}`}
                   className={`px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${page === totalPages ? 'pointer-events-none opacity-40' : 'hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors text-zinc-700 dark:text-zinc-300'}`}
+                  data-testid={TEST_IDS.landing.btnSiguientePag}
                 >
                   Siguiente
                 </Link>
@@ -99,7 +102,7 @@ export default async function HomePage(props: { searchParams: Promise<{ [key: st
           </div>
         )}
       </section>
-      
+
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-12 text-center text-sm text-zinc-500 dark:text-zinc-400 px-6">
         <p>© {new Date().getFullYear()} Accesorios Premium. Todos los derechos reservados.</p>
