@@ -2,14 +2,21 @@ import 'dotenv/config';
 import pg from 'pg';
 
 async function wipeDatabase() {
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString = process.env.LOCAL_DATABASE_URL;
 
   if (!connectionString) {
-    console.error('❌ Error: DATABASE_URL no está definida en el .env');
+    console.error('❌ Error: Ni LOCAL_DATABASE_URL ni DATABASE_URL están definidas en el .env');
     process.exit(1);
   }
 
-  console.log('⚠️  ATENCIÓN: Se van a ELIMINAR TODAS las tablas de la base de datos de PRODUCCIÓN (Supabase).');
+  const isLocal = connectionString.includes('127.0.0.1') || connectionString.includes('localhost');
+  
+  if (isLocal) {
+    console.log('⚠️  ATENCIÓN: Se van a ELIMINAR TODAS las tablas de la base de datos LOCAL.');
+  } else {
+    console.log('🔥 ADVERTENCIA: Conectando a una base de datos NO LOCAL (Supabase/Prod).');
+  }
+  
   console.log('Conectando a:', connectionString.split('@')[1]); // Mostrar solo el host para seguridad
 
   const client = new pg.Client({
