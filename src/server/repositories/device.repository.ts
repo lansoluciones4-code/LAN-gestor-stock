@@ -2,7 +2,7 @@ import { desc, eq, ilike, sql, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { devices } from '@/lib/db/schema';
 import type { DeviceInput, DeviceUpdateInput } from '@/schemas/device.schema';
-import { ConcurrencyError } from '@/lib/errors';
+import { ConcurrencyError, DuplicateEntityError } from '@/lib/errors';
 
 export class DeviceRepository {
   async getAllDevices() {
@@ -58,8 +58,9 @@ export class DeviceRepository {
           .where(eq(devices.id, existing.id))
           .returning();
         return { ...result[0], wasInactive: true };
+      } else {
+        throw new DuplicateEntityError();
       }
-      // If active, let the DB throw the unique constraint error
     }
 
     const result = await dbtx.insert(devices).values({ 
@@ -75,7 +76,13 @@ export class DeviceRepository {
       updatedAt: sql`NOW()`,
       version: sql`${devices.version} + 1`
     };
-    if (input.name !== undefined) updateData.name = input.name;
+    if (input.name !== undefined) {
+      const existing = await dbtx.query.devices.findFirst({
+        where: and(ilike(devices.name, input.name), sql`${devices.id} != ${id}`),
+      });
+      if (existing) throw new DuplicateEntityError();
+      updateData.name = input.name;
+    }
 
     const result = await dbtx
       .update(devices)

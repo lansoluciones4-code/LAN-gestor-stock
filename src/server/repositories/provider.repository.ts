@@ -2,7 +2,7 @@ import { desc, eq, sql, ilike, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { providers } from '@/lib/db/schema';
 import type { ProviderInput, ProviderUpdateInput } from '@/schemas/provider.schema';
-import { ConcurrencyError } from '@/lib/errors';
+import { ConcurrencyError, DuplicateEntityError } from '@/lib/errors';
 
 export class ProviderRepository {
   async getAllProviders() {
@@ -54,8 +54,9 @@ export class ProviderRepository {
           .where(eq(providers.id, existing.id))
           .returning();
         return { ...result[0], wasInactive: true };
+      } else {
+        throw new DuplicateEntityError();
       }
-      // If active, let the DB throw the unique constraint error
     }
 
     const result = await dbtx
@@ -77,7 +78,13 @@ export class ProviderRepository {
       version: sql`${providers.version} + 1`
     };
 
-    if (input.name !== undefined) updateData.name = input.name;
+    if (input.name !== undefined) {
+      const existing = await dbtx.query.providers.findFirst({
+        where: and(ilike(providers.name, input.name), sql`${providers.id} != ${id}`),
+      });
+      if (existing) throw new DuplicateEntityError();
+      updateData.name = input.name;
+    }
     if (input.phone !== undefined) updateData.phone = input.phone || '';
     if (input.email !== undefined) updateData.email = input.email || '';
 

@@ -37,5 +37,9 @@ export function handleDatabaseError(error: any, entityName: string): string {
     return MESSAGES.ERROR.DATABASE.CONCURRENCY;
   }
 
+  if (error.name === 'DuplicateEntityError') {
+    return MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION;
+  }
+
   return error.message || MESSAGES.ERROR.DATABASE.GENERIC(entityName);
 }

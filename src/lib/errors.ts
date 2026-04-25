@@ -4,3 +4,10 @@ export class ConcurrencyError extends Error {
     this.name = 'ConcurrencyError';
   }
 }
+
+export class DuplicateEntityError extends Error {
+  constructor(message = 'Ya existe un registro con esos datos.') {
+    super(message);
+    this.name = 'DuplicateEntityError';
+  }
+}

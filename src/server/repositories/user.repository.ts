@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import * as bcrypt from 'bcrypt';
 import type { UserInput, UserUpdateInput } from '@/schemas/user.schema';
-import { ConcurrencyError } from '@/lib/errors';
+import { ConcurrencyError, DuplicateEntityError } from '@/lib/errors';
 
 export class UserRepository {
   async getUserByUsername(username: string, dbtx: any = db) {
@@ -85,8 +85,9 @@ export class UserRepository {
           .where(eq(users.id, existing.id))
           .returning();
         return { ...result[0], wasInactive: true };
+      } else {
+        throw new DuplicateEntityError();
       }
-      // If active, let the DB throw the unique constraint error
     }
 
     const result = await dbtx
@@ -109,7 +110,13 @@ export class UserRepository {
       version: sql`${users.version} + 1`,
     };
 
-    if (input.username !== undefined) updateSet.username = input.username;
+    if (input.username !== undefined) {
+      const existing = await dbtx.query.users.findFirst({
+        where: and(ilike(users.username, input.username), sql`${users.id} != ${id}`),
+      });
+      if (existing) throw new DuplicateEntityError();
+      updateSet.username = input.username;
+    }
     if (input.role !== undefined) updateSet.role = input.role;
 
     if (input.password !== undefined && input.password.length >= 6) {

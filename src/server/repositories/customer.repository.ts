@@ -2,7 +2,7 @@ import { desc, eq, sql, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers } from '@/lib/db/schema';
 import type { CustomerInput, CustomerUpdateInput } from '@/schemas/customer.schema';
-import { ConcurrencyError } from '@/lib/errors';
+import { ConcurrencyError, DuplicateEntityError } from '@/lib/errors';
 
 export class CustomerRepository {
   async getAllCustomers() {
@@ -45,21 +45,25 @@ export class CustomerRepository {
         where: sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`,
       });
 
-      if (existing && !existing.isActive) {
-        const result = await dbtx
-          .update(customers)
-          .set({
-            name: input.name,
-            phone: input.phone || '',
-            email: input.email || '',
-            isActive: true,
-            updatedAt: sql`NOW()`,
-            version: sql`${customers.version} + 1`,
-          })
-          .where(eq(customers.id, existing.id))
-          .returning();
+      if (existing) {
+        if (!existing.isActive) {
+          const result = await dbtx
+            .update(customers)
+            .set({
+              name: input.name,
+              phone: input.phone || '',
+              email: input.email || '',
+              isActive: true,
+              updatedAt: sql`NOW()`,
+              version: sql`${customers.version} + 1`,
+            })
+            .where(eq(customers.id, existing.id))
+            .returning();
 
-        return { ...result[0], wasInactive: true };
+          return { ...result[0], wasInactive: true };
+        } else {
+          throw new DuplicateEntityError();
+        }
       }
     }
 
@@ -86,7 +90,22 @@ export class CustomerRepository {
     if (input.name !== undefined) updateData.name = input.name;
     if (input.phone !== undefined) updateData.phone = input.phone || '';
     if (input.email !== undefined) updateData.email = input.email || '';
-    if (input.documentNumber !== undefined) updateData.documentNumber = input.documentNumber || '';
+    
+    if (input.documentNumber !== undefined) {
+      const normalizedInput = (input.documentNumber || '').replace(/[.\-]/g, '');
+      const existing = await dbtx.query.customers.findFirst({
+        where: and(
+          sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`,
+          sql`${customers.id} != ${id}`
+        ),
+      });
+      
+      if (existing) {
+        throw new DuplicateEntityError();
+      }
+      
+      updateData.documentNumber = input.documentNumber || '';
+    }
 
     const result = await dbtx
       .update(customers)
