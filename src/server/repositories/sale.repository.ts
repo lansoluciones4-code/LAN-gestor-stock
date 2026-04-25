@@ -60,7 +60,7 @@ export class SaleRepository {
       });
 
       if (!prod || prod.stock < item.quantity) {
-        throw new Error(`Stock insuficiente para el producto: ${prod?.device?.name || 'ID ' + item.productId}. Disponible: ${prod?.stock || 0}`);
+        throw new Error(`Stock insuficiente para: ${prod?.device?.name || 'Producto'}. Disponible: ${prod?.stock || 0}`);
       }
     }
 
@@ -76,7 +76,7 @@ export class SaleRepository {
       })
       .returning();
 
-    // 2.5 Activate customer if provided (re-activate if inactive)
+    // 2.5 Ensure customer is active
     if (input.customerId) {
       await dbtx.update(customers).set({ isActive: true }).where(eq(customers.id, input.customerId));
     }
@@ -91,11 +91,12 @@ export class SaleRepository {
         subtotal: item.subtotal.toString(),
       });
 
-      // Atomic Update with Stock Validation (Concurrency safe)
+      // Atomic Update with Stock Validation
       const updated = await dbtx
         .update(products)
         .set({
           stock: sql`${products.stock} - ${item.quantity}`,
+          version: sql`${products.version} + 1`,
           updatedAt: sql`NOW()`,
         })
         .where(
@@ -107,7 +108,7 @@ export class SaleRepository {
         .returning();
 
       if (updated.length === 0) {
-        throw new Error(`Stock insuficiente para el producto ID ${item.productId} (pudo haber sido vendido mientras procesabas).`);
+        throw new Error('Conflicto de stock: el inventario cambió durante la operación.');
       }
     }
     
@@ -125,11 +126,7 @@ export class SaleRepository {
     return sale;
   }
 
-  /**
-   * Deleting a sale should restore stock.
-   */
   async deleteSale(id: string, dbtx: any = db) {
-    // 1. Get items to restore stock
     const items = await dbtx.query.saleItems.findMany({
       where: eq(saleItems.saleId, id),
     });
@@ -139,12 +136,12 @@ export class SaleRepository {
         .update(products)
         .set({
           stock: sql`${products.stock} + ${item.quantity}`,
+          version: sql`${products.version} + 1`,
           updatedAt: sql`NOW()`,
         })
         .where(eq(products.id, item.productId));
     }
 
-    // 2. Delete entries
     await dbtx.delete(saleItems).where(eq(saleItems.saleId, id));
     await dbtx.delete(salePayments).where(eq(salePayments.saleId, id));
     await dbtx.delete(sales).where(eq(sales.id, id));

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Store, RefreshCcw } from 'lucide-react';
-import { providerSchema, type ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
+import { providerSchema, type ProviderInput, type ProviderDef, type ProviderUpdateInput } from '@/schemas/provider.schema';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProvidersStore } from '@/stores/providers.store';
 import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
@@ -18,6 +18,7 @@ import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
 import { getProviderColumns } from '@/config/tables/provider-columns';
 import { normalizeString } from '@/lib/utils';
+import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 
 export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -28,7 +29,7 @@ export function ProvidersPanel() {
 
   const [showInactive, setShowInactive] = useState(false);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<ProviderDef, ProviderInput>({
+  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<ProviderDef, ProviderInput, ProviderUpdateInput>({
     handlers: {
       fetchData: () => fetchProviders(),
       createAction: createProviderAction,
@@ -66,7 +67,7 @@ export function ProvidersPanel() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<ProviderInput>({
     resolver: zodResolver(providerSchema),
   });
@@ -153,7 +154,7 @@ export function ProvidersPanel() {
             )}
           </div>
 
-          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+          <GlobalMessage message={globalMessage} />
 
           <VirtualizedDataTable
             columns={columns}
@@ -168,11 +169,30 @@ export function ProvidersPanel() {
             title={editingItem ? 'Editar Proveedor' : 'Nuevo Proveedor Local'}
             icon={<Store className="w-5 h-5 text-indigo-500" />}
             width="md"
-            onSubmit={handleSubmit(handleEditSubmit)}
+            onSubmit={handleSubmit((data) => {
+              if (editingItem) {
+                const changedData: any = { version: editingItem.version };
+                let hasChanges = false;
+
+                Object.keys(dirtyFields).forEach((key) => {
+                  const k = key as keyof ProviderInput;
+                  (changedData as any)[k] = data[k];
+                  hasChanges = true;
+                });
+
+                if (!hasChanges) {
+                  closeFormModal();
+                  return;
+                }
+                handleEditSubmit(changedData);
+              } else {
+                handleEditSubmit(data);
+              }
+            })}
             submitLabel={editingItem ? 'Actualizar Firma' : 'Registrar Proveedor'}
             isPending={isPending}
           >
-            {serverError && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            <ErrorAlert error={serverError} />
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Razón Social / Identificador</label>

@@ -1,7 +1,8 @@
-import { desc, eq, sql, ilike } from 'drizzle-orm';
+import { desc, eq, sql, ilike, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { providers } from '@/lib/db/schema';
-import type { ProviderInput } from '@/schemas/provider.schema';
+import type { ProviderInput, ProviderUpdateInput } from '@/schemas/provider.schema';
+import { ConcurrencyError } from '@/lib/errors';
 
 export class ProviderRepository {
   async getAllProviders() {
@@ -21,69 +22,74 @@ export class ProviderRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(providers)
-      .set({ isActive, updatedAt: sql`NOW()` })
+      .set({ 
+        isActive, 
+        updatedAt: sql`NOW()`,
+        version: sql`${providers.version} + 1` 
+      })
       .where(eq(providers.id, id))
       .returning();
     return result[0];
   }
 
   async createProvider(input: ProviderInput, dbtx: any = db) {
-    // Check for existing (case-insensitive)
+    // Check for existing (for reactivation logic)
     const existing = await dbtx.query.providers.findFirst({
       where: ilike(providers.name, input.name),
     });
 
     if (existing) {
-      if (existing.isActive) {
-        throw new Error('Ya existe un proveedor registrado con ese nombre.');
+      if (!existing.isActive) {
+        // Reactivate
+        const result = await dbtx
+          .update(providers)
+          .set({
+            name: input.name,
+            phone: input.phone || '',
+            email: input.email || '',
+            isActive: true,
+            updatedAt: sql`NOW()`,
+            version: sql`${providers.version} + 1`,
+          })
+          .where(eq(providers.id, existing.id))
+          .returning();
+        return { ...result[0], wasInactive: true };
       }
-      // Reactivate
-      const result = await dbtx
-        .update(providers)
-        .set({
-          name: input.name, // Update casing
-          phone: input.phone || null,
-          email: input.email || null,
-          isActive: true,
-          updatedAt: sql`NOW()`,
-        })
-        .where(eq(providers.id, existing.id))
-        .returning();
-      return { ...result[0], wasInactive: true };
+      // If active, let the DB throw the unique constraint error
     }
 
     const result = await dbtx
       .insert(providers)
       .values({
         name: input.name,
-        phone: input.phone || null,
-        email: input.email || null,
+        phone: input.phone || '',
+        email: input.email || '',
         isActive: true,
+        version: 1,
       })
       .returning();
     return result[0];
   }
 
-  async updateProvider(id: string, input: ProviderInput, dbtx: any = db) {
-    // Check duplication ignoring self
-    const existing = await dbtx.query.providers.findFirst({
-      where: ilike(providers.name, input.name),
-    });
+  async updateProvider(id: string, input: ProviderUpdateInput, dbtx: any = db) {
+    const updateData: any = { 
+      updatedAt: sql`NOW()`,
+      version: sql`${providers.version} + 1`
+    };
 
-    if (existing && existing.id !== id) {
-      throw new Error('El nombre de proveedor ya está en uso por otro registro.');
-    }
+    if (input.name !== undefined) updateData.name = input.name;
+    if (input.phone !== undefined) updateData.phone = input.phone || '';
+    if (input.email !== undefined) updateData.email = input.email || '';
 
     const result = await dbtx
       .update(providers)
-      .set({
-        name: input.name,
-        phone: input.phone || null,
-        email: input.email || null,
-        updatedAt: sql`NOW()`,
-      })
-      .where(eq(providers.id, id))
+      .set(updateData)
+      .where(and(eq(providers.id, id), eq(providers.version, input.version)))
       .returning();
+
+    if (result.length === 0) {
+      throw new ConcurrencyError();
+    }
 
     return result[0];
   }

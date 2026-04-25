@@ -22,7 +22,13 @@ export const providerSchema = createInsertSchema(providers, {
 
 export type ProviderInput = z.infer<typeof providerSchema>;
 
+export const providerUpdateSchema = providerSchema.partial().extend({
+  version: z.number().int().min(1),
+});
+export type ProviderUpdateInput = z.infer<typeof providerUpdateSchema>;
+
 export const providerDefSchema = createSelectSchema(providers).extend({
+  version: z.number(),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });

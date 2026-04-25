@@ -18,6 +18,7 @@ import { useSalesStore } from '@/stores/sales.store';
 import { useProductsStore } from '@/stores/products.store';
 import { useCustomersStore } from '@/stores/customers.store';
 import { useEntityManager } from '@/hooks/use-entity-manager';
+import { GlobalMessage } from '@/components/ui/alert';
 
 export function SalesPanel() {
   const [view, setView] = useState<'list' | 'new' | 'print'>('list');
@@ -177,7 +178,7 @@ export function SalesPanel() {
             setView('print');
           }}
           onDeleteRow={setItemToDelete}
-          globalMessage={globalMessage}
+          globalMessage={<GlobalMessage message={globalMessage} />}
         />
       </div>
 

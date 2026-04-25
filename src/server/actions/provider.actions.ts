@@ -3,9 +3,14 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { providerRepository } from '@/server/repositories/provider.repository';
-import { providerSchema, providerDefSchema, ProviderInput, type ProviderDef } from '@/schemas/provider.schema';
+import { providerSchema, providerDefSchema, ProviderInput, type ProviderDef, providerUpdateSchema, type ProviderUpdateInput } from '@/schemas/provider.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
+import { ConcurrencyError } from '@/lib/errors';
+
+import { MESSAGES } from '@/config/messages';
+import { handleDatabaseError } from '@/lib/db-errors';
+import { ActionResult } from '@/lib/action-result';
 
 export async function fetchProviders(): Promise<ProviderDef[]> {
   try {
@@ -18,77 +23,85 @@ export async function fetchProviders(): Promise<ProviderDef[]> {
   }
 }
 
-export async function toggleProviderActiveAction(id: string, isActive: boolean) {
+export async function toggleProviderActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     
     return await db.transaction(async (tx) => {
       await providerRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'PROVIDER', id, { active: isActive }, tx);
-      return { success: true, message: `Proveedor ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+      return { 
+        success: true, 
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Proveedor') : MESSAGES.SUCCESS.DEACTIVATED('Proveedor') 
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al cambiar estado del proveedor' };
+    return { success: false, error: handleDatabaseError(error, 'Proveedor') };
   }
 }
 
-export async function createProviderAction(input: ProviderInput) {
+export async function createProviderAction(input: ProviderInput): Promise<ActionResult<ProviderDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     const parsed = providerSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
       const result = await providerRepository.createProvider(parsed.data, tx);
-      const wasInactive = (result as any).wasInactive;
+      const wasReactivated = (result as any).wasInactive;
 
       await recordAuditLog(caller.id, 'CREAR', 'PROVIDER', result.id, { 
         name: result.name,
-        note: wasInactive ? 'Proveedor reactivado' : 'Nuevo registro'
+        note: wasReactivated ? 'Proveedor reactivado' : 'Nuevo registro'
       }, tx);
 
       return { 
         success: true, 
-        message: wasInactive ? 'El proveedor ya existía (inactivo) y ha sido reactivado' : 'Proveedor registrado exitosamente' 
+        message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Proveedor') : MESSAGES.SUCCESS.CREATED('Proveedor'),
+        data: result as ProviderDef
       };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al guardar proveedor' };
+    return { success: false, error: handleDatabaseError(error, 'Proveedor') };
   }
 }
 
-export async function updateProviderAction(id: string, input: ProviderInput) {
+export async function updateProviderAction(id: string, input: ProviderUpdateInput): Promise<ActionResult<ProviderDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    const parsed = providerSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    const parsed = providerUpdateSchema.safeParse(input);
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
-      await providerRepository.updateProvider(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PROVIDER', id, { name: input.name }, tx);
-      return { success: true, message: 'Proveedor actualizado exitosamente' };
+      const updated = await providerRepository.updateProvider(id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PROVIDER', id, parsed.data, tx);
+      return { 
+        success: true, 
+        message: MESSAGES.SUCCESS.UPDATED('Proveedor'),
+        data: updated as ProviderDef
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al actualizar proveedor' };
+    return { success: false, error: handleDatabaseError(error, 'Proveedor') };
   }
 }
 
-export async function deleteProviderAction(id: string) {
+export async function deleteProviderAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
-      // Check relations
+      // Check relations (business logic check before DB constraint)
       const hasProducts = await providerRepository.checkHasRelations(id, tx);
       if (hasProducts) {
-        throw new Error('No se puede eliminar permanentemente: este proveedor tiene productos asociados. Prueba desactivarlo.');
+        return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
       await providerRepository.deleteProvider(id, tx);
       await recordAuditLog(caller.id, 'ELIMINAR', 'PROVIDER', id, { note: 'Eliminación permanente' }, tx);
-      return { success: true, message: 'Proveedor eliminado permanentemente' };
+      return { success: true, message: MESSAGES.SUCCESS.DELETED('Proveedor') };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al eliminar proveedor de la base de datos.' };
+    return { success: false, error: handleDatabaseError(error, 'Proveedor') };
   }
 }

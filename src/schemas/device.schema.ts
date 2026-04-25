@@ -15,10 +15,16 @@ export const deviceSchema = createInsertSchema(devices, {
 
 export type DeviceInput = z.infer<typeof deviceSchema>;
 
+export const deviceUpdateSchema = deviceSchema.partial().extend({
+  version: z.number().int().min(1),
+});
+export type DeviceUpdateInput = z.infer<typeof deviceUpdateSchema>;
+
 /**
  * Definition schema for reading devices.
  */
 export const deviceDefSchema = createSelectSchema(devices).extend({
+  version: z.number(),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });

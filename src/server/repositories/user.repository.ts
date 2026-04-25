@@ -1,13 +1,11 @@
-import { desc, eq, sql, ilike } from 'drizzle-orm';
+import { desc, eq, sql, ilike, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import * as bcrypt from 'bcrypt';
-import type { UserInput } from '@/schemas/user.schema';
+import type { UserInput, UserUpdateInput } from '@/schemas/user.schema';
+import { ConcurrencyError } from '@/lib/errors';
 
 export class UserRepository {
-  /**
-   * Retrieves a user from the database by their unique username.
-   */
   async getUserByUsername(username: string, dbtx: any = db) {
     return await dbtx.query.users.findFirst({
       where: (users: any, { and }: any) => and(ilike(users.username, username), eq(users.isActive, true)),
@@ -17,6 +15,7 @@ export class UserRepository {
         role: true,
         passwordHash: true,
         isActive: true,
+        version: true,
       },
     });
   }
@@ -34,6 +33,7 @@ export class UserRepository {
         username: true,
         role: true,
         isActive: true,
+        version: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -42,7 +42,6 @@ export class UserRepository {
   }
 
   async checkHasRelations(id: string, dbtx: any = db) {
-    // Check ONLY if the user was the operator (performer) of any action
     const performedLog = await dbtx.query.auditLogs.findFirst({
       where: (l: any, { eq }: any) => eq(l.userId, id),
     });
@@ -52,46 +51,42 @@ export class UserRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(users)
-      .set({ isActive, updatedAt: sql`NOW()` })
+      .set({ 
+        isActive, 
+        updatedAt: sql`NOW()`,
+        version: sql`${users.version} + 1`
+      })
       .where(eq(users.id, id))
       .returning();
     return result[0];
   }
 
   async createUser(input: UserInput, dbtx: any = db) {
-    if (!input.password) throw new Error('La contraseña es obligatoria para nuevos usuarios');
-
-    // Case-insensitive duplication check
+    // Check for existing (for reactivation logic)
     const existing = await dbtx.query.users.findFirst({
       where: ilike(users.username, input.username),
     });
 
-    const hashedPassword = await bcrypt.hash(input.password, 10);
+    const hashedPassword = await bcrypt.hash(input.password!, 10);
 
     if (existing) {
-      if (existing.isActive) {
-        throw new Error('El nombre de usuario ya está registrado');
+      if (!existing.isActive) {
+        // Reactivate
+        const result = await dbtx
+          .update(users)
+          .set({
+            username: input.username,
+            passwordHash: hashedPassword,
+            role: input.role,
+            isActive: true,
+            updatedAt: sql`NOW()`,
+            version: sql`${users.version} + 1`,
+          })
+          .where(eq(users.id, existing.id))
+          .returning();
+        return { ...result[0], wasInactive: true };
       }
-
-      // Reactivate inactive user
-      const result = await dbtx
-        .update(users)
-        .set({
-          username: input.username, // Update to current casing
-          passwordHash: hashedPassword,
-          role: input.role,
-          isActive: true,
-          updatedAt: sql`NOW()`,
-        })
-        .where(eq(users.id, existing.id))
-        .returning({
-          id: users.id,
-          username: users.username,
-          role: users.role,
-          isReactivated: sql<boolean>`true`,
-        });
-
-      return { ...result[0], wasInactive: true };
+      // If active, let the DB throw the unique constraint error
     }
 
     const result = await dbtx
@@ -101,48 +96,39 @@ export class UserRepository {
         passwordHash: hashedPassword,
         role: input.role,
         isActive: true,
+        version: 1,
       })
-      .returning({
-        id: users.id,
-        username: users.username,
-        role: users.role,
-      });
+      .returning();
 
     return result[0];
   }
 
-  async updateUser(id: string, input: UserInput, dbtx: any = db) {
-    // Case-insensitive duplication check ignoring self
-    const existing = await dbtx.query.users.findFirst({
-      where: ilike(users.username, input.username),
-    });
-
-    if (existing && existing.id !== id) {
-      throw new Error('El nombre de usuario ya está en uso');
-    }
-
+  async updateUser(id: string, input: UserUpdateInput, dbtx: any = db) {
     const updateSet: any = {
-      username: input.username,
-      role: input.role,
       updatedAt: sql`NOW()`,
+      version: sql`${users.version} + 1`,
     };
 
-    if (input.password && input.password.length >= 6) {
+    if (input.username !== undefined) updateSet.username = input.username;
+    if (input.role !== undefined) updateSet.role = input.role;
+
+    if (input.password !== undefined && input.password.length >= 6) {
       updateSet.passwordHash = await bcrypt.hash(input.password, 10);
     }
 
-    const result = await dbtx.update(users).set(updateSet).where(eq(users.id, id)).returning({
-      id: users.id,
-      username: users.username,
-      role: users.role,
-    });
+    const result = await dbtx
+      .update(users)
+      .set(updateSet)
+      .where(and(eq(users.id, id), eq(users.version, input.version)))
+      .returning();
+
+    if (result.length === 0) {
+      throw new ConcurrencyError();
+    }
 
     return result[0];
   }
 
-  /**
-   * Deletes a user from the database.
-   */
   async deleteUser(id: string, dbtx: any = db) {
     await dbtx.delete(users).where(eq(users.id, id));
   }

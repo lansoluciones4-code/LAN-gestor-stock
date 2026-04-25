@@ -7,6 +7,10 @@ import { saleSchema, saleDefSchema, type SaleInput, type SaleDef } from '@/schem
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
+import { MESSAGES } from '@/config/messages';
+import { handleDatabaseError } from '@/lib/db-errors';
+import { ActionResult } from '@/lib/action-result';
+
 /**
  * Fetch all sales. Vendors can see their history.
  */
@@ -26,11 +30,11 @@ export async function fetchSales(): Promise<SaleDef[]> {
 /**
  * Create a new sale. Decrements stock.
  */
-export async function createSaleAction(input: SaleInput) {
+export async function createSaleAction(input: SaleInput): Promise<ActionResult<{ id: string }>> {
   try {
     const caller = await verifyAuthOrAdmin(false);
     const parsed = saleSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos de venta inválidos' };
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
       const result = await saleRepository.createSale(caller.id, parsed.data, tx);
@@ -40,18 +44,18 @@ export async function createSaleAction(input: SaleInput) {
       return {
         success: true,
         message: 'Venta realizada con éxito',
-        id: result.id,
+        data: { id: result.id },
       };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al procesar la venta' };
+    return { success: false, error: handleDatabaseError(error, 'Venta') };
   }
 }
 
 /**
  * Delete a sale. Admin ONLY.
  */
-export async function deleteSaleAction(id: string) {
+export async function deleteSaleAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     
@@ -61,6 +65,6 @@ export async function deleteSaleAction(id: string) {
       return { success: true, message: 'Venta anulada y stock restablecido.' };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al anular la venta' };
+    return { success: false, error: handleDatabaseError(error, 'Venta') };
   }
 }

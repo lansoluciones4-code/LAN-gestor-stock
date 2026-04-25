@@ -7,7 +7,7 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { type CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
+import { type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/schemas/customer.schema';
 import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetchCustomers, toggleCustomerActiveAction } from '@/server/actions/customer.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useCustomersStore } from '@/stores/customers.store';
@@ -16,6 +16,7 @@ import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeString } from '@/lib/utils';
 import { CustomerModal } from '@/components/modals/customer-modal';
+import { GlobalMessage } from '@/components/ui/alert';
 
 export function CustomerPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -26,7 +27,7 @@ export function CustomerPanel() {
 
   const [showInactive, setShowInactive] = useState(false);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<CustomerDef, CustomerInput>({
+  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<CustomerDef, CustomerInput, CustomerUpdateInput>({
     handlers: {
       fetchData: fetchCustomers,
       createAction: createCustomerAction,
@@ -142,7 +143,7 @@ export function CustomerPanel() {
             </div>
           </div>
 
-          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+          <GlobalMessage message={globalMessage} />
 
           <VirtualizedDataTable
             columns={columns}

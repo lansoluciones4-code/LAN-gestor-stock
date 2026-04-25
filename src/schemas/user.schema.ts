@@ -18,6 +18,11 @@ export const userSchema = createInsertSchema(users, {
 
 export type UserInput = z.infer<typeof userSchema>;
 
+export const userUpdateSchema = userSchema.partial().extend({
+  version: z.number().int().min(1),
+});
+export type UserUpdateInput = z.infer<typeof userUpdateSchema>;
+
 /**
  * Definition schema automatically inferred from DB Columns.
  * Used for reading data with full type safety.
@@ -25,6 +30,7 @@ export type UserInput = z.infer<typeof userSchema>;
 export const userDefSchema = createSelectSchema(users)
   .omit({ passwordHash: true })
   .extend({
+    version: z.number(),
     // Override or add specific client-side requirements if needed
     createdAt: z.union([z.date(), z.string()]),
     updatedAt: z.union([z.date(), z.string()]),

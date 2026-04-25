@@ -63,13 +63,13 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       });
 
       if (result.success) {
-        onSuccessMessage(result.message);
+        onSuccessMessage(result.message || 'Venta realizada con éxito');
         clearCart();
         closeMobileCart();
         navigateToList();
         loadData();
       } else {
-        onErrorMessage(result.message);
+        onErrorMessage(result.error);
       }
     });
   };
@@ -80,10 +80,10 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     startTransition(async () => {
       const result = await deleteSaleAction(id);
       if (result.success) {
-        onSuccessMessage(result.message);
+        onSuccessMessage(result.message || 'Venta anulada');
         loadData();
       } else {
-        onErrorMessage(result.message);
+        onErrorMessage(result.error);
       }
     });
   };

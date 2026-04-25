@@ -5,9 +5,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Users } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { customerSchema, type CustomerInput, type CustomerDef } from '@/schemas/customer.schema';
+import { customerSchema, type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/schemas/customer.schema';
 import { createCustomerAction, updateCustomerAction } from '@/server/actions/customer.actions';
 import { invalidateAllCaches } from '@/stores';
+import { ErrorAlert } from '@/components/ui/alert';
 
 interface CustomerModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<CustomerInput>({
     resolver: zodResolver(customerSchema),
   });
@@ -50,19 +51,21 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
     }
   }, [isOpen, editingItem, reset]);
 
-  const onSubmit = async (data: CustomerInput) => {
+  const handleModalSubmit = async (data: CustomerInput | CustomerUpdateInput) => {
     setServerError(null);
     startTransition(async () => {
-      const action = editingItem ? updateCustomerAction(editingItem.id, data) : createCustomerAction(data);
+      const action = editingItem 
+        ? updateCustomerAction(editingItem.id, data as CustomerUpdateInput) 
+        : createCustomerAction(data as CustomerInput);
 
       const result = await action;
 
       if (!result.success) {
-        setServerError(result.message);
+        setServerError(result.error);
         return;
       }
 
-      onSuccess(result.data as CustomerDef, (result as any).message);
+      onSuccess(result.data as CustomerDef, result.message);
       invalidateAllCaches();
       onClose();
     });
@@ -75,11 +78,30 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
       title={editingItem ? 'Editar Ficha Cliente' : 'Nuevo Registro de Cliente'}
       icon={<Users className="w-5 h-5 text-indigo-500" />}
       width="md"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit((data) => {
+        if (editingItem) {
+          const changedData: any = { version: editingItem.version };
+          let hasChanges = false;
+          
+          Object.keys(dirtyFields).forEach((key) => {
+            const k = key as keyof CustomerInput;
+            (changedData as any)[k] = data[k];
+            hasChanges = true;
+          });
+
+          if (!hasChanges) {
+            onClose();
+            return;
+          }
+          handleModalSubmit(changedData);
+        } else {
+          handleModalSubmit(data);
+        }
+      })}
       submitLabel={editingItem ? 'Actualizar Ficha' : 'Guardar Cliente'}
       isPending={isPending}
     >
-      {serverError && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200 mb-6">{serverError}</div>}
+      <ErrorAlert error={serverError} />
       <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
         <div>
           <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nombre Completo / Razón Social</label>

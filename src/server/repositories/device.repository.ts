@@ -1,7 +1,8 @@
-import { desc, eq, ilike, sql } from 'drizzle-orm';
+import { desc, eq, ilike, sql, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { devices } from '@/lib/db/schema';
-import type { DeviceInput } from '@/schemas/device.schema';
+import type { DeviceInput, DeviceUpdateInput } from '@/schemas/device.schema';
+import { ConcurrencyError } from '@/lib/errors';
 
 export class DeviceRepository {
   async getAllDevices() {
@@ -21,7 +22,11 @@ export class DeviceRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(devices)
-      .set({ isActive, updatedAt: sql`NOW()` })
+      .set({ 
+        isActive, 
+        updatedAt: sql`NOW()`,
+        version: sql`${devices.version} + 1`
+      })
       .where(eq(devices.id, id))
       .returning();
     return result[0];
@@ -34,50 +39,53 @@ export class DeviceRepository {
   }
 
   async createDevice(input: DeviceInput, dbtx: any = db) {
-    // Check for existing (case-insensitive)
+    // Check for existing (for reactivation logic)
     const existing = await dbtx.query.devices.findFirst({
       where: ilike(devices.name, input.name),
     });
 
     if (existing) {
-      if (existing.isActive) {
-        throw new Error('Ya existe un equipo registrado con ese nombre.');
+      if (!existing.isActive) {
+        // Reactivate
+        const result = await dbtx
+          .update(devices)
+          .set({
+            name: input.name,
+            isActive: true,
+            updatedAt: sql`NOW()`,
+            version: sql`${devices.version} + 1`,
+          })
+          .where(eq(devices.id, existing.id))
+          .returning();
+        return { ...result[0], wasInactive: true };
       }
-      // Reactivate
-      const result = await dbtx
-        .update(devices)
-        .set({
-          name: input.name, // Update casing
-          isActive: true,
-          updatedAt: sql`NOW()`,
-        })
-        .where(eq(devices.id, existing.id))
-        .returning();
-      return { ...result[0], wasInactive: true };
+      // If active, let the DB throw the unique constraint error
     }
 
-    const result = await dbtx.insert(devices).values({ name: input.name, isActive: true }).returning();
+    const result = await dbtx.insert(devices).values({ 
+      name: input.name, 
+      isActive: true,
+      version: 1
+    }).returning();
     return result[0];
   }
 
-  async updateDevice(id: string, input: DeviceInput, dbtx: any = db) {
-    // Check duplication ignoring self
-    const existing = await dbtx.query.devices.findFirst({
-      where: ilike(devices.name, input.name),
-    });
-
-    if (existing && existing.id !== id) {
-      throw new Error('El nombre de equipo ya está en uso por otro registro.');
-    }
+  async updateDevice(id: string, input: DeviceUpdateInput, dbtx: any = db) {
+    const updateData: any = { 
+      updatedAt: sql`NOW()`,
+      version: sql`${devices.version} + 1`
+    };
+    if (input.name !== undefined) updateData.name = input.name;
 
     const result = await dbtx
       .update(devices)
-      .set({
-        name: input.name,
-        updatedAt: sql`NOW()`,
-      })
-      .where(eq(devices.id, id))
+      .set(updateData)
+      .where(and(eq(devices.id, id), eq(devices.version, input.version)))
       .returning();
+
+    if (result.length === 0) {
+      throw new ConcurrencyError();
+    }
     return result[0];
   }
 
