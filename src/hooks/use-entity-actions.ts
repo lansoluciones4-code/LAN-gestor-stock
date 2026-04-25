@@ -1,16 +1,17 @@
 import { useTransition } from 'react';
 import { invalidateAllCaches } from '@/stores';
+import { ActionResult } from '@/lib/action-result';
 
-interface EntityActionHandlers<TDef, TInput> {
+interface EntityActionHandlers<TDef, TInput, TUpdateInput = Partial<TInput>> {
   fetchData: (showInactive: boolean) => Promise<TDef[]>;
-  createAction?: (data: TInput) => Promise<{ success: boolean; message: string; data?: TDef }>;
-  updateAction?: (id: string, data: TInput) => Promise<{ success: boolean; message: string; data?: TDef }>;
-  deleteAction?: (id: string) => Promise<{ success: boolean; message: string }>;
-  toggleActiveAction?: (id: string, isActive: boolean) => Promise<{ success: boolean; message: string }>;
+  createAction?: (data: TInput) => Promise<ActionResult<TDef>>;
+  updateAction?: (id: string, data: TUpdateInput) => Promise<ActionResult<TDef>>;
+  deleteAction?: (id: string) => Promise<ActionResult>;
+  toggleActiveAction?: (id: string, isActive: boolean) => Promise<ActionResult>;
 }
 
-interface UseEntityActionsProps<TDef, TInput> {
-  handlers: EntityActionHandlers<TDef, TInput>;
+interface UseEntityActionsProps<TDef, TInput, TUpdateInput = Partial<TInput>> {
+  handlers: EntityActionHandlers<TDef, TInput, TUpdateInput>;
   setStoreData: (data: TDef[]) => void;
   onSuccessMessage: (msg: string) => void;
   onErrorMessage: (msg: string) => void;
@@ -21,7 +22,17 @@ interface UseEntityActionsProps<TDef, TInput> {
   showInactive: boolean;
 }
 
-export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive }: UseEntityActionsProps<TDef, TInput>) {
+export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput, TUpdateInput = Partial<TInput>>({ 
+  handlers, 
+  setStoreData, 
+  onSuccessMessage, 
+  onErrorMessage, 
+  closeFormModal, 
+  setServerError, 
+  setItemToDelete, 
+  editingItem, 
+  showInactive 
+}: UseEntityActionsProps<TDef, TInput, TUpdateInput>) {
   const [isPending, startTransition] = useTransition();
 
   const syncData = async (manual = false) => {
@@ -39,21 +50,21 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     });
   };
 
-  const handleEditSubmit = async (data: TInput) => {
+  const handleEditSubmit = async (data: TInput | TUpdateInput) => {
     setServerError(null);
     let result;
     if (editingItem) {
       if (!handlers.updateAction) return setServerError('Operación no soportada');
-      result = await handlers.updateAction(editingItem.id!, data);
+      result = await handlers.updateAction(editingItem.id!, data as TUpdateInput);
     } else {
       if (!handlers.createAction) return setServerError('Operación no soportada');
-      result = await handlers.createAction(data);
+      result = await handlers.createAction(data as TInput);
     }
 
-    if (!result.success) return setServerError(result.message);
+    if (!result.success) return setServerError(result.error);
 
     closeFormModal();
-    onSuccessMessage(result.message);
+    onSuccessMessage(result.message || 'Operación exitosa');
     invalidateAllCaches();
     syncData();
   };
@@ -64,9 +75,9 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
 
     const result = await handlers.deleteAction(id);
 
-    if (!result.success) return onErrorMessage(result.message);
+    if (!result.success) return onErrorMessage(result.error);
 
-    onSuccessMessage(result.message);
+    onSuccessMessage(result.message || 'Operación exitosa');
     invalidateAllCaches();
     syncData();
   };
@@ -77,9 +88,9 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     const nextStatus = !item.isActive;
     const result = await handlers.toggleActiveAction(item.id!, nextStatus);
     if (!result.success) {
-      onErrorMessage(result.message);
+      onErrorMessage(result.error);
     } else {
-      onSuccessMessage(result.message);
+      onSuccessMessage(result.message || 'Operación exitosa');
       invalidateAllCaches();
       syncData();
     }

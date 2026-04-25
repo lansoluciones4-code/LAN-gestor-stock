@@ -22,7 +22,11 @@ export async function proxy(request: NextRequest) {
     try {
       user = await verifyToken(token);
       isAuthenticated = true;
-    } catch {}
+    } catch {
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      response.cookies.delete('session');
+      return response;
+    }
   }
 
   // 1. Redirigir a LOGIN si no está autenticado y no es ruta pública

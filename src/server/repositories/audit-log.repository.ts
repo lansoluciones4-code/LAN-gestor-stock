@@ -47,7 +47,6 @@ export class AuditLogRepository {
           const searchConditions = [
             sql`unaccent(${logs.action}) ilike unaccent(${s})`,
             sql`unaccent(${logs.entity}) ilike unaccent(${s})`,
-            sql`unaccent(${logs.username}) ilike unaccent(${s})`,
             sql`unaccent(${logs.detail}::text) ilike unaccent(${s})`,
             sql`${logs.id}::text ilike ${s}`,
             sql`${logs.entityId}::text ilike ${s}`,

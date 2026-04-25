@@ -2,11 +2,16 @@
 
 import { z } from 'zod';
 import { userRepository } from '@/server/repositories/user.repository';
-import { userSchema, userDefSchema, UserInput, type UserDef } from '@/schemas/user.schema';
+import { userSchema, userDefSchema, UserInput, type UserDef, userUpdateSchema, type UserUpdateInput } from '@/schemas/user.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
+import { ConcurrencyError } from '@/lib/errors';
 
 import { db } from '@/lib/db';
+
+import { MESSAGES } from '@/config/messages';
+import { handleDatabaseError } from '@/lib/db-errors';
+import { ActionResult } from '@/lib/action-result';
 
 export async function fetchUsers(): Promise<UserDef[]> {
   try {
@@ -19,104 +24,106 @@ export async function fetchUsers(): Promise<UserDef[]> {
   }
 }
 
-export async function toggleUserActiveAction(id: string, isActive: boolean) {
+export async function toggleUserActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     if (caller.id === id) {
-      return { success: false, message: 'No puedes cambiar tu propio estado de actividad.' };
+      return { success: false, error: 'No puedes cambiar tu propio estado de actividad.' };
     }
 
     return await db.transaction(async (tx) => {
       await userRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, { active: isActive }, tx);
-      return { success: true, message: `Usuario ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+      return { 
+        success: true, 
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Usuario') : MESSAGES.SUCCESS.DEACTIVATED('Usuario') 
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al cambiar estado del usuario' };
+    return { success: false, error: handleDatabaseError(error, 'Usuario') };
   }
 }
 
-export async function createUserAction(input: UserInput) {
+export async function createUserAction(input: UserInput): Promise<ActionResult<UserDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     const parsed = userSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
       const result = await userRepository.createUser(parsed.data, tx);
+      const wasReactivated = (result as any).wasInactive;
 
       await recordAuditLog(caller.id, 'CREAR', 'USER', result.id, {
         username: result.username,
         role: result.role,
-        note: (result as any).wasInactive ? 'Usuario reactivado' : 'Nuevo registro',
+        note: wasReactivated ? 'Usuario reactivado' : 'Nuevo registro',
       }, tx);
 
       return {
         success: true,
-        message: (result as any).wasInactive
-          ? 'El usuario ya existía (inactivo) y ha sido reactivado con los nuevos datos'
-          : 'Usuario registrado exitosamente',
+        message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Usuario') : MESSAGES.SUCCESS.CREATED('Usuario'),
+        data: result as UserDef
       };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al guardar usuario' };
+    return { success: false, error: handleDatabaseError(error, 'Usuario') };
   }
 }
 
-export async function updateUserAction(id: string, input: UserInput) {
+export async function updateUserAction(id: string, input: UserUpdateInput): Promise<ActionResult<UserDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     // Prevent an admin from mistakenly removing their own admin rights
-    if (caller.id === id && input.role !== 'admin') {
-      return { success: false, message: 'No puedes revocar tus propios permisos de administrador.' };
+    if (caller.id === id && input.role !== undefined && input.role !== 'admin') {
+      return { success: false, error: 'No puedes revocar tus propios permisos de administrador.' };
     }
 
-    const parsed = userSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    const parsed = userUpdateSchema.safeParse(input);
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
-      await userRepository.updateUser(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, { username: input.username, role: input.role }, tx);
-      return { success: true, message: 'Usuario actualizado exitosamente' };
+      const updated = await userRepository.updateUser(id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, parsed.data, tx);
+      return { 
+        success: true, 
+        message: MESSAGES.SUCCESS.UPDATED('Usuario'),
+        data: updated as UserDef
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al actualizar usuario' };
+    return { success: false, error: handleDatabaseError(error, 'Usuario') };
   }
 }
 
-export async function deleteUserAction(id: string) {
+export async function deleteUserAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     if (caller.id === id) {
-      return { success: false, message: 'No puedes Auto-Inmolarte (Eliminar tu propia cuenta).' };
+      return { success: false, error: 'No puedes Auto-Inmolarte (Eliminar tu propia cuenta).' };
     }
 
     return await db.transaction(async (tx) => {
       const user = await userRepository.getUserById(id, tx);
-      if (!user) throw new Error('Usuario no encontrado');
+      if (!user) return { success: false, error: MESSAGES.ERROR.DATABASE.NOT_FOUND('Usuario') };
 
       // Rule 1: Only inactive users can be deleted
       if (user.isActive) {
-        throw new Error('Primero debes desactivar al usuario para poder eliminarlo.');
+        return { success: false, error: 'Primero debes desactivar al usuario para poder eliminarlo.' };
       }
 
-      // Rule 2: Cannot delete users with history (logs)
+      // Rule 2: Cannot delete users with history (Business check before DB constraint)
       const hasLogs = await userRepository.checkHasRelations(id, tx);
       if (hasLogs) {
-        throw new Error(
-          'No se puede eliminar de la base de datos a un usuario que posee historial de registros asociados. ' +
-            'Este usuario ya forma parte de la historia del sistema. ' +
-            'Simplemente mantenlo desactivado.'
-        );
+        return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
       await userRepository.deleteUser(id, tx);
-      
       await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Usuario eliminado permanentemente (sin historial previo).' }, tx);
       
-      return { success: true, message: 'Usuario eliminado permanentemente de la base de datos.' };
+      return { success: true, message: MESSAGES.SUCCESS.DELETED('Usuario') };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al eliminar usuario' };
+    return { success: false, error: handleDatabaseError(error, 'Usuario') };
   }
 }

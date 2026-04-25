@@ -12,6 +12,7 @@ export const users = pgTable('users', {
   passwordHash: varchar('password_hash').notNull(),
   role: roleEnum('role').notNull(),
   isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -22,6 +23,7 @@ export const devices = pgTable('devices', {
     .default(sql`gen_random_uuid()`),
   name: varchar('name', { length: 100 }).notNull().unique(),
   isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -34,6 +36,7 @@ export const providers = pgTable('providers', {
   phone: varchar('phone', { length: 30 }).notNull().default(''),
   email: varchar('email', { length: 100 }).notNull().default(''),
   isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -47,6 +50,7 @@ export const customers = pgTable('customers', {
   email: varchar('email', { length: 100 }).notNull().default(''),
   documentNumber: varchar('document_number', { length: 20 }).notNull().default('').unique(),
   isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -63,16 +67,16 @@ export const products = pgTable(
     providerId: uuid('provider_id')
       .notNull()
       .references(() => providers.id),
-    customerId: uuid('customer_id').references(() => customers.id),
     description: varchar('description', { length: 255 }).notNull().default(''),
     purchasePrice: numeric('purchase_price', { precision: 10, scale: 2 }).notNull(),
     salePrice: numeric('sale_price', { precision: 10, scale: 2 }).notNull(),
     stock: integer('stock').default(1).notNull(),
     showOnLanding: boolean('show_on_landing').default(true).notNull(),
+    version: integer('version').default(1).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
-  (table) => [index('device_id_idx').on(table.deviceId), index('provider_id_idx').on(table.providerId), index('customer_id_idx').on(table.customerId)]
+  (table) => [index('device_id_idx').on(table.deviceId), index('provider_id_idx').on(table.providerId)]
 );
 
 export const sales = pgTable(
@@ -119,7 +123,6 @@ export const auditLogs = pgTable(
       .primaryKey()
       .default(sql`gen_random_uuid()`),
     userId: uuid('user_id').references(() => users.id),
-    username: varchar('username', { length: 50 }),
     action: varchar('action', { length: 50 }).notNull(),
     entity: varchar('entity', { length: 50 }).notNull(),
     entityId: uuid('entity_id'),
@@ -172,10 +175,6 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   provider: one(providers, {
     fields: [products.providerId],
     references: [providers.id],
-  }),
-  customer: one(customers, {
-    fields: [products.customerId],
-    references: [customers.id],
   }),
   losses: many(productLosses),
   logs: many(auditLogs),
@@ -233,7 +232,6 @@ export const providersRelations = relations(providers, ({ many }) => ({
 }));
 
 export const customersRelations = relations(customers, ({ many }) => ({
-  products: many(products),
   sales: many(sales),
   logs: many(auditLogs),
 }));

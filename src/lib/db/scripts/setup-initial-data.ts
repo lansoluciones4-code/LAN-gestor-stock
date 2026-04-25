@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { db } from '..';
-import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses, users } from '../schema';
+import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses, users, salePayments } from '../schema';
 
 async function setup() {
   console.log('--- Database Reset & Initial Data Setup ---');
@@ -10,6 +10,7 @@ async function setup() {
     // Order matters for deletion due to foreign keys
     await db.delete(auditLogs);
     await db.delete(saleItems);
+    await db.delete(salePayments);
     await db.delete(sales);
     await db.delete(productLosses);
     await db.delete(products);
@@ -49,20 +50,35 @@ async function setup() {
       { name: 'Redmi 12C' },
     ];
 
-    await db.insert(devices).values(deviceList);
+    const insertedDevices = await db.insert(devices).values(deviceList).returning();
     console.log(`${deviceList.length} devices created.`);
 
-    console.log('Creating "Mostrador" customer...');
-    await db.insert(customers).values({
-      name: 'Mostrador',
-      phone: '00000000',
-      email: 'mail@mail.com',
-      documentNumber: '00000000',
-    });
-    console.log('Customer "Mostrador" created.');
+    console.log('Creating customers...');
+    const customerList = [
+      {
+        name: 'Mostrador',
+        phone: '00000000',
+        email: 'mail@mail.com',
+        documentNumber: '00000000',
+      },
+      {
+        name: 'Juan Pérez',
+        phone: '1122334455',
+        email: 'juan.perez@example.com',
+        documentNumber: '35123456',
+      },
+      {
+        name: 'María García',
+        phone: '1199887766',
+        email: 'maria.garcia@example.com',
+        documentNumber: '40987654',
+      }
+    ];
+    await db.insert(customers).values(customerList);
+    console.log(`${customerList.length} customers created.`);
 
     console.log('Creating default providers...');
-    await db.insert(providers).values([
+    const providerList = [
       {
         name: 'TechWorld Distribuidora',
         phone: '1144556677',
@@ -78,8 +94,30 @@ async function setup() {
         phone: '1199887766',
         email: 'contacto@importpremium.com',
       },
-    ]);
-    console.log('3 default providers created.');
+    ];
+    const insertedProviders = await db.insert(providers).values(providerList).returning();
+    console.log(`${providerList.length} default providers created.`);
+
+    console.log('Creating initial products...');
+    // Create some products for the first 5 devices and random providers
+    const productList = [];
+    for (let i = 0; i < 5; i++) {
+      const device = insertedDevices[i];
+      const provider = insertedProviders[i % insertedProviders.length];
+      
+      productList.push({
+        deviceId: device.id,
+        providerId: provider.id,
+        description: `Equipo ${device.name} - Nuevo en caja`,
+        purchasePrice: (Math.random() * 500 + 500).toFixed(2),
+        salePrice: (Math.random() * 500 + 1000).toFixed(2),
+        stock: Math.floor(Math.random() * 10) + 1,
+        showOnLanding: true,
+        version: 1,
+      });
+    }
+    await db.insert(products).values(productList);
+    console.log(`${productList.length} products created.`);
 
     console.log('Creating initial users...');
     const adminPasswordHash = await bcrypt.hash('admin', 10);
@@ -95,7 +133,7 @@ async function setup() {
       passwordHash: vendorPasswordHash,
       role: 'vendedor',
     });
-    console.log('Initial users created.');
+    console.log('Initial users created (admin:admin, vendedor:vendedor).');
 
     console.log('Initial data setup finished successfully.');
     process.exit(0);

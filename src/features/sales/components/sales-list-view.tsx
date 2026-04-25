@@ -21,7 +21,7 @@ interface SalesListViewProps {
   onNewSale: () => void;
   onPrintRow: (s: SaleDef) => void;
   onDeleteRow: (id: string) => void;
-  globalMessage: { type: 'success' | 'error' | 'info'; text: string } | null;
+  globalMessage: React.ReactNode;
 }
 
 export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, startDate, setStartDate, endDate, setEndDate, onSync, onNewSale, onPrintRow, onDeleteRow, globalMessage }: SalesListViewProps) {
@@ -97,7 +97,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
         </div>
       </div>
 
-      {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+      {globalMessage}
 
       <VirtualizedDataTable
         columns={columns}

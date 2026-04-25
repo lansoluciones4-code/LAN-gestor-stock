@@ -28,10 +28,16 @@ export const customerSchema = createInsertSchema(customers, {
 
 export type CustomerInput = z.infer<typeof customerSchema>;
 
+export const customerUpdateSchema = customerSchema.partial().extend({
+  version: z.number().int().min(1),
+});
+export type CustomerUpdateInput = z.infer<typeof customerUpdateSchema>;
+
 /**
  * Definition schema for reading customers.
  */
 export const customerDefSchema = createSelectSchema(customers).extend({
+  version: z.number(),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });

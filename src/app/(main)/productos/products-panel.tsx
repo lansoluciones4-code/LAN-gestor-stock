@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, DollarSign, PackageOpen, PackageX, RefreshCcw } from 'lucide-react';
-import { productSchema, type ProductInput, type ProductDef } from '@/schemas/product.schema';
+import { productSchema, type ProductInput, type ProductDef, type ProductUpdateInput } from '@/schemas/product.schema';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProductsStore } from '@/stores/products.store';
 import { useDevicesStore } from '@/stores/devices.store';
@@ -22,6 +22,7 @@ import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
 import { getProductColumns } from '@/config/tables/product-columns';
 import { normalizeString } from '@/lib/utils';
+import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -48,7 +49,7 @@ export function ProductsPanel() {
     syncData,
     handleEditSubmit,
     handleDelete,
-  } = useEntityActions<ProductDef, ProductInput>({
+  } = useEntityActions<ProductDef, ProductInput, ProductUpdateInput>({
     handlers: {
       fetchData: () => fetchProducts(),
       createAction: createProductAction,
@@ -75,10 +76,10 @@ export function ProductsPanel() {
     setServerError(null);
     startTransition(async () => {
       const result = await registerProductLossAction(lossProduct.id, qty, reason);
-      if (!result.success) return setServerError(result.message);
+      if (!result.success) return setServerError(result.error);
 
       onLossClose();
-      showGlobalMessage('success', result.message);
+      showGlobalMessage('success', result.message || 'Pérdida registrada');
       invalidateAllCaches();
       syncData();
     });
@@ -87,9 +88,9 @@ export function ProductsPanel() {
   const handleToggleVisibility = async (p: ProductDef) => {
     startTransition(async () => {
       const result = await toggleProductVisibilityAction(p.id!, !p.showOnLanding);
-      if (!result.success) return showGlobalMessage('error', result.message);
+      if (!result.success) return showGlobalMessage('error', result.error);
       
-      showGlobalMessage('success', result.message);
+      showGlobalMessage('success', result.message || 'Visibilidad actualizada');
       invalidateAllCaches();
       syncData();
     });
@@ -124,7 +125,7 @@ export function ProductsPanel() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     setValue,
     watch,
   } = useForm<ProductInput>({
@@ -253,7 +254,7 @@ export function ProductsPanel() {
               </div>
           </div>
 
-          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+          <GlobalMessage message={globalMessage} />
 
           <VirtualizedDataTable
             columns={columns}
@@ -268,11 +269,39 @@ export function ProductsPanel() {
             title={editingItem ? 'Editar Producto / Stock' : 'Añadir Nuevo Lote'}
             icon={<PackageOpen className="w-6 h-6 text-indigo-500" />}
             width="2xl"
-            onSubmit={handleSubmit(handleEditSubmit)}
+            onSubmit={handleSubmit((data) => {
+              if (editingItem) {
+                const changedData: any = { 
+                  version: editingItem.version,
+                  deviceVersion: editingItem.device?.version,
+                  providerVersion: editingItem.provider?.version
+                };
+
+                let hasChanges = false;
+                Object.keys(dirtyFields).forEach((key) => {
+                  const k = key as keyof ProductInput;
+                  if (k === 'stock') {
+                    changedData.stockDelta = (data.stock ?? 0) - (editingItem.stock ?? 0);
+                    if (changedData.stockDelta !== 0) hasChanges = true;
+                  } else {
+                    changedData[k] = data[k];
+                    hasChanges = true;
+                  }
+                });
+
+                if (!hasChanges) {
+                  closeFormModal();
+                  return;
+                }
+                handleEditSubmit(changedData);
+              } else {
+                handleEditSubmit(data);
+              }
+            })}
             submitLabel="Confirmar Inventario"
             isPending={isPending}
           >
-            {serverError && <div className="p-4 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            <ErrorAlert error={serverError} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Modelo / Equipo</label>
@@ -373,7 +402,7 @@ export function ProductsPanel() {
             submitLabel="Confirmar Pérdida"
             isPending={isPending}
           >
-            {serverError && <div className="p-3 mb-4 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">{serverError}</div>}
+            <ErrorAlert error={serverError} />
             <div className="p-3 mb-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg">
               <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">Producto</p>
               <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate" title={`${lossProduct?.device?.name} - ${lossProduct?.description}`}>

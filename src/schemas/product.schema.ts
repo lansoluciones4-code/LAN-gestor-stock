@@ -19,6 +19,12 @@ export const productSchema = createInsertSchema(products)
 
 export type ProductInput = z.infer<typeof productSchema>;
 
+export const productUpdateSchema = productSchema.partial().extend({
+  version: z.number().int().min(1),
+  stockDelta: z.number().int().optional(),
+});
+export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
+
 /**
  * Definition schema for reading products.
  * Includes nested relations for the UI.
@@ -27,8 +33,9 @@ export const productDefSchema = createSelectSchema(products).extend({
   purchasePrice: z.number(),
   salePrice: z.number(),
   showOnLanding: z.boolean(),
-  device: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
-  provider: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
+  version: z.number(),
+  device: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
+  provider: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });

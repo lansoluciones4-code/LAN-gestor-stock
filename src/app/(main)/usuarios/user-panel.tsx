@@ -7,7 +7,7 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { type UserInput, type UserDef } from '@/schemas/user.schema';
+import { type UserInput, type UserDef, type UserUpdateInput } from '@/schemas/user.schema';
 import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/server/actions/user.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUsersStore } from '@/stores/users.store';
@@ -18,6 +18,7 @@ import { normalizeString } from '@/lib/utils';
 
 import { UserModal } from '@/components/modals/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
+import { GlobalMessage } from '@/components/ui/alert';
 
 export function UserPanel() {
   const currentUserId = useAuthStore((s) => s.user?.id);
@@ -30,12 +31,12 @@ export function UserPanel() {
 
   const [showInactives, setShowInactives] = useState(false);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<UserDef, UserInput>({
+  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<UserDef, UserInput, UserUpdateInput>({
     handlers: {
       fetchData: fetchUsers,
       createAction: createUserAction,
       updateAction: updateUserAction,
-      deleteAction: deleteUserAction,
+      deleteAction: deleteAction => deleteUserAction(deleteAction),
       toggleActiveAction: toggleUserActiveAction,
     },
     setStoreData: setUsers,
@@ -100,7 +101,7 @@ export function UserPanel() {
   });
 
 
-  const handleModalSubmit = async (data: UserInput) => {
+  const handleModalSubmit = async (data: UserInput | UserUpdateInput) => {
     await handleEditSubmit(data);
   };
 
@@ -150,7 +151,7 @@ export function UserPanel() {
             </div>
           </div>
 
-          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+          <GlobalMessage message={globalMessage} />
 
           <VirtualizedDataTable
             columns={columns}

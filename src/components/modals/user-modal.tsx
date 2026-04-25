@@ -4,14 +4,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X, UserCog } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { userSchema, type UserInput, type UserDef } from '@/schemas/user.schema';
+import { userSchema, type UserInput, type UserDef, type UserUpdateInput } from '@/schemas/user.schema';
 import { useEffect } from 'react';
+import { ErrorAlert } from '@/components/ui/alert';
 
 interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
   editingItem: UserDef | null;
-  onSubmit: (data: UserInput) => void;
+  onSubmit: (data: UserInput | UserUpdateInput) => void;
   isPending: boolean;
   serverError: string | null;
 }
@@ -21,7 +22,7 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<UserInput>({
     resolver: zodResolver(userSchema),
     defaultValues: { role: 'vendedor' },
@@ -45,7 +46,7 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
     }
   }, [isOpen, editingItem, reset]);
 
-  const handleInnerSubmit = (data: UserInput) => {
+  const handleInnerSubmit = (data: UserInput | UserUpdateInput) => {
     onSubmit(data);
   };
 
@@ -56,12 +57,31 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
       title={editingItem ? 'Editar Perfil de Seguridad' : 'Nueva Credencial de Acceso'}
       icon={<UserCog className="w-5 h-5 text-indigo-500" />}
       width="md"
-      onSubmit={handleSubmit(handleInnerSubmit)}
+      onSubmit={handleSubmit((data) => {
+        if (editingItem) {
+          const changedData: any = { version: editingItem.version };
+          let hasChanges = false;
+
+          Object.keys(dirtyFields).forEach((key) => {
+            const k = key as keyof UserInput;
+            (changedData as any)[k] = data[k];
+            hasChanges = true;
+          });
+
+          if (!hasChanges) {
+            onClose();
+            return;
+          }
+          handleInnerSubmit(changedData);
+        } else {
+          handleInnerSubmit(data);
+        }
+      })}
       submitLabel={editingItem ? 'Confirmar Credencial' : 'Confirmar Credencial'}
       isPending={isPending}
     >
       <div className="p-1 space-y-5">
-        {serverError && <div className="p-3 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-200 dark:border-red-900/30">{serverError}</div>}
+        <ErrorAlert error={serverError} />
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Nombre de Usuario</label>

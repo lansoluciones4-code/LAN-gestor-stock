@@ -10,7 +10,7 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
-import { deviceSchema, type DeviceInput, type DeviceDef } from '@/schemas/device.schema';
+import { deviceSchema, type DeviceInput, type DeviceDef, type DeviceUpdateInput } from '@/schemas/device.schema';
 import { createDeviceAction, updateDeviceAction, deleteDeviceAction, fetchDevices, toggleDeviceActiveAction } from '@/server/actions/device.actions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useDevicesStore } from '@/stores/devices.store';
@@ -18,6 +18,7 @@ import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeString } from '@/lib/utils';
+import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 
 
 export function DevicePanel() {
@@ -29,7 +30,7 @@ export function DevicePanel() {
 
   const [showInactive, setShowInactive] = useState(false);
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<DeviceDef, DeviceInput>({
+  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<DeviceDef, DeviceInput, DeviceUpdateInput>({
     handlers: {
       fetchData: fetchDevices,
       createAction: createDeviceAction,
@@ -65,7 +66,7 @@ export function DevicePanel() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<DeviceInput>({
     resolver: zodResolver(deviceSchema),
   });
@@ -151,7 +152,7 @@ export function DevicePanel() {
             )}
           </div>
 
-          {globalMessage && <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>{globalMessage.text}</div>}
+          <GlobalMessage message={globalMessage} />
 
           <VirtualizedDataTable
             columns={columns}
@@ -166,11 +167,30 @@ export function DevicePanel() {
             title={editingItem ? 'Actualizar Categoría' : 'Nueva Categoría en Catálogo'}
             icon={<MonitorSmartphone className="w-5 h-5 text-indigo-500" />}
             width="sm"
-            onSubmit={handleSubmit(handleEditSubmit)}
+            onSubmit={handleSubmit((data) => {
+              if (editingItem) {
+                const changedData: any = { version: editingItem.version };
+                let hasChanges = false;
+                
+                Object.keys(dirtyFields).forEach((key) => {
+                  const k = key as keyof DeviceInput;
+                  (changedData as any)[k] = data[k];
+                  hasChanges = true;
+                });
+
+                if (!hasChanges) {
+                  closeFormModal();
+                  return;
+                }
+                handleEditSubmit(changedData);
+              } else {
+                handleEditSubmit(data);
+              }
+            })}
             submitLabel={editingItem ? 'Fichar Equipo' : 'Fichar Equipo'}
             isPending={isPending}
           >
-            {serverError && <div className="p-4 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200 mb-6">{serverError}</div>}
+            <ErrorAlert error={serverError} />
             <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
               <div>
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nombre / Modelo / Marca</label>

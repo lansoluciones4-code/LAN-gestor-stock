@@ -55,7 +55,8 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     },
     {
       header: 'Acción',
-      cell: (log) => <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[13px] ${getActionColor(log.action)}`}>{log.action}</span>,
+      cellClassName: 'max-w-[120px] truncate',
+      cell: (log) => <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[13px] truncate block w-full text-center ${getActionColor(log.action)}`} title={log.action}>{log.action}</span>,
     },
     {
       header: 'Entidad',

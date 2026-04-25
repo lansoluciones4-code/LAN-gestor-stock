@@ -3,9 +3,14 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { deviceRepository } from '@/server/repositories/device.repository';
-import { deviceSchema, deviceDefSchema, DeviceInput, type DeviceDef } from '@/schemas/device.schema';
+import { deviceSchema, deviceDefSchema, DeviceInput, type DeviceDef, deviceUpdateSchema, type DeviceUpdateInput } from '@/schemas/device.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
+import { ConcurrencyError } from '@/lib/errors';
+
+import { MESSAGES } from '@/config/messages';
+import { handleDatabaseError } from '@/lib/db-errors';
+import { ActionResult } from '@/lib/action-result';
 
 export async function fetchDevices(): Promise<DeviceDef[]> {
   try {
@@ -18,85 +23,85 @@ export async function fetchDevices(): Promise<DeviceDef[]> {
   }
 }
 
-export async function toggleDeviceActiveAction(id: string, isActive: boolean) {
+export async function toggleDeviceActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     
     return await db.transaction(async (tx) => {
       await deviceRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'DEVICE', id, { active: isActive }, tx);
-      return { success: true, message: `Equipo ${isActive ? 'activado' : 'desactivado'} exitosamente` };
+      return { 
+        success: true, 
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Equipo') : MESSAGES.SUCCESS.DEACTIVATED('Equipo') 
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al cambiar estado del equipo' };
+    return { success: false, error: handleDatabaseError(error, 'Equipo') };
   }
 }
 
-export async function createDeviceAction(input: DeviceInput): Promise<{ success: true; message: string } | { success: false; message: string }> {
+export async function createDeviceAction(input: DeviceInput): Promise<ActionResult<DeviceDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     const parsed = deviceSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
       const result = await deviceRepository.createDevice(parsed.data, tx);
-      const wasInactive = (result as any).wasInactive;
+      const wasReactivated = (result as any).wasInactive;
 
       await recordAuditLog(caller.id, 'CREAR', 'DEVICE', result.id, { 
         name: result.name,
-        note: wasInactive ? 'Equipo reactivado' : 'Nuevo registro' 
+        note: wasReactivated ? 'Equipo reactivado' : 'Nuevo registro' 
       }, tx);
 
       return { 
         success: true, 
-        message: wasInactive ? 'El equipo ya existía (inactivo) y ha sido reactivado' : 'Equipo creado exitosamente' 
+        message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Equipo') : MESSAGES.SUCCESS.CREATED('Equipo'),
+        data: result as DeviceDef
       };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al crear equipo' };
+    return { success: false, error: handleDatabaseError(error, 'Equipo') };
   }
 }
 
-export async function updateDeviceAction(id: string, input: DeviceInput) {
+export async function updateDeviceAction(id: string, input: DeviceUpdateInput): Promise<ActionResult<DeviceDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    const parsed = deviceSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    const parsed = deviceUpdateSchema.safeParse(input);
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
-      await deviceRepository.updateDevice(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, { name: input.name }, tx);
-      return { success: true, message: 'Equipo actualizado exitosamente' };
+      const updated = await deviceRepository.updateDevice(id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, parsed.data, tx);
+      return { 
+        success: true, 
+        message: MESSAGES.SUCCESS.UPDATED('Equipo'),
+        data: updated as DeviceDef
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al actualizar equipo' };
+    return { success: false, error: handleDatabaseError(error, 'Equipo') };
   }
 }
 
-export async function deleteDeviceAction(id: string) {
+export async function deleteDeviceAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
-      // Check relations
+      // Check relations (Business logic check before DB constraint)
       const hasProducts = await deviceRepository.checkHasRelations(id, tx);
       if (hasProducts) {
-        throw new Error('No se puede eliminar permanentemente: este equipo tiene productos asociados en el stock. Prueba desactivarlo.');
+        return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
       await deviceRepository.deleteDevice(id, tx);
       await recordAuditLog(caller.id, 'ELIMINAR', 'DEVICE', id, { note: 'Eliminación permanente' }, tx);
-      return { success: true, message: 'Equipo eliminado permanentemente' };
+      return { success: true, message: MESSAGES.SUCCESS.DELETED('Equipo') };
     });
   } catch (error: any) {
-    console.error('[DeviceAction] Error al eliminar equipo:', error);
-
-    // Parse PostgreSQL FK Error
-    const errorMsg = error.message?.toLowerCase() || '';
-    if (errorMsg.includes('23503') || errorMsg.includes('foreign key constraint') || errorMsg.includes('violates foreign key')) {
-      return { success: false, message: 'No se puede eliminar el equipo porque tiene registros vinculados. Por favor, inactívalo.' };
-    }
-
-    return { success: false, message: error.message || 'Error al eliminar equipo' };
+    return { success: false, error: handleDatabaseError(error, 'Equipo') };
   }
 }

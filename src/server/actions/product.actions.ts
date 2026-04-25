@@ -5,11 +5,16 @@ import { db } from '@/lib/db';
 import { productRepository } from '@/server/repositories/product.repository';
 import { deviceRepository } from '@/server/repositories/device.repository';
 import { providerRepository } from '@/server/repositories/provider.repository';
-import { productSchema, productDefSchema, ProductInput, type ProductDef } from '@/schemas/product.schema';
+import { productSchema, productDefSchema, ProductInput, type ProductDef, productUpdateSchema, type ProductUpdateInput } from '@/schemas/product.schema';
 import { providerDefSchema, type ProviderDef } from '@/schemas/provider.schema';
 import { deviceDefSchema, type DeviceDef } from '@/schemas/device.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
+import { ConcurrencyError } from '@/lib/errors';
+
+import { MESSAGES } from '@/config/messages';
+import { handleDatabaseError } from '@/lib/db-errors';
+import { ActionResult } from '@/lib/action-result';
 
 export async function fetchProducts(): Promise<ProductDef[]> {
   try {
@@ -41,11 +46,11 @@ export async function fetchSelectorData(): Promise<{ devices: DeviceDef[]; provi
   }
 }
 
-export async function createProductAction(input: ProductInput) {
+export async function createProductAction(input: ProductInput): Promise<ActionResult<ProductDef>> {
   try {
     const caller = await verifyAuthOrAdmin(false);
     const parsed = productSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
       const newProduct = await productRepository.createProduct(parsed.data, tx);
@@ -57,62 +62,66 @@ export async function createProductAction(input: ProductInput) {
         salePrice: parsed.data.salePrice,
       }, tx);
 
-      return { success: true, message: 'Producto registrado exitosamente' };
+      return { 
+        success: true, 
+        message: MESSAGES.SUCCESS.CREATED('Producto'),
+        data: newProduct as ProductDef
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al guardar producto' };
+    return { success: false, error: handleDatabaseError(error, 'producto') };
   }
 }
 
-export async function updateProductAction(id: string, input: ProductInput) {
+export async function updateProductAction(id: string, input: ProductUpdateInput): Promise<ActionResult<ProductDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    const parsed = productSchema.safeParse(input);
-    if (!parsed.success) return { success: false, message: 'Datos inválidos' };
+    const parsed = productUpdateSchema.safeParse(input);
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
-      await productRepository.updateProduct(id, parsed.data, tx);
+      const updated = await productRepository.updateProduct(id, parsed.data, tx);
 
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, {
-        deviceId: parsed.data.deviceId,
-        stock: parsed.data.stock,
-        salePrice: parsed.data.salePrice,
-      }, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, parsed.data, tx);
 
-      return { success: true, message: 'Producto actualizado exitosamente' };
+      return { 
+        success: true, 
+        message: MESSAGES.SUCCESS.UPDATED('Producto'),
+        data: updated as ProductDef
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al actualizar producto' };
+    return { success: false, error: handleDatabaseError(error, 'producto') };
   }
 }
 
-export async function deleteProductAction(id: string) {
+export async function deleteProductAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
-      // Rule: Cannot delete if has sales or losses
+      // Rule: Cannot delete if has sales or losses (Business check before DB constraint)
       const hasRelations = await productRepository.checkHasRelations(id, tx);
       if (hasRelations) {
-        throw new Error('No se puede eliminar: este producto ya ha sido parte de una venta o tiene pérdidas registradas.');
+        return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
       await productRepository.deleteProduct(id, tx);
       await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id, undefined, tx);
 
-      return { success: true, message: 'Producto eliminado exitosamente' };
+      return { success: true, message: MESSAGES.SUCCESS.DELETED('Producto') };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al eliminar producto' };
+    return { success: false, error: handleDatabaseError(error, 'producto') };
   }
 }
 
-export async function registerProductLossAction(productId: string, quantity: number, reason: string) {
+export async function registerProductLossAction(productId: string, quantity: number, reason: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
 
-    if (quantity <= 0) return { success: false, message: 'La cantidad debe ser mayor a 0' };
-    if (!reason.trim()) return { success: false, message: 'Debe especificar un motivo' };
+    if (quantity <= 0) return { success: false, error: 'La cantidad debe ser mayor a 0' };
+    if (!reason.trim()) return { success: false, error: 'Debe especificar un motivo' };
 
     return await db.transaction(async (tx) => {
       await productRepository.registerLoss(productId, caller.id, quantity, reason, tx);
@@ -123,7 +132,7 @@ export async function registerProductLossAction(productId: string, quantity: num
     });
   } catch (error: any) {
     console.error('Error in registerProductLossAction:', error);
-    return { success: false, message: error.message || 'No se pudo completar la operación.' };
+    return { success: false, error: handleDatabaseError(error, 'producto') };
   }
 }
 
@@ -142,7 +151,7 @@ export async function fetchLandingProducts(): Promise<ProductDef[]> {
   }
 }
 
-export async function toggleProductVisibilityAction(id: string, isVisible: boolean) {
+export async function toggleProductVisibilityAction(id: string, isVisible: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
     
@@ -151,10 +160,13 @@ export async function toggleProductVisibilityAction(id: string, isVisible: boole
 
       await recordAuditLog(caller.id, 'ACTUALIZAR_VISIBILIDAD_LANDING', 'PRODUCT', id, { showOnLanding: isVisible }, tx);
 
-      return { success: true, message: `Producto ${isVisible ? 'visible' : 'oculto'} en landing page` };
+      return { 
+        success: true, 
+        message: isVisible ? 'Producto visible en landing page' : 'Producto oculto en landing page' 
+      };
     });
   } catch (error: any) {
-    return { success: false, message: error.message || 'Error al cambiar visibilidad' };
+    return { success: false, error: handleDatabaseError(error, 'producto') };
   }
 }
 

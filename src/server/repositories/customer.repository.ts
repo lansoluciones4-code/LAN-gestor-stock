@@ -1,7 +1,8 @@
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, sql, and } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { customers } from '@/lib/db/schema';
-import type { CustomerInput } from '@/schemas/customer.schema';
+import type { CustomerInput, CustomerUpdateInput } from '@/schemas/customer.schema';
+import { ConcurrencyError } from '@/lib/errors';
 
 export class CustomerRepository {
   async getAllCustomers() {
@@ -27,7 +28,11 @@ export class CustomerRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(customers)
-      .set({ isActive, updatedAt: sql`NOW()` })
+      .set({ 
+        isActive, 
+        updatedAt: sql`NOW()`,
+        version: sql`${customers.version} + 1`
+      })
       .where(eq(customers.id, id))
       .returning();
     return result[0];
@@ -35,26 +40,25 @@ export class CustomerRepository {
 
   async createCustomer(input: CustomerInput, dbtx: any = db) {
     if (input.documentNumber) {
+      const normalizedInput = input.documentNumber.replace(/[.\-]/g, '');
       const existing = await dbtx.query.customers.findFirst({
-        where: sql`${customers.documentNumber} ILIKE ${input.documentNumber}`,
+        where: sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`,
       });
 
-      if (existing) {
-        if (existing.isActive) {
-          throw new Error(`Ya existe un cliente con el documento ${input.documentNumber}.`);
-        }
-        // Reactivate
+      if (existing && !existing.isActive) {
         const result = await dbtx
           .update(customers)
           .set({
             name: input.name,
-            phone: input.phone || null,
-            email: input.email || null,
+            phone: input.phone || '',
+            email: input.email || '',
             isActive: true,
             updatedAt: sql`NOW()`,
+            version: sql`${customers.version} + 1`,
           })
           .where(eq(customers.id, existing.id))
           .returning();
+
         return { ...result[0], wasInactive: true };
       }
     }
@@ -63,38 +67,36 @@ export class CustomerRepository {
       .insert(customers)
       .values({
         name: input.name,
-        phone: input.phone || null,
-        email: input.email || null,
-        documentNumber: input.documentNumber || null,
+        phone: input.phone || '',
+        email: input.email || '',
+        documentNumber: input.documentNumber || '',
         isActive: true,
+        version: 1,
       })
       .returning();
 
     return result[0];
   }
 
-  async updateCustomer(id: string, input: CustomerInput, dbtx: any = db) {
-    if (input.documentNumber) {
-      const existing = await dbtx.query.customers.findFirst({
-        where: sql`${customers.documentNumber} ILIKE ${input.documentNumber}`,
-      });
-
-      if (existing && existing.id !== id) {
-        throw new Error(`El número de documento ${input.documentNumber} ya está registrado en otro cliente.`);
-      }
-    }
+  async updateCustomer(id: string, input: CustomerUpdateInput, dbtx: any = db) {
+    const updateData: any = { 
+      updatedAt: sql`NOW()`,
+      version: sql`${customers.version} + 1`
+    };
+    if (input.name !== undefined) updateData.name = input.name;
+    if (input.phone !== undefined) updateData.phone = input.phone || '';
+    if (input.email !== undefined) updateData.email = input.email || '';
+    if (input.documentNumber !== undefined) updateData.documentNumber = input.documentNumber || '';
 
     const result = await dbtx
       .update(customers)
-      .set({
-        name: input.name,
-        phone: input.phone || null,
-        email: input.email || null,
-        documentNumber: input.documentNumber || null,
-        updatedAt: sql`NOW()`,
-      })
-      .where(eq(customers.id, id))
+      .set(updateData)
+      .where(and(eq(customers.id, id), eq(customers.version, input.version)))
       .returning();
+
+    if (result.length === 0) {
+      throw new ConcurrencyError();
+    }
 
     return result[0];
   }
