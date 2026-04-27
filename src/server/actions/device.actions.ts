@@ -105,3 +105,15 @@ export async function deleteDeviceAction(id: string): Promise<ActionResult> {
     return { success: false, error: handleDatabaseError(error, 'Equipo') };
   }
 }
+
+export async function fetchLandingCategories(): Promise<DeviceDef[]> {
+  try {
+    const devicesList = await deviceRepository.getAllDevices();
+    // Only return active categories for the landing page
+    const active = devicesList.filter(d => d.isActive);
+    return z.array(deviceDefSchema).parse(active);
+  } catch (error) {
+    console.error('fetchLandingCategories error:', error);
+    return [];
+  }
+}

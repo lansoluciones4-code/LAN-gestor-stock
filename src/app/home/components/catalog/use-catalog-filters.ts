@@ -1,0 +1,79 @@
+'use client';
+
+import { useState, useMemo, useEffect } from 'react';
+import { type ProductDef } from '@/schemas/product.schema';
+import { normalizeString } from '@/lib/utils';
+
+interface UseCatalogFiltersProps {
+  products: ProductDef[];
+  itemsPerPage: number;
+}
+
+export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersProps) {
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
+  const [page, setPage] = useState(1);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, selectedCategory, minPrice, maxPrice]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      // 1. Search filter (Fuzzy)
+      const searchTerms = normalizeString(search).split(/\s+/).filter(Boolean);
+      const combinedText = normalizeString(`${p.device?.name || ''} ${p.description || ''}`);
+      const matchesSearch = searchTerms.every((term) => combinedText.includes(term));
+
+      // 2. Category filter
+      const matchesCategory = selectedCategory ? p.deviceId === selectedCategory : true;
+
+      // 3. Price range filter
+      const price = p.salePrice;
+      const min = minPrice ? parseFloat(minPrice) : 0;
+      const max = maxPrice ? parseFloat(maxPrice) : Infinity;
+      const matchesPrice = price >= min && price <= max;
+
+      return matchesSearch && matchesCategory && matchesPrice;
+    });
+  }, [products, search, selectedCategory, minPrice, maxPrice]);
+
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((a, b) => {
+      if (a.stock > 0 && b.stock <= 0) return -1;
+      if (a.stock <= 0 && b.stock > 0) return 1;
+      return 0;
+    });
+  }, [filteredProducts]);
+
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+  const paginatedProducts = sortedProducts.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+  const clearFilters = () => {
+    setSearch('');
+    setSelectedCategory(null);
+    setMinPrice('');
+    setMaxPrice('');
+  };
+
+  return {
+    search,
+    setSearch,
+    selectedCategory,
+    setSelectedCategory,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+    page,
+    setPage,
+    totalPages,
+    paginatedProducts,
+    totalResults: sortedProducts.length,
+    clearFilters,
+    isFiltered: !!(search || selectedCategory || minPrice || maxPrice),
+  };
+}

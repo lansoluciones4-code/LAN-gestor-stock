@@ -163,7 +163,7 @@ export function DevicePanel() {
             columns={columns}
             data={filteredDevices}
             isLoading={isPending}
-            emptyMessage="No hay equipos registrados."
+            emptyMessage="No hay categorías registradas."
           />
 
           <ResponsiveModal
@@ -192,7 +192,7 @@ export function DevicePanel() {
                 handleEditSubmit(data);
               }
             })}
-            submitLabel={editingItem ? 'Fichar Equipo' : 'Fichar Equipo'}
+            submitLabel={editingItem ? 'Actualizar Categoría' : 'Agregar Categoría'}
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />
