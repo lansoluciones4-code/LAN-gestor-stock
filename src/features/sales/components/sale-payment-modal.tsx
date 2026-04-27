@@ -35,12 +35,12 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       // Auto-start adding if empty
       setIsAdding(true);
       setType('efectivo');
-      setAmount(total.toString());
+      setAmount(total.toFixed(2).replace('.', ','));
     }
   }, [isOpen, total]);
 
   const validateAndAdd = () => {
-    const normalizedAmount = amount.replace(/\./g, '').replace(',', '.');
+    const normalizedAmount = amount.replace(',', '.');
     const numAmount = Number(normalizedAmount);
     if (isNaN(numAmount) || numAmount < 0 || (numAmount === 0 && total > 0)) {
       setError('Monto inválido');
@@ -89,7 +89,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   const startEdit = (index: number) => {
     const p = payments[index];
     setType(p.type);
-    setAmount(p.amount.toString());
+    setAmount(p.amount.toFixed(2).replace('.', ','));
     setEditingIndex(index);
     setIsAdding(true);
   };
@@ -110,13 +110,19 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       return;
     }
 
-    const normalized = val.replace(/\./g, '').replace(',', '.');
-    setAmount(val);
+    // Prohibido el punto
+    if (val.includes('.')) return;
 
-    if (isNaN(Number(normalized))) {
-      setError('Formato inválido');
-    } else {
+    // Solo números y una coma, máximo 2 decimales
+    if (/^\d*,?\d{0,2}$/.test(val)) {
+      setAmount(val);
       setError(null);
+    } else {
+      if (val.includes(',') && val.split(',')[1].length > 2) {
+        setError('Máximo 2 decimales');
+      } else {
+        setError('Formato inválido');
+      }
     }
   };
 
@@ -156,7 +162,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                   setIsAdding(true);
                   setEditingIndex(null);
                   setType(payments.length > 0 && payments[0].type === 'efectivo' ? 'transferencia' : 'efectivo');
-                  setAmount(remaining.toString());
+                  setAmount(remaining.toFixed(2).replace('.', ','));
                 }}
                 leftIcon={<Plus className="w-3 h-3" />}
               >

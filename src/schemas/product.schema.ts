@@ -14,11 +14,11 @@ export const productSchema = createInsertSchema(products)
     providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
     description: z.string().trim().max(255, 'La descripción es demasiado larga').optional(),
     purchasePrice: z.preprocess(
-      (v) => (typeof v === 'string' ? v.replace(/\./g, '').replace(',', '.') : v),
+      (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
       z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio inválido').transform(Number).pipe(z.number().min(0, 'El precio de compra no puede ser negativo').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
     ),
     salePrice: z.preprocess(
-      (v) => (typeof v === 'string' ? v.replace(/\./g, '').replace(',', '.') : v),
+      (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
       z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio inválido').transform(Number).pipe(z.number().min(0, 'El precio de venta no puede ser negativo').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
     ),
     stock: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades inválidas').transform(v => Math.floor(Number(v))).pipe(z.number().min(0, 'El stock no puede ser negativo')),

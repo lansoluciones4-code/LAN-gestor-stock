@@ -86,8 +86,8 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     <span className="block text-[10px] font-normal text-zinc-500 uppercase mt-0.5">{item.product?.description}</span>
                   </td>
                   <td className="py-5 text-center font-bold text-zinc-900">{item.quantity}</td>
-                  <td className="py-5 text-right text-zinc-900">${item.unitPrice.toLocaleString('es-AR')}</td>
-                  <td className="py-5 text-right font-black text-zinc-900">${item.subtotal.toLocaleString('es-AR')}</td>
+                  <td className="py-5 text-right text-zinc-900">${item.unitPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="py-5 text-right font-black text-zinc-900">${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 </tr>
               ))}
             </tbody>
@@ -100,7 +100,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 {sale.payments?.map((p: any, i: number) => (
                   <div key={i} className="flex justify-between items-center text-[11px] font-bold text-zinc-700 max-w-[200px]">
                     <span className="uppercase">{p.type}</span>
-                    <span>${p.amount.toLocaleString('es-AR')}</span>
+                    <span>${p.amount.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 ))}
               </div>
@@ -111,7 +111,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 <>
                   <div className="flex justify-between w-full text-xs font-bold text-zinc-500 border-b border-zinc-100 pb-2">
                     <span className="uppercase tracking-widest">Subtotal</span>
-                    <span>${(sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0).toLocaleString('es-AR')}</span>
+                    <span>${(sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   {sale.discountPercentage! > 0 && (
                     <div className="flex justify-between w-full text-[11px] font-bold text-emerald-600 mt-1">
@@ -122,7 +122,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                   {sale.discountAmount! > 0 && (
                     <div className="flex justify-between w-full text-[11px] font-bold text-emerald-600">
                       <span className="uppercase">Descuento en Monto</span>
-                      <span>-${sale.discountAmount?.toLocaleString('es-AR')}</span>
+                      <span>-${sale.discountAmount?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}
                 </>
@@ -130,7 +130,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
               <div className="flex justify-between w-full items-center mt-2">
                 <span className="text-xl font-black uppercase text-zinc-900 pt-2">Total</span>
                 <span className="text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300">
-                  ${sale.total.toLocaleString('es-AR')}
+                  ${sale.total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>

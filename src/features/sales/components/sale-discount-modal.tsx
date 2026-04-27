@@ -33,13 +33,27 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       return;
     }
 
-    const normalized = val.replace(/\./g, '').replace(',', '.');
-    setPercentage(val);
+    // No permitimos puntos en el porcentaje
+    if (val.includes('.')) return;
 
-    if (isNaN(Number(normalized))) {
-      setError('Formato inválido');
+    const normalized = val.replace(',', '.');
+    
+    // Validar que sea un número válido y que no tenga más de 2 decimales
+    if (/^\d*,?\d{0,2}$/.test(val)) {
+      const num = Number(normalized);
+      if (num >= 0 && num <= 100) {
+        setPercentage(val);
+        setError(null);
+      } else {
+        setError('El porcentaje debe estar entre 0 y 100');
+      }
     } else {
-      setError(null);
+      // Si llegamos aquí es porque tiene más de 2 decimales o caracteres inválidos
+      if (val.includes(',') && val.split(',')[1].length > 2) {
+        setError('Máximo 2 decimales');
+      } else {
+        setError('Formato inválido');
+      }
     }
   };
 
@@ -50,13 +64,19 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       return;
     }
 
-    const normalized = val.replace(/\./g, '').replace(',', '.');
-    setAmount(val);
+    // Prohibido el punto
+    if (val.includes('.')) return;
 
-    if (isNaN(Number(normalized))) {
-      setError('Formato inválido');
-    } else {
+    // Solo números y una coma, máximo 2 decimales
+    if (/^\d*,?\d{0,2}$/.test(val)) {
+      setAmount(val);
       setError(null);
+    } else {
+      if (val.includes(',') && val.split(',')[1].length > 2) {
+        setError('Máximo 2 decimales');
+      } else {
+        setError('Formato inválido');
+      }
     }
   };
 
@@ -75,8 +95,8 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       setError('El descuento total supera al subtotal.');
       return;
     }
-    const normalizedP = percentage.replace(/\./g, '').replace(',', '.');
-    const normalizedA = amount.replace(/\./g, '').replace(',', '.');
+    const normalizedP = percentage.replace(',', '.');
+    const normalizedA = amount.replace(',', '.');
 
     if (!isValidDecimal(normalizedP, 2) || !isValidDecimal(normalizedA, 2)) {
       setError('Los descuentos no pueden tener más de 2 decimales.');

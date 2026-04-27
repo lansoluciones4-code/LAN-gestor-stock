@@ -140,8 +140,8 @@ export function ProductsPanel() {
     return displayProducts
       .filter((p) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        const min = parseFloat(minPrice) || 0;
-        const max = parseFloat(maxPrice) || Infinity;
+        const min = parseFloat(minPrice.replace(',', '.')) || 0;
+        const max = parseFloat(maxPrice.replace(',', '.')) || Infinity;
 
         const combinedText = [
           normalizeForSearch(p.device?.name),
@@ -163,9 +163,16 @@ export function ProductsPanel() {
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
     if (item) {
-      reset({ deviceId: item.deviceId, providerId: item.providerId, description: item.description || '', purchasePrice: item.purchasePrice, salePrice: item.salePrice, stock: item.stock });
+      reset({ 
+        deviceId: item.deviceId, 
+        providerId: item.providerId, 
+        description: item.description || '', 
+        purchasePrice: item.purchasePrice.toFixed(2).replace('.', ','), 
+        salePrice: item.salePrice.toFixed(2).replace('.', ','), 
+        stock: item.stock 
+      } as any);
     } else {
-      reset({ deviceId: '', providerId: '', description: '', purchasePrice: 0, salePrice: 0, stock: 1 });
+      reset({ deviceId: '', providerId: '', description: '', purchasePrice: '0,00', salePrice: '0,00', stock: 1 } as any);
     }
   };
 
@@ -207,10 +214,11 @@ export function ProductsPanel() {
                 <div className="relative w-[110px] sm:max-w-[130px]">
                   <DollarSign className="absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400" />
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="Min"
                     value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
+                    onChange={(e) => setMinPrice(e.target.value.replace(/\./g, ''))}
                     className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
                     data-testid={TEST_IDS.productos.inputBusquedaPrecioMin}
                   />
@@ -218,10 +226,11 @@ export function ProductsPanel() {
                 <div className="relative w-[110px] sm:max-w-[130px]">
                   <DollarSign className="absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400" />
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     placeholder="Max"
                     value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
+                    onChange={(e) => setMaxPrice(e.target.value.replace(/\./g, ''))}
                     className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
                     data-testid={TEST_IDS.productos.inputBusquedaPrecioMax}
                   />
@@ -352,8 +361,13 @@ export function ProductsPanel() {
                   <input
                     type="text"
                     inputMode="decimal"
-                    {...register('purchasePrice')}
-                    placeholder="0.00"
+                    {...register('purchasePrice', {
+                      onChange: (e) => {
+                        const val = e.target.value.replace(/\./g, '');
+                        setValue('purchasePrice', val);
+                      }
+                    })}
+                    placeholder="0,00"
                     className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -366,8 +380,13 @@ export function ProductsPanel() {
                   <input
                     type="text"
                     inputMode="decimal"
-                    {...register('salePrice')}
-                    placeholder="0.00"
+                    {...register('salePrice', {
+                      onChange: (e) => {
+                        const val = e.target.value.replace(/\./g, '');
+                        setValue('salePrice', val);
+                      }
+                    })}
+                    placeholder="0,00"
                     className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
