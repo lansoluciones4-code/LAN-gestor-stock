@@ -5,20 +5,13 @@ import { motion } from 'framer-motion';
 import { type ProductDef } from '@/schemas/product.schema';
 import { Package } from 'lucide-react';
 import Link from 'next/link';
+import { normalizeForUrl } from '@/lib/utils';
 
 export function ProductCard({ product }: { product: ProductDef }) {
   const [imageStatus, setImageStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
   const deviceName = product.device?.name || 'Accesorio Apple';
 
-  // Normalize name for image file: "Funda iPhone 15 Pro Max" -> "funda-iphone-15-pro-max"
-  const normalizedName = deviceName
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-
-  const imagePath = `/products/${normalizedName}.webp`;
+  const imagePath = `/products/${normalizeForUrl(deviceName)}.webp`;
   const isOutOfStock = product.stock <= 0;
 
   useEffect(() => {

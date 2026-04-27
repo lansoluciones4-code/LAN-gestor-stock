@@ -28,6 +28,7 @@ export class ProductRepository {
       where: (products, { eq }) => eq(products.id, id),
       with: {
         device: true,
+        provider: true,
       },
     });
   }

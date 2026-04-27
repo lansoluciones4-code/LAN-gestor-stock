@@ -18,3 +18,14 @@ export function toSentenceCase(str: string | null | undefined): string {
   const lowercase = str.toLowerCase();
   return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
 }
+/**
+ * Normalizes a string for use in URLs or filenames.
+ */
+export function normalizeForUrl(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+}
