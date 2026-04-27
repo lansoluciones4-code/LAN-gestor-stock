@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X, UserCog } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { userSchema, type UserInput, type UserDef, type UserUpdateInput } from '@/schemas/user.schema';
+import { userSchema, userEditFormSchema, type UserInput, type UserDef, type UserUpdateInput } from '@/schemas/user.schema';
 import { useEffect } from 'react';
 import { ErrorAlert } from '@/components/ui/alert';
 
@@ -24,7 +24,7 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
     reset,
     formState: { errors, dirtyFields },
   } = useForm<UserInput>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(editingItem ? userEditFormSchema : userSchema),
     defaultValues: { role: 'vendedor' },
   });
 
@@ -97,7 +97,7 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
             Contraseña de Ingreso
-            {editingItem && <span className="text-zinc-500 font-normal">(Dejar en blanco para no cambiar)</span>}
+            {editingItem && <span className="text-zinc-500 font-normal"> (Dejar en blanco para no cambiar)</span>}
           </label>
           <input
             type="password"

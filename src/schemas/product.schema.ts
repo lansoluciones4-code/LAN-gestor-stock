@@ -12,9 +12,9 @@ export const productSchema = createInsertSchema(products)
     deviceId: z.string().trim().min(1, 'Debes seleccionar un equipo válido'),
     providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
     description: z.string().trim().max(255, 'La descripción es demasiado larga').optional(),
-    purchasePrice: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades válidas').transform(Number).pipe(z.number().min(0, 'El precio de compra no puede ser negativo')),
-    salePrice: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades válidas').transform(Number).pipe(z.number().min(0, 'El precio de venta no puede ser negativo')),
-    stock: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades válidas').transform(v => Math.floor(Number(v))).pipe(z.number().min(0, 'El stock no puede ser negativo')),
+    purchasePrice: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades inválidas').transform(Number).pipe(z.number().min(0, 'El precio de compra no puede ser negativo')),
+    salePrice: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades inválidas').transform(Number).pipe(z.number().min(0, 'El precio de venta no puede ser negativo')),
+    stock: z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Precio o unidades inválidas').transform(v => Math.floor(Number(v))).pipe(z.number().min(0, 'El stock no puede ser negativo')),
   });
 
 export type ProductInput = z.infer<typeof productSchema>;

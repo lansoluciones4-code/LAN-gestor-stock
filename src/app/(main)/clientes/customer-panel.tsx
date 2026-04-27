@@ -17,6 +17,7 @@ import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeString } from '@/lib/utils';
 import { CustomerModal } from '@/components/modals/customer-modal';
 import { GlobalMessage } from '@/components/ui/alert';
+import { TEST_IDS } from '@/constants/test-ids';
 
 export function CustomerPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -69,7 +70,7 @@ export function CustomerPanel() {
           normalizeString(c.phone),
           normalizeString(c.documentNumber)
         ].join(' ');
-        
+
         const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactive ? true : c.isActive;
         return matchesSearch && matchesStatus;
@@ -112,12 +113,14 @@ export function CustomerPanel() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar clientes por nombre, mail o DNI..."
                 className="h-11"
+                data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
                 id="showInactive"
                 checked={showInactive}
                 onChange={setShowInactive}
                 label="Ver Inactivos"
+                data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
@@ -129,6 +132,7 @@ export function CustomerPanel() {
                 disabled={isPending}
                 title="Sincronizar"
                 className="h-11 w-11"
+                data-testid={TEST_IDS.general.btnSincronizar}
               >
                 <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
               </Button>
@@ -137,6 +141,7 @@ export function CustomerPanel() {
                 variant="primary"
                 leftIcon={<Plus className="w-5 h-5" />}
                 className="h-11"
+                data-testid={TEST_IDS.general.btnAgregar}
               >
                 Registrar Cliente
               </Button>

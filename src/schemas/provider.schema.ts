@@ -9,9 +9,8 @@ export const providerSchema = createInsertSchema(providers, {
   name: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'Nombre demasiado largo'),
   phone: z.string().trim().min(1, 'El teléfono es obligatorio').max(30, 'Número de teléfono demasiado largo'),
   email: z
-    .string()
-    .trim()
     .email('Formato de correo electrónico inválido')
+    .trim()
     .min(1, 'El correo es obligatorio')
     .max(100, 'El correo electrónico es demasiado largo'),
 })

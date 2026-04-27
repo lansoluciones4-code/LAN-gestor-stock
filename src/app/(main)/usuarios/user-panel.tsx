@@ -19,11 +19,12 @@ import { normalizeString } from '@/lib/utils';
 import { UserModal } from '@/components/modals/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
 import { GlobalMessage } from '@/components/ui/alert';
+import { TEST_IDS } from '@/constants/test-ids';
 
 export function UserPanel() {
   const currentUserId = useAuthStore((s) => s.user?.id);
   const role = useAuthStore((s) => s.user?.role);
-  
+
   const [initialLoading, setInitialLoading] = useState(true);
   const { users, setUsers, isLoaded } = useUsersStore();
 
@@ -67,10 +68,10 @@ export function UserPanel() {
     return users
       .filter((u) => {
         const terms = normalizeString(search).split(/\s+/);
-        
+
         // Convert DB roles to Spanish display names for searching
         const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
-        
+
         const combinedText = [
           normalizeString(u.username),
           normalizeString(u.role),
@@ -120,12 +121,14 @@ export function UserPanel() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar usuarios por nombre o rol..."
                 className="h-11"
+                data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
                 id="showInactives"
                 checked={showInactives}
                 onChange={setShowInactives}
                 label="Ver Inactivos"
+                data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
@@ -137,6 +140,7 @@ export function UserPanel() {
                 disabled={isPending}
                 title="Sincronizar"
                 className="h-11 w-11"
+                data-testid={TEST_IDS.general.btnSincronizar}
               >
                 <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
               </Button>
@@ -145,6 +149,7 @@ export function UserPanel() {
                 variant="primary"
                 leftIcon={<Plus className="w-5 h-5" />}
                 className="h-11"
+                data-testid={TEST_IDS.general.btnAgregar}
               >
                 Crear Credencial
               </Button>

@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { getProviderColumns } from '@/config/tables/provider-columns';
 import { normalizeString } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
+import { TEST_IDS } from '@/constants/test-ids';
 
 export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -81,7 +82,7 @@ export function ProvidersPanel() {
           normalizeString(p.email),
           normalizeString(p.phone)
         ].join(' ');
-        
+
         const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactive ? true : p.isActive;
         return matchesSearch && matchesStatus;
@@ -123,12 +124,14 @@ export function ProvidersPanel() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar distribuidor por nombre, teléfono o email..."
+                data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
                 id="showInactive"
                 checked={showInactive}
                 onChange={setShowInactive}
                 label="Ver Inactivos"
+                data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
@@ -140,6 +143,7 @@ export function ProvidersPanel() {
                   onClick={() => syncData(true)}
                   disabled={isPending}
                   title="Sincronizar Datos"
+                  data-testid={TEST_IDS.general.btnSincronizar}
                 >
                   <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
                 </Button>
@@ -147,6 +151,7 @@ export function ProvidersPanel() {
                   variant="primary"
                   onClick={() => handleEditClick()}
                   leftIcon={<Plus className="w-5 h-5" />}
+                  data-testid={TEST_IDS.general.btnAgregar}
                 >
                   Agregar Proveedor
                 </Button>

@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { getProductColumns } from '@/config/tables/product-columns';
 import { normalizeString } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
+import { TEST_IDS } from '@/constants/test-ids';
 
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -89,7 +90,7 @@ export function ProductsPanel() {
     startTransition(async () => {
       const result = await toggleProductVisibilityAction(p.id!, !p.showOnLanding);
       if (!result.success) return showGlobalMessage('error', result.error);
-      
+
       showGlobalMessage('success', result.message || 'Visibilidad actualizada');
       invalidateAllCaches();
       syncData();
@@ -141,7 +142,7 @@ export function ProductsPanel() {
         const terms = normalizeString(search).split(/\s+/);
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
-        
+
         const combinedText = [
           normalizeString(p.device?.name),
           normalizeString(p.description),
@@ -200,6 +201,7 @@ export function ProductsPanel() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={role === 'admin' ? "Buscar por equipo, descripción o proveedor" : "Buscar por equipo o descripción"}
                 className="h-11"
+                data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <div className="flex items-center gap-2">
                 <div className="relative w-[110px] sm:max-w-[130px]">
@@ -210,6 +212,7 @@ export function ProductsPanel() {
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value)}
                     className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
+                    data-testid={TEST_IDS.productos.inputBusquedaPrecioMin}
                   />
                 </div>
                 <div className="relative w-[110px] sm:max-w-[130px]">
@@ -220,38 +223,42 @@ export function ProductsPanel() {
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value)}
                     className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
+                    data-testid={TEST_IDS.productos.inputBusquedaPrecioMax}
                   />
                 </div>
               </div>
             </div>
-              <div className="flex items-center gap-2 sm:gap-4">
-                {role === 'admin' && (
-                  <ToggleFilter
-                    id="showZeroStock"
-                    checked={showZeroStock}
-                    onChange={setShowZeroStock}
-                    label="Ver sin stock"
-                  />
-                )}
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={() => syncData(true)}
-                  disabled={isPending}
-                  title="Sincronizar"
-                  className="h-11 w-11"
-                >
-                  <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick()}
-                  leftIcon={<Plus className="w-5 h-5" />}
-                  className="h-11"
-                >
-                  Ingresar Stock
-                </Button>
-              </div>
+            <div className="flex items-center gap-2 sm:gap-4">
+              {role === 'admin' && (
+                <ToggleFilter
+                  id="showZeroStock"
+                  checked={showZeroStock}
+                  onChange={setShowZeroStock}
+                  label="Ver sin stock"
+                  data-testid={TEST_IDS.general.btnVerOcultos}
+                />
+              )}
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={() => syncData(true)}
+                disabled={isPending}
+                title="Sincronizar"
+                className="h-11 w-11"
+                data-testid={TEST_IDS.general.btnSincronizar}
+              >
+                <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => handleEditClick()}
+                leftIcon={<Plus className="w-5 h-5" />}
+                className="h-11"
+                data-testid={TEST_IDS.general.btnAgregar}
+              >
+                Ingresar Stock
+              </Button>
+            </div>
           </div>
 
           <GlobalMessage message={globalMessage} />
@@ -271,7 +278,7 @@ export function ProductsPanel() {
             width="2xl"
             onSubmit={handleSubmit((data) => {
               if (editingItem) {
-                const changedData: any = { 
+                const changedData: any = {
                   version: editingItem.version,
                   deviceVersion: editingItem.device?.version,
                   providerVersion: editingItem.provider?.version

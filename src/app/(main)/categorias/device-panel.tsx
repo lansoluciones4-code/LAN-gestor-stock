@@ -19,6 +19,7 @@ import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeString } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
+import { TEST_IDS } from '@/constants/test-ids';
 
 
 export function DevicePanel() {
@@ -119,12 +120,14 @@ export function DevicePanel() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar modelos por marca, versión o nombre..."
                 className="h-11"
+                data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
                 id="showInactive"
                 checked={showInactive}
                 onChange={setShowInactive}
                 label="Ver Inactivos"
+                data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
@@ -137,6 +140,7 @@ export function DevicePanel() {
                   disabled={isPending}
                   title="Sincronizar"
                   className="h-11 w-11"
+                  data-testid={TEST_IDS.general.btnSincronizar}
                 >
                   <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
                 </Button>
@@ -145,6 +149,7 @@ export function DevicePanel() {
                   variant="primary"
                   leftIcon={<Plus className="w-5 h-5" />}
                   className="h-11"
+                  data-testid={TEST_IDS.general.btnAgregar}
                 >
                   Agregar Categoría
                 </Button>
@@ -158,7 +163,7 @@ export function DevicePanel() {
             columns={columns}
             data={filteredDevices}
             isLoading={isPending}
-            emptyMessage="No hay equipos registrados."
+            emptyMessage="No hay categorías registradas."
           />
 
           <ResponsiveModal
@@ -171,7 +176,7 @@ export function DevicePanel() {
               if (editingItem) {
                 const changedData: any = { version: editingItem.version };
                 let hasChanges = false;
-                
+
                 Object.keys(dirtyFields).forEach((key) => {
                   const k = key as keyof DeviceInput;
                   (changedData as any)[k] = data[k];
@@ -187,7 +192,7 @@ export function DevicePanel() {
                 handleEditSubmit(data);
               }
             })}
-            submitLabel={editingItem ? 'Fichar Equipo' : 'Fichar Equipo'}
+            submitLabel={editingItem ? 'Actualizar Categoría' : 'Agregar Categoría'}
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />

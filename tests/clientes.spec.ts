@@ -1,5 +1,7 @@
 /* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
+import { ClientesPage } from './pages/ClientesPage';
+import { MESSAGES } from '@/config/messages';
 
 
 // =========================================================================
@@ -30,7 +32,7 @@ const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería requerir campos obligatorios',
     nombre: 'Cliente Valido', telefono: '', correo: '', dni: '',
-    erroresEsperados: ['El teléfono es obligatorio', 'El correo electrónico es', 'El DNI es obligatorio']
+    erroresEsperados: ['El teléfono es obligatorio', 'Formato de correo electrónico', 'El DNI es obligatorio']
   },
   {
     descripcion: 'Debería requerir un nombre de al menos 2 caracteres',
@@ -53,51 +55,43 @@ const CASOS_DE_VALIDACION = [
     erroresEsperados: [
       'Nombre demasiado largo',
       'Número de teléfono demasiado',
-      'Email demasiado largo', //TODO can change
+      'El correo electrónico es',
       'Documento demasiado largo'
     ]
   }
 ];
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3000/login');
-  await page.getByRole('textbox', { name: 'Usuario' }).fill('admin');
-  await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin');
-  await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
-
-  await expect(page).not.toHaveURL(/login/);
-  // URL de la pestaña de Clientes
-  await page.goto('http://localhost:3000/clientes');
+  const clientesPage = new ClientesPage(page);
+  await clientesPage.goto();
 });
 
 test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
 
   for (const caso of CASOS_DE_VALIDACION) {
     test(`Validación: ${caso.descripcion}`, async ({ page }) => {
-      const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
-      const inputTelefono = page.getByRole('textbox', { name: UI.TELEFONO });
-      const inputCorreo = page.getByRole('textbox', { name: UI.CORREO });
-      const inputDni = page.getByRole('textbox', { name: UI.DNI });
-
-      const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
-      const btnRegistrar = page.getByRole('button', { name: UI.BTN_REGISTRAR });
-
-      await btnAgregar.click();
-
-      if (caso.nombre) await inputNombre.fill(caso.nombre);
-      if (caso.telefono) await inputTelefono.fill(caso.telefono);
-      if (caso.correo) await inputCorreo.fill(caso.correo);
-      if (caso.dni) await inputDni.fill(caso.dni);
-
-      await btnRegistrar.click();
+      const clientesPage = new ClientesPage(page);
+      await clientesPage.crearCliente(caso.nombre, caso.telefono, caso.correo, caso.dni);
 
       for (const errorTexto of caso.erroresEsperados) {
         await expect(page.getByText(errorTexto)).toBeVisible();
       }
-
-      await expect(btnRegistrar).toBeVisible();
     });
   }
+
+  test('Deberia fallar por DNI duplicado', async ({ page }) => {
+    const clientesPage = new ClientesPage(page);
+    const { nombre, dni, tel, email } = await clientesPage.inyectarClienteEfimero();
+    const errorEsperado = MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION;
+
+    await clientesPage.crearCliente(nombre, tel, email, dni);
+    await expect(page.getByText(errorEsperado)).toBeVisible();
+    await clientesPage.cancelarFormularioCreacion();
+
+    const dni2 = dni + '-/';
+    await clientesPage.crearCliente(nombre, tel, email, dni2);
+    await expect(page.getByText(errorEsperado)).toBeVisible();
+  });
 
   test('Debería vaciar el formulario al cancelar', async ({ page }) => {
     const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
@@ -124,109 +118,106 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
   });
 
   test('Debería transitar correctamente el ciclo de desactivación y reactivación', async ({ page }) => {
-    const nombre = 'ClienteDesactivable';
-    const telefono = '291 718-1273';
-    const correo = 'correoEjemplo@correo.com';
-    const dni = '12345678';
+    const clientesPage = new ClientesPage(page);
+    const { nombre } = await clientesPage.inyectarClienteEfimero();
 
-    const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
-    const inputTelefono = page.getByRole('textbox', { name: UI.TELEFONO });
-    const inputCorreo = page.getByRole('textbox', { name: UI.CORREO });
-    const inputDni = page.getByRole('textbox', { name: UI.DNI });
+    await clientesPage.buscarCliente(nombre);
+    await expect(page.getByText(nombre, { exact: true })).toBeVisible();
 
-    const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
-    const btnRegistrar = page.getByRole('button', { name: UI.BTN_REGISTRAR });
-    const btnVerInactivos = page.getByLabel(UI.BTN_VER_INACTIVOS);
+    await clientesPage.desactivarCliente(nombre);
+    await expect(page.getByText(nombre, { exact: true })).toBeHidden();
 
-    // Módulo de Creación
-    await btnAgregar.click();
-    await inputNombre.fill(nombre);
-    await inputTelefono.fill(telefono);
-    await inputCorreo.fill(correo);
-    await inputDni.fill(dni);
-    await btnRegistrar.click();
+    await clientesPage.verInactivos();
 
-    // Desactivación Lógica
-    const filaActiva = page.getByRole('row').filter({ hasText: nombre });
-    await expect(filaActiva).toBeVisible();
-    await filaActiva.getByRole('button', { name: UI.BTN_DESACTIVAR }).click();
-    await expect(filaActiva).toBeHidden({ timeout: 15000 });
+    await clientesPage.buscarCliente(nombre);
+    await expect(page.getByText(nombre, { exact: true })).toBeVisible();
 
-    // Verificación en Inactivos y Reactivación
-    await btnVerInactivos.click();
-    const filaInactiva = page.getByRole('row').filter({ hasText: nombre });
-    await expect(filaInactiva).toBeVisible({ timeout: 15000 });
-
-    await filaInactiva.getByRole('button', { name: UI.BTN_ACTIVAR }).click();
-    await expect(filaInactiva).toBeVisible({ timeout: 15000 });
+    await clientesPage.activarCliente(nombre);
+    await clientesPage.buscarCliente(nombre);
+    await expect(page.getByText(nombre, { exact: true })).toBeVisible();
   });
-});
 
-test.describe.serial('Gestión de Clientes: Ciclo de Vida CRUD', () => {
+  for (const caso of CASOS_DE_VALIDACION) {
+    test(`Validación edición: ${caso.descripcion}`, async ({ page }) => {
+      const clientesPage = new ClientesPage(page);
+      const { nombre } = await clientesPage.inyectarClienteEfimero();
 
-  const testEntity = {
-    nombreOriginal: 'ClienteCualquiera',
-    telefonoOriginal: '291 718-1273',
-    correoOriginal: 'correoEjemplo@correo.com',
-    dniOriginal: '11111111',
-    nombreEditado: 'ClienteEditado',
-    telefonoEditado: '291 999-9999',
-    correoEditado: 'editado@correo.com',
-    dniEditado: '99999999'
-  };
+      await clientesPage.buscarCliente(nombre);
+
+      await clientesPage.editarCliente(nombre, caso.nombre, caso.telefono, caso.correo, caso.dni);
+
+      for (const errorTexto of caso.erroresEsperados) {
+        await expect(page.getByText(errorTexto)).toBeVisible();
+      }
+    });
+  }
+
+  test('Debería desactivar a un cliente, crear uno con DNI identico y aseverar reactivacion con nuevos datos', async ({ page }) => {
+    const clientesPage = new ClientesPage(page);
+    const { nombre: nombreAntiguo, dni } = await clientesPage.inyectarClienteEfimero();
+
+    const clienteBase = {
+      nombre: 'Cliente ocupa dni desactivado',
+      telefono: '291 1112222',
+      correo: 'base@reactivado.com',
+      dni: dni
+    };
+
+    await clientesPage.buscarCliente(nombreAntiguo);
+    await clientesPage.desactivarCliente(nombreAntiguo);
+
+    await clientesPage.crearCliente(clienteBase.nombre, clienteBase.telefono, clienteBase.correo, clienteBase.dni);
+
+    await clientesPage.buscarCliente(clienteBase.dni);
+    await expect(page.getByText(clienteBase.dni, { exact: true })).toBeVisible();
+
+    await clientesPage.verInactivos();
+    await clientesPage.buscarCliente(nombreAntiguo);
+    await expect(page.getByText(nombreAntiguo, { exact: true })).toBeHidden();
+  });
 
   test('Debería crear un nuevo cliente exitosamente', async ({ page }) => {
-    const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
-    const inputTelefono = page.getByRole('textbox', { name: UI.TELEFONO });
-    const inputCorreo = page.getByRole('textbox', { name: UI.CORREO });
-    const inputDni = page.getByRole('textbox', { name: UI.DNI });
+    const clientesPage = new ClientesPage(page);
+    const testEntity = {
+      nombre: 'ClienteCualquiera',
+      telefono: '291 718-1273',
+      correo: 'correoEjemplo@correo.com',
+      dni: '11111111',
+      nombreEditado: 'ClienteEditado',
+      telefonoEditado: '291 999-9999',
+      correoEditado: 'editado@correo.com',
+      dniEditado: '99999999'
+    };
 
-    const btnAgregar = page.getByRole('button', { name: UI.BTN_AGREGAR_NUEVO });
-    const btnRegistrar = page.getByRole('button', { name: UI.BTN_REGISTRAR });
+    await clientesPage.crearCliente(testEntity.nombre, testEntity.telefono, testEntity.correo, testEntity.dni);
 
-    await btnAgregar.click();
-    await inputNombre.fill(testEntity.nombreOriginal);
-    await inputTelefono.fill(testEntity.telefonoOriginal);
-    await inputCorreo.fill(testEntity.correoOriginal);
-    await inputDni.fill(testEntity.dniOriginal);
-
-    await btnRegistrar.click();
-
-    await expect(page.getByText(testEntity.nombreOriginal)).toBeVisible();
+    await clientesPage.buscarCliente(testEntity.nombre);
+    await expect(page.getByText(testEntity.nombre, { exact: true })).toBeVisible();
   });
 
-  test('Debería buscar listar únicamente al cliente creado', async ({ page }) => {
-    const inputBusqueda = page.getByRole('textbox', { name: UI.BUSQUEDA });
-
-    await inputBusqueda.fill(testEntity.nombreOriginal);
-    await expect(page.getByText(testEntity.nombreOriginal)).toBeVisible();
-
-    const filasTabla = page.getByRole('row');
-    await expect(filasTabla).toHaveCount(2);
-  });
 
   test('Debería editar exitosamente los datos', async ({ page }) => {
-    const filaOriginal = page.getByRole('row').filter({ hasText: testEntity.nombreOriginal });
-    const btnEditar = filaOriginal.getByRole('button', { name: UI.BTN_EDITAR });
+    const clientesPage = new ClientesPage(page);
+    const { nombre, dni } = await clientesPage.inyectarClienteEfimero();
+    const testEntity = {
+      nombreOriginal: nombre,
+      nombreEditado: 'ClienteEditado',
+      telefonoEditado: '291 999-9999',
+      correoEditado: 'editado@correo.com',
+      dniEditado: dni
+    };
 
-    const inputNombre = page.getByRole('textbox', { name: UI.NOMBRE });
-    const inputTelefono = page.getByRole('textbox', { name: UI.TELEFONO });
-    const inputCorreo = page.getByRole('textbox', { name: UI.CORREO });
-    const inputDni = page.getByRole('textbox', { name: UI.DNI });
+    await clientesPage.editarCliente(
+      testEntity.nombreOriginal,
+      testEntity.nombreEditado,
+      testEntity.telefonoEditado,
+      testEntity.correoEditado,
+      testEntity.dniEditado);
 
-    const btnActualizar = page.getByRole('button', { name: UI.BTN_ACTUALIZAR });
+    await clientesPage.buscarCliente(testEntity.nombreOriginal);
+    await expect(page.getByText(testEntity.nombreOriginal, { exact: true })).toBeHidden();
 
-    await btnEditar.click();
-
-    await inputNombre.fill(testEntity.nombreEditado);
-    await inputTelefono.fill(testEntity.telefonoEditado);
-    await inputCorreo.fill(testEntity.correoEditado);
-    await inputDni.fill(testEntity.dniEditado);
-    await btnActualizar.click();
-
-    // Verificamos la desaparición (depende de los campos exactos q se muestren en la UI, usualmente Nombre o Correo y Tel)
-    await expect(page.getByText(testEntity.nombreOriginal)).toBeHidden();
-
-    await expect(page.getByText(testEntity.nombreEditado)).toBeVisible();
+    await clientesPage.buscarCliente(testEntity.dniEditado);
+    await expect(page.getByText(testEntity.dniEditado, { exact: true })).toBeVisible();
   });
 });

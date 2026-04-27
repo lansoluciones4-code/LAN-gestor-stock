@@ -1,262 +1,318 @@
 /* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
+import { ProductosPage } from './pages/ProductosPage';
+import { MESSAGES } from '@/config/messages';
 
-// =========================================================================
-// VARIABLES CONFIGURABLES
-// =========================================================================
-const TEST_DATA = {
-  EQUIPO: 'iPhone 14',
-  PROVEEDOR: 'TechWorld Distribuidora',
-  DESC_NUEVA: 'Negro, 256GB - Kit Funda TEST',
-  DESC_EDITADA: 'Negro, 256GB - Sin cargador EDITADO',
-  PRECIO_COMPRA: '1000',
-  PRECIO_VENTA: '1500',
-  UNIDADES: '5',
-  UNIDADES_EDITADAS: '10'
-};
+const CASOS_DE_VALIDACION = [
+  {
+    descripcion: 'Debería requerir equipo',
+    equipo: undefined,
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '1',
+    venta: '100',
+    unidades: '200',
+    erroresEsperados: ['Debes seleccionar un equipo v']
+  },
+  {
+    descripcion: 'Debería requerir proveedor',
+    equipo: 'Equipo 1',
+    proveedor: undefined,
+    desc: '',
+    compra: '1',
+    venta: '100',
+    unidades: '200',
+    erroresEsperados: ['Debes seleccionar un proveedor válido']
+  },
+  {
+    descripcion: 'Debería requerir equipo y proveedor',
+    equipo: undefined,
+    proveedor: undefined,
+    desc: '',
+    compra: '1',
+    venta: '100',
+    unidades: '200',
+    erroresEsperados: ['Debes seleccionar un equipo v', 'Debes seleccionar un proveedor válido']
+  },
+  {
+    descripcion: 'Debería requerir venta no negativas',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '1',
+    venta: '-100',
+    unidades: '200',
+    erroresEsperados: ['El precio de venta no puede ser negativo']
+  },
+  {
+    descripcion: 'Debería requerir unidades no negativas',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '1',
+    venta: '100',
+    unidades: '-200',
+    erroresEsperados: ['El stock no puede ser negativo']
+  },
+  {
+    descripcion: 'Debería requerir compra no negativas',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '-1',
+    venta: '100',
+    unidades: '200',
+    erroresEsperados: ['El precio de compra no puede ser negativo']
+  },
+  {
+    descripcion: 'Debería requerir compra numerica',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '-',
+    venta: '1',
+    unidades: '1',
+    erroresEsperados: ['Precio o unidades inválidas']
+  },
+  {
+    descripcion: 'Debería requerir venta numerica',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '1',
+    venta: '-',
+    unidades: '1',
+    erroresEsperados: ['Precio o unidades inválidas']
+  },
+  {
+    descripcion: 'Debería requerir unidad numerica',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
+    desc: '',
+    compra: '1',
+    venta: '1',
+    unidades: '-',
+    erroresEsperados: ['Precio o unidades inválidas']
+  },
+];
 
-const UI = {
-  // Botones Modales
-  BTN_INGRESAR_STOCK: 'Ingresar Stock',
-  BTN_SELECCIONAR_EQUIPO: 'Seleccionar Equipo',
-  BTN_SELECCIONAR_PROVEEDOR: 'Seleccionar Proveedor',
-  BTN_CONFIRMAR_INVENTARIO: 'Confirmar Inventario',
-  BTN_CANCELAR: 'Cancelar',
-  BTN_EDITAR: 'Editar',
-  BTN_ELIMINAR: 'Eliminar',
-  BTN_PURGAR: 'Purgar Stock',
-  BTN_REGISTRAR_PERDIDA: 'Registrar Pérdida',
-  BTN_CONFIRMAR_PERDIDA: 'Confirmar Pérdida',
-
-  // Inputs/Placeholders
-  INPUT_DESC: 'Ej: Negro, 256GB - Kit Funda',
-  INPUT_PRECIO_COMPRA: 'input[name="purchasePrice"]',
-  INPUT_PRECIO_VENTA: 'input[name="salePrice"]',
-  INPUT_UNIDADES: '1', // placeholder temporal grabado
-  INPUT_PERDIDA_CANTIDAD: 'Ej: 1', // placeholder
-  INPUT_PERDIDA_MOTIVO: 'Ej: Pantalla rota al', // textbox name
-
-  // Textos y Filtros
-  FILTRO_VER_SIN_STOCK: 'Ver sin stock',
-  DEFAULT_UNITS_VALUE: '1' //No es un placeholder, unidades siempre dice 1 por default
-};
+const CASOS_DE_EDICION = [
+  {
+    descripcion: 'Debería requerir compra, venta y unidades no negativas',
+    desc: '',
+    compra: '-1',
+    venta: '-100',
+    unidades: '-200',
+    erroresEsperados: ['El stock no puede ser negativo', 'El precio de compra no puede', 'El precio de venta no puede']
+  },
+  {
+    descripcion: 'Debería requerir compra numerica',
+    desc: '',
+    compra: '-',
+    venta: '1',
+    unidades: '1',
+    erroresEsperados: ['Precio o unidades inválidas']
+  },
+  {
+    descripcion: 'Debería requerir venta numerica',
+    desc: '',
+    compra: '1',
+    venta: '-',
+    unidades: '1',
+    erroresEsperados: ['Precio o unidades inválidas']
+  },
+  {
+    descripcion: 'Debería requerir unidad numerica',
+    desc: '',
+    compra: '1',
+    venta: '1',
+    unidades: '-',
+    erroresEsperados: ['Precio o unidades inválidas']
+  },
+];
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3000/login');
-  await page.getByRole('textbox', { name: 'Usuario' }).fill('admin');
-  await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin');
-  await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
-
-  await expect(page).not.toHaveURL(/login/);
-  // URL de Productos
-  await page.goto('http://localhost:3000/productos');
+  const productosPage = new ProductosPage(page);
+  await productosPage.goto();
 });
 
 test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
 
   test('Debería vaciar el formulario al cancelar', async ({ page }) => {
-    // Abrir modal
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
+    const productosPage = new ProductosPage(page);
+    const producto = await productosPage.inyectarProductoEfimero();
 
-    // Llenar campos
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
-    await page.getByRole('button', { name: TEST_DATA.EQUIPO, exact: true }).click();
-    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill('Test Wiping');
+    await productosPage.abrirFormularioCreacion();
+    await productosPage.completarFormularioCreacion(producto.equipo, undefined, 'Test Wiping', '100', undefined, '5');
+    await productosPage.cancelarFormularioCreacion();
 
-    // Llenar con force true si a veces auto-selecciona al hacer click
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('5');
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('100');
-
-    // Cancelar
-    await page.getByRole('button', { name: UI.BTN_CANCELAR }).click();
-
-    // Volver a abrir
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
-
-    // Validar vacío
-    await expect(page.getByRole('textbox', { name: UI.INPUT_DESC })).toHaveValue('');
-    await expect(page.getByPlaceholder(UI.INPUT_UNIDADES)).toHaveValue(UI.DEFAULT_UNITS_VALUE);
-    await expect(page.locator(UI.INPUT_PRECIO_COMPRA)).toHaveValue('0');
-    await expect(page.locator(UI.INPUT_PRECIO_VENTA)).toHaveValue('0');
-
-    // Validar que el equipo haya vuelto al selector por defecto
-    await expect(page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO })).toBeVisible();
+    await productosPage.abrirFormularioCreacion();
+    await productosPage.verificarFormularioCreacionVacio();
   });
 
-  test('Validar no permitir cantidades ni precios negativos', async ({ page }) => {
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
+  for (const caso of CASOS_DE_VALIDACION) {
+    test(`Validación: ${caso.descripcion}`, async ({ page }) => {
+      const productosPage = new ProductosPage(page);
+      const producto = await productosPage.inyectarProductoEfimero();
+      const equipo = (caso.equipo) ? producto.equipo : undefined;
+      const proveedor = caso.proveedor ? producto.proveedor : undefined;
 
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('-1');
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('-100');
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill('-200');
+      await productosPage.crearProducto(equipo, proveedor, caso.desc, caso.compra, caso.venta, caso.unidades);
 
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
+      for (const errorTexto of caso.erroresEsperados) {
+        await expect(page.getByText(errorTexto)).toBeVisible();
+      }
+    });
+  }
 
-    await expect(page.getByText('El stock no puede ser negativo')).toBeVisible();
-    await expect(page.getByText('El precio de compra no puede')).toBeVisible();
-    await expect(page.getByText('El precio de venta no puede')).toBeVisible();
-  });
+  for (const caso of CASOS_DE_EDICION) {
+    test(`Validación edición: ${caso.descripcion}`, async ({ page }) => {
+      const productosPage = new ProductosPage(page);
+      const producto = await productosPage.inyectarProductoEfimero();
 
-  test('Validar borrado manual de campos numéricos', async ({ page }) => {
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
+      await productosPage.editarProducto(
+        producto.equipo,
+        producto.proveedor,
+        caso.desc,
+        undefined,
+        undefined,
+        undefined,
+        caso.unidades,
+        caso.compra,
+        caso.venta
+      );
 
-    // Simulamos escribir y borrar para disparar validación de campo requerido / "debe ser número"
-    // Las acciones de Playwright de borrar con fill('') deben bastar según product_actions.txt
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('1');
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('');
-
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('100');
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('');
-
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill('200');
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill('');
-
-    await expect(page.getByText('El stock debe ser un número')).toBeVisible();
-    await expect(page.getByText('El precio de compra debe ser un número')).toBeVisible();
-    await expect(page.getByText('El precio de venta debe ser un número')).toBeVisible();
-  });
-});
-
-test.describe.serial('Gestión de Productos: Ciclo de Vida CRUD y Mermas', () => {
+      for (const errorTexto of caso.erroresEsperados) {
+        await expect(page.getByText(errorTexto)).toBeVisible();
+      }
+    });
+  }
 
   test('Debería crear un nuevo producto (Ingresar Stock)', async ({ page }) => {
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
+    const productosPage = new ProductosPage(page);
+    const producto = await productosPage.inyectarProductoEfimero();
 
-    // Equipo y Proveedor
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
-    await page.getByRole('button', { name: TEST_DATA.EQUIPO, exact: true }).click();
+    const TEST_DATA = {
+      EQUIPO: producto.equipo,
+      PROVEEDOR: producto.proveedor,
+      DESC: producto.equipo + producto.proveedor,
+      PRECIO_COMPRA: '1000',
+      PRECIO_VENTA: '1500',
+      UNIDADES: '5',
+      UNIDADES_EDITADAS: '10'
+    };
 
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_PROVEEDOR }).click();
-    await page.getByRole('button', { name: TEST_DATA.PROVEEDOR }).first().click();
+    await productosPage.crearProducto(
+      TEST_DATA.EQUIPO,
+      TEST_DATA.PROVEEDOR,
+      TEST_DATA.DESC,
+      TEST_DATA.PRECIO_COMPRA,
+      TEST_DATA.PRECIO_VENTA,
+      TEST_DATA.UNIDADES);
 
-    // Textos Numéricos y Descripción
-    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(TEST_DATA.DESC_NUEVA);
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill(TEST_DATA.PRECIO_COMPRA);
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill(TEST_DATA.PRECIO_VENTA);
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill(TEST_DATA.UNIDADES);
-
-    // Confirmar
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
-
-    // Validar creación filtrando por nombre de descripción y equipo
-    const filaCreado = page.getByRole('row').filter({ hasText: TEST_DATA.DESC_NUEVA });
-    await expect(filaCreado).toBeVisible();
-    await expect(filaCreado).toContainText(TEST_DATA.EQUIPO);
+    await productosPage.buscarProducto(TEST_DATA.DESC);
+    const fila = productosPage.obtenerFila(TEST_DATA.EQUIPO, TEST_DATA.PROVEEDOR, TEST_DATA.DESC);
+    await expect(fila).toBeVisible();
   });
 
   test('Debería editar exitosamente', async ({ page }) => {
-    const filaOriginal = page.getByRole('row').filter({ hasText: TEST_DATA.DESC_NUEVA });
-    await filaOriginal.getByRole('button', { name: UI.BTN_EDITAR }).click();
+    const productosPage = new ProductosPage(page);
+    const producto = await productosPage.inyectarProductoEfimero();
+    const TEST_DATA = {
+      EQUIPO_VIEJO: producto.equipo,
+      EQUIPO: undefined,
+      PROVEEDOR_VIEJO: producto.proveedor,
+      PROVEEDOR: producto.proveedor,
+      DESC_VIEJA: producto.descripcion,
+      DESC_EDITADA: producto.descripcion + producto.proveedor,
+      PRECIO_COMPRA: '999',
+      PRECIO_VENTA: '999',
+      UNIDADES_EDITADAS: '10'
+    };
 
-    // Modificar valores
-    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(TEST_DATA.DESC_EDITADA);
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill(TEST_DATA.UNIDADES_EDITADAS);
+    await productosPage.editarProducto(
+      TEST_DATA.EQUIPO_VIEJO,
+      TEST_DATA.PROVEEDOR_VIEJO,
+      TEST_DATA.DESC_VIEJA,
+      TEST_DATA.EQUIPO,
+      TEST_DATA.PROVEEDOR,
+      TEST_DATA.DESC_EDITADA,
+      TEST_DATA.UNIDADES_EDITADAS,
+      TEST_DATA.PRECIO_COMPRA,
+      TEST_DATA.PRECIO_VENTA);
 
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
-
-    // Verificar invisibilidad del anterior y presencia del nuevo
-    await expect(page.getByRole('row').filter({ hasText: TEST_DATA.DESC_NUEVA })).toBeHidden();
-    const filaEditada = page.getByRole('row').filter({ hasText: TEST_DATA.DESC_EDITADA });
+    await productosPage.buscarProducto(TEST_DATA.DESC_EDITADA);
+    const filaEditada = productosPage.obtenerFila(TEST_DATA.EQUIPO_VIEJO, TEST_DATA.PROVEEDOR, TEST_DATA.DESC_EDITADA);
     await expect(filaEditada).toBeVisible();
     await expect(filaEditada).toContainText(TEST_DATA.UNIDADES_EDITADAS);
+    await expect(filaEditada).toContainText(TEST_DATA.PRECIO_COMPRA);
+    await expect(filaEditada).toContainText(TEST_DATA.PRECIO_VENTA);
   });
 
   test('Debería fallar al registrar pérdida sin motivo', async ({ page }) => {
-    const fila = page.getByRole('row').filter({ hasText: TEST_DATA.DESC_EDITADA });
-    await fila.getByRole('button', { name: UI.BTN_REGISTRAR_PERDIDA }).click();
+    const productosPage = new ProductosPage(page);
+    const producto = await productosPage.inyectarProductoEfimero();
+    const PRODUCTO = {
+      EQUIPO: producto.equipo,
+      PROVEEDOR: producto.proveedor,
+      DESC: producto.descripcion,
+      CANTIDAD: '1'
+    };
 
-    await page.getByPlaceholder(UI.INPUT_PERDIDA_CANTIDAD).fill('1');
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_PERDIDA }).click();
+    await productosPage.registrarPerdida(PRODUCTO.EQUIPO, PRODUCTO.PROVEEDOR, PRODUCTO.DESC, PRODUCTO.CANTIDAD, undefined);
 
     await expect(page.getByText('Debe especificar un motivo')).toBeVisible();
-    await page.getByRole('button', { name: UI.BTN_CANCELAR }).click();
   });
 
-  test('Debería registrar pérdida exitosamente', async ({ page }) => {
-    const fila = page.getByRole('row').filter({ hasText: TEST_DATA.DESC_EDITADA });
-    await fila.getByRole('button', { name: UI.BTN_REGISTRAR_PERDIDA }).click();
+  test('Debería registrar pérdida exitosamente, intentar eliminar el producto y fallar', async ({ page }) => {
+    const productosPage = new ProductosPage(page);
+    const producto = await productosPage.inyectarProductoEfimero();
 
-    const qtyPerdida = '2';
-    await page.getByPlaceholder(UI.INPUT_PERDIDA_CANTIDAD).fill(qtyPerdida);
-    await page.getByRole('textbox', { name: UI.INPUT_PERDIDA_MOTIVO }).fill('Prueba perdida E2E');
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_PERDIDA }).click();
+    const unidades = producto.stock;
+    const unidadesAPerder = 1;
+    const unidadesResultantes = unidades - unidadesAPerder;
 
-    // Verificamos que contenga la actualización: 10 - 2 = 8
-    const expectedQty = parseInt(TEST_DATA.UNIDADES_EDITADAS) - parseInt(qtyPerdida);
-    await expect(fila).toContainText(expectedQty.toString());
-  });
+    const PRODUCTO = {
+      EQUIPO: producto.equipo,
+      PROVEEDOR: producto.proveedor,
+      DESC: producto.descripcion,
+      MOTIVO: 'Algo',
+      CANTIDAD_PERDIDA: unidadesAPerder.toString(),
+      UNIDADES_NUEVO: unidadesResultantes.toString(),
+    };
 
-  test('Debería fallar al intentar eliminar un producto con historial de pérdidas', async ({ page }) => {
-    const fila = page.getByRole('row').filter({ hasText: TEST_DATA.DESC_EDITADA });
-    await fila.getByRole('button', { name: UI.BTN_ELIMINAR }).click();
+    await productosPage.registrarPerdida(PRODUCTO.EQUIPO, PRODUCTO.PROVEEDOR, PRODUCTO.DESC, PRODUCTO.CANTIDAD_PERDIDA, PRODUCTO.MOTIVO);
 
-    // Modal confirmación
-    await page.getByRole('button', { name: UI.BTN_PURGAR }).click();
+    await productosPage.buscarProducto(PRODUCTO.DESC);
+    const fila = productosPage.obtenerFila(PRODUCTO.EQUIPO, PRODUCTO.PROVEEDOR, PRODUCTO.DESC);
+    await expect(fila).toContainText(PRODUCTO.UNIDADES_NUEVO);
 
-    // Validar mensaje de error de que no se puede eliminar por tener historial
-    await expect(page.getByText('No se puede eliminar: este')).toBeVisible();
+    await productosPage.eliminarProducto(PRODUCTO.EQUIPO, PRODUCTO.PROVEEDOR, PRODUCTO.DESC);
+
+    await expect(page.getByText(MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION)).toBeVisible();
   });
 
   test('Debería crear y purgar exitosamente un producto sin historial', async ({ page }) => {
-    // 1. Crear producto temporal sin pérdidas
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
-    await page.getByRole('button', { name: TEST_DATA.EQUIPO, exact: true }).click();
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_PROVEEDOR }).click();
-    await page.getByRole('button', { name: TEST_DATA.PROVEEDOR }).first().click();
+    const productosPage = new ProductosPage(page);
+    const producto = await productosPage.inyectarProductoEfimero();
 
-    const descEliminar = 'Test para purgado final';
-    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(descEliminar);
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('100');
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill('200');
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('5');
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
+    await productosPage.eliminarProducto(producto.equipo, producto.proveedor, producto.descripcion);
 
-    const filaNueva = page.getByRole('row').filter({ hasText: descEliminar });
-    await expect(filaNueva).toBeVisible();
-
-    // 2. Proceder a purgarlo físicamente
-    await filaNueva.getByRole('button', { name: UI.BTN_ELIMINAR }).click();
-    await page.getByRole('button', { name: UI.BTN_PURGAR }).click();
-
-    // Validar que desaparece del DOM y no hay error
-    await expect(filaNueva).toBeHidden({ timeout: 15000 });
+    await productosPage.buscarProducto(producto.descripcion);
+    const fila = productosPage.obtenerFila(producto.equipo, producto.proveedor, producto.descripcion);
+    await expect(fila).toBeHidden();
   });
 
-  test('Debería filtrar por precio correctamente buscando Redmi Note 13', async ({ page }) => {
-    // 1. Crear Primer Redmi con precio 100
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
-    await page.getByRole('button', { name: 'Redmi Note 12', exact: true }).click();
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_PROVEEDOR }).click();
-    await page.getByRole('button', { name: TEST_DATA.PROVEEDOR }).first().click();
+  test('Debería filtrar por precio correctamente', async ({ page }) => {
+    const productosPage = new ProductosPage(page);
+    const producto1 = await productosPage.inyectarProductoEfimero();
+    const producto2 = await productosPage.inyectarProductoEfimero();
 
-    const descBarato = 'Redmi Barato';
-    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(descBarato);
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('100');
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill('200');
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('1');
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
+    await productosPage.filtrarPorPrecio(producto1.salePrice, undefined);
 
-    // 2. Crear Segundo Redmi con precio 500
-    await page.getByRole('button', { name: UI.BTN_INGRESAR_STOCK }).click();
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_EQUIPO }).click();
-    await page.getByRole('button', { name: 'Redmi Note 13', exact: true }).click();
-    await page.getByRole('button', { name: UI.BTN_SELECCIONAR_PROVEEDOR }).click();
-    await page.getByRole('button', { name: TEST_DATA.PROVEEDOR }).first().click();
+    await expect(page.getByRole('row').filter({ hasText: producto1.descripcion })).toBeVisible();
 
-    const descCaro = 'Redmi Caro';
-    await page.getByRole('textbox', { name: UI.INPUT_DESC }).fill(descCaro);
-    await page.locator(UI.INPUT_PRECIO_COMPRA).fill('500');
-    await page.locator(UI.INPUT_PRECIO_VENTA).fill('1000');
-    await page.getByPlaceholder(UI.INPUT_UNIDADES).fill('1');
-    await page.getByRole('button', { name: UI.BTN_CONFIRMAR_INVENTARIO }).click();
-
-    // 3. Filtrar por precio. Establecemos Min = 600 para que solo aparezca el Caro
-    await page.getByPlaceholder('Min').fill('600');
-
-    // 4. Validar que solo se vea el caro
-    await expect(page.getByRole('row').filter({ hasText: 'Redmi Note 13' })).toBeVisible();
-    await expect(page.getByRole('row').filter({ hasText: 'Redmi Note 12' })).toBeHidden();
+    await productosPage.filtrarPorPrecio(undefined, producto2.salePrice);
+    await expect(page.getByRole('row').filter({ hasText: producto2.descripcion })).toBeVisible();
   });
 });

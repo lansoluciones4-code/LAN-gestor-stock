@@ -13,15 +13,24 @@ export const userSchema = createInsertSchema(users, {
   .pick({ username: true, role: true })
   .extend({
     id: z.string().optional(),
-    password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres').optional().or(z.literal('')),
+    password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres'),
   });
 
 export type UserInput = z.infer<typeof userSchema>;
 
 export const userUpdateSchema = userSchema.partial().extend({
   version: z.number().int().min(1),
+  password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres').optional().or(z.literal('')),
 });
 export type UserUpdateInput = z.infer<typeof userUpdateSchema>;
+
+/**
+ * Validation schema for the UI form when editing.
+ * Similar to userSchema but with password being optional.
+ */
+export const userEditFormSchema = userSchema.extend({
+  password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres').or(z.literal('')),
+});
 
 /**
  * Definition schema automatically inferred from DB Columns.

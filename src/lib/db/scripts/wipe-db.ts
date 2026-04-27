@@ -9,9 +9,7 @@ async function wipeDatabase() {
     process.exit(1);
   }
 
-  
   console.log('⚠️  ATENCIÓN: Se van a ELIMINAR TODAS las tablas de la base de datos LOCAL.');
-
   
   console.log('Conectando a:', connectionString.split('@')[1]); // Mostrar solo el host para seguridad
 
