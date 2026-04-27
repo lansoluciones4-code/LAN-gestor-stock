@@ -40,7 +40,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   }, [isOpen, total]);
 
   const validateAndAdd = () => {
-    const normalizedAmount = amount.replace(',', '.');
+    const normalizedAmount = amount.replace(/\./g, '').replace(',', '.');
     const numAmount = Number(normalizedAmount);
     if (isNaN(numAmount) || numAmount < 0 || (numAmount === 0 && total > 0)) {
       setError('Monto inválido');

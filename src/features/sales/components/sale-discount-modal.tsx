@@ -61,8 +61,8 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
   };
 
   // Derive logic
-  const pVal = Number(percentage.replace(',', '.')) || 0;
-  const aVal = Number(amount.replace(',', '.')) || 0;
+  const pVal = Number(percentage.replace(/\./g, '').replace(',', '.')) || 0;
+  const aVal = Number(amount.replace(/\./g, '').replace(',', '.')) || 0;
 
   const discountFromPercentage = subtotal * (pVal / 100);
   const totalAfterPercentage = subtotal - discountFromPercentage;
@@ -75,8 +75,8 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       setError('El descuento total supera al subtotal.');
       return;
     }
-    const normalizedP = percentage.replace(',', '.');
-    const normalizedA = amount.replace(',', '.');
+    const normalizedP = percentage.replace(/\./g, '').replace(',', '.');
+    const normalizedA = amount.replace(/\./g, '').replace(',', '.');
 
     if (!isValidDecimal(normalizedP, 2) || !isValidDecimal(normalizedA, 2)) {
       setError('Los descuentos no pueden tener más de 2 decimales.');
