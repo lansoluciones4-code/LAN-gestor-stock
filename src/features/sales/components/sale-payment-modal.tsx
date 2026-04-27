@@ -110,14 +110,10 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       return;
     }
 
-    const normalized = val.replace(',', '.');
-    const dotCount = (normalized.match(/\./g) || []).length;
-
+    const normalized = val.replace(/\./g, '').replace(',', '.');
     setAmount(val);
 
-    if (dotCount > 1) {
-      setError('Máximo un separador decimal');
-    } else if (isNaN(Number(normalized))) {
+    if (isNaN(Number(normalized))) {
       setError('Formato inválido');
     } else {
       setError(null);

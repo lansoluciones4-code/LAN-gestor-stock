@@ -33,14 +33,14 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisi
     {
       header: 'Precio Público',
       cellClassName: 'font-semibold text-emerald-600 dark:text-emerald-400',
-      cell: (p) => `$${p.salePrice}`,
+      cell: (p) => `$${p.salePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
     },
     ...(role === 'admin'
       ? [
           {
             header: 'Costo',
             cellClassName: 'font-medium text-zinc-500',
-            cell: (p: ProductDef) => `$${p.purchasePrice}`,
+            cell: (p: ProductDef) => `$${p.purchasePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
           },
         ]
       : []),

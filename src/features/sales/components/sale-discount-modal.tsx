@@ -33,14 +33,10 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       return;
     }
 
-    const normalized = val.replace(',', '.');
-    const dotCount = (normalized.match(/\./g) || []).length;
-
+    const normalized = val.replace(/\./g, '').replace(',', '.');
     setPercentage(val);
 
-    if (dotCount > 1) {
-      setError('Máximo un separador decimal');
-    } else if (!/^\d*\.?\d*$/.test(normalized)) {
+    if (isNaN(Number(normalized))) {
       setError('Formato inválido');
     } else {
       setError(null);
@@ -54,14 +50,10 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       return;
     }
 
-    const normalized = val.replace(',', '.');
-    const dotCount = (normalized.match(/\./g) || []).length;
-
+    const normalized = val.replace(/\./g, '').replace(',', '.');
     setAmount(val);
 
-    if (dotCount > 1) {
-      setError('Máximo un separador decimal');
-    } else if (!/^\d*\.?\d*$/.test(normalized)) {
+    if (isNaN(Number(normalized))) {
       setError('Formato inválido');
     } else {
       setError(null);
