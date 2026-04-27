@@ -32,7 +32,7 @@ export function slugify(str: string): string {
 /**
  * Validates that a number (or string representation of a number) has at most the specified number of decimals.
  */
-export function isValidDecimal(value: number | string, maxDecimals: number = 3): boolean {
+export function isValidDecimal(value: number | string, maxDecimals: number = 2): boolean {
   const numStr = value.toString();
   if (!numStr.includes('.')) return true;
   const decimals = numStr.split('.')[1];
@@ -42,7 +42,7 @@ export function isValidDecimal(value: number | string, maxDecimals: number = 3):
 /**
  * Rounds a number to a specified number of decimal places.
  */
-export function roundToDecimals(num: number, decimals: number = 3): number {
+export function roundToDecimals(num: number, decimals: number = 2): number {
   const factor = Math.pow(10, decimals);
   return Math.round((num + Number.EPSILON) * factor) / factor;
 }

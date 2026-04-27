@@ -29,29 +29,48 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
   const handlePercentageChange = (val: string) => {
     if (val === '') {
       setPercentage('');
+      setError(null);
       return;
     }
-    if (/^\d*\.?\d*$/.test(val)) {
-      const num = Number(val);
-      if (num >= 0 && num <= 100) {
-        setPercentage(val);
-      }
+
+    const normalized = val.replace(',', '.');
+    const dotCount = (normalized.match(/\./g) || []).length;
+
+    setPercentage(val);
+
+    if (dotCount > 1) {
+      setError('Máximo un separador decimal');
+    } else if (!/^\d*\.?\d*$/.test(normalized)) {
+      setError('Formato inválido');
+    } else {
+      setError(null);
     }
   };
 
   const handleAmountChange = (val: string) => {
     if (val === '') {
       setAmount('');
+      setError(null);
       return;
     }
-    if (/^\d*\.?\d*$/.test(val)) {
-      setAmount(val);
+
+    const normalized = val.replace(',', '.');
+    const dotCount = (normalized.match(/\./g) || []).length;
+
+    setAmount(val);
+
+    if (dotCount > 1) {
+      setError('Máximo un separador decimal');
+    } else if (!/^\d*\.?\d*$/.test(normalized)) {
+      setError('Formato inválido');
+    } else {
+      setError(null);
     }
   };
 
   // Derive logic
-  const pVal = Number(percentage) || 0;
-  const aVal = Number(amount) || 0;
+  const pVal = Number(percentage.replace(',', '.')) || 0;
+  const aVal = Number(amount.replace(',', '.')) || 0;
 
   const discountFromPercentage = subtotal * (pVal / 100);
   const totalAfterPercentage = subtotal - discountFromPercentage;
@@ -64,8 +83,11 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
       setError('El descuento total supera al subtotal.');
       return;
     }
-    if (!isValidDecimal(percentage, 3) || !isValidDecimal(amount, 3)) {
-      setError('Los descuentos no pueden tener más de 3 decimales.');
+    const normalizedP = percentage.replace(',', '.');
+    const normalizedA = amount.replace(',', '.');
+
+    if (!isValidDecimal(normalizedP, 2) || !isValidDecimal(normalizedA, 2)) {
+      setError('Los descuentos no pueden tener más de 2 decimales.');
       return;
     }
     setError(null);

@@ -40,13 +40,14 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   }, [isOpen, total]);
 
   const validateAndAdd = () => {
-    const numAmount = Number(amount);
+    const normalizedAmount = amount.replace(',', '.');
+    const numAmount = Number(normalizedAmount);
     if (isNaN(numAmount) || numAmount < 0 || (numAmount === 0 && total > 0)) {
       setError('Monto inválido');
       return;
     }
-    if (!isValidDecimal(amount, 3)) {
-      setError('El monto no puede tener más de 3 decimales');
+    if (!isValidDecimal(normalizedAmount, 2)) {
+      setError('El monto no puede tener más de 2 decimales');
       return;
     }
 
@@ -105,10 +106,21 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   const handleAmountChange = (val: string) => {
     if (val === '-' || val === '') {
       setAmount(val);
+      setError(null);
       return;
     }
-    if (!isNaN(Number(val))) {
-      setAmount(val);
+
+    const normalized = val.replace(',', '.');
+    const dotCount = (normalized.match(/\./g) || []).length;
+
+    setAmount(val);
+
+    if (dotCount > 1) {
+      setError('Máximo un separador decimal');
+    } else if (isNaN(Number(normalized))) {
+      setError('Formato inválido');
+    } else {
+      setError(null);
     }
   };
 
