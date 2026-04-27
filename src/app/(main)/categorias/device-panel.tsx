@@ -17,7 +17,7 @@ import { useDevicesStore } from '@/stores/devices.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -75,8 +75,8 @@ export function DevicePanel() {
   const filteredDevices = useMemo(() => {
     return devices
       .filter((d) => {
-        const terms = normalizeString(search).split(/\s+/);
-        const combinedText = normalizeString(d.name);
+        const terms = normalizeForSearch(search).split(/\s+/);
+        const combinedText = normalizeForSearch(d.name);
         const matchesSearch = terms.every(word => combinedText.includes(word));
         const matchesStatus = showInactive ? true : d.isActive;
         return matchesSearch && matchesStatus;

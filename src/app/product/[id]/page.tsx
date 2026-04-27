@@ -1,6 +1,6 @@
 import { fetchProductById } from '@/server/actions/product.actions';
 import { notFound } from 'next/navigation';
-import { normalizeForUrl } from '@/lib/utils';
+import { slugify } from '@/lib/utils';
 import { BackButton } from '../components/back-button';
 import { ProductImageView } from '../components/product-image-view';
 import { ProductInfo } from '../components/product-info';
@@ -19,7 +19,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const deviceName = product.device?.name || 'Accesorio Apple';
   const isOutOfStock = product.stock <= 0;
-  const imagePath = `/products/${normalizeForUrl(deviceName)}.webp`;
+  const imagePath = `/products/${slugify(deviceName)}.webp`;
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 pt-24 pb-16 px-4 sm:px-6">

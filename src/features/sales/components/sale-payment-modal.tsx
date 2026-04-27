@@ -3,6 +3,7 @@ import { CreditCard, Banknote, Plus, Trash2, Edit2, AlertCircle } from 'lucide-r
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { type SalePaymentInput } from '@/schemas/sale.schema';
+import { isValidDecimal } from '@/lib/utils';
 
 interface SalePaymentModalProps {
   isOpen: boolean;
@@ -42,6 +43,10 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
     const numAmount = Number(amount);
     if (isNaN(numAmount) || numAmount < 0 || (numAmount === 0 && total > 0)) {
       setError('Monto inválido');
+      return;
+    }
+    if (!isValidDecimal(amount, 3)) {
+      setError('El monto no puede tener más de 3 decimales');
       return;
     }
 

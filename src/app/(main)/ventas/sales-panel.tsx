@@ -19,6 +19,7 @@ import { useProductsStore } from '@/stores/products.store';
 import { useCustomersStore } from '@/stores/customers.store';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { GlobalMessage } from '@/components/ui/alert';
+import { roundToDecimals } from '@/lib/utils';
 
 export function SalesPanel() {
   const [view, setView] = useState<'list' | 'new' | 'print'>('list');
@@ -144,10 +145,10 @@ export function SalesPanel() {
         <SalePaymentModal
           isOpen={isPaymentModalOpen}
           onClose={() => setIsPaymentModalOpen(false)}
-          total={cartProps.cartTotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount}
+          total={roundToDecimals(cartProps.cartTotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount)}
           isPending={isPending}
           onConfirm={(payments) => {
-            const finalTotal = cartProps.cartTotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount;
+            const finalTotal = roundToDecimals(cartProps.cartTotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount);
             handleCreateSale(selectedCustomerId, cartProps.cart, finalTotal, payments, currentDiscounts);
             setIsPaymentModalOpen(false);
           }}

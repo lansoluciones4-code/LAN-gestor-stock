@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { type ProductDef } from '@/schemas/product.schema';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 
 interface UseCatalogFiltersProps {
   products: ProductDef[];
@@ -24,8 +24,8 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       // 1. Search filter (Fuzzy)
-      const searchTerms = normalizeString(search).split(/\s+/).filter(Boolean);
-      const combinedText = normalizeString(`${p.device?.name || ''} ${p.description || ''}`);
+      const searchTerms = normalizeForSearch(search).split(/\s+/).filter(Boolean);
+      const combinedText = normalizeForSearch(`${p.device?.name || ''} ${p.description || ''}`);
       const matchesSearch = searchTerms.every((term) => combinedText.includes(term));
 
       // 2. Category filter

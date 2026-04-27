@@ -2,7 +2,7 @@ import { desc, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { auditLogs, users, products, customers, providers, devices } from '@/lib/db/schema';
 import { type AuditLogInput } from '@/schemas/audit-log.schema';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 
 export class AuditLogRepository {
   async getAllLogs(options?: { page?: number; limit?: number; search?: string; startDate?: string; endDate?: string }) {
@@ -33,15 +33,15 @@ export class AuditLogRepository {
             { label: 'baja', value: 'ELIMINAR' },
           ];
           
-          const searchNormalized = normalizeString(search);
+          const searchNormalized = normalizeForSearch(search);
           const s = `%${searchNormalized}%`;
           
           const matchingEntities = entityMapping
-            .filter(m => normalizeString(m.label).includes(searchNormalized))
+            .filter(m => normalizeForSearch(m.label).includes(searchNormalized))
             .map(m => m.value);
 
           const matchingActions = actionMapping
-            .filter(m => normalizeString(m.label).includes(searchNormalized))
+            .filter(m => normalizeForSearch(m.label).includes(searchNormalized))
             .map(m => m.value);
 
           const searchConditions = [

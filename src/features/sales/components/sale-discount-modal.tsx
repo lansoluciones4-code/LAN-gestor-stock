@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Tag, AlertCircle, Percent, DollarSign } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
+import { isValidDecimal } from '@/lib/utils';
 
 interface SaleDiscountModalProps {
   isOpen: boolean;
@@ -61,6 +62,10 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
   const validateAndConfirm = () => {
     if (finalTotal < 0) {
       setError('El descuento total supera al subtotal.');
+      return;
+    }
+    if (!isValidDecimal(percentage, 3) || !isValidDecimal(amount, 3)) {
+      setError('Los descuentos no pueden tener más de 3 decimales.');
       return;
     }
     setError(null);

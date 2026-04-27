@@ -6,7 +6,7 @@ import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth.store';
 import { getSalesColumns } from '@/config/tables/sales-columns';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 
 interface SalesListViewProps {
@@ -29,10 +29,10 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
   const role = useAuthStore((s) => s.user?.role);
 
   const filteredSales = sales.filter((s) => {
-    const terms = normalizeString(searchTerm).split(/\s+/);
+    const terms = normalizeForSearch(searchTerm).split(/\s+/);
     const combinedText = [
-      normalizeString(s.customer?.name || 'Consumidor Final'),
-      normalizeString(s.vendor?.username || '')
+      normalizeForSearch(s.customer?.name || 'Consumidor Final'),
+      normalizeForSearch(s.vendor?.username || '')
     ].join(' ');
 
     const matchesSearch = terms.every(word => combinedText.includes(word));

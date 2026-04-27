@@ -17,7 +17,7 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
 import { getProviderColumns } from '@/config/tables/provider-columns';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -76,11 +76,11 @@ export function ProvidersPanel() {
   const filteredProviders = useMemo(() => {
     return displayProviders
       .filter((p) => {
-        const terms = normalizeString(search).split(/\s+/);
+        const terms = normalizeForSearch(search).split(/\s+/);
         const combinedText = [
-          normalizeString(p.name),
-          normalizeString(p.email),
-          normalizeString(p.phone)
+          normalizeForSearch(p.name),
+          normalizeForSearch(p.email),
+          normalizeForSearch(p.phone)
         ].join(' ');
 
         const matchesSearch = terms.every(word => combinedText.includes(word));

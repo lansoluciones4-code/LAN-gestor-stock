@@ -5,13 +5,13 @@ import { motion } from 'framer-motion';
 import { type ProductDef } from '@/schemas/product.schema';
 import { Package } from 'lucide-react';
 import Link from 'next/link';
-import { normalizeForUrl } from '@/lib/utils';
+import { slugify } from '@/lib/utils';
 
 export function ProductCard({ product }: { product: ProductDef }) {
   const [imageStatus, setImageStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
   const deviceName = product.device?.name || 'Accesorio Apple';
 
-  const imagePath = `/products/${normalizeForUrl(deviceName)}.webp`;
+  const imagePath = `/products/${slugify(deviceName)}.webp`;
   const isOutOfStock = product.stock <= 0;
 
   useEffect(() => {

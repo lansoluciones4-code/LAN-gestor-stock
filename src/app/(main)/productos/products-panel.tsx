@@ -21,7 +21,7 @@ import { Combobox } from '@/components/ui/combobox';
 import { SearchBar } from '@/components/ui/search-bar';
 import { Button } from '@/components/ui/button';
 import { getProductColumns } from '@/config/tables/product-columns';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -139,14 +139,14 @@ export function ProductsPanel() {
   const filteredProducts = useMemo(() => {
     return displayProducts
       .filter((p) => {
-        const terms = normalizeString(search).split(/\s+/);
+        const terms = normalizeForSearch(search).split(/\s+/);
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
 
         const combinedText = [
-          normalizeString(p.device?.name),
-          normalizeString(p.description),
-          role === 'admin' ? normalizeString(p.provider?.name) : ''
+          normalizeForSearch(p.device?.name),
+          normalizeForSearch(p.description),
+          role === 'admin' ? normalizeForSearch(p.provider?.name) : ''
         ].join(' ');
 
         const matchesSearch = terms.every(word => combinedText.includes(word));
@@ -351,7 +351,7 @@ export function ProductsPanel() {
                   <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
                   <input
                     type="number"
-                    step="0.01"
+                    step="0.001"
                     {...register('purchasePrice', { valueAsNumber: true })}
                     placeholder="0.00"
                     className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
@@ -365,7 +365,7 @@ export function ProductsPanel() {
                   <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-emerald-500" />
                   <input
                     type="number"
-                    step="0.01"
+                    step="0.001"
                     {...register('salePrice', { valueAsNumber: true })}
                     placeholder="0.00"
                     className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
