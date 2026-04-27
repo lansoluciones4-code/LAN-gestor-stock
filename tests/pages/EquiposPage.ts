@@ -12,7 +12,6 @@ export class EquiposPage {
   // UI
   // =========================================================================
   static readonly UI = {
-    BTN_REGISTRAR: 'Fichar Equipo',
     BTN_EDITAR: 'Editar Ficha',
     BTN_DESACTIVAR: 'Desactivar',
     BTN_VER_INACTIVOS: 'Ver Inactivos',
@@ -42,8 +41,8 @@ export class EquiposPage {
     this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
-    this.btnRegistrar = page.getByRole('button', { name: EquiposPage.UI.BTN_REGISTRAR, exact: true });
-    this.btnActualizar = page.getByRole('button', { name: EquiposPage.UI.BTN_REGISTRAR, exact: true });
+    this.btnRegistrar = page.getByTestId(TEST_IDS.general.btnSubmitModal);
+    this.btnActualizar = page.getByTestId(TEST_IDS.general.btnSubmitModal);
     this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos);
     this.btnCancelar = page.getByRole('button', { name: EquiposPage.UI.BTN_CANCELAR, exact: true });
     this.btnSincronizar = page.getByTestId(TEST_IDS.general.btnSincronizar);
