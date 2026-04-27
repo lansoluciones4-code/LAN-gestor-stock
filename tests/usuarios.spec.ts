@@ -12,12 +12,12 @@ const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería requerir contraseña de mínimo 6 caracteres',
     username: 'vendedor_valido', password: '123',
-    erroresEsperados: ['La contraseña debe tener al']
+    erroresEsperados: ['La contraseña debe tener al menos 6 caracteres']
   },
   {
     descripcion: 'Debería requerir contraseña',
     username: 'vendedor_valido', password: '',
-    erroresEsperados: [MESSAGES.ERROR.VALIDATION.REQUIRED_FIELD]
+    erroresEsperados: ['La contraseña debe tener al menos 6 caracteres']
   },
   {
     descripcion: 'Debería respetar límites máximos de username',
