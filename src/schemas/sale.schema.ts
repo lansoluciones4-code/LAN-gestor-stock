@@ -19,10 +19,10 @@ export type SaleItemInput = z.infer<typeof saleItemSchema>;
  */
 export const salePaymentSchema = z.object({
   type: z.enum(['efectivo', 'transferencia']),
-  amount: z.preprocess(
-    (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-    z.any().refine(v => v !== '' && v !== '-' && !isNaN(Number(v)), 'Monto válido').transform(Number).pipe(z.number().min(0, 'El monto no puede ser negativo').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
-  ),
+  amount: z.any().transform((v) => {
+    if (typeof v === 'string') return Number(v.replace(',', '.'));
+    return Number(v);
+  }).pipe(z.number().min(0, 'El monto no puede ser negativo').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
 });
 
 export type SalePaymentInput = z.infer<typeof salePaymentSchema>;
@@ -30,35 +30,34 @@ export type SalePaymentInput = z.infer<typeof salePaymentSchema>;
 /**
  * Sale Input Schema
  */
-export const saleSchema = createInsertSchema(sales, {
-  total: z.preprocess(
-    (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-    z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El total es requerido').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
-  ),
-  discountAmount: z.preprocess(
-    (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-    z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().optional().default('0').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
-  ),
-  discountPercentage: z.preprocess(
-    (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-    z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().optional().default('0').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
-  ),
-})
+export const saleSchema = createInsertSchema(sales)
   .pick({ customerId: true, total: true, discountAmount: true, discountPercentage: true })
   .extend({
+    total: z.any().transform((v) => {
+      if (typeof v === 'string') return Number(v.replace(',', '.'));
+      return Number(v);
+    }).pipe(z.number().min(0, 'El total es requerido').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
+    discountAmount: z.any().transform((v) => {
+      if (typeof v === 'string') return Number(v.replace(',', '.') || '0');
+      return Number(v);
+    }).pipe(z.number().min(0).refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
+    discountPercentage: z.any().transform((v) => {
+      if (typeof v === 'string') return Number(v.replace(',', '.') || '0');
+      return Number(v);
+    }).pipe(z.number().min(0).max(100).refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
     items: z
       .array(
         z.object({
           productId: z.string().uuid(),
           quantity: z.number().int().min(1),
-          unitPrice: z.preprocess(
-            (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-            z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El precio es requerido').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
-          ),
-          subtotal: z.preprocess(
-            (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-            z.preprocess((v) => (typeof v === 'number' ? v.toString() : v), z.string().trim().min(1, 'El subtotal es requerido').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales'))
-          ),
+          unitPrice: z.any().transform((v) => {
+            if (typeof v === 'string') return Number(v.replace(',', '.'));
+            return Number(v);
+          }).pipe(z.number().min(0).refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
+          subtotal: z.any().transform((v) => {
+            if (typeof v === 'string') return Number(v.replace(',', '.'));
+            return Number(v);
+          }).pipe(z.number().min(0).refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
         })
       )
       .min(1, 'La venta debe tener al menos un producto'),

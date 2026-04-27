@@ -50,15 +50,15 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
         customerId: selectedCustomerId || undefined,
         items: cart.map(({ name, desc, max, ...rest }) => ({
           ...rest,
-          unitPrice: rest.unitPrice.toString(),
-          subtotal: rest.subtotal.toString(),
-        })) as any,
-        total: cartTotal.toString(),
-        discountAmount: discounts.amount.toString(),
-        discountPercentage: discounts.percentage.toString(),
+          unitPrice: rest.unitPrice,
+          subtotal: rest.subtotal,
+        })),
+        total: cartTotal,
+        discountAmount: discounts.amount,
+        discountPercentage: discounts.percentage,
         payments: payments.map((p) => ({
           ...p,
-          amount: p.amount.toString(),
+          amount: p.amount,
         })),
       });
 
