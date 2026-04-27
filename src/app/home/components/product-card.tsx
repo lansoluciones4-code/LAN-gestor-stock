@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { type ProductDef } from '@/schemas/product.schema';
 import { Package } from 'lucide-react';
 
 export function ProductCard({ product }: { product: ProductDef }) {
-  const [imageError, setImageError] = useState(false);
+  const [imageStatus, setImageStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
   const deviceName = product.device?.name || 'Accesorio Apple';
 
   // Normalize name for image file: "Funda iPhone 15 Pro Max" -> "funda-iphone-15-pro-max"
@@ -20,6 +20,10 @@ export function ProductCard({ product }: { product: ProductDef }) {
   const imagePath = `/products/${normalizedName}.webp`;
   const isOutOfStock = product.stock <= 0;
 
+  useEffect(() => {
+    setImageStatus('loading');
+  }, [imagePath]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,18 +35,25 @@ export function ProductCard({ product }: { product: ProductDef }) {
       }`}
     >
       <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden p-4 sm:p-6">
-        {!imageError ? (
-          <img
-            src={imagePath}
-            alt={deviceName}
-            className="object-contain w-full h-full transition-transform duration-500 group-hover:scale-105"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600">
+        {/* Placeholder / Icono de Error (Package) */}
+        {imageStatus !== 'loaded' && (
+          <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300">
             <Package className="w-10 h-10 sm:w-16 sm:h-16 stroke-[1.5] mb-2 sm:mb-4" />
             <span className="text-[10px] sm:text-xs font-medium tracking-widest uppercase">Pronto</span>
           </div>
+        )}
+
+        {/* Imagen con fade-in */}
+        {imageStatus !== 'error' && (
+          <img
+            src={imagePath}
+            alt={deviceName}
+            className={`object-contain w-full h-full transition-all duration-500 group-hover:scale-105 absolute inset-0 p-4 sm:p-6 ${
+              imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'
+            }`}
+            onLoad={() => setImageStatus('loaded')}
+            onError={() => setImageStatus('error')}
+          />
         )}
 
         {isOutOfStock && (
