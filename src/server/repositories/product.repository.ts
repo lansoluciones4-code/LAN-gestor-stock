@@ -26,6 +26,9 @@ export class ProductRepository {
   async getProductById(id: string) {
     return await db.query.products.findFirst({
       where: (products, { eq }) => eq(products.id, id),
+      with: {
+        device: true,
+      },
     });
   }
 

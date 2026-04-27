@@ -170,3 +170,21 @@ export async function toggleProductVisibilityAction(id: string, isVisible: boole
   }
 }
 
+export async function fetchProductById(id: string): Promise<ProductDef | null> {
+  try {
+    const product = await productRepository.getProductById(id);
+    if (!product) return null;
+    
+    const formatted = {
+      ...product,
+      salePrice: parseFloat(product.salePrice as any),
+      purchasePrice: parseFloat(product.purchasePrice as any),
+    };
+    
+    return productDefSchema.parse(formatted);
+  } catch (error) {
+    console.error('fetchProductById error:', error);
+    return null;
+  }
+}
+
