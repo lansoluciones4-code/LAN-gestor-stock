@@ -232,7 +232,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                       className="w-full pl-7 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 font-bold"
                       value={amount}
                       onChange={(e) => handleAmountChange(e.target.value)}
-                      placeholder="0.00"
+                      placeholder="0,00"
                     />
                   </div>
                 </div>

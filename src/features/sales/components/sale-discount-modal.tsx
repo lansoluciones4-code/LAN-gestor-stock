@@ -137,7 +137,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
           <div className="flex justify-between items-center pt-2 border-t border-indigo-100 dark:border-indigo-900/30">
             <span className="text-xs font-black uppercase text-indigo-400 tracking-widest">Total a Cobrar</span>
             <span className="text-2xl font-black text-indigo-700 dark:text-indigo-300">
-              ${finalTotal < 0 ? '0.00' : finalFormatted}
+              ${finalTotal < 0 ? '0,00' : finalFormatted}
             </span>
           </div>
         </div>
@@ -173,7 +173,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                 className="w-full pl-7 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 font-bold"
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
-                placeholder="0.00"
+                placeholder="0,00"
               />
             </div>
           </div>
