@@ -9,3 +9,12 @@ export function normalizeString(str: string | null | undefined): string {
     .replace(/[\u0300-\u036f]/g, '') // Removes the accents
     .toLowerCase();
 }
+
+/**
+ * Converts a string to sentence case (First letter uppercase, rest lowercase).
+ */
+export function toSentenceCase(str: string | null | undefined): string {
+  if (!str) return '';
+  const lowercase = str.toLowerCase();
+  return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
+}

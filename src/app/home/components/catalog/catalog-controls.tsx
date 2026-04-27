@@ -3,6 +3,7 @@
 import { SearchBar } from '@/components/ui/search-bar';
 import { Filter, Tag, X } from 'lucide-react';
 import { type DeviceDef } from '@/schemas/device.schema';
+import { toSentenceCase } from '@/lib/utils';
 
 interface CatalogControlsProps {
   search: string;
@@ -46,7 +47,7 @@ export function CatalogControls({
         {selectedCategory && (
           <div className="hidden sm:flex lg:hidden items-center gap-2 px-4 h-12 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-xl text-sm font-medium text-indigo-600 dark:text-indigo-400">
             <Tag className="w-4 h-4" />
-            {selectedCategoryName}
+            {toSentenceCase(selectedCategoryName)}
             <button
               onClick={onClearCategory}
               className="ml-1 p-0.5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-full transition-colors"

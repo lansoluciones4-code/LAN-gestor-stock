@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, Tag, ChevronRight } from 'lucide-react';
 import { type DeviceDef } from '@/schemas/device.schema';
+import { toSentenceCase } from '@/lib/utils';
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
@@ -89,7 +90,7 @@ export function MobileFilterDrawer({
                           : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'
                       }`}
                     >
-                      {category.name}
+                      {toSentenceCase(category.name)}
                       {selectedCategory === category.id && <ChevronRight className="w-4 h-4" />}
                     </button>
                   ))}

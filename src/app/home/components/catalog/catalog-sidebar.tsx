@@ -2,6 +2,7 @@
 
 import { type DeviceDef } from '@/schemas/device.schema';
 import { Tag, SlidersHorizontal, ChevronRight } from 'lucide-react';
+import { toSentenceCase } from '@/lib/utils';
 
 interface CatalogSidebarProps {
   categories: DeviceDef[];
@@ -51,7 +52,7 @@ export function CatalogSidebar({
                   : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'
               }`}
             >
-              {category.name}
+              {toSentenceCase(category.name)}
               <ChevronRight
                 className={`w-4 h-4 transition-transform ${
                   selectedCategory === category.id
