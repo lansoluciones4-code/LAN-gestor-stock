@@ -42,7 +42,7 @@ const CASOS_DE_VALIDACION = [
     compra: '',
     venta: '',
     unidades: '',
-    erroresEsperados: ['El precio de venta no puede ser negativo', 'El precio de compra no puede ser negativo', 'El stock debe ser al menos 1']
+    erroresEsperados: ['El precio de venta debe ser mayor a 0', 'El precio de compra debe ser mayor a 0', 'Debe ingresar una cantidad válida']
   },
 ];
 
@@ -55,7 +55,7 @@ const CASOS_DE_EDICION = [
     compra: '',
     venta: '',
     unidades: '',
-    erroresEsperados: ['El precio de venta no puede ser negativo', 'El precio de compra no puede ser negativo', 'El stock debe ser al menos 1']
+    erroresEsperados: ['El precio de venta debe ser mayor a 0', 'El precio de compra debe ser mayor a 0', 'Debe ingresar una cantidad válida']
   },
 ];
 
