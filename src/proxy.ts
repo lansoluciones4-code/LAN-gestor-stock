@@ -12,7 +12,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicPath = publicPaths.some((p) => pathname.startsWith(p));
+  const isPublicPath = publicPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
   const token = request.cookies.get('session')?.value;
 
   let isAuthenticated = false;
