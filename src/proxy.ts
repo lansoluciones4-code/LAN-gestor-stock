@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth/jwt';
 
-const publicPaths = ['/login', '/favicon.ico', '/api/public', '/home'];
+const publicPaths = ['/login', '/favicon.ico', '/api/public', '/home', '/product'];
 const allowedVendedorPaths = ['/productos', '/ventas', '/clientes'];
 
 export async function proxy(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isPublicPath = publicPaths.some((p) => pathname.startsWith(p));
+  const isPublicPath = publicPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
   const token = request.cookies.get('session')?.value;
 
   let isAuthenticated = false;
