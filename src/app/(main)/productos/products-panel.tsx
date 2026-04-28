@@ -408,7 +408,7 @@ export function ProductsPanel() {
                   type="number"
                   {...register('stock', { valueAsNumber: true })}
                   onKeyDown={(e) => {
-                    if (['-', '.', ',', 'e', 'E'].includes(e.key)) e.preventDefault();
+                    if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                   }}
                   min="0"
                   step="1"
