@@ -372,7 +372,15 @@ export function ProductsPanel() {
                       }
                     })}
                     onKeyDown={(e) => {
-                      if (e.key === '-' || e.key === '.') e.preventDefault();
+                      if (
+                        !/^[0-9]$/.test(e.key) &&
+                        e.key !== ',' &&
+                        !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
+                        !e.ctrlKey &&
+                        !e.metaKey
+                      ) {
+                        e.preventDefault();
+                      }
                     }}
                     placeholder="0,00"
                     className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
@@ -394,7 +402,15 @@ export function ProductsPanel() {
                       }
                     })}
                     onKeyDown={(e) => {
-                      if (e.key === '-' || e.key === '.') e.preventDefault();
+                      if (
+                        !/^[0-9]$/.test(e.key) &&
+                        e.key !== ',' &&
+                        !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
+                        !e.ctrlKey &&
+                        !e.metaKey
+                      ) {
+                        e.preventDefault();
+                      }
                     }}
                     placeholder="0,00"
                     className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
