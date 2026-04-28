@@ -372,6 +372,10 @@ export function ProductsPanel() {
                       }
                     })}
                     onKeyDown={(e) => {
+                      if (e.key === ',' && e.currentTarget.value.includes(',')) {
+                        e.preventDefault();
+                        return;
+                      }
                       if (
                         !/^[0-9]$/.test(e.key) &&
                         e.key !== ',' &&
@@ -402,6 +406,10 @@ export function ProductsPanel() {
                       }
                     })}
                     onKeyDown={(e) => {
+                      if (e.key === ',' && e.currentTarget.value.includes(',')) {
+                        e.preventDefault();
+                        return;
+                      }
                       if (
                         !/^[0-9]$/.test(e.key) &&
                         e.key !== ',' &&
