@@ -84,7 +84,7 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
                      log.provider?.name || 
                      log.device?.name || 
                      log.targetUser?.username ||
-                     (log.sale ? `$${log.sale.total}` : null);
+                     (log.sale ? `$${Number(log.sale.total).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : null);
 
         const displayName = name || log.entityId?.substring(0, 8).toUpperCase() || '--';
         const fullTitle = name ? `${name} (${log.entityId})` : log.entityId || '--';

@@ -14,7 +14,7 @@ import { useUsersStore } from '@/stores/users.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 
 import { UserModal } from '@/components/modals/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
@@ -67,15 +67,15 @@ export function UserPanel() {
   const filteredUsers = useMemo(() => {
     return users
       .filter((u) => {
-        const terms = normalizeString(search).split(/\s+/);
+        const terms = normalizeForSearch(search).split(/\s+/);
 
         // Convert DB roles to Spanish display names for searching
         const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
 
         const combinedText = [
-          normalizeString(u.username),
-          normalizeString(u.role),
-          normalizeString(roleDisplay)
+          normalizeForSearch(u.username),
+          normalizeForSearch(u.role),
+          normalizeForSearch(roleDisplay)
         ].join(' ');
 
         const matchesSearch = terms.every(word => combinedText.includes(word));

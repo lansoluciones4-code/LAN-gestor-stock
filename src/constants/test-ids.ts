@@ -5,6 +5,8 @@ export const TEST_IDS = {
     btnAgregar: 'btnAgregar',
     btnVerOcultos: 'btnVerOcultos',
     inputBusquedaTabla: 'inputBusquedaTabla',
+    btnSubmitModal: 'btnSubmitModal',
+    btnCancelModal: 'btnCancelModal',
   },
 
   productos: {

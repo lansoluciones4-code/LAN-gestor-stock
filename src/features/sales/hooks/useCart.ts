@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type ProductDef } from '@/schemas/product.schema';
+import { roundToDecimals } from '@/lib/utils';
 
 export interface CartItem {
   productId: string;
@@ -20,7 +21,7 @@ export function useCart() {
       const existing = prev.find((i) => i.productId === product.id);
       if (existing) {
         if (existing.quantity >= product.stock) return prev;
-        return prev.map((i) => (i.productId === product.id ? { ...i, quantity: i.quantity + 1, subtotal: (i.quantity + 1) * i.unitPrice } : i));
+        return prev.map((i) => (i.productId === product.id ? { ...i, quantity: i.quantity + 1, subtotal: roundToDecimals((i.quantity + 1) * i.unitPrice) } : i));
       }
       return [
         ...prev,
@@ -47,7 +48,7 @@ export function useCart() {
         if (i.productId === productId) {
           const newQty = i.quantity + delta;
           if (newQty > i.max || newQty < 1) return i;
-          return { ...i, quantity: newQty, subtotal: newQty * i.unitPrice };
+          return { ...i, quantity: newQty, subtotal: roundToDecimals(newQty * i.unitPrice) };
         }
         return i;
       })
@@ -56,7 +57,7 @@ export function useCart() {
 
   const clearCart = () => setCart([]);
 
-  const cartTotal = cart.reduce((acc, i) => acc + i.subtotal, 0);
+  const cartTotal = roundToDecimals(cart.reduce((acc, i) => acc + i.subtotal, 0));
 
   return {
     cart,

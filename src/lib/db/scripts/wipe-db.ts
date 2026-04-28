@@ -21,8 +21,9 @@ async function wipeDatabase() {
     await client.connect();
     console.log('✅ Conectado.');
 
-    console.log('🔥 Dropping schema public...');
-    await client.query('DROP SCHEMA public CASCADE;');
+    console.log('🔥 Dropping schema public and drizzle...');
+    await client.query('DROP SCHEMA IF EXISTS public CASCADE;');
+    await client.query('DROP SCHEMA IF EXISTS drizzle CASCADE;');
     
     console.log('✨ Creating schema public...');
     await client.query('CREATE SCHEMA public;');
@@ -30,13 +31,11 @@ async function wipeDatabase() {
     console.log('🔑 Granting permissions...');
     await client.query('GRANT ALL ON SCHEMA public TO postgres;');
     await client.query('GRANT ALL ON SCHEMA public TO public;');
-    await client.query('GRANT ALL ON SCHEMA public TO anon;');
-    await client.query('GRANT ALL ON SCHEMA public TO authenticated;');
-    await client.query('GRANT ALL ON SCHEMA public TO service_role;');
 
     console.log('✅ Base de datos reseteada con éxito.');
   } catch (err) {
     console.error('❌ Error durante el wipe:', err);
+    process.exit(1);
   } finally {
     await client.end();
   }

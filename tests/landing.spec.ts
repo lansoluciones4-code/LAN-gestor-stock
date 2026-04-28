@@ -12,15 +12,18 @@ test.describe.serial('Pruebas de Landing Page', () => {
 
     const landingPage = new LandingPage(page);
     await landingPage.goto();
-    let esVisible = await landingPage.buscarProductoEnTodasLasPaginas(producto.descripcion);
-    expect(esVisible).toBe(true);
+    await landingPage.buscarProducto(producto.equipo);
+
+    const tarjeta = landingPage.obtenerTarjetaProducto(producto.equipo);
+    await tarjeta.scrollIntoViewIfNeeded();
+    await expect(tarjeta).toBeVisible();
 
     await productosPage.goto();
     await productosPage.alternarVisibilidadLanding(producto.equipo, producto.proveedor, producto.descripcion);
 
     await landingPage.goto();
-    esVisible = await landingPage.buscarProductoEnTodasLasPaginas(producto.descripcion);
-    expect(esVisible).toBe(false);
+    await landingPage.buscarProducto(producto.equipo);
+    await expect(tarjeta).toBeHidden();
   });
 
 });

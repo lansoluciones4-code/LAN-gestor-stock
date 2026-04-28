@@ -14,7 +14,7 @@ import { useCustomersStore } from '@/stores/customers.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
-import { normalizeString } from '@/lib/utils';
+import { normalizeForSearch } from '@/lib/utils';
 import { CustomerModal } from '@/components/modals/customer-modal';
 import { GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
@@ -63,12 +63,12 @@ export function CustomerPanel() {
   const filteredCustomers = useMemo(() => {
     return customers
       .filter((c) => {
-        const terms = normalizeString(search).split(/\s+/);
+        const terms = normalizeForSearch(search).split(/\s+/);
         const combinedText = [
-          normalizeString(c.name),
-          normalizeString(c.email),
-          normalizeString(c.phone),
-          normalizeString(c.documentNumber)
+          normalizeForSearch(c.name),
+          normalizeForSearch(c.email),
+          normalizeForSearch(c.phone),
+          normalizeForSearch(c.documentNumber)
         ].join(' ');
 
         const matchesSearch = terms.every(word => combinedText.includes(word));
