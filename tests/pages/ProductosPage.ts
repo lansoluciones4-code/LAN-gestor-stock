@@ -159,8 +159,8 @@ export class ProductosPage {
   async verificarFormularioCreacionVacio() {
     await expect(this.inputDescripcion).toHaveValue('');
     await expect(this.inputUnidades).toHaveValue('1');
-    await expect(this.inputPrecioCompra).toHaveValue('0');
-    await expect(this.inputPrecioVenta).toHaveValue('0');
+    await expect(this.inputPrecioCompra).toHaveValue('0,00');
+    await expect(this.inputPrecioVenta).toHaveValue('0,00');
     await expect(this.page.getByRole('button', { name: ProductosPage.UI.BTN_SELECCIONAR_EQUIPO })).toBeVisible();
   }
 

@@ -193,6 +193,7 @@ export function DevicePanel() {
               }
             })}
             submitLabel={editingItem ? 'Actualizar Categoría' : 'Agregar Categoría'}
+            submitTestId={TEST_IDS.general.btnSubmitModal}
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />
@@ -218,6 +219,7 @@ export function DevicePanel() {
             title="Inhabilitar / Eliminar Modelo"
             description="¿Confirmar operación? El modelo no se borrará si tiene inventario existente por cuestiones de seguridad."
             submitLabel="Eliminar"
+            submitTestId={TEST_IDS.general.btnSubmitModal}
             isPending={isPending}
           />
         </>

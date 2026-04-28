@@ -13,9 +13,11 @@ interface ResponsiveModalProps {
   submitLabel?: string;
   cancelLabel?: string;
   isPending?: boolean;
+  submitTestId?: string;
+  cancelTestId?: string;
 }
 
-export function ResponsiveModal({ isOpen, onClose, title, icon, children, width = 'md', onSubmit, submitLabel = 'Guardar', cancelLabel = 'Cancelar', isPending }: ResponsiveModalProps) {
+export function ResponsiveModal({ isOpen, onClose, title, icon, children, width = 'md', onSubmit, submitLabel = 'Guardar', cancelLabel = 'Cancelar', isPending, submitTestId, cancelTestId }: ResponsiveModalProps) {
   return (
     <Modal
       isOpen={isOpen}
@@ -39,6 +41,7 @@ export function ResponsiveModal({ isOpen, onClose, title, icon, children, width 
               type="button"
               onClick={onClose}
               className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium shadow-sm"
+              data-testid={cancelTestId}
             >
               {cancelLabel}
             </button>
@@ -46,6 +49,7 @@ export function ResponsiveModal({ isOpen, onClose, title, icon, children, width 
               type="submit"
               disabled={isPending}
               className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm"
+              data-testid={submitTestId}
             >
               {submitLabel}
             </button>
@@ -67,9 +71,11 @@ interface ConfirmModalProps {
   submitLabel?: string;
   cancelLabel?: string;
   isPending?: boolean;
+  submitTestId?: string;
+  cancelTestId?: string;
 }
 
-export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, submitLabel = 'Eliminar', cancelLabel = 'Cancelar', isPending }: ConfirmModalProps) {
+export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, submitLabel = 'Eliminar', cancelLabel = 'Cancelar', isPending, submitTestId, cancelTestId }: ConfirmModalProps) {
   return (
     <Modal
       isOpen={isOpen}
@@ -89,6 +95,7 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
             onClick={onClose}
             disabled={isPending}
             className="px-4 py-2 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors font-medium shadow-sm"
+            data-testid={cancelTestId}
           >
             {cancelLabel}
           </button>
@@ -96,6 +103,7 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
             onClick={onConfirm}
             disabled={isPending}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-70"
+            data-testid={submitTestId}
           >
             {submitLabel}
           </button>
