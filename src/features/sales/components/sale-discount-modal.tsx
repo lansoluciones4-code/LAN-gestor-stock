@@ -91,6 +91,10 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
   const totalDiscounts = discountFromPercentage + aVal;
 
   const validateAndConfirm = () => {
+    if (percentage === '' && amount === '') {
+      setError('Debes ingresar un descuento o usar la opción "Omitir".');
+      return;
+    }
     if (finalTotal < 0) {
       setError('El descuento total supera al subtotal.');
       return;

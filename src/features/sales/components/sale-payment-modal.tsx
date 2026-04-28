@@ -53,7 +53,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
     if (editingIndex !== null) {
       const otherPaymentsTotal = payments.filter((_, i) => i !== editingIndex).reduce((acc, p) => acc + p.amount, 0);
-      if (otherPaymentsTotal + numAmount > total + 0.01) { // small epsilon
+      if (otherPaymentsTotal + numAmount > total + 0.001) { // small epsilon
         setError(`El total excede los $${total.toLocaleString('es-AR')}`);
         return;
       }
@@ -63,7 +63,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       setPayments(newPayments);
       setEditingIndex(null);
     } else {
-      if (currentCovered + numAmount > total + 0.01) {
+      if (currentCovered + numAmount > total + 0.001) {
         setError(`El total excede los $${total.toLocaleString('es-AR')}`);
         return;
       }
@@ -95,8 +95,8 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   };
 
   const handleConfirm = () => {
-    if (Math.abs(total - currentCovered) > 0.01) {
-      setError('El total de los pagos debe coincidir con el total de la venta');
+    if (Math.abs(total - currentCovered) > 0.001) {
+      setError('El total de los pagos debe coincidir exactamente con el total de la venta');
       return;
     }
     onConfirm(payments);
@@ -274,12 +274,19 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
           </div>
         </div>
 
+        {error && !isAdding && (
+          <div className="flex items-center gap-2 p-2 bg-red-50 dark:bg-red-500/10 text-red-600 rounded-lg border border-red-100 dark:border-red-900/30">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span className="text-[10px] font-bold">{error}</span>
+          </div>
+        )}
+
         <div className="pt-4 flex flex-col gap-3">
           <Button
             size="lg"
             fullWidth
             onClick={handleConfirm}
-            disabled={isPending || Math.abs(total - currentCovered) > 0.01 || isAdding}
+            disabled={isPending || isAdding}
           >
             {isPending ? 'Confirmando...' : 'Finalizar y Facturar'}
           </Button>

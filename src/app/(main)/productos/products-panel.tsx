@@ -410,7 +410,7 @@ export function ProductsPanel() {
                   onKeyDown={(e) => {
                     if (['-', '.', ',', 'e', 'E'].includes(e.key)) e.preventDefault();
                   }}
-                  min="1"
+                  min="0"
                   step="1"
                   placeholder="1"
                   className="w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
