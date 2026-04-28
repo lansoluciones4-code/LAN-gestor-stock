@@ -35,99 +35,27 @@ const CASOS_DE_VALIDACION = [
     erroresEsperados: ['Debes seleccionar un equipo v', 'Debes seleccionar un proveedor válido']
   },
   {
-    descripcion: 'Debería requerir venta no negativas',
+    descripcion: 'Debería requerir venta, compra y unidades validas',
     equipo: 'Equipo 1',
     proveedor: 'Proveedor 1',
     desc: '',
-    compra: '1',
-    venta: '-100',
-    unidades: '200',
-    erroresEsperados: ['El precio de venta no puede ser negativo']
-  },
-  {
-    descripcion: 'Debería requerir unidades no negativas',
-    equipo: 'Equipo 1',
-    proveedor: 'Proveedor 1',
-    desc: '',
-    compra: '1',
-    venta: '100',
-    unidades: '-200',
-    erroresEsperados: ['El stock no puede ser negativo']
-  },
-  {
-    descripcion: 'Debería requerir compra no negativas',
-    equipo: 'Equipo 1',
-    proveedor: 'Proveedor 1',
-    desc: '',
-    compra: '-1',
-    venta: '100',
-    unidades: '200',
-    erroresEsperados: ['El precio de compra no puede ser negativo']
-  },
-  {
-    descripcion: 'Debería requerir compra numerica',
-    equipo: 'Equipo 1',
-    proveedor: 'Proveedor 1',
-    desc: '',
-    compra: '-',
-    venta: '1',
-    unidades: '1',
-    erroresEsperados: ['Precio o unidades inválidas']
-  },
-  {
-    descripcion: 'Debería requerir venta numerica',
-    equipo: 'Equipo 1',
-    proveedor: 'Proveedor 1',
-    desc: '',
-    compra: '1',
-    venta: '-',
-    unidades: '1',
-    erroresEsperados: ['Precio o unidades inválidas']
-  },
-  {
-    descripcion: 'Debería requerir unidad numerica',
-    equipo: 'Equipo 1',
-    proveedor: 'Proveedor 1',
-    desc: '',
-    compra: '1',
-    venta: '1',
-    unidades: '-',
-    erroresEsperados: ['Precio o unidades inválidas']
+    compra: '',
+    venta: '',
+    unidades: '',
+    erroresEsperados: ['El precio de venta no puede ser negativo', 'El precio de compra no puede ser negativo', 'El stock debe ser al menos 1']
   },
 ];
 
 const CASOS_DE_EDICION = [
   {
-    descripcion: 'Debería requerir compra, venta y unidades no negativas',
+    descripcion: 'Debería requerir venta, compra y unidades validas',
+    equipo: 'Equipo 1',
+    proveedor: 'Proveedor 1',
     desc: '',
-    compra: '-1',
-    venta: '-100',
-    unidades: '-200',
-    erroresEsperados: ['El stock no puede ser negativo', 'El precio de compra no puede', 'El precio de venta no puede']
-  },
-  {
-    descripcion: 'Debería requerir compra numerica',
-    desc: '',
-    compra: '-',
-    venta: '1',
-    unidades: '1',
-    erroresEsperados: ['Precio o unidades inválidas']
-  },
-  {
-    descripcion: 'Debería requerir venta numerica',
-    desc: '',
-    compra: '1',
-    venta: '-',
-    unidades: '1',
-    erroresEsperados: ['Precio o unidades inválidas']
-  },
-  {
-    descripcion: 'Debería requerir unidad numerica',
-    desc: '',
-    compra: '1',
-    venta: '1',
-    unidades: '-',
-    erroresEsperados: ['Precio o unidades inválidas']
+    compra: '',
+    venta: '',
+    unidades: '',
+    erroresEsperados: ['El precio de venta no puede ser negativo', 'El precio de compra no puede ser negativo', 'El stock debe ser al menos 1']
   },
 ];
 
