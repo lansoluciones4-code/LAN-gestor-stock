@@ -4,6 +4,7 @@ import { SearchBar } from '@/components/ui/search-bar';
 import { Filter, Tag, X } from 'lucide-react';
 import { type DeviceDef } from '@/schemas/device.schema';
 import { toSentenceCase } from '@/lib/utils';
+import { TEST_IDS } from '@/constants/test-ids';
 
 interface CatalogControlsProps {
   search: string;
@@ -32,6 +33,7 @@ export function CatalogControls({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Buscar por nombre o descripción..."
           containerClassName="w-full"
+          data-testid={TEST_IDS.general.inputBusquedaTabla}
         />
       </div>
 

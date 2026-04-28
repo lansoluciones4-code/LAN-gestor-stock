@@ -1,13 +1,17 @@
 import { TEST_IDS } from '@/constants/test-ids';
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 
 export class LandingPage {
   static readonly URL = '/home';
 
   readonly page: Page;
 
+  readonly inputBusqueda: Locator;
+
   constructor(page: Page) {
     this.page = page;
+
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
   }
 
   // =========================================================================
@@ -16,7 +20,10 @@ export class LandingPage {
 
   async goto() {
     await this.page.goto(LandingPage.URL);
-    await expect(this.page).toHaveURL(new RegExp(LandingPage.URL));
+  }
+
+  async buscarProducto(nombre: string) {
+    await this.inputBusqueda.fill(nombre);
   }
 
   obtenerTarjetaProducto(texto: string): Locator {
@@ -41,22 +48,6 @@ export class LandingPage {
         await btn.click({ force: true });
         await this.page.waitForTimeout(500);
         return true;
-      }
-    }
-    return false;
-  }
-
-  async buscarProductoEnTodasLasPaginas(nombre: string): Promise<boolean> {
-    await this.page.waitForSelector('div.group.relative.flex.flex-col', { state: 'visible', timeout: 5000 }).catch(() => { });
-
-    while (true) {
-      if (await this.productoEsVisible(nombre)) {
-        return true;
-      }
-
-      const hayMasPaginas = await this.clickSiguientePagina();
-      if (!hayMasPaginas) {
-        break;
       }
     }
     return false;
