@@ -6,8 +6,13 @@ import { type ProductDef } from '@/schemas/product.schema';
 import { Package } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/utils';
+import { ContactButtons } from '@/components/contact/contact-buttons';
 
-export function ProductCard({ product }: { product: ProductDef }) {
+interface ProductCardProps {
+  product: ProductDef;
+}
+
+export function ProductCard({ product }: ProductCardProps) {
   const [imageStatus, setImageStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
   const deviceName = product.device?.name || 'Accesorio Apple';
 
@@ -19,16 +24,16 @@ export function ProductCard({ product }: { product: ProductDef }) {
   }, [imagePath]);
 
   return (
-    <Link href={`/product/${product.id}`} className="h-full block">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 ${
-          isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''
-        }`}
-      >
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+      className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 ${
+        isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''
+      }`}
+    >
+      <Link href={`/product/${product.id}`} className="flex flex-col flex-1">
         <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden p-3 sm:p-4">
           {/* Placeholder / Icono de Error (Package) */}
           {imageStatus !== 'loaded' && (
@@ -67,13 +72,23 @@ export function ProductCard({ product }: { product: ProductDef }) {
           <p className="text-[11px] sm:text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-2 sm:mb-3 leading-relaxed flex-1">
             {product.description || 'Diseñado con precisión para ofrecer la mejor experiencia y protección.'}
           </p>
-          <div className="mt-auto">
+          <div className="mb-3">
             <span className="text-sm sm:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
               ${product.salePrice.toLocaleString('es-AR')}
             </span>
           </div>
         </div>
-      </motion.div>
-    </Link>
+      </Link>
+      
+      {!isOutOfStock && (
+        <div className="px-3 pb-4 pt-0 mt-auto">
+          <ContactButtons 
+            product={{ name: deviceName, description: product.description }} 
+            size="sm" 
+            showLabels={false}
+          />
+        </div>
+      )}
+    </motion.div>
   );
 }

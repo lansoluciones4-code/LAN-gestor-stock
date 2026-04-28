@@ -1,4 +1,5 @@
 import { ShieldCheck, Truck, Clock } from 'lucide-react';
+import { ContactButtons } from '@/components/contact/contact-buttons';
 
 interface FeatureItemProps {
   icon: React.ReactNode;
@@ -50,13 +51,24 @@ export function ProductInfo({ deviceName, salePrice, description, isOutOfStock }
 
         <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800">
           <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-3">Descripción</h3>
-          <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+          <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium mb-8">
             {description || 'Este accesorio ha sido diseñado meticulosamente para complementar la estética y funcionalidad de tus dispositivos Apple, utilizando materiales de la más alta calidad.'}
           </p>
+
+          {!isOutOfStock && (
+            <div className="w-full lg:max-w-md">
+              <ContactButtons 
+                product={{ name: deviceName, description }} 
+                size="lg"
+              />
+            </div>
+          )}
+
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-8 border-t border-zinc-100 dark:border-zinc-800">
+
         <FeatureItem 
           icon={<ShieldCheck className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />}
           title="Calidad Garantizada"

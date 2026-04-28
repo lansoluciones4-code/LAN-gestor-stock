@@ -25,29 +25,27 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-indigo-500/30">
+    <div className="lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-indigo-500/30 flex flex-col">
       {/* Hero Section */}
-      <section className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold tracking-tight text-zinc-900 dark:text-white leading-tight">
+      <section className="relative pb-4 md:pb-10 pt-8 md:pt-10 overflow-hidden px-4 sm:px-8 shrink-0">
+        <div className="max-w-6xl mx-auto text-center space-y-4 md:space-y-6">
+
+          <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white">
             Phone Center
-            <br className="hidden md:block" />
-            <span className="block sm:inline text-zinc-500 dark:text-zinc-400"> Diseñados para brillar.</span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto font-medium px-2">
-            Nuestra cuidadosa selección de accesorios para tus dispositivos Apple fusiona
-            estética minimalista con durabilidad de grado premium.
-          </p>
         </div>
       </section>
 
       {/* Catalog Section */}
-      <CatalogClient products={products} categories={categories} />
+      <div className="flex-1 min-h-0">
+        <CatalogClient products={products} categories={categories} />
+      </div>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-12 text-center text-sm text-zinc-500 dark:text-zinc-400 px-6">
+      {/* Footer - Minimal on desktop to save space */}
+      <footer className="shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 text-center text-[14px] text-zinc-500 dark:text-zinc-400 px-6">
         <p>© {new Date().getFullYear()} Phone Center. Todos los derechos reservados.</p>
       </footer>
     </div>
   );
 }
+

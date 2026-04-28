@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { type ProductDef } from '@/schemas/product.schema';
 import { normalizeForSearch } from '@/lib/utils';
 
@@ -16,15 +16,19 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [page, setPage] = useState(1);
 
+  // Use deferred value for search to keep the input snappy
+  const deferredSearch = useDeferredValue(search);
+
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [search, selectedCategory, minPrice, maxPrice]);
+  }, [deferredSearch, selectedCategory, minPrice, maxPrice]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       // 1. Search filter (Fuzzy)
-      const searchTerms = normalizeForSearch(search).split(/\s+/).filter(Boolean);
+      const searchTerms = normalizeForSearch(deferredSearch).split(/\s+/).filter(Boolean);
+
       const combinedText = normalizeForSearch(`${p.device?.name || ''} ${p.description || ''}`);
       const matchesSearch = searchTerms.every((term) => combinedText.includes(term));
 

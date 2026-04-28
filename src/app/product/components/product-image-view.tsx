@@ -17,7 +17,9 @@ export function ProductImageView({ imagePath, deviceName, isOutOfStock }: Produc
   }, [imagePath]);
 
   return (
-    <div className="relative aspect-square rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center overflow-hidden p-12 shadow-sm">
+    <div className="relative aspect-square rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center overflow-hidden p-12 shadow-sm w-full max-w-xl mx-auto">
+
+
       {/* Placeholder / Icono de Error (Package) */}
       {imageStatus !== 'loaded' && (
         <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300">

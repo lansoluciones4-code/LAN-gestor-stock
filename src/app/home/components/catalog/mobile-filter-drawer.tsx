@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, Tag, ChevronRight } from 'lucide-react';
 import { type DeviceDef } from '@/schemas/device.schema';
 import { toSentenceCase } from '@/lib/utils';
+import { useEffect } from 'react';
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
@@ -28,7 +29,20 @@ export function MobileFilterDrawer({
   maxPrice,
   onMaxPriceChange,
 }: MobileFilterDrawerProps) {
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   return (
+
     <AnimatePresence>
       {isOpen && (
         <>
@@ -97,42 +111,10 @@ export function MobileFilterDrawer({
                 </div>
               </section>
 
-              <section>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4 flex items-center gap-2">
-                  <SlidersHorizontal className="w-3 h-3" /> Rango de Precio
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Precio Mínimo</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={minPrice}
-                        onChange={(e) => onMinPriceChange(e.target.value)}
-                        className="w-full h-12 pl-6 pr-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Precio Máximo</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
-                      <input
-                        type="number"
-                        placeholder="Sin tope"
-                        value={maxPrice}
-                        onChange={(e) => onMaxPriceChange(e.target.value)}
-                        className="w-full h-12 pl-6 pr-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </section>
             </div>
 
             <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800">
+
               <button
                 onClick={onClose}
                 className="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold shadow-xl active:scale-95 transition-transform"

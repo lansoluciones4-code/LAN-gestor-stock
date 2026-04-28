@@ -43,7 +43,7 @@ export function CatalogPagination({
 
   return (
     <nav 
-      className="flex items-center justify-center gap-1 sm:gap-2 mt-12 md:mt-20 pb-12 px-4"
+      className="flex items-center justify-center gap-1 sm:gap-2 mt-2 md:pb-2 px-4"
       aria-label="Navegación de páginas"
     >
       {/* Botón Anterior */}
