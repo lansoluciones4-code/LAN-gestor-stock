@@ -16,12 +16,12 @@ export const productSchema = createInsertSchema(products)
     purchasePrice: z.any().transform((v) => {
       if (typeof v === 'string') return Number(v.replace(',', '.'));
       return Number(v);
-    }).pipe(z.number().min(0, 'El precio de compra no puede ser negativo').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
+    }).pipe(z.number().gt(0, 'El precio de compra debe ser mayor a 0').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
     salePrice: z.any().transform((v) => {
       if (typeof v === 'string') return Number(v.replace(',', '.'));
       return Number(v);
-    }).pipe(z.number().min(0, 'El precio de venta no puede ser negativo').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
-    stock: z.any().transform(v => Math.floor(Number(v))).pipe(z.number().min(0, 'El stock no puede ser negativo')),
+    }).pipe(z.number().gt(0, 'El precio de venta debe ser mayor a 0').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
+    stock: z.any().transform(v => Math.floor(Number(v))).pipe(z.number().min(1, 'El stock debe ser al menos 1')),
   });
 
 export type ProductInput = z.infer<typeof productSchema>;
