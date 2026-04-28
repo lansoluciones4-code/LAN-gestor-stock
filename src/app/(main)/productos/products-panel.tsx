@@ -219,7 +219,7 @@ export function ProductsPanel() {
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ''))}
                     onKeyDown={(e) => {
-                      if (e.key === ',' || e.key === '.') e.preventDefault();
+                      if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                     }}
                     className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
                     data-testid={TEST_IDS.productos.inputBusquedaPrecioMin}
@@ -233,7 +233,7 @@ export function ProductsPanel() {
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value.replace(/\D/g, ''))}
                     onKeyDown={(e) => {
-                      if (e.key === ',' || e.key === '.') e.preventDefault();
+                      if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                     }}
                     className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
                     data-testid={TEST_IDS.productos.inputBusquedaPrecioMax}
