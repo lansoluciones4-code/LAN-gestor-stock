@@ -104,7 +104,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
   // Mask logic similar to product form
   const handleAmountChange = (val: string) => {
-    if (val === '-' || val === '') {
+    if (val === '') {
       setAmount(val);
       setError(null);
       return;
@@ -232,6 +232,21 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                       className="w-full pl-7 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 font-bold"
                       value={amount}
                       onChange={(e) => handleAmountChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === ',' && e.currentTarget.value.includes(',')) {
+                          e.preventDefault();
+                          return;
+                        }
+                        if (
+                          !/^[0-9]$/.test(e.key) &&
+                          e.key !== ',' &&
+                          !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
+                          !e.ctrlKey &&
+                          !e.metaKey
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
                       placeholder="0,00"
                     />
                   </div>
