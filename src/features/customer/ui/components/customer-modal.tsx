@@ -54,9 +54,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
   const handleModalSubmit = async (data: CustomerInput | CustomerUpdateInput) => {
     setServerError(null);
     startTransition(async () => {
-      const action = editingItem 
-        ? updateCustomerAction(editingItem.id, data as CustomerUpdateInput) 
-        : createCustomerAction(data as CustomerInput);
+      const action = editingItem ? updateCustomerAction(editingItem.id, data as CustomerUpdateInput) : createCustomerAction(data as CustomerInput);
 
       const result = await action;
 
@@ -82,7 +80,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
         if (editingItem) {
           const changedData: any = { version: editingItem.version };
           let hasChanges = false;
-          
+
           Object.keys(dirtyFields).forEach((key) => {
             const k = key as keyof CustomerInput;
             (changedData as any)[k] = data[k];

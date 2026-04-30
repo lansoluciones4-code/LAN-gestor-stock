@@ -53,11 +53,11 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
   const filteredProducts = products.filter((p) => {
     if (p.stock <= 0) return false;
     if (!saleSearch) return true;
-    
+
     const terms = saleSearch.toLowerCase().trim().split(/\s+/);
     const combinedText = `${p.device?.name || ''} ${p.description || ''}`.toLowerCase();
-    
-    return terms.every(word => combinedText.includes(word));
+
+    return terms.every((word) => combinedText.includes(word));
   });
 
   return (
@@ -118,8 +118,18 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-indigo-500 hover:shadow-md'}`}
               >
                 <div className="text-left min-w-0 flex-1 mr-4">
-                  <h4 className="font-bold text-zinc-900 dark:text-zinc-100 text-sm truncate" title={p.device?.name}>{p.device?.name}</h4>
-                  <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight truncate" title={p.description || '--'}>{p.description || '--'}</p>
+                  <h4
+                    className="font-bold text-zinc-900 dark:text-zinc-100 text-sm truncate"
+                    title={p.device?.name}
+                  >
+                    {p.device?.name}
+                  </h4>
+                  <p
+                    className="text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight truncate"
+                    title={p.description || '--'}
+                  >
+                    {p.description || '--'}
+                  </p>
                   <span className={`text-[10px] font-bold ${p.stock < 5 ? 'text-amber-500' : 'text-zinc-500'}`}>
                     Disp:
                     {p.stock}
@@ -147,7 +157,12 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0"
               >
                 <div className="flex justify-between items-start gap-2 overflow-hidden">
-                  <span className="text-xs font-bold uppercase leading-tight truncate" title={item.name}>{item.name}</span>
+                  <span
+                    className="text-xs font-bold uppercase leading-tight truncate"
+                    title={item.name}
+                  >
+                    {item.name}
+                  </span>
                   <button
                     onClick={() => removeFromCart(item.productId)}
                     className="text-zinc-300 hover:text-red-500 transition-colors p-1"
@@ -233,7 +248,12 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                   className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0"
                 >
                   <div className="flex justify-between items-start overflow-hidden">
-                    <span className="text-sm font-bold uppercase leading-tight truncate" title={item.name}>{item.name}</span>
+                    <span
+                      className="text-sm font-bold uppercase leading-tight truncate"
+                      title={item.name}
+                    >
+                      {item.name}
+                    </span>
                     <button
                       onClick={() => removeFromCart(item.productId)}
                       className="text-red-500 p-1"
@@ -286,10 +306,8 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
         onSuccess={(newC: CustomerDef, message?: string) => {
           // Robust update: If id exists (reactivation case), replace it. Otherwise append.
           const exists = customers.some((c) => c.id === newC.id);
-          const updatedList = exists
-            ? customers.map((c) => (c.id === newC.id ? newC : c))
-            : [...customers, newC];
-          
+          const updatedList = exists ? customers.map((c) => (c.id === newC.id ? newC : c)) : [...customers, newC];
+
           setCustomers(updatedList);
           setSelectedCustomerId(newC.id);
           setGlobalMessage({ type: 'success', text: message || 'Cliente registrado y seleccionado.' });

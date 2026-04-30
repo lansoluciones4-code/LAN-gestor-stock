@@ -67,9 +67,9 @@ export function SalesPanel() {
 
   useEffect(() => {
     if (view === 'new' && !selectedCustomerId && displayCustomers.length > 0) {
-      const activeCustomers = displayCustomers.filter(c => c.isActive);
+      const activeCustomers = displayCustomers.filter((c) => c.isActive);
       if (activeCustomers.length > 0) {
-        const defaultCust = activeCustomers.find(c => c.name.toLowerCase() === 'mostrador') || activeCustomers[0];
+        const defaultCust = activeCustomers.find((c) => c.name.toLowerCase() === 'mostrador') || activeCustomers[0];
         setSelectedCustomerId(defaultCust.id);
       }
     }
@@ -159,7 +159,10 @@ export function SalesPanel() {
 
   return (
     <>
-      <div className="flex flex-col flex-1 h-full overflow-hidden outline-none" tabIndex={-1}>
+      <div
+        className="flex flex-col flex-1 h-full overflow-hidden outline-none"
+        tabIndex={-1}
+      >
         <SalesListView
           sales={displaySales}
           isPending={isPending}

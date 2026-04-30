@@ -16,7 +16,10 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
       header: 'Usuario Creado',
       cell: (u) => (
         <div className="flex flex-col">
-          <div className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 truncate min-w-0" title={u.username}>
+          <div
+            className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 truncate min-w-0"
+            title={u.username}
+          >
             <span className="truncate">{u.username}</span>
             {!u.isActive && <span className="shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase tracking-tighter">Inactivo</span>}
             {currentUserId === u.id && <span className="shrink-0 px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 text-[10px] uppercase font-bold ml-2">Tú</span>}

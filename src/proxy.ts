@@ -43,8 +43,8 @@ export async function proxy(request: NextRequest) {
   // 3. Protección de Rutas por ROL (RBAC) para Vendedor
   if (isAuthenticated && user.role === 'vendedor') {
     const isRoot = pathname === '/';
-    const isAllowed = allowedVendedorPaths.some(p => pathname.startsWith(p));
-    
+    const isAllowed = allowedVendedorPaths.some((p) => pathname.startsWith(p));
+
     if (isRoot || (!isPublicPath && !isAllowed)) {
       return NextResponse.redirect(new URL('/productos', request.url));
     }

@@ -21,7 +21,6 @@ import { normalizeForSearch } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 
-
 export function DevicePanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -77,7 +76,7 @@ export function DevicePanel() {
       .filter((d) => {
         const terms = normalizeForSearch(search).split(/\s+/);
         const combinedText = normalizeForSearch(d.name);
-        const matchesSearch = terms.every(word => combinedText.includes(word));
+        const matchesSearch = terms.every((word) => combinedText.includes(word));
         const matchesStatus = showInactive ? true : d.isActive;
         return matchesSearch && matchesStatus;
       })
@@ -103,7 +102,6 @@ export function DevicePanel() {
     onToggleActive: handleToggleActive,
     onDelete: setItemToDelete,
   });
-
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden">

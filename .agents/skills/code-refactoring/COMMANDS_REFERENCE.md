@@ -8,9 +8,11 @@
 ## 🎯 Available Commands
 
 ### 1. `/start-watcher`
+
 **Purpose:** Start background file watcher for real-time monitoring
 
 **What it does:**
+
 - Starts `file-watcher.js` process in background
 - Auto-detects `src/` directory in your project
 - Monitors JavaScript/TypeScript (.js, .jsx, .ts, .tsx) and Python (.py) files
@@ -18,11 +20,13 @@
 - Creates PID file for process management
 
 **When to use:**
+
 - At start of coding session
 - When you want real-time alerts as you edit files
 - After cloning a new repository
 
 **Output shows:**
+
 - Number of files being monitored
 - Critical files (>300 lines)
 - Alert files (200-300 lines)
@@ -30,6 +34,7 @@
 - Process ID (PID)
 
 **Example:**
+
 ```
 /start-watcher
 
@@ -46,15 +51,18 @@
 ---
 
 ### 2. `/stop-watcher`
+
 **Purpose:** Stop the background file watcher
 
 **What it does:**
+
 - Stops the running `file-watcher.js` process
 - Removes PID file
 - Stops real-time monitoring
 - Preserves existing alerts in `watcher-alerts.json`
 
 **When to use:**
+
 - End of coding session
 - When you want to disable real-time monitoring
 - When troubleshooting watcher issues
@@ -62,6 +70,7 @@
 **Note:** Alerts already created remain accessible. The skill can still check for them manually.
 
 **Example:**
+
 ```
 /stop-watcher
 
@@ -72,9 +81,11 @@
 ---
 
 ### 3. `/scan-code-size`
+
 **Purpose:** One-time scan for oversized files (doesn't start background monitoring)
 
 **What it does:**
+
 - Runs a quick scan of your codebase
 - Identifies files exceeding size thresholds
 - Generates a detailed report
@@ -82,16 +93,19 @@
 - Does NOT start background monitoring
 
 **When to use:**
+
 - Quick audit of a new codebase
 - Before starting a refactoring initiative
 - When you want a snapshot without continuous monitoring
 - Checking status before a release
 
 **Difference from `/start-watcher`:**
+
 - `/scan-code-size` = One-time report, then exits
 - `/start-watcher` = Continuous monitoring with real-time alerts
 
 **Example:**
+
 ```
 /scan-code-size
 
@@ -117,6 +131,7 @@ Top 5 largest files:
 ## 🔄 Typical Workflows
 
 ### Workflow 1: Start of Day (Continuous Monitoring)
+
 ```
 1. /start-watcher
 2. Code normally
@@ -126,6 +141,7 @@ Top 5 largest files:
 ```
 
 ### Workflow 2: Quick Audit (No Monitoring)
+
 ```
 1. /scan-code-size
 2. Review the report
@@ -134,6 +150,7 @@ Top 5 largest files:
 ```
 
 ### Workflow 3: Troubleshooting
+
 ```
 1. /stop-watcher (if watcher seems stuck)
 2. /start-watcher (restart fresh)
@@ -147,11 +164,13 @@ Top 5 largest files:
 **You DON'T need slash commands to see alerts!**
 
 When you interact with Claude, the skill **automatically**:
+
 1. Checks `watcher-alerts.json` for unread alerts
 2. Displays alerts in chat before responding
 3. Asks if you want help refactoring
 
 **Example automatic alert:**
+
 ```
 You: "Add a new feature to the dashboard"
 
@@ -168,30 +187,36 @@ Would you like me to help refactor it before adding the new feature?
 
 ## 📋 Quick Command Reference
 
-| Command | When to Use | Background Process? |
-|---------|------------|---------------------|
-| `/start-watcher` | Start of session, want real-time alerts | ✅ Yes (stays running) |
-| `/stop-watcher` | End of session, disable monitoring | ❌ No (stops process) |
-| `/scan-code-size` | Quick audit, one-time report | ❌ No (runs once, exits) |
+| Command           | When to Use                             | Background Process?      |
+| ----------------- | --------------------------------------- | ------------------------ |
+| `/start-watcher`  | Start of session, want real-time alerts | ✅ Yes (stays running)   |
+| `/stop-watcher`   | End of session, disable monitoring      | ❌ No (stops process)    |
+| `/scan-code-size` | Quick audit, one-time report            | ❌ No (runs once, exits) |
 
 ---
 
 ## 💡 Pro Tips
 
 ### Tip 1: Auto-Start on Claude Code Launch
+
 The watcher is configured to auto-start when Claude Code launches via the `SessionStart` hook. You don't need to manually run `/start-watcher` every time!
 
 ### Tip 2: Alerts Persist
+
 Even if you stop the watcher, alerts already created are saved. Claude can still check and display them.
 
 ### Tip 3: Manual Checks Without Commands
+
 Just ask Claude to invoke the `code-refactoring` skill, and it will check for alerts automatically. No slash commands needed!
 
 ### Tip 4: Scan Before Big Refactor
+
 Before starting a major refactoring initiative:
+
 ```
 /scan-code-size
 ```
+
 Then ask: "Show me a prioritized refactoring roadmap for the critical files"
 
 ---
@@ -201,16 +226,19 @@ Then ask: "Show me a prioritized refactoring roadmap for the critical files"
 **What each command actually runs:**
 
 ### `/start-watcher`
+
 ```bash
 node ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/start-watcher-interactive.js
 ```
 
 ### `/stop-watcher`
+
 ```bash
 bash ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/stop-watcher.sh
 ```
 
 ### `/scan-code-size`
+
 ```bash
 # Runs file-watcher.js with 10-second timeout (scan only, doesn't stay running)
 timeout 10 node "...\file-watcher.js" "$WATCH_DIR" 2>&1 | tee "$REPORT_FILE"
@@ -220,11 +248,11 @@ timeout 10 node "...\file-watcher.js" "$WATCH_DIR" 2>&1 | tee "$REPORT_FILE"
 
 ## 📁 Files Created by Commands
 
-| Command | Files Created | Location |
-|---------|---------------|----------|
-| `/start-watcher` | `watcher.pid`<br>`watcher.log`<br>`watcher-alerts.json` | `~/.claude/.../scripts/` |
-| `/stop-watcher` | (removes `watcher.pid`) | - |
-| `/scan-code-size` | `code-size-report-[timestamp].txt` | Current directory |
+| Command           | Files Created                                           | Location                 |
+| ----------------- | ------------------------------------------------------- | ------------------------ |
+| `/start-watcher`  | `watcher.pid`<br>`watcher.log`<br>`watcher-alerts.json` | `~/.claude/.../scripts/` |
+| `/stop-watcher`   | (removes `watcher.pid`)                                 | -                        |
+| `/scan-code-size` | `code-size-report-[timestamp].txt`                      | Current directory        |
 
 ---
 
@@ -244,6 +272,7 @@ A: Run `/stop-watcher` to disable monitoring. The skill can still check file siz
 
 **Q: What's the difference between scan and watcher?**
 A:
+
 - `/scan-code-size` = One-time snapshot report
 - `/start-watcher` = Continuous real-time monitoring
 

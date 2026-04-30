@@ -22,9 +22,7 @@ export function CatalogGrid({ products, onResetFilters }: CatalogGridProps) {
           <PackageSearch className="w-10 h-10 text-zinc-400" />
         </div>
         <h3 className="text-xl font-bold text-zinc-900 dark:text-white">No encontramos lo que buscas</h3>
-        <p className="text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto">
-          Prueba ajustando los filtros o el término de búsqueda para encontrar otros accesorios.
-        </p>
+        <p className="text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto">Prueba ajustando los filtros o el término de búsqueda para encontrar otros accesorios.</p>
         <button
           onClick={onResetFilters}
           className="mt-4 px-6 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-xl text-sm font-bold hover:scale-105 active:scale-95 transition-all shadow-xl"

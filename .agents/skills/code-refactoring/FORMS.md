@@ -49,24 +49,28 @@ Where:
 ### File 1: [path/to/file.tsx]
 
 **Size Metrics:**
+
 - Current lines: 450
 - Size factor: 450 / 100 = 4.5
 
 **Change Frequency:**
+
 - Commits (last 3 months): 24
 - Commits per month: 8
 - Change frequency factor: 8 × 2.0 = 16.0
 
 **Business Impact:**
+
 - [ ] Low (1): Minor feature, few users affected
 - [ ] Medium (2): Important feature, significant users
-- [X] High (3): Critical feature, all users affected
+- [x] High (3): Critical feature, all users affected
 - Business impact factor: 3 × 3.0 = 9.0
 
 **Risk/Complexity:**
+
 - [ ] Low (1): Simple logic, good test coverage
 - [ ] Medium (2): Moderate complexity, some tests
-- [X] High (3): Complex logic, poor test coverage
+- [x] High (3): Complex logic, poor test coverage
 - Risk factor: 3 × 1.5 = 4.5
 
 **Total Priority Score:** 4.5 + 16.0 + 9.0 + 4.5 = **34.0**
@@ -77,23 +81,27 @@ Where:
 ### File 2: [path/to/file2.py]
 
 **Size Metrics:**
+
 - Current lines: 280
 - Size factor: 280 / 100 = 2.8
 
 **Change Frequency:**
+
 - Commits (last 3 months): 6
 - Commits per month: 2
 - Change frequency factor: 2 × 2.0 = 4.0
 
 **Business Impact:**
+
 - [ ] Low (1)
-- [X] Medium (2)
+- [x] Medium (2)
 - [ ] High (3)
 - Business impact factor: 2 × 3.0 = 6.0
 
 **Risk/Complexity:**
+
 - [ ] Low (1)
-- [X] Medium (2)
+- [x] Medium (2)
 - [ ] High (3)
 - Risk factor: 2 × 1.5 = 3.0
 
@@ -109,21 +117,25 @@ Where:
 ## Priority Level Guidelines
 
 **P0 - Critical (Score ≥ 25)**
+
 - **Action:** Fix within 1 week
 - **Rationale:** High size + high change frequency + critical impact
 - **Approach:** Dedicated sprint, full team focus
 
 **P1 - High (Score 15-24)**
+
 - **Action:** Fix within 1 month
 - **Rationale:** Moderate to high concern in multiple areas
 - **Approach:** Regular sprint work, pair programming
 
 **P2 - Medium (Score 10-14)**
+
 - **Action:** Fix within quarter
 - **Rationale:** Some concern, but manageable
 - **Approach:** Opportunistic refactoring when making changes
 
 **P3 - Low (Score <10)**
+
 - **Action:** Fix when convenient
 - **Rationale:** Low concern, stable code
 - **Approach:** Include in larger refactoring initiatives
@@ -134,33 +146,35 @@ Where:
 
 **Based on scores above:**
 
-| Rank | File | Score | Priority | Timeline |
-|------|------|-------|----------|----------|
-| 1 | file.tsx | 34.0 | P0 | Week 1 |
-| 2 | file2.py | 15.8 | P1 | Week 3 |
-| ... | ... | ... | ... | ... |
+| Rank | File     | Score | Priority | Timeline |
+| ---- | -------- | ----- | -------- | -------- |
+| 1    | file.tsx | 34.0  | P0       | Week 1   |
+| 2    | file2.py | 15.8  | P1       | Week 3   |
+| ...  | ...      | ...   | ...      | ...      |
 
 ---
 
 ## Resource Allocation
 
 **P0 Files:**
+
 - Developer allocation: 2 developers
 - Estimated time: [X] hours
 - Sprint allocation: Sprint [X]
 
 **P1 Files:**
+
 - Developer allocation: 1 developer
 - Estimated time: [X] hours
 - Sprint allocation: Sprint [X-Y]
 
 **P2 Files:**
+
 - Developer allocation: As available
 - Estimated time: [X] hours
 - Sprint allocation: Ongoing
 
 ---
-
 ```
 
 ### Quick Prioritization Guide
@@ -194,12 +208,12 @@ Where:
 
 ### Codebase Health Metrics
 
-| Metric | Current | Industry Standard | Gap |
-|--------|---------|-------------------|-----|
-| Average file size | [X] lines | <150 lines | +[X] lines |
-| Files >300 lines | [X] files | 0 files | [X] files |
-| Test coverage | [X]% | >80% | -[X]% |
-| Technical debt ratio | [X]% | <5% | +[X]% |
+| Metric               | Current   | Industry Standard | Gap        |
+| -------------------- | --------- | ----------------- | ---------- |
+| Average file size    | [X] lines | <150 lines        | +[X] lines |
+| Files >300 lines     | [X] files | 0 files           | [X] files  |
+| Test coverage        | [X]%      | >80%              | -[X]%      |
+| Technical debt ratio | [X]%      | <5%               | +[X]%      |
 
 ### Problem Summary
 
@@ -224,12 +238,12 @@ Where:
 
 ### Success Metrics
 
-| Metric | Baseline | 3-Month Target | 6-Month Target |
-|--------|----------|----------------|----------------|
-| Critical files | [X] | 0 | 0 |
-| High priority files | [X] | [X/2] | 0 |
-| Average file size | [X] | <200 | <150 |
-| Test coverage | [X]% | [X+10]% | >80% |
+| Metric              | Baseline | 3-Month Target | 6-Month Target |
+| ------------------- | -------- | -------------- | -------------- |
+| Critical files      | [X]      | 0              | 0              |
+| High priority files | [X]      | [X/2]          | 0              |
+| Average file size   | [X]      | <200           | <150           |
+| Test coverage       | [X]%     | [X+10]%        | >80%           |
 
 ---
 
@@ -243,6 +257,7 @@ Where:
 - [ ] Document current architecture
 
 **Deliverables:**
+
 - Technical debt assessment report
 - Prioritized refactoring list
 - Architecture diagram (current state)
@@ -255,6 +270,7 @@ Where:
 - [ ] Plan test strategy
 
 **Deliverables:**
+
 - Detailed refactoring plans (use Refactoring Execution Plan template)
 - Sprint allocation plan
 - Risk assessment
@@ -267,19 +283,21 @@ Where:
 
 **Target:** Top [X] critical files
 
-| File | Current Lines | Target Lines | Estimated Time | Assignee |
-|------|---------------|--------------|----------------|----------|
-| file1.tsx | 450 | <200 | 8 hours | [Name] |
-| file2.py | 420 | <200 | 6 hours | [Name] |
-| ... | ... | ... | ... | ... |
+| File      | Current Lines | Target Lines | Estimated Time | Assignee |
+| --------- | ------------- | ------------ | -------------- | -------- |
+| file1.tsx | 450           | <200         | 8 hours        | [Name]   |
+| file2.py  | 420           | <200         | 6 hours        | [Name]   |
+| ...       | ...           | ...          | ...            | ...      |
 
 **Approach:**
+
 1. Extract data/configuration files
 2. Split into logical sub-components/modules
 3. Add missing tests
 4. Verify functionality unchanged
 
 **Success Criteria:**
+
 - [ ] All targeted files <300 lines
 - [ ] Test coverage improved by [X]%
 - [ ] No regressions introduced
@@ -297,6 +315,7 @@ Where:
 **Target:** [X] high-priority files
 
 **Approach:** Opportunistic refactoring
+
 - Refactor files when making feature changes
 - Batch similar refactorings together
 - Focus on highest-scoring P1 files first
@@ -308,16 +327,19 @@ Where:
 ### Ongoing Activities
 
 **Refactoring:**
+
 - [ ] Address P2 files opportunistically
 - [ ] Refactor any P3 files if quick wins available
 
 **Prevention:**
+
 - [ ] Enable code-refactoring skill for all developers
 - [ ] Add file size limits to CI/CD
 - [ ] Implement pre-commit hooks
 - [ ] Update code review checklist
 
 **Monitoring:**
+
 - [ ] Monthly codebase audits
 - [ ] Track refactoring metrics
 - [ ] Celebrate successes
@@ -329,6 +351,7 @@ Where:
 ### Identified Risks
 
 **Risk 1: Breaking changes during refactoring**
+
 - **Likelihood:** Medium
 - **Impact:** High
 - **Mitigation:**
@@ -338,6 +361,7 @@ Where:
 - **Contingency:** Have rollback plan for each file
 
 **Risk 2: Timeline overruns**
+
 - **Likelihood:** High
 - **Impact:** Medium
 - **Mitigation:**
@@ -347,6 +371,7 @@ Where:
 - **Contingency:** Extend timeline, reduce scope
 
 **Risk 3: New technical debt created**
+
 - **Likelihood:** Medium
 - **Impact:** Medium
 - **Mitigation:**
@@ -363,12 +388,12 @@ Where:
 
 **Full-time equivalent (FTE) needed:** [X] FTE
 
-| Phase | Duration | FTE Required | Team Members |
-|-------|----------|--------------|--------------|
-| Phase 1: Planning | 2 weeks | 0.5 FTE | [Names] |
-| Phase 2: Critical | 4 weeks | 1.0 FTE | [Names] |
-| Phase 3: High Priority | 6 weeks | 0.5 FTE | [Names] |
-| Phase 4: Ongoing | Ongoing | 0.25 FTE | [Names] |
+| Phase                  | Duration | FTE Required | Team Members |
+| ---------------------- | -------- | ------------ | ------------ |
+| Phase 1: Planning      | 2 weeks  | 0.5 FTE      | [Names]      |
+| Phase 2: Critical      | 4 weeks  | 1.0 FTE      | [Names]      |
+| Phase 3: High Priority | 6 weeks  | 0.5 FTE      | [Names]      |
+| Phase 4: Ongoing       | Ongoing  | 0.25 FTE     | [Names]      |
 
 ### Budget
 
@@ -390,25 +415,30 @@ Where:
 **Monthly:** Detailed report with trends
 
 ### Reporting Template
-
 ```
+
 ## Refactoring Update: Week [X]
 
 **Progress:**
+
 - Files refactored this week: [X]
 - Total files refactored: [X] of [Y] ([X]%)
 - Lines of code reduced: [X]
 
 **Metrics:**
+
 - Critical files remaining: [X]
 - Average file size: [X] lines (was [Y])
 - Test coverage: [X]% (was [Y]%)
 
 **Blockers:**
+
 - [Issue 1 and mitigation]
 
 **Next week:**
+
 - Target files: [list]
+
 ```
 
 ---
@@ -465,39 +495,44 @@ Where:
 ## Current State
 
 ### File Information
+
 - **Path:** `[full/path/to/file]`
 - **Size:** [X] lines
 - **Type:** [Component/Module/Class/Service]
 - **Status:** [✅ Good / ⚠️ Warning / 🛑 Critical]
 
 ### Size Breakdown
-| Category | Lines | Percentage |
-|----------|-------|------------|
-| Main logic | [X] | [X]% |
-| Data/Config | [X] | [X]% |
-| Helper functions | [X] | [X]% |
-| Types/Interfaces | [X] | [X]% |
-| Imports/Exports | [X] | [X]% |
-| Comments/Docs | [X] | [X]% |
-| **Total** | **[X]** | **100%** |
+
+| Category         | Lines   | Percentage |
+| ---------------- | ------- | ---------- |
+| Main logic       | [X]     | [X]%       |
+| Data/Config      | [X]     | [X]%       |
+| Helper functions | [X]     | [X]%       |
+| Types/Interfaces | [X]     | [X]%       |
+| Imports/Exports  | [X]     | [X]%       |
+| Comments/Docs    | [X]     | [X]%       |
+| **Total**        | **[X]** | **100%**   |
 
 ---
 
 ## Identified Issues
 
 ### Critical Issues (🛑 Must Fix)
+
 - [ ] File exceeds 300 lines
 - [ ] Multiple responsibilities detected
 - [ ] Complex nested logic (>3 levels)
 - [ ] [Other critical issue]
 
 ### Warnings (⚠️ Should Fix)
+
 - [ ] File exceeds 200 lines
 - [ ] Large data structures inline
 - [ ] Repeated code patterns
 - [ ] [Other warning]
 
 ### Improvements (💡 Nice to Have)
+
 - [ ] Better naming conventions
 - [ ] Add documentation
 - [ ] Performance optimizations
@@ -515,7 +550,9 @@ Where:
 
 **Target Structure:**
 ```
+
 [proposed file structure]
+
 ```
 
 **Estimated Impact:**
@@ -532,7 +569,9 @@ Where:
 
 **Target Structure:**
 ```
+
 [proposed structure]
+
 ```
 
 **Estimated Impact:**
@@ -595,6 +634,7 @@ Where:
 ## Pre-Refactoring Checklist: [Filename]
 
 ### Preparation
+
 - [ ] Current code is committed to version control
 - [ ] All tests are passing
 - [ ] No pending changes in working directory
@@ -602,6 +642,7 @@ Where:
 - [ ] Team notified (if working in team)
 
 ### Understanding
+
 - [ ] Read and understood entire file
 - [ ] Identified all dependencies
 - [ ] Mapped data flow
@@ -609,6 +650,7 @@ Where:
 - [ ] Reviewed related files
 
 ### Testing
+
 - [ ] Test suite exists for this file
 - [ ] Test coverage is adequate (>70%)
 - [ ] Tests are passing
@@ -616,18 +658,21 @@ Where:
 - [ ] Edge cases documented
 
 ### Backup
+
 - [ ] Created backup branch
 - [ ] Tagged current state
 - [ ] Documented current behavior
 - [ ] Captured current metrics
 
 ### Tools
+
 - [ ] Linter configured
 - [ ] Type checker enabled
 - [ ] Test runner ready
 - [ ] Code review tool available
 
 ### Risk Assessment
+
 - [ ] Identified breaking change potential: [Low/Medium/High]
 - [ ] Impact on other files: [List files]
 - [ ] Rollback plan documented
@@ -663,6 +708,7 @@ Where:
 **To:** `[new-file-path]`
 
 **Procedure:**
+
 1. Create new file: `[new-file-path]`
 2. Copy relevant code (lines [X]-[Y])
 3. Update imports in original file
@@ -671,6 +717,7 @@ Where:
 6. Commit with message: "refactor: extract [description]"
 
 **Verification:**
+
 - [ ] Code extracted successfully
 - [ ] All imports resolved
 - [ ] Tests passing
@@ -693,11 +740,13 @@ Where:
 **To:** `[destination]`
 
 **Procedure:**
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
 
 **Verification:**
+
 - [ ] [Check 1]
 - [ ] [Check 2]
 - [ ] [Check 3]
@@ -718,6 +767,7 @@ Where:
 **Action:** Integrate all refactored components
 
 **Procedure:**
+
 1. Review all changes
 2. Run full test suite
 3. Check performance metrics
@@ -725,6 +775,7 @@ Where:
 5. Final commit
 
 **Verification:**
+
 - [ ] All tests passing
 - [ ] No performance regression
 - [ ] Documentation updated
@@ -742,6 +793,7 @@ Where:
 **Success:** [YES / PARTIAL / NO]
 
 **Lessons Learned:**
+
 - [Lesson 1]
 - [Lesson 2]
 - [Lesson 3]
@@ -764,6 +816,7 @@ Where:
 ### Code Quality Checks
 
 #### Structure
+
 - [ ] Main file within size target (<200 lines for most)
 - [ ] All extracted files within size targets
 - [ ] Clear separation of concerns
@@ -771,6 +824,7 @@ Where:
 - [ ] Proper file organization
 
 #### Code Standards
+
 - [ ] Follows naming conventions
 - [ ] No linter errors
 - [ ] No type errors
@@ -778,6 +832,7 @@ Where:
 - [ ] Comments/documentation updated
 
 #### Functionality
+
 - [ ] All tests passing
 - [ ] No new bugs introduced
 - [ ] Edge cases still handled
@@ -785,6 +840,7 @@ Where:
 - [ ] Business logic unchanged
 
 #### Performance
+
 - [ ] No performance regression
 - [ ] Bundle size acceptable
 - [ ] Load time maintained or improved
@@ -795,17 +851,20 @@ Where:
 ### Testing Verification
 
 #### Unit Tests
+
 - [ ] All existing tests pass
 - [ ] New tests added for extracted code
 - [ ] Test coverage maintained or improved
 - [ ] Edge cases tested
 
 #### Integration Tests
+
 - [ ] Integration tests pass
 - [ ] No breaking changes detected
 - [ ] Dependencies work correctly
 
 #### Manual Testing
+
 - [ ] Manually tested main flow
 - [ ] Tested error scenarios
 - [ ] Tested edge cases
@@ -825,13 +884,13 @@ Where:
 
 ### Metrics Comparison
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Main file size | [X] lines | [Y] lines | [+/-Z] |
-| Total lines | [X] lines | [Y] lines | [+/-Z] |
-| Test coverage | [X]% | [Y]% | [+/-Z]% |
-| Performance | [X]ms | [Y]ms | [+/-Z]ms |
-| Bundle size | [X]KB | [Y]KB | [+/-Z]KB |
+| Metric         | Before    | After     | Change   |
+| -------------- | --------- | --------- | -------- |
+| Main file size | [X] lines | [Y] lines | [+/-Z]   |
+| Total lines    | [X] lines | [Y] lines | [+/-Z]   |
+| Test coverage  | [X]%      | [Y]%      | [+/-Z]%  |
+| Performance    | [X]ms     | [Y]ms     | [+/-Z]ms |
+| Bundle size    | [X]KB     | [Y]KB     | [+/-Z]KB |
 
 ---
 
@@ -850,15 +909,18 @@ Where:
 **Overall Success:** [✅ Success / ⚠️ Partial / ❌ Failed]
 
 **Benefits Achieved:**
+
 - [Benefit 1]
 - [Benefit 2]
 - [Benefit 3]
 
 **Issues Encountered:**
+
 - [Issue 1 and resolution]
 - [Issue 2 and resolution]
 
 **Recommendations:**
+
 - [Future improvement 1]
 - [Future improvement 2]
 
@@ -878,11 +940,13 @@ Where:
 ## React Component Refactoring Checklist
 
 ### Component Size
+
 - [ ] Component <200 lines
 - [ ] Each sub-component <150 lines
 - [ ] Data extracted to separate files
 
 ### React Best Practices
+
 - [ ] React.memo() used for components with animations
 - [ ] useMemo() for expensive computations
 - [ ] useCallback() for callbacks passed to children
@@ -890,30 +954,35 @@ Where:
 - [ ] Keys used properly in lists
 
 ### Performance
+
 - [ ] No unnecessary re-renders
 - [ ] Lazy loading for heavy components
 - [ ] Code splitting at route boundaries
 - [ ] Images optimized (if applicable)
 
 ### Imports
+
 - [ ] No file extensions in imports
 - [ ] Absolute imports used (@/ prefix)
 - [ ] Imports organized (React, libraries, local, styles)
 - [ ] No unused imports
 
 ### TypeScript
+
 - [ ] Proper types/interfaces defined
 - [ ] No 'any' types (unless justified)
 - [ ] Props interface defined
 - [ ] Return types specified for functions
 
 ### Hooks
+
 - [ ] Custom hooks extracted (if 4+ hooks)
 - [ ] Hook dependencies correct
 - [ ] No hooks inside conditionals
 - [ ] Cleanup in useEffect when needed
 
 ### Testing
+
 - [ ] Component tests exist
 - [ ] Hook tests exist (if custom hooks)
 - [ ] Snapshot tests updated
@@ -926,12 +995,14 @@ Where:
 ## Python Module/Class Refactoring Checklist
 
 ### File Size
+
 - [ ] Module <400 lines (or split into package)
 - [ ] Class <300 lines
 - [ ] Function <50 lines
 - [ ] No method >30 lines
 
 ### Python Best Practices
+
 - [ ] PEP 8 compliant
 - [ ] Type hints used (Python 3.6+)
 - [ ] Docstrings for all public methods
@@ -939,31 +1010,36 @@ Where:
 - [ ] Context managers for resources
 
 ### Class Design
+
 - [ ] Single Responsibility Principle
 - [ ] No God classes (too many methods)
 - [ ] Composition over inheritance
-- [ ] __init__ not too complex (<20 lines)
-- [ ] Private methods prefixed with _
+- [ ] **init** not too complex (<20 lines)
+- [ ] Private methods prefixed with \_
 
 ### Configuration
+
 - [ ] No magic numbers
 - [ ] Constants extracted to config file
 - [ ] Environment variables for settings
 - [ ] Configuration validated
 
 ### Imports
+
 - [ ] Standard library imports first
 - [ ] Third-party imports second
 - [ ] Local imports last
 - [ ] No circular imports
 
 ### Error Handling
+
 - [ ] Specific exceptions caught
 - [ ] No bare except clauses
 - [ ] Proper error messages
 - [ ] Logging in place
 
 ### Testing
+
 - [ ] Unit tests exist
 - [ ] Edge cases tested
 - [ ] Mocks used appropriately
@@ -977,6 +1053,7 @@ Where:
 ### Extract to Separate File When:
 
 **JavaScript/TypeScript:**
+
 - ✅ 5+ data items in component
 - ✅ Array >20 lines
 - ✅ 4+ hooks
@@ -984,6 +1061,7 @@ Where:
 - ✅ Complex form
 
 **Python:**
+
 - ✅ 5+ configuration variables
 - ✅ Class >300 lines
 - ✅ Function >50 lines
@@ -991,6 +1069,7 @@ Where:
 - ✅ Multiple responsibilities
 
 **Universal:**
+
 - ✅ Repeated code across files
 - ✅ Complex conditionals (>5 branches)
 - ✅ Deeply nested logic (>3 levels)
@@ -1002,14 +1081,14 @@ Where:
 
 **Use these as rough guidelines:**
 
-| Task | Time Estimate |
-|------|---------------|
-| Extract data to file | 10-15 minutes |
-| Extract sub-component | 20-30 minutes |
-| Extract custom hook | 30-45 minutes |
+| Task                       | Time Estimate |
+| -------------------------- | ------------- |
+| Extract data to file       | 10-15 minutes |
+| Extract sub-component      | 20-30 minutes |
+| Extract custom hook        | 30-45 minutes |
 | Split class into 2 classes | 45-60 minutes |
-| Convert module to package | 1-2 hours |
-| Full feature refactor | 2-4 hours |
+| Convert module to package  | 1-2 hours     |
+| Full feature refactor      | 2-4 hours     |
 
 **Always add 50% buffer for testing and fixes!**
 
@@ -1023,12 +1102,14 @@ Where:
 ### If Refactoring Fails
 
 **Trigger Conditions:**
+
 - Tests fail and can't be fixed in 30 minutes
 - Performance regression >20%
 - Breaking changes discovered
 - Critical bugs introduced
 
 **Rollback Procedure:**
+
 1. Stop all changes immediately
 2. Stash or discard uncommitted changes
 3. Revert to backup branch: `git checkout [backup-branch]`
@@ -1038,11 +1119,13 @@ Where:
 7. Create post-mortem
 
 **Backup Locations:**
+
 - Branch: `[backup-branch-name]`
 - Tag: `[pre-refactor-tag]`
 - Commit: `[commit-hash]`
 
 **Notification List:**
+
 - [Person/team to notify]
 - [Person/team to notify]
 

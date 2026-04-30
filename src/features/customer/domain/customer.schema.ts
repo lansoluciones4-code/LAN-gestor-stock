@@ -13,11 +13,7 @@ export const customerSchema = createInsertSchema(customers, {
     .min(1, 'El teléfono es obligatorio')
     .max(30, 'Número de teléfono demasiado largo')
     .regex(/^[0-9\s+-]*$/, 'Formato de teléfono inválido (solo números, +, - y espacios)'),
-  email: z
-    .email('Formato de correo electrónico inválido')
-    .trim()
-    .min(1, 'El correo electrónico es obligatorio')
-    .max(100, 'El correo electrónico es demasiado largo'),
+  email: z.email('Formato de correo electrónico inválido').trim().min(1, 'El correo electrónico es obligatorio').max(100, 'El correo electrónico es demasiado largo'),
   documentNumber: z.string().trim().min(1, 'El DNI es obligatorio').max(20, 'Documento demasiado largo'),
 })
   .pick({ name: true, phone: true, email: true, documentNumber: true })

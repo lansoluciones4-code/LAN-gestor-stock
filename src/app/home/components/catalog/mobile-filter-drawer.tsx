@@ -18,17 +18,7 @@ interface MobileFilterDrawerProps {
   onMaxPriceChange: (val: string) => void;
 }
 
-export function MobileFilterDrawer({
-  isOpen,
-  onClose,
-  categories,
-  selectedCategory,
-  onSelectCategory,
-  minPrice,
-  onMinPriceChange,
-  maxPrice,
-  onMaxPriceChange,
-}: MobileFilterDrawerProps) {
+export function MobileFilterDrawer({ isOpen, onClose, categories, selectedCategory, onSelectCategory, minPrice, onMinPriceChange, maxPrice, onMaxPriceChange }: MobileFilterDrawerProps) {
   // Lock body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
@@ -42,7 +32,6 @@ export function MobileFilterDrawer({
   }, [isOpen]);
 
   return (
-
     <AnimatePresence>
       {isOpen && (
         <>
@@ -83,11 +72,7 @@ export function MobileFilterDrawer({
                       onSelectCategory(null);
                       onClose();
                     }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${
-                      selectedCategory === null
-                        ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm border-zinc-200 dark:border-zinc-700'
-                        : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'
-                    }`}
+                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${selectedCategory === null ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm border-zinc-200 dark:border-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'}`}
                   >
                     Todos los productos
                   </button>
@@ -98,11 +83,7 @@ export function MobileFilterDrawer({
                         onSelectCategory(category.id);
                         onClose();
                       }}
-                      className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-between outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${
-                        selectedCategory === category.id
-                          ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-zinc-200 dark:border-zinc-700'
-                          : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'
-                      }`}
+                      className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-between outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${selectedCategory === category.id ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-zinc-200 dark:border-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'}`}
                     >
                       {toSentenceCase(category.name)}
                       {selectedCategory === category.id && <ChevronRight className="w-4 h-4" />}
@@ -110,11 +91,9 @@ export function MobileFilterDrawer({
                   ))}
                 </div>
               </section>
-
             </div>
 
             <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800">
-
               <button
                 onClick={onClose}
                 className="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold shadow-xl active:scale-95 transition-transform"

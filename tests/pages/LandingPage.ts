@@ -28,7 +28,7 @@ export class LandingPage {
 
   obtenerTarjetaProducto(texto: string): Locator {
     return this.page.locator('div.group.relative.flex.flex-col').filter({
-      hasText: new RegExp(texto, 'i')
+      hasText: new RegExp(texto, 'i'),
     });
   }
 
@@ -41,7 +41,7 @@ export class LandingPage {
     const btn = this.page.getByTestId(TEST_IDS.landing.btnSiguientePag);
     if (await btn.isVisible()) {
       const className = await btn.getAttribute('class');
-      const isDisabled = await btn.getAttribute('aria-disabled') === 'true' || className?.includes('pointer-events-none');
+      const isDisabled = (await btn.getAttribute('aria-disabled')) === 'true' || className?.includes('pointer-events-none');
 
       if (!isDisabled) {
         await btn.scrollIntoViewIfNeeded();

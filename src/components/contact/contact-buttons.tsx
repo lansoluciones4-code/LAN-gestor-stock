@@ -1,13 +1,7 @@
 'use client';
 
-import { 
-  generateWhatsAppLink, 
-  generateWhatsAppMessage, 
-  generateInstagramLink,
-  type ProductMessageData 
-} from '@/lib/contact/message-generator';
+import { generateWhatsAppLink, generateWhatsAppMessage, generateInstagramLink, type ProductMessageData } from '@/lib/contact/message-generator';
 import { CONTACT_CONFIG } from '@/lib/contact/contact.config';
-
 
 interface ContactButtonsProps {
   product: ProductMessageData;
@@ -16,8 +10,8 @@ interface ContactButtonsProps {
 }
 
 const WhatsAppIcon = () => (
-  <svg 
-    viewBox="0 0 24 24" 
+  <svg
+    viewBox="0 0 24 24"
     className="w-5 h-5 fill-[#25D366]"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -26,8 +20,8 @@ const WhatsAppIcon = () => (
 );
 
 const InstagramIcon = () => (
-  <svg 
-    viewBox="0 0 24 24" 
+  <svg
+    viewBox="0 0 24 24"
     className="w-5 h-5 fill-[#E1306C]"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -45,7 +39,7 @@ export function ContactButtons({ product, size = 'md', showLabels = true }: Cont
   if (!showLabels) {
     return (
       <div className="flex items-center justify-center gap-3 w-full">
-        <a 
+        <a
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
@@ -55,7 +49,7 @@ export function ContactButtons({ product, size = 'md', showLabels = true }: Cont
         >
           <WhatsAppIcon />
         </a>
-        <a 
+        <a
           href={instagramLink}
           target="_blank"
           rel="noopener noreferrer"
@@ -70,29 +64,33 @@ export function ContactButtons({ product, size = 'md', showLabels = true }: Cont
   }
 
   // Common styles for the link buttons to match the Button component look
-  const baseButtonStyles = "flex-1 flex items-center justify-center rounded-lg transition-all duration-300 shadow-sm whitespace-nowrap py-6 sm:py-2.5 border group cursor-pointer font-semibold text-sm";
-  const sizeStyles = size === 'lg' ? "px-6 py-3 text-lg" : "px-4 py-2.5 text-base";
+  const baseButtonStyles = 'flex-1 flex items-center justify-center rounded-lg transition-all duration-300 shadow-sm whitespace-nowrap py-6 sm:py-2.5 border group cursor-pointer font-semibold text-sm';
+  const sizeStyles = size === 'lg' ? 'px-6 py-3 text-lg' : 'px-4 py-2.5 text-base';
 
   return (
     <div className="flex flex-col xl:flex-row items-stretch gap-3 w-full">
-      <a 
+      <a
         href={whatsappLink}
         target="_blank"
         rel="noopener noreferrer"
         onClick={stopProp}
         className={`${baseButtonStyles} ${sizeStyles} border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-emerald-50 dark:hover:bg-emerald-500/5`}
       >
-        <span className="mr-2"><WhatsAppIcon /></span>
+        <span className="mr-2">
+          <WhatsAppIcon />
+        </span>
         <span>Consultar por WhatsApp</span>
       </a>
-      <a 
+      <a
         href={instagramLink}
         target="_blank"
         rel="noopener noreferrer"
         onClick={stopProp}
         className={`${baseButtonStyles} ${sizeStyles} border-pink-100 dark:border-pink-900/30 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-pink-50 dark:hover:bg-pink-500/5`}
       >
-        <span className="mr-2"><InstagramIcon /></span>
+        <span className="mr-2">
+          <InstagramIcon />
+        </span>
         <span>Consultar por Instagram</span>
       </a>
     </div>

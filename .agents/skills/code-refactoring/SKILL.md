@@ -33,7 +33,6 @@ Language Support:
 
 **Works with:** JavaScript/TypeScript (React, Node), Python, and general codebases.
 
-
 ## 🔔 CRITICAL FIRST STEP: Check for File Watcher Alerts
 
 **BEFORE doing anything else when this skill is invoked, ALWAYS check for unread alerts from the background file watcher:**
@@ -43,17 +42,20 @@ node ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/check
 ```
 
 **Why this is critical:**
+
 - The file watcher runs in the background monitoring code file sizes
 - It writes alerts to `watcher-alerts.json` when files are edited and exceed thresholds
 - These alerts tell you which files the user just edited that need refactoring attention
 - **You must check these alerts FIRST** to provide real-time feedback
 
 **If alerts exist:**
+
 1. Display the alerts using the check-alerts.js script output
 2. Ask the user if they want help refactoring the alerted files NOW or LATER
 3. Then proceed with the rest of the skill workflow
 
 **If no alerts:**
+
 - Continue with normal skill workflow (checking file sizes manually, etc.)
 
 **User can also manually check alerts with:** `/check-refactor-alerts`
@@ -77,6 +79,7 @@ wc -l [target-file]
 ```
 
 **Example workflow:**
+
 ```
 User: "Add new feature to UserProfile.tsx"
 AI: *Before editing, checks file size*
@@ -97,6 +100,7 @@ Skill: "🚨 UserProfile.tsx is 280 lines. Before adding features:
 - At 200 lines → 🚨 Stop, extract now
 
 **Example workflow:**
+
 ```
 AI: *Creating new DashboardService.py*
 AI: *Reaches 150 lines*
@@ -119,6 +123,7 @@ wc -l filename
 ```
 
 **Example workflow:**
+
 ```
 User: "Take a look at the analytics module"
 AI: *Reads analytics.py*
@@ -140,6 +145,7 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 **AI should automatically detect these patterns and invoke skill:**
 
 #### Universal Patterns (All Languages)
+
 - ✅ Large data structures (>20 lines) → Suggest separate config/data file
 - ✅ Complex conditionals (5+ branches) → Suggest strategy pattern or dispatch table
 - ✅ Deeply nested logic (>3 levels) → Suggest extraction
@@ -147,6 +153,7 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 - ✅ Long parameter lists (>5 params) → Suggest config object or builder pattern
 
 #### JavaScript/TypeScript/React Patterns
+
 - ✅ 5+ data items hardcoded → Suggest data file extraction
 - ✅ 4+ useState/useEffect hooks → Suggest custom hook extraction
 - ✅ Modal/Dialog code → Suggest separate component
@@ -154,32 +161,37 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 - ✅ Large switch statements → Suggest lookup table or component map
 
 #### Python Patterns
+
 - ✅ Class >300 lines → Suggest splitting into multiple classes
 - ✅ Function >50 lines → Suggest breaking into smaller functions
 - ✅ Module >500 lines → Suggest splitting into package
 - ✅ Too many methods (>15) → Suggest composition or mixins
-- ✅ Complex __init__ (>20 lines) → Suggest factory method or builder
+- ✅ Complex **init** (>20 lines) → Suggest factory method or builder
 
 ---
 
 ## 📏 File Size Guidelines (Language-Specific)
 
 ### JavaScript/TypeScript/React Components
+
 - **100-200 lines**: ✅ Perfect for most components
 - **200-300 lines**: ⚠️ Good for complex components, watch closely
 - **300+ lines**: 🛑 MUST split into logical sub-components
 
 ### Python Modules
+
 - **150-250 lines**: ✅ Good module size
 - **250-400 lines**: ⚠️ Consider splitting by responsibility
 - **400+ lines**: 🛑 Split into multiple modules or package
 
 ### Python Classes
+
 - **100-200 lines**: ✅ Well-focused class
 - **200-300 lines**: ⚠️ Check single responsibility principle
 - **300+ lines**: 🛑 Split into multiple classes or use composition
 
 ### General Files (Any Language)
+
 - **150-250 lines**: ✅ Maintainable size
 - **250-400 lines**: ⚠️ Getting complex
 - **400+ lines**: 🛑 Refactor needed
@@ -196,11 +208,13 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 **Current State:** [X] lines - [✅ Good / ⚠️ Warning / 🛑 Critical]
 
 **Identified Issues:**
+
 - File size issues (>200 or >300 lines)
 - Complex nested logic / too many responsibilities
 - Language-specific patterns (hooks, data arrays, classes, etc.)
 
 **Refactoring Recommendations:**
+
 1. Extract [what] to [new-file] (saves [X] lines, [X] mins)
 2. Extract [what] to [new-file] (saves [X] lines, [X] mins)
 
@@ -218,6 +232,7 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 **When ANY of these conditions occur, AUTO-INVOKE this skill:**
 
 ### Universal Triggers (All Languages)
+
 1. ✅ File reaches 150 lines → Suggest extraction points
 2. ✅ File reaches 200 lines → Alert and plan refactor
 3. ✅ File reaches 300 lines → Stop and refactor first
@@ -225,6 +240,7 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 5. ✅ Repeated code patterns found
 
 ### JavaScript/TypeScript Triggers
+
 1. ✅ Component reaches 150 lines → Extract next section
 2. ✅ 3+ useState hooks → Extract to custom hook
 3. ✅ Large data array → Move to data file immediately
@@ -232,11 +248,12 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 5. ✅ Complex form → Separate form component immediately
 
 ### Python Triggers
+
 1. ✅ Class reaches 250 lines → Plan class split
 2. ✅ Function reaches 40 lines → Suggest breaking down
 3. ✅ Module reaches 350 lines → Plan module split
 4. ✅ 10+ methods in class → Consider composition
-5. ✅ Complex __init__ → Suggest factory pattern
+5. ✅ Complex **init** → Suggest factory pattern
 
 ---
 
@@ -245,11 +262,13 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 **When to extract what (Quick Reference):**
 
 **JavaScript/TypeScript/React:**
+
 - **Data file**: 5+ items, arrays >20 lines, config objects
 - **Sub-component**: Modal/dialog, complex list items, distinct UI sections
 - **Custom hook**: 4+ useState, complex logic, reusable state
 
 **Python:**
+
 - **Config file**: 5+ variables, large data (>20 lines), magic numbers
 - **New class**: Class >300 lines, multiple responsibilities, 10+ methods
 - **Utility function**: Repeated logic, pure functions, generic operations
@@ -262,6 +281,7 @@ Skill: "🛑 analytics.py is 450 lines (150 lines over limit).
 ## 💡 Proactive Suggestions
 
 **AI should auto-suggest at these milestones:**
+
 - **New file**: Monitor size, alert at 150 lines
 - **100 lines**: Looking good, will alert at 150
 - **150 lines**: ⚠️ Check if should extract before continuing
@@ -285,6 +305,7 @@ After analyzing file size and creating refactoring plan, **always ask for approv
 **Target:** Reduce to <[target] lines
 
 ### Proposed Changes:
+
 1. Extract [data/component/class] to [new-file] (saves [X] lines)
 2. Extract [component/function] to [new-file] (saves [X] lines)
 3. Extract [hook/utility] to [new-file] (saves [X] lines)
@@ -296,24 +317,28 @@ After analyzing file size and creating refactoring plan, **always ask for approv
 ### Options:
 
 **✅ Yes** - Execute refactoring now (recommended)
-  - I'll split the file step-by-step
-  - Each step will be tested and committed
-  - You can rollback if needed
-  - Then I'll continue with your original request
+
+- I'll split the file step-by-step
+- Each step will be tested and committed
+- You can rollback if needed
+- Then I'll continue with your original request
 
 **❌ No** - Skip refactoring
-  - I'll continue with your edit
-  - Warning: File will grow larger
-  - May become harder to maintain
+
+- I'll continue with your edit
+- Warning: File will grow larger
+- May become harder to maintain
 
 **⏰ Later** - Save plan for later
-  - I'll save the plan to `refactoring-plan-[filename].md`
-  - You can execute it manually later
-  - I'll continue with your edit now
+
+- I'll save the plan to `refactoring-plan-[filename].md`
+- You can execute it manually later
+- I'll continue with your edit now
 
 **📋 Review** - Show detailed step-by-step execution plan
-  - I'll explain exactly what will happen
-  - Then you can choose Yes/No/Later
+
+- I'll explain exactly what will happen
+- Then you can choose Yes/No/Later
 
 **Your choice?**
 ```
@@ -331,6 +356,7 @@ After analyzing file size and creating refactoring plan, **always ask for approv
 5. **Rollback automatically** if any step fails
 
 **Key execution principles:**
+
 - ✅ Each step is atomic and committed separately
 - ✅ Each step is verified before proceeding
 - ✅ Automatic rollback on any failure
@@ -356,11 +382,13 @@ Now proceeding with your request...
 ## 🔄 Integration with Other Skills
 
 **Works with:**
+
 - `ui-ux-audit` - Check file sizes during UI audits
 - `technical-writing` - Document refactored structure
 - `qa-testing` - Ensure tests cover refactored code
 
 **Triggers:**
+
 - Before major edits to large files
 - During file creation
 - After reading files >200 lines
@@ -371,6 +399,7 @@ Now proceeding with your request...
 ## 🔍 CODEBASE AUDIT MODE (For Existing Technical Debt)
 
 **Use this mode when user asks to:**
+
 - "Audit the codebase" or "find large files"
 - Check for "technical debt" or "existing problems"
 - "Scan for refactoring opportunities"
@@ -386,6 +415,7 @@ Now proceeding with your request...
 5. **Execute incrementally** (one file per sprint)
 
 **Quick scan commands:**
+
 ```bash
 # Find oversized files by type
 find src -name "*.tsx" -exec wc -l {} \; | awk '$1 > 200' | sort -rn
@@ -401,10 +431,12 @@ bash scripts/check-size.sh src/ '*.tsx'
 ## 📚 Language-Specific Details
 
 **For detailed refactoring patterns specific to each language, see:**
+
 - `REFERENCE.md` - Comprehensive language-specific guides
 - `FORMS.md` - Refactoring templates and checklists
 
 **To check file size quickly:**
+
 ```bash
 # Use the helper script
 bash ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/check-size.sh [filename]
@@ -430,6 +462,7 @@ bash ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/check
 ## Remember: Prevention > Cure
 
 **This skill prevents "caught by accident" scenarios by:**
+
 - Checking BEFORE editing (preventive)
 - Alerting DURING creation (proactive)
 - Suggesting AFTER reading (reactive)

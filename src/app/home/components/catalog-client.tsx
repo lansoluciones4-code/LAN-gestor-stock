@@ -20,22 +20,7 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const itemsPerPage = 16;
 
-
-  const {
-    search,
-    setSearch,
-    selectedCategory,
-    setSelectedCategory,
-    minPrice,
-    setMinPrice,
-    maxPrice,
-    setMaxPrice,
-    page,
-    setPage,
-    totalPages,
-    paginatedProducts,
-    clearFilters,
-  } = useCatalogFilters({ products, itemsPerPage });
+  const { search, setSearch, selectedCategory, setSelectedCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, page, setPage, totalPages, paginatedProducts, clearFilters } = useCatalogFilters({ products, itemsPerPage });
 
   return (
     <div className="h-full max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col min-h-0">
@@ -67,9 +52,9 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
           </div>
 
           <div className="flex-1">
-            <CatalogGrid 
-              products={paginatedProducts} 
-              onResetFilters={clearFilters} 
+            <CatalogGrid
+              products={paginatedProducts}
+              onResetFilters={clearFilters}
             />
           </div>
 
@@ -80,7 +65,6 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
           />
         </main>
       </div>
-
 
       <MobileFilterDrawer
         isOpen={isSidebarOpen}

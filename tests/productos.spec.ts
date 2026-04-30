@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { ProductosPage } from './pages/ProductosPage';
 import { MESSAGES } from '@/config/messages';
@@ -12,7 +11,7 @@ const CASOS_DE_VALIDACION = [
     compra: '1',
     venta: '100',
     unidades: '200',
-    erroresEsperados: ['Debes seleccionar un equipo v']
+    erroresEsperados: ['Debes seleccionar un equipo v'],
   },
   {
     descripcion: 'Debería requerir proveedor',
@@ -22,7 +21,7 @@ const CASOS_DE_VALIDACION = [
     compra: '1',
     venta: '100',
     unidades: '200',
-    erroresEsperados: ['Debes seleccionar un proveedor válido']
+    erroresEsperados: ['Debes seleccionar un proveedor válido'],
   },
   {
     descripcion: 'Debería requerir equipo y proveedor',
@@ -32,7 +31,7 @@ const CASOS_DE_VALIDACION = [
     compra: '1',
     venta: '100',
     unidades: '200',
-    erroresEsperados: ['Debes seleccionar un equipo v', 'Debes seleccionar un proveedor válido']
+    erroresEsperados: ['Debes seleccionar un equipo v', 'Debes seleccionar un proveedor válido'],
   },
   {
     descripcion: 'Debería requerir venta, compra y unidades validas',
@@ -42,7 +41,7 @@ const CASOS_DE_VALIDACION = [
     compra: '',
     venta: '',
     unidades: '',
-    erroresEsperados: ['El precio de venta debe ser mayor a 0', 'El precio de compra debe ser mayor a 0', 'Debe ingresar una cantidad válida']
+    erroresEsperados: ['El precio de venta debe ser mayor a 0', 'El precio de compra debe ser mayor a 0', 'Debe ingresar una cantidad válida'],
   },
 ];
 
@@ -55,7 +54,7 @@ const CASOS_DE_EDICION = [
     compra: '',
     venta: '',
     unidades: '',
-    erroresEsperados: ['El precio de venta debe ser mayor a 0', 'El precio de compra debe ser mayor a 0', 'Debe ingresar una cantidad válida']
+    erroresEsperados: ['El precio de venta debe ser mayor a 0', 'El precio de compra debe ser mayor a 0', 'Debe ingresar una cantidad válida'],
   },
 ];
 
@@ -65,7 +64,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
-
   test('Debería vaciar el formulario al cancelar', async ({ page }) => {
     const productosPage = new ProductosPage(page);
     const producto = await productosPage.inyectarProductoEfimero();
@@ -82,7 +80,7 @@ test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
     test(`Validación: ${caso.descripcion}`, async ({ page }) => {
       const productosPage = new ProductosPage(page);
       const producto = await productosPage.inyectarProductoEfimero();
-      const equipo = (caso.equipo) ? producto.equipo : undefined;
+      const equipo = caso.equipo ? producto.equipo : undefined;
       const proveedor = caso.proveedor ? producto.proveedor : undefined;
 
       await productosPage.crearProducto(equipo, proveedor, caso.desc, caso.compra, caso.venta, caso.unidades);
@@ -98,17 +96,7 @@ test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
       const productosPage = new ProductosPage(page);
       const producto = await productosPage.inyectarProductoEfimero();
 
-      await productosPage.editarProducto(
-        producto.equipo,
-        producto.proveedor,
-        caso.desc,
-        undefined,
-        undefined,
-        undefined,
-        caso.unidades,
-        caso.compra,
-        caso.venta
-      );
+      await productosPage.editarProducto(producto.equipo, producto.proveedor, caso.desc, undefined, undefined, undefined, caso.unidades, caso.compra, caso.venta);
 
       for (const errorTexto of caso.erroresEsperados) {
         await expect(page.getByText(errorTexto)).toBeVisible();
@@ -127,16 +115,10 @@ test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
       PRECIO_COMPRA: '1000',
       PRECIO_VENTA: '1500',
       UNIDADES: '5',
-      UNIDADES_EDITADAS: '10'
+      UNIDADES_EDITADAS: '10',
     };
 
-    await productosPage.crearProducto(
-      TEST_DATA.EQUIPO,
-      TEST_DATA.PROVEEDOR,
-      TEST_DATA.DESC,
-      TEST_DATA.PRECIO_COMPRA,
-      TEST_DATA.PRECIO_VENTA,
-      TEST_DATA.UNIDADES);
+    await productosPage.crearProducto(TEST_DATA.EQUIPO, TEST_DATA.PROVEEDOR, TEST_DATA.DESC, TEST_DATA.PRECIO_COMPRA, TEST_DATA.PRECIO_VENTA, TEST_DATA.UNIDADES);
 
     await productosPage.buscarProducto(TEST_DATA.DESC);
     const fila = productosPage.obtenerFila(TEST_DATA.EQUIPO, TEST_DATA.PROVEEDOR, TEST_DATA.DESC);
@@ -155,19 +137,10 @@ test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
       DESC_EDITADA: producto.descripcion + producto.proveedor,
       PRECIO_COMPRA: '999',
       PRECIO_VENTA: '999',
-      UNIDADES_EDITADAS: '10'
+      UNIDADES_EDITADAS: '10',
     };
 
-    await productosPage.editarProducto(
-      TEST_DATA.EQUIPO_VIEJO,
-      TEST_DATA.PROVEEDOR_VIEJO,
-      TEST_DATA.DESC_VIEJA,
-      TEST_DATA.EQUIPO,
-      TEST_DATA.PROVEEDOR,
-      TEST_DATA.DESC_EDITADA,
-      TEST_DATA.UNIDADES_EDITADAS,
-      TEST_DATA.PRECIO_COMPRA,
-      TEST_DATA.PRECIO_VENTA);
+    await productosPage.editarProducto(TEST_DATA.EQUIPO_VIEJO, TEST_DATA.PROVEEDOR_VIEJO, TEST_DATA.DESC_VIEJA, TEST_DATA.EQUIPO, TEST_DATA.PROVEEDOR, TEST_DATA.DESC_EDITADA, TEST_DATA.UNIDADES_EDITADAS, TEST_DATA.PRECIO_COMPRA, TEST_DATA.PRECIO_VENTA);
 
     await productosPage.buscarProducto(TEST_DATA.DESC_EDITADA);
     const filaEditada = productosPage.obtenerFila(TEST_DATA.EQUIPO_VIEJO, TEST_DATA.PROVEEDOR, TEST_DATA.DESC_EDITADA);
@@ -184,7 +157,7 @@ test.describe.parallel('Gestión de Productos: Validaciones y Lógica', () => {
       EQUIPO: producto.equipo,
       PROVEEDOR: producto.proveedor,
       DESC: producto.descripcion,
-      CANTIDAD: '1'
+      CANTIDAD: '1',
     };
 
     await productosPage.registrarPerdida(PRODUCTO.EQUIPO, PRODUCTO.PROVEEDOR, PRODUCTO.DESC, PRODUCTO.CANTIDAD, undefined);

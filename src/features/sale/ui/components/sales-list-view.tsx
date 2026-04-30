@@ -30,12 +30,9 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
 
   const filteredSales = sales.filter((s) => {
     const terms = normalizeForSearch(searchTerm).split(/\s+/);
-    const combinedText = [
-      normalizeForSearch(s.customer?.name || 'Consumidor Final'),
-      normalizeForSearch(s.vendor?.username || '')
-    ].join(' ');
+    const combinedText = [normalizeForSearch(s.customer?.name || 'Consumidor Final'), normalizeForSearch(s.vendor?.username || '')].join(' ');
 
-    const matchesSearch = terms.every(word => combinedText.includes(word));
+    const matchesSearch = terms.every((word) => combinedText.includes(word));
     const saleTime = new Date(s.createdAt).getTime();
 
     let matchesStart = true;

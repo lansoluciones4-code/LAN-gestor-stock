@@ -30,13 +30,13 @@ export function useEntityManager<T>() {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     setGlobalMessage({ type, text });
-    
+
     timeoutRef.current = setTimeout(() => {
       setGlobalMessage(null);
       timeoutRef.current = null;
-    }, 4500); 
+    }, 4500);
   };
 
   // Limpiar timeout al desmontar

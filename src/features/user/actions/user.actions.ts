@@ -34,9 +34,9 @@ export async function toggleUserActiveAction(id: string, isActive: boolean): Pro
     return await db.transaction(async (tx) => {
       await userRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, { active: isActive }, tx);
-      return { 
-        success: true, 
-        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Usuario') : MESSAGES.SUCCESS.DEACTIVATED('Usuario') 
+      return {
+        success: true,
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Usuario') : MESSAGES.SUCCESS.DEACTIVATED('Usuario'),
       };
     });
   } catch (error: any) {
@@ -54,16 +54,23 @@ export async function createUserAction(input: UserInput): Promise<ActionResult<U
       const result = await userRepository.createUser(parsed.data, tx);
       const wasReactivated = (result as any).wasInactive;
 
-      await recordAuditLog(caller.id, 'CREAR', 'USER', result.id, {
-        username: result.username,
-        role: result.role,
-        note: wasReactivated ? 'Usuario reactivado' : 'Nuevo registro',
-      }, tx);
+      await recordAuditLog(
+        caller.id,
+        'CREAR',
+        'USER',
+        result.id,
+        {
+          username: result.username,
+          role: result.role,
+          note: wasReactivated ? 'Usuario reactivado' : 'Nuevo registro',
+        },
+        tx
+      );
 
       return {
         success: true,
         message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Usuario') : MESSAGES.SUCCESS.CREATED('Usuario'),
-        data: result as UserDef
+        data: result as UserDef,
       };
     });
   } catch (error: any) {
@@ -85,10 +92,10 @@ export async function updateUserAction(id: string, input: UserUpdateInput): Prom
     return await db.transaction(async (tx) => {
       const updated = await userRepository.updateUser(id, parsed.data, tx);
       await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, parsed.data, tx);
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: MESSAGES.SUCCESS.UPDATED('Usuario'),
-        data: updated as UserDef
+        data: updated as UserDef,
       };
     });
   } catch (error: any) {
@@ -120,7 +127,7 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
 
       await userRepository.deleteUser(id, tx);
       await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Usuario eliminado permanentemente (sin historial previo).' }, tx);
-      
+
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Usuario') };
     });
   } catch (error: any) {

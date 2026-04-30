@@ -55,17 +55,24 @@ export async function createProductAction(input: ProductInput): Promise<ActionRe
     return await db.transaction(async (tx) => {
       const newProduct = await productRepository.createProduct(parsed.data, tx);
 
-      await recordAuditLog(caller.id, 'CREAR', 'PRODUCT', newProduct.id, {
-        deviceId: parsed.data.deviceId,
-        stock: parsed.data.stock,
-        purchasePrice: parsed.data.purchasePrice,
-        salePrice: parsed.data.salePrice,
-      }, tx);
+      await recordAuditLog(
+        caller.id,
+        'CREAR',
+        'PRODUCT',
+        newProduct.id,
+        {
+          deviceId: parsed.data.deviceId,
+          stock: parsed.data.stock,
+          purchasePrice: parsed.data.purchasePrice,
+          salePrice: parsed.data.salePrice,
+        },
+        tx
+      );
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: MESSAGES.SUCCESS.CREATED('Producto'),
-        data: newProduct as ProductDef
+        data: newProduct as ProductDef,
       };
     });
   } catch (error: any) {
@@ -84,10 +91,10 @@ export async function updateProductAction(id: string, input: ProductUpdateInput)
 
       await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, parsed.data, tx);
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: MESSAGES.SUCCESS.UPDATED('Producto'),
-        data: updated as ProductDef
+        data: updated as ProductDef,
       };
     });
   } catch (error: any) {
@@ -154,15 +161,15 @@ export async function fetchLandingProducts(): Promise<ProductDef[]> {
 export async function toggleProductVisibilityAction(id: string, isVisible: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    
+
     return await db.transaction(async (tx) => {
       await productRepository.toggleVisibility(id, isVisible, tx);
 
       await recordAuditLog(caller.id, 'ACTUALIZAR_VISIBILIDAD_LANDING', 'PRODUCT', id, { showOnLanding: isVisible }, tx);
 
-      return { 
-        success: true, 
-        message: isVisible ? 'Producto visible en landing page' : 'Producto oculto en landing page' 
+      return {
+        success: true,
+        message: isVisible ? 'Producto visible en landing page' : 'Producto oculto en landing page',
       };
     });
   } catch (error: any) {
@@ -174,17 +181,16 @@ export async function fetchProductById(id: string): Promise<ProductDef | null> {
   try {
     const product = await productRepository.getProductById(id);
     if (!product) return null;
-    
+
     const formatted = {
       ...product,
       salePrice: parseFloat(product.salePrice as any),
       purchasePrice: parseFloat(product.purchasePrice as any),
     };
-    
+
     return productDefSchema.parse(formatted);
   } catch (error) {
     console.error('fetchProductById error:', error);
     return null;
   }
 }
-

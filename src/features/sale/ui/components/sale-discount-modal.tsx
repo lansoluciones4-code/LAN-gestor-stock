@@ -37,7 +37,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
     if (val.includes('.')) return;
 
     const normalized = val.replace(',', '.');
-    
+
     // Validar que sea un número válido y que no tenga más de 2 decimales
     if (/^\d*,?\d{0,2}$/.test(val)) {
       const num = Number(normalized);
@@ -140,9 +140,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
           )}
           <div className="flex justify-between items-center pt-2 border-t border-indigo-100 dark:border-indigo-900/30">
             <span className="text-xs font-black uppercase text-indigo-400 tracking-widest">Total a Cobrar</span>
-            <span className="text-2xl font-black text-indigo-700 dark:text-indigo-300">
-              ${finalTotal < 0 ? '0,00' : finalFormatted}
-            </span>
+            <span className="text-2xl font-black text-indigo-700 dark:text-indigo-300">${finalTotal < 0 ? '0,00' : finalFormatted}</span>
           </div>
         </div>
 
@@ -163,13 +161,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                     e.preventDefault();
                     return;
                   }
-                  if (
-                    !/^[0-9]$/.test(e.key) &&
-                    e.key !== ',' &&
-                    !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
-                    !e.ctrlKey &&
-                    !e.metaKey
-                  ) {
+                  if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
                     e.preventDefault();
                   }
                 }}
@@ -197,13 +189,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                     e.preventDefault();
                     return;
                   }
-                  if (
-                    !/^[0-9]$/.test(e.key) &&
-                    e.key !== ',' &&
-                    !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
-                    !e.ctrlKey &&
-                    !e.metaKey
-                  ) {
+                  if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
                     e.preventDefault();
                   }
                 }}

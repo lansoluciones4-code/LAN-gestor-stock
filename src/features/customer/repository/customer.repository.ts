@@ -28,10 +28,10 @@ export class CustomerRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(customers)
-      .set({ 
-        isActive, 
+      .set({
+        isActive,
         updatedAt: sql`NOW()`,
-        version: sql`${customers.version} + 1`
+        version: sql`${customers.version} + 1`,
       })
       .where(eq(customers.id, id))
       .returning();
@@ -83,27 +83,24 @@ export class CustomerRepository {
   }
 
   async updateCustomer(id: string, input: CustomerUpdateInput, dbtx: any = db) {
-    const updateData: any = { 
+    const updateData: any = {
       updatedAt: sql`NOW()`,
-      version: sql`${customers.version} + 1`
+      version: sql`${customers.version} + 1`,
     };
     if (input.name !== undefined) updateData.name = input.name;
     if (input.phone !== undefined) updateData.phone = input.phone || '';
     if (input.email !== undefined) updateData.email = input.email || '';
-    
+
     if (input.documentNumber !== undefined) {
       const normalizedInput = (input.documentNumber || '').replace(/[.\-]/g, '');
       const existing = await dbtx.query.customers.findFirst({
-        where: and(
-          sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`,
-          sql`${customers.id} != ${id}`
-        ),
+        where: and(sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`, sql`${customers.id} != ${id}`),
       });
-      
+
       if (existing) {
         throw new DuplicateEntityError();
       }
-      
+
       updateData.documentNumber = input.documentNumber || '';
     }
 

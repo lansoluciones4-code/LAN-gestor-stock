@@ -19,26 +19,23 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [products, categories] = await Promise.all([
-    fetchLandingProducts(),
-    fetchLandingCategories(),
-  ]);
+  const [products, categories] = await Promise.all([fetchLandingProducts(), fetchLandingCategories()]);
 
   return (
     <div className="lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-indigo-500/30 flex flex-col">
       {/* Hero Section */}
       <section className="relative pb-4 md:pb-10 pt-8 md:pt-10 overflow-hidden px-4 sm:px-8 shrink-0">
         <div className="max-w-6xl mx-auto text-center space-y-4 md:space-y-6">
-
-          <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white">
-            Phone Center
-          </h1>
+          <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white">Phone Center</h1>
         </div>
       </section>
 
       {/* Catalog Section */}
       <div className="flex-1 min-h-0">
-        <CatalogClient products={products} categories={categories} />
+        <CatalogClient
+          products={products}
+          categories={categories}
+        />
       </div>
 
       {/* Footer - Minimal on desktop to save space */}
@@ -48,4 +45,3 @@ export default async function HomePage() {
     </div>
   );
 }
-

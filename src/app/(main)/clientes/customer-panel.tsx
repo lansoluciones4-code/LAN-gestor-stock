@@ -64,14 +64,9 @@ export function CustomerPanel() {
     return customers
       .filter((c) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        const combinedText = [
-          normalizeForSearch(c.name),
-          normalizeForSearch(c.email),
-          normalizeForSearch(c.phone),
-          normalizeForSearch(c.documentNumber)
-        ].join(' ');
+        const combinedText = [normalizeForSearch(c.name), normalizeForSearch(c.email), normalizeForSearch(c.phone), normalizeForSearch(c.documentNumber)].join(' ');
 
-        const matchesSearch = terms.every(word => combinedText.includes(word));
+        const matchesSearch = terms.every((word) => combinedText.includes(word));
         const matchesStatus = showInactive ? true : c.isActive;
         return matchesSearch && matchesStatus;
       })
@@ -91,7 +86,6 @@ export function CustomerPanel() {
     onEdit: handleEditClick,
     onToggleActive: handleToggleActive,
   });
-
 
   const handleSuccess = (data: any) => {
     showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');

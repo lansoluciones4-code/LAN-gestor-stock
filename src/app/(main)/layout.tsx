@@ -50,16 +50,18 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     window.location.href = '/login';
   };
 
-  const navLinks = [...navigation, ...adminNavigation].filter(item =>
-    item.roles.includes(user?.role || 'vendedor')
-  );
+  const navLinks = [...navigation, ...adminNavigation].filter((item) => item.roles.includes(user?.role || 'vendedor'));
 
   const SidebarContent = () => (
     <div className="flex h-full w-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors relative">
       <div className="p-6 flex items-center justify-between shrink-0">
         <div className="flex items-center">
           <div className="w-12 h-12 bg-white border border-zinc-200 shadow-sm rounded-lg flex items-center justify-center mr-3 overflow-hidden">
-            <img src="/icon.ico" alt="PhoneCenter" className="w-10 h-10 object-contain" />
+            <img
+              src="/icon.ico"
+              alt="PhoneCenter"
+              className="w-10 h-10 object-contain"
+            />
           </div>
           <span className="font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100">PhoneCenter</span>
         </div>
@@ -137,7 +139,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Main Column */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden outline-none" tabIndex={-1}>
+      <div
+        className="flex flex-col flex-1 min-w-0 overflow-hidden outline-none"
+        tabIndex={-1}
+      >
         {/* Top Header */}
         <header className="shrink-0 h-16 flex items-center justify-between px-4 lg:px-8 transition-colors bg-transparent border-none no-print">
           <button
@@ -161,10 +166,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Dynamic Route Content */}
-        <main className="flex-1 relative overflow-hidden outline-none ring-0 focus:ring-0 focus-visible:ring-0 flex flex-col" tabIndex={-1}>
-          <div className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col outline-none ring-0 focus:ring-0 focus-visible:ring-0">
-            {children}
-          </div>
+        <main
+          className="flex-1 relative overflow-hidden outline-none ring-0 focus:ring-0 focus-visible:ring-0 flex flex-col"
+          tabIndex={-1}
+        >
+          <div className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 flex flex-col outline-none ring-0 focus:ring-0 focus-visible:ring-0">{children}</div>
         </main>
       </div>
 

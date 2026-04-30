@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2025-10-31
 
 ### Added
+
 - **🎯 Path-Based Thresholds** (MAJOR FEATURE)
   - File watcher now uses intelligent path-based thresholds instead of just file extensions
   - Different thresholds for different file types based on their purpose:
@@ -22,17 +23,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Thresholds now show their source (path-based vs extension-based) for transparency
 
 ### Changed
+
 - **Breaking:** Thresholds are now calculated per-file based on path, not just extension
 - Alert messages now include threshold source information `[path-based (reason)]`
 - RAG Playground pages now get appropriate 800-line critical threshold (was 300)
 
 ### Technical Details
+
 - Added `getThresholds(filePath)` function for intelligent threshold selection
 - Path patterns use normalized paths for cross-platform compatibility (Windows & Unix)
 - Thresholds include `reason` field explaining why a threshold was chosen
 - Cross-platform regex patterns: `/[/\\]data[/\\]/` works on both Windows and Unix
 
 ### Benefits
+
 - ✅ **Solves false positives** - Educational pages no longer flagged incorrectly
 - ✅ **Context-aware** - Logic files held to stricter standards than UI files
 - ✅ **Industry-aligned** - Follows real-world developer mental models
@@ -41,15 +45,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ **Extensible** - Easy to add new path patterns for your project
 
 ### Migration Guide
+
 **No action required!** The skill automatically detects file types and applies appropriate thresholds. Existing behavior for unmatched files remains unchanged (falls back to extension-based thresholds from v1.x).
 
 ### Example Results
 
 **Before v2.0 (Extension-based only):**
+
 - `page.tsx` (1,246 lines) → CRITICAL ❌ (>300 lines) - False positive!
 - `utils/helper.ts` (250 lines) → ALERT ⚠️ (>200 lines)
 
 **After v2.0 (Path-based + Extension-based):**
+
 - `page.tsx` (1,246 lines) → ALERT ⚠️ (>500, <800 for pages) ✅ More reasonable!
 - `utils/helper.ts` (250 lines) → CRITICAL 🛑 (>200 for utilities) ✅ Correctly strict!
 
@@ -58,22 +65,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.1] - 2025-10-30
 
 ### Changed
+
 - **Streamlined slash commands** from 5 to 3 essential commands
   - Removed `/check-refactor-alerts` (redundant - skill auto-checks)
   - Removed `/watcher-status` (redundant - `/start-watcher` shows status)
   - Kept `/start-watcher`, `/stop-watcher`, `/scan-code-size`
 
 ### Added
+
 - **COMMANDS_REFERENCE.md** - Comprehensive slash command documentation
 - **SKILL_QUALITY_REPORT.md** - Quality assessment by skill-builder (94/100)
 - **File watcher section in README.md** - Real-time monitoring documentation
 - **Slash commands section in README.md** - User-friendly command guide
 
 ### Fixed
+
 - Updated SKILL.md to remove references to deleted commands
 - Updated all documentation to reflect streamlined command set
 
 ### Quality
+
 - Skill-builder assessment: **94/100 (Grade A - EXCELLENT)**
 - Status: **PRODUCTION READY**
 
@@ -82,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-10-30
 
 ### Added
+
 - **Real-time file watcher system** with background process monitoring
   - `file-watcher.js` - Main watcher daemon
   - `check-alerts.js` - Alert display and management
@@ -113,11 +125,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `WATCHER_README.md` - Watcher system documentation
 
 ### Fixed
+
 - Alert notifications now appear in Claude Code Chat (was silent before v1.1.0)
 - File watcher integrates seamlessly with Claude's workflow
 - Alerts properly grouped by severity (critical/alert/warning)
 
 ### Technical Details
+
 - File watcher monitors: `.js`, `.jsx`, `.ts`, `.tsx`, `.py` files
 - Alert thresholds: 150 (warning), 200 (alert), 300+ (critical) lines
 - Reminder intervals: 5min (critical), 15min (alert), 30min (warning)
@@ -129,6 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-10-30
 
 ### Added
+
 - **Initial release** of code-refactoring skill
 
 - **Multi-language support**
@@ -176,6 +191,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - FORMS.md - Templates and checklists
 
 ### Design Principles
+
 - Prevention over cure (proactive monitoring)
 - Progressive disclosure (minimal token usage)
 - Language-agnostic with language-specific customization
@@ -195,6 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Future Enhancements (Roadmap)
 
 ### Planned for v1.2.0
+
 - [ ] Add before/after code examples to `resources/examples/`
 - [ ] Create QUICK_REFERENCE.md cheat sheet
 - [ ] Add metrics dashboard script (`generate-metrics-report.js`)
@@ -202,6 +219,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Refactoring progress tracking over time
 
 ### Under Consideration
+
 - [ ] Real-time push notifications (vs. polling)
 - [ ] Integration with git hooks (pre-commit checks)
 - [ ] Smart alert throttling based on user behavior

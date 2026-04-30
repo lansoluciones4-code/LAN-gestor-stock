@@ -21,7 +21,10 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
         return (
           <>
             {dateString}
-            <span title={timeString} className="text-indigo-600 dark:text-indigo-400 ml-1 font-bold">
+            <span
+              title={timeString}
+              className="text-indigo-600 dark:text-indigo-400 ml-1 font-bold"
+            >
               {timeString}
             </span>
           </>
@@ -31,17 +34,13 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
     {
       header: 'Cliente',
       cellClassName: 'text-zinc-500 max-w-[150px] truncate',
-      cell: (s) => (
-        <span title={s.customer?.name || 'Consumidor Final'}>
-          {s.customer?.name || 'Consumidor Final'}
-        </span>
-      ),
+      cell: (s) => <span title={s.customer?.name || 'Consumidor Final'}>{s.customer?.name || 'Consumidor Final'}</span>,
     },
     {
       header: 'Vend.',
       cellClassName: 'max-w-[70px] truncate',
       cell: (s) => (
-        <span 
+        <span
           className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[13px] font-black rounded uppercase truncate block w-fit"
           title={s.vendor?.username || 'Sistema'}
         >
@@ -55,16 +54,14 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
       cell: (s) => (
         <div className="flex gap-1">
           {s.payments?.map((p, i) => (
-            <span 
-              key={i} 
+            <span
+              key={i}
               className={`px-1.5 py-0.5 text-[15px] font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400'}`}
             >
               {p.type === 'efectivo' ? 'EF' : 'TR'}
             </span>
           ))}
-          {(!s.payments || s.payments.length === 0) && (
-             <span className="text-[10px] text-zinc-400 font-bold italic">--</span>
-          )}
+          {(!s.payments || s.payments.length === 0) && <span className="text-[10px] text-zinc-400 font-bold italic">--</span>}
         </div>
       ),
     },

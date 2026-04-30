@@ -16,8 +16,8 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  max: 20,                    // Maximum pool size
-  idleTimeoutMillis: 30000,   // Close idle clients after 30s
+  max: 20, // Maximum pool size
+  idleTimeoutMillis: 30000, // Close idle clients after 30s
   connectionTimeoutMillis: 2000, // Timeout connection attempts
 });
 
@@ -85,11 +85,13 @@ process.on('exit', () => sqlite.close());
 const users = await db.select().from(users);
 
 // ✅ Good: Fetch only needed columns
-const users = await db.select({
-  id: users.id,
-  email: users.email,
-  name: users.name,
-}).from(users);
+const users = await db
+  .select({
+    id: users.id,
+    email: users.email,
+    name: users.name,
+  })
+  .from(users);
 ```
 
 ### Use Indexes Effectively
@@ -97,26 +99,28 @@ const users = await db.select({
 ```typescript
 import { pgTable, serial, text, varchar, index } from 'drizzle-orm/pg-core';
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull(),
-  city: text('city'),
-  status: text('status'),
-}, (table) => ({
-  // Index frequently queried columns
-  emailIdx: index('email_idx').on(table.email),
+export const users = pgTable(
+  'users',
+  {
+    id: serial('id').primaryKey(),
+    email: varchar('email', { length: 255 }).notNull(),
+    city: text('city'),
+    status: text('status'),
+  },
+  (table) => ({
+    // Index frequently queried columns
+    emailIdx: index('email_idx').on(table.email),
 
-  // Composite index for common query patterns
-  cityStatusIdx: index('city_status_idx').on(table.city, table.status),
-}));
+    // Composite index for common query patterns
+    cityStatusIdx: index('city_status_idx').on(table.city, table.status),
+  })
+);
 
 // Query uses index
-const activeUsersInNYC = await db.select()
+const activeUsersInNYC = await db
+  .select()
   .from(users)
-  .where(and(
-    eq(users.city, 'NYC'),
-    eq(users.status, 'active')
-  ));
+  .where(and(eq(users.city, 'NYC'), eq(users.status, 'active')));
 ```
 
 ### Analyze Query Plans
@@ -125,9 +129,7 @@ const activeUsersInNYC = await db.select()
 import { sql } from 'drizzle-orm';
 
 // PostgreSQL EXPLAIN
-const plan = await db.execute(
-  sql`EXPLAIN ANALYZE SELECT * FROM ${users} WHERE ${users.email} = 'user@example.com'`
-);
+const plan = await db.execute(sql`EXPLAIN ANALYZE SELECT * FROM ${users} WHERE ${users.email} = 'user@example.com'`);
 
 console.log(plan.rows);
 
@@ -141,24 +143,13 @@ console.log(plan.rows);
 
 ```typescript
 // ❌ Bad: OFFSET on large datasets (gets slower as offset increases)
-const page = await db.select()
-  .from(users)
-  .limit(20)
-  .offset(10000); // Scans 10,020 rows!
+const page = await db.select().from(users).limit(20).offset(10000); // Scans 10,020 rows!
 
 // ✅ Good: Cursor-based pagination (constant time)
-const page = await db.select()
-  .from(users)
-  .where(gt(users.id, lastSeenId))
-  .orderBy(asc(users.id))
-  .limit(20);
+const page = await db.select().from(users).where(gt(users.id, lastSeenId)).orderBy(asc(users.id)).limit(20);
 
 // ✅ Good: Seek method for timestamp-based pagination
-const page = await db.select()
-  .from(posts)
-  .where(lt(posts.createdAt, lastSeenTimestamp))
-  .orderBy(desc(posts.createdAt))
-  .limit(20);
+const page = await db.select().from(posts).where(lt(posts.createdAt, lastSeenTimestamp)).orderBy(desc(posts.createdAt)).limit(20);
 ```
 
 ## Edge Runtime Integration
@@ -248,11 +239,7 @@ import { Redis } from 'ioredis';
 
 const redis = new Redis(process.env.REDIS_URL);
 
-async function getCachedData<T>(
-  key: string,
-  fetcher: () => Promise<T>,
-  ttl: number = 300
-): Promise<T> {
+async function getCachedData<T>(key: string, fetcher: () => Promise<T>, ttl: number = 300): Promise<T> {
   // Try cache first
   const cached = await redis.get(key);
   if (cached) return JSON.parse(cached);
@@ -267,11 +254,7 @@ async function getCachedData<T>(
 }
 
 // Usage
-const users = await getCachedData(
-  'users:all',
-  () => db.select().from(users),
-  600
-);
+const users = await getCachedData('users:all', () => db.select().from(users), 600);
 ```
 
 ### Materialized Views (PostgreSQL)
@@ -295,16 +278,17 @@ CREATE UNIQUE INDEX ON user_stats (id);
 
 // Define schema
 export const userStats = pgMaterializedView('user_stats').as((qb) =>
-  qb.select({
-    id: users.id,
-    name: users.name,
-    postCount: sql<number>`COUNT(${posts.id})`,
-    commentCount: sql<number>`COUNT(${comments.id})`,
-  })
-  .from(users)
-  .leftJoin(posts, eq(posts.authorId, users.id))
-  .leftJoin(comments, eq(comments.userId, users.id))
-  .groupBy(users.id)
+  qb
+    .select({
+      id: users.id,
+      name: users.name,
+      postCount: sql<number>`COUNT(${posts.id})`,
+      commentCount: sql<number>`COUNT(${comments.id})`,
+    })
+    .from(users)
+    .leftJoin(posts, eq(posts.authorId, users.id))
+    .leftJoin(comments, eq(comments.userId, users.id))
+    .groupBy(users.id)
 );
 
 // Refresh materialized view
@@ -327,13 +311,9 @@ async function bulkInsert(data: any[]) {
   const client = await pool.connect();
 
   try {
-    const stream = client.query(
-      copyFrom(`COPY users (email, name) FROM STDIN WITH (FORMAT csv)`)
-    );
+    const stream = client.query(copyFrom(`COPY users (email, name) FROM STDIN WITH (FORMAT csv)`));
 
-    const input = Readable.from(
-      data.map(row => `${row.email},${row.name}\n`)
-    );
+    const input = Readable.from(data.map((row) => `${row.email},${row.name}\n`));
 
     await pipeline(input, stream);
   } finally {
@@ -357,9 +337,7 @@ async function bulkUpdate(updates: { id: number; name: string }[]) {
   for await (const chunk of chunked(updates, 100)) {
     await db.transaction(async (tx) => {
       for (const update of chunk) {
-        await tx.update(users)
-          .set({ name: update.name })
-          .where(eq(users.id, update.id));
+        await tx.update(users).set({ name: update.name }).where(eq(users.id, update.id));
       }
     });
   }
@@ -491,10 +469,7 @@ class MetricsLogger {
 ```typescript
 import { performance } from 'perf_hooks';
 
-async function measureQuery<T>(
-  name: string,
-  query: Promise<T>
-): Promise<T> {
+async function measureQuery<T>(name: string, query: Promise<T>): Promise<T> {
   const start = performance.now();
 
   try {
@@ -512,10 +487,7 @@ async function measureQuery<T>(
 }
 
 // Usage
-const users = await measureQuery(
-  'fetchUsers',
-  db.select().from(users).limit(100)
-);
+const users = await measureQuery('fetchUsers', db.select().from(users).limit(100));
 ```
 
 ## Database-Specific Optimizations

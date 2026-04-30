@@ -9,37 +9,37 @@
 
 ### ✅ **Well Covered in Our Skill**
 
-| Topic | Our Coverage | Source |
-|-------|--------------|--------|
-| **File size guidelines** | ✅ Excellent (150/200/300 thresholds) | Custom (practical experience) |
-| **Before/After examples** | ✅ Strong (JS/TS/React, Python) | REFERENCE.md |
-| **Step-by-step execution** | ✅ Unique (incremental commits, rollback) | SKILL.md |
-| **Language-specific patterns** | ✅ Good (React hooks, Python classes) | REFERENCE.md |
-| **Templates & checklists** | ✅ Comprehensive | FORMS.md |
-| **Decision flowcharts** | ✅ Excellent (8 Mermaid diagrams) | resources/diagrams/ |
-| **When to extract** | ✅ Good (data, components, hooks, classes) | Quick Decision Matrix |
+| Topic                          | Our Coverage                               | Source                        |
+| ------------------------------ | ------------------------------------------ | ----------------------------- |
+| **File size guidelines**       | ✅ Excellent (150/200/300 thresholds)      | Custom (practical experience) |
+| **Before/After examples**      | ✅ Strong (JS/TS/React, Python)            | REFERENCE.md                  |
+| **Step-by-step execution**     | ✅ Unique (incremental commits, rollback)  | SKILL.md                      |
+| **Language-specific patterns** | ✅ Good (React hooks, Python classes)      | REFERENCE.md                  |
+| **Templates & checklists**     | ✅ Comprehensive                           | FORMS.md                      |
+| **Decision flowcharts**        | ✅ Excellent (8 Mermaid diagrams)          | resources/diagrams/           |
+| **When to extract**            | ✅ Good (data, components, hooks, classes) | Quick Decision Matrix         |
 
 ### ⚠️ **Partially Covered - Could Enhance**
 
-| Topic | Current State | Opportunity |
-|-------|---------------|-------------|
-| **Code smells catalog** | Partial (anti-patterns only) | Add full 21-smell catalog from Fowler |
-| **When NOT to refactor** | In diagrams, not explicit | Add dedicated section with risks |
-| **Testing strategy** | Mentioned, not emphasized | Add TDD/Red-Green-Refactor workflow |
-| **Tool integration** | Not covered | Add IDE features, AI tools guidance |
-| **Metrics for success** | In FORMS.md only | Make more prominent in SKILL.md |
+| Topic                    | Current State                | Opportunity                           |
+| ------------------------ | ---------------------------- | ------------------------------------- |
+| **Code smells catalog**  | Partial (anti-patterns only) | Add full 21-smell catalog from Fowler |
+| **When NOT to refactor** | In diagrams, not explicit    | Add dedicated section with risks      |
+| **Testing strategy**     | Mentioned, not emphasized    | Add TDD/Red-Green-Refactor workflow   |
+| **Tool integration**     | Not covered                  | Add IDE features, AI tools guidance   |
+| **Metrics for success**  | In FORMS.md only             | Make more prominent in SKILL.md       |
 
 ### ❌ **Missing - Should Add**
 
-| Topic | Authority Source | Priority |
-|-------|------------------|----------|
-| **Martin Fowler's 70+ techniques** | Refactoring (2nd ed.) | Medium - We focus on size-based, not technique-based |
-| **Code smells taxonomy** | Fowler's 5 categories | High - Missing systematic smell detection |
-| **Refactoring.guru's 66 techniques** | Refactoring.guru | Low - Overlap with Fowler |
-| **TDD Red-Green-Refactor** | Kent Beck | High - Best practice workflow |
-| **Real-world case studies** | Industry (Netflix, Spotify) | Medium - Adds credibility |
-| **Risk mitigation strategies** | Best practices | High - Safety critical |
-| **Tool recommendations** | Modern tools (2025) | Medium - Practical utility |
+| Topic                                | Authority Source            | Priority                                             |
+| ------------------------------------ | --------------------------- | ---------------------------------------------------- |
+| **Martin Fowler's 70+ techniques**   | Refactoring (2nd ed.)       | Medium - We focus on size-based, not technique-based |
+| **Code smells taxonomy**             | Fowler's 5 categories       | High - Missing systematic smell detection            |
+| **Refactoring.guru's 66 techniques** | Refactoring.guru            | Low - Overlap with Fowler                            |
+| **TDD Red-Green-Refactor**           | Kent Beck                   | High - Best practice workflow                        |
+| **Real-world case studies**          | Industry (Netflix, Spotify) | Medium - Adds credibility                            |
+| **Risk mitigation strategies**       | Best practices              | High - Safety critical                               |
+| **Tool recommendations**             | Modern tools (2025)         | Medium - Practical utility                           |
 
 ---
 
@@ -54,6 +54,7 @@
 **Why:** Our skill currently triggers on SIZE, but Fowler's work triggers on SMELL. We should detect both.
 
 **Content:**
+
 - All 21 code smells with examples
 - 5 categories (Bloaters, OO Abusers, Change Preventers, Dispensables, Couplers)
 - Detection patterns for each smell
@@ -68,6 +69,7 @@
 **Why:** Prevents misuse of skill - knowing when to skip refactoring is as important as knowing when to refactor.
 
 **Content:**
+
 - Frozen code / maintenance-only products
 - No test coverage (refactoring = breaking code)
 - Large changes all at once
@@ -81,6 +83,7 @@
 **Why:** Industry standard workflow - our skill should align with TDD best practices.
 
 **Content:**
+
 - Red: Write failing test
 - Green: Write minimum code to pass
 - Refactor: Improve code while keeping tests green
@@ -97,6 +100,7 @@
 **Why:** Users want to know how to use this skill WITH their existing tools.
 
 **Content:**
+
 - IDE refactoring features (IntelliJ, VSCode, ReSharper)
 - AI-powered tools (GitHub Copilot, Zencoder, Tabnine)
 - Analysis tools (SonarLint, CodeScene, NDepend)
@@ -109,6 +113,7 @@
 **Why:** Demonstrates value with real metrics.
 
 **Content:**
+
 - Django: Inline method refactoring (25% dev time reduction)
 - Netflix: Method simplification (fewer client errors)
 - Spotify: Moving features (30% better recommendations)
@@ -121,6 +126,7 @@
 **Why:** Addresses "Risks and Drawbacks" from research.
 
 **Content:**
+
 - Time-consuming: Break into sprints (from FORMS.md)
 - New bugs: Incremental commits with testing
 - Blocking workflow: Feature flags
@@ -138,6 +144,7 @@
 **Why:** Comprehensive reference for advanced users.
 
 **Content:**
+
 - Link to refactoring.com catalog
 - Link to Refactoring.guru
 - Mapping of our patterns to Fowler's techniques
@@ -150,21 +157,25 @@
 ### What Makes Our Skill Different (KEEP THIS!)
 
 **1. Preventive vs Corrective:**
+
 - **Fowler:** Detects smells AFTER they exist, prescribes fixes
 - **Our Skill:** Prevents complexity BEFORE it becomes a problem (150/200/300 triggers)
 - **Verdict:** Complementary approaches, both valuable
 
 **2. Automated Execution:**
+
 - **Fowler:** Manual techniques (human executes)
 - **Our Skill:** AI executes with user approval, incremental commits, automatic rollback
 - **Verdict:** Our automation is unique and valuable
 
 **3. Language-Agnostic Size Focus:**
+
 - **Fowler:** Technique-focused (works across languages but smell-based)
 - **Our Skill:** Size-focused (150 lines is 150 lines in any language)
 - **Verdict:** Simpler mental model, easier to apply universally
 
 **4. Multi-Language Support:**
+
 - **Fowler:** Examples in Java/JavaScript
 - **Refactoring.guru:** Examples in Java/C#/PHP
 - **Our Skill:** Explicit patterns for JavaScript/TypeScript/React AND Python AND universal patterns
@@ -173,18 +184,22 @@
 ### Where We Should Align (ADD THIS!)
 
 **1. Code Smells Detection:**
+
 - Add Fowler's 21 smells as additional auto-invoke triggers
 - Example: Detect "Long Parameter List" (>5 params) → Suggest config object
 
 **2. Systematic Techniques:**
+
 - Map our patterns to Fowler's techniques
 - Example: Our "Extract data file" = Fowler's "Extract Class" + "Move Method"
 
 **3. Testing Emphasis:**
+
 - Integrate TDD Red-Green-Refactor into our execution phase
 - Make testing requirements more prominent
 
 **4. Risk Awareness:**
+
 - Add explicit "When NOT to refactor" guidance
 - Add risk mitigation for each refactoring type
 
@@ -193,6 +208,7 @@
 ## 📝 Recommended Documentation Structure
 
 ### Current (Good)
+
 ```
 code-refactoring/
 ├── SKILL.md           # Core workflow
@@ -203,6 +219,7 @@ code-refactoring/
 ```
 
 ### Proposed (Better)
+
 ```
 code-refactoring/
 ├── SKILL.md           # Core workflow (enhanced with smells)
@@ -223,25 +240,22 @@ code-refactoring/
 ## ✅ Action Items
 
 **High Priority (Do Now):**
+
 1. ✅ Create `code-smells-catalog.md` with Fowler's 21 smells
 2. ✅ Add "When NOT to Refactor" section to REFERENCE.md
 3. ✅ Add TDD Red-Green-Refactor workflow to REFERENCE.md
 4. ✅ Update SKILL.md to mention smell detection (in addition to size)
 
-**Medium Priority (Next):**
-5. Create `tool-integration.md` with modern tools guide
-6. Create `case-studies.md` with Netflix, Spotify, Django examples
-7. Enhance safety section in REFERENCE.md with risk mitigation
+**Medium Priority (Next):** 5. Create `tool-integration.md` with modern tools guide 6. Create `case-studies.md` with Netflix, Spotify, Django examples 7. Enhance safety section in REFERENCE.md with risk mitigation
 
-**Low Priority (Optional):**
-8. Create `fowler-techniques-reference.md` mapping to authoritative sources
-9. Add more code smell examples to resources/examples/
+**Low Priority (Optional):** 8. Create `fowler-techniques-reference.md` mapping to authoritative sources 9. Add more code smell examples to resources/examples/
 
 ---
 
 ## 🎯 Success Criteria
 
 **Our skill should:**
+
 - ✅ Cover 100% of Fowler's core principles (refactor in small steps, test early, etc.) - **ALREADY MET**
 - ⚠️ Include code smell detection (not just size) - **PARTIALLY MET** (have anti-patterns, need full catalog)
 - ✅ Provide automation beyond manual techniques - **ALREADY MET** (unique feature)
@@ -257,7 +271,7 @@ code-refactoring/
 
 ## 📚 Sources Referenced
 
-1. **Fowler, Martin.** *Refactoring: Improving the Design of Existing Code (2nd Edition)*. Addison-Wesley, 2018.
+1. **Fowler, Martin.** _Refactoring: Improving the Design of Existing Code (2nd Edition)_. Addison-Wesley, 2018.
 2. **Refactoring.Guru.** Interactive catalog of refactoring techniques. https://refactoring.guru
 3. **Fowler, Martin.** Refactoring catalog. https://refactoring.com
 4. **Beck, Kent.** Test-Driven Development. Addison-Wesley, 2002.

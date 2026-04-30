@@ -37,7 +37,7 @@ export function UserPanel() {
       fetchData: fetchUsers,
       createAction: createUserAction,
       updateAction: updateUserAction,
-      deleteAction: deleteAction => deleteUserAction(deleteAction),
+      deleteAction: (deleteAction) => deleteUserAction(deleteAction),
       toggleActiveAction: toggleUserActiveAction,
     },
     setStoreData: setUsers,
@@ -72,13 +72,9 @@ export function UserPanel() {
         // Convert DB roles to Spanish display names for searching
         const roleDisplay = u.role === 'admin' ? 'administrador' : 'vendedor';
 
-        const combinedText = [
-          normalizeForSearch(u.username),
-          normalizeForSearch(u.role),
-          normalizeForSearch(roleDisplay)
-        ].join(' ');
+        const combinedText = [normalizeForSearch(u.username), normalizeForSearch(u.role), normalizeForSearch(roleDisplay)].join(' ');
 
-        const matchesSearch = terms.every(word => combinedText.includes(word));
+        const matchesSearch = terms.every((word) => combinedText.includes(word));
         const matchesStatus = showInactives ? true : u.isActive;
         return matchesSearch && matchesStatus;
       })
@@ -100,7 +96,6 @@ export function UserPanel() {
     onDelete: (id) => setItemToDelete(id),
     onToggleActive: handleToggleActive,
   });
-
 
   const handleModalSubmit = async (data: UserInput | UserUpdateInput) => {
     await handleEditSubmit(data);

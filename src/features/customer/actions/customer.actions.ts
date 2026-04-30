@@ -26,13 +26,13 @@ export async function fetchCustomers(): Promise<CustomerDef[]> {
 export async function toggleCustomerActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true); // Only admin for status toggle
-    
+
     return await db.transaction(async (tx) => {
       await customerRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'CUSTOMER', id, { active: isActive }, tx);
-      return { 
-        success: true, 
-        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Cliente') : MESSAGES.SUCCESS.DEACTIVATED('Cliente') 
+      return {
+        success: true,
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Cliente') : MESSAGES.SUCCESS.DEACTIVATED('Cliente'),
       };
     });
   } catch (error: any) {
@@ -50,15 +50,22 @@ export async function createCustomerAction(input: CustomerInput): Promise<Action
       const result = await customerRepository.createCustomer(parsed.data, tx);
       const wasReactivated = (result as any).wasInactive;
 
-      await recordAuditLog(caller.id, 'CREAR', 'CUSTOMER', result.id, { 
-        name: result.name,
-        note: wasReactivated ? 'Cliente reactivado (DNI duplicado)' : 'Nuevo registro'
-      }, tx);
+      await recordAuditLog(
+        caller.id,
+        'CREAR',
+        'CUSTOMER',
+        result.id,
+        {
+          name: result.name,
+          note: wasReactivated ? 'Cliente reactivado (DNI duplicado)' : 'Nuevo registro',
+        },
+        tx
+      );
 
-      return { 
-        success: true, 
-        message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Cliente') : MESSAGES.SUCCESS.CREATED('Cliente'), 
-        data: result as CustomerDef 
+      return {
+        success: true,
+        message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Cliente') : MESSAGES.SUCCESS.CREATED('Cliente'),
+        data: result as CustomerDef,
       };
     });
   } catch (error: any) {
@@ -75,10 +82,10 @@ export async function updateCustomerAction(id: string, input: CustomerUpdateInpu
     return await db.transaction(async (tx) => {
       const updated = await customerRepository.updateCustomer(id, parsed.data, tx);
       await recordAuditLog(caller.id, 'ACTUALIZAR', 'CUSTOMER', id, parsed.data, tx);
-      return { 
-        success: true, 
-        message: MESSAGES.SUCCESS.UPDATED('Cliente'), 
-        data: updated as CustomerDef 
+      return {
+        success: true,
+        message: MESSAGES.SUCCESS.UPDATED('Cliente'),
+        data: updated as CustomerDef,
       };
     });
   } catch (error: any) {

@@ -10,7 +10,10 @@ export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { r
       header: 'Modelo y Categoría',
       cellClassName: 'max-w-[300px]',
       cell: (row: DeviceDef) => (
-        <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0" title={row.name}>
+        <div
+          className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0"
+          title={row.name}
+        >
           <span className="truncate">{row.name}</span>
           {!row.isActive && <span className="shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
         </div>

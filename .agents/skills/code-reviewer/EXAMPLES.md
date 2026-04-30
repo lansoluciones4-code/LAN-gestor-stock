@@ -15,12 +15,14 @@ Complete end-to-end examples showing how to use the code-reviewer skill effectiv
 ## Example 1: Good Comprehensive Code Review
 
 ### Context
+
 **Feature:** User authentication API endpoint
 **Files Changed:** `src/api/auth.ts`, `src/middleware/validate.ts`
 **Lines Changed:** +150/-30
 **Review Type:** Pre-merge PR review
 
 ### User Request
+
 ```
 "Review this authentication PR for security, performance, and code quality issues"
 ```
@@ -28,11 +30,13 @@ Complete end-to-end examples showing how to use the code-reviewer skill effectiv
 ### Review Process
 
 **Step 1: Run Automated Tools**
+
 ```bash
 bash scripts/quick-audit.sh
 ```
 
 **Results:**
+
 - ✅ npm audit: No vulnerabilities
 - ✅ ESLint: 0 errors, 2 warnings
 - ✅ TypeScript: All type checks pass
@@ -43,21 +47,25 @@ bash scripts/quick-audit.sh
 Checked `src/api/auth.ts`:
 
 **A01 - Broken Access Control:**
+
 - ✅ Authentication middleware present on all protected routes
 - ✅ Token validation checks user permissions
 - ✅ Direct object references prevented with user ID validation
 
 **A02 - Cryptographic Failures:**
+
 - ✅ Passwords hashed with bcrypt (cost factor 12)
 - ✅ JWT secrets in environment variables
 - ✅ HTTPS enforced in production
 
 **A03 - Injection:**
+
 - ✅ Parameterized queries used (TypeORM)
 - ✅ Input validation with Zod schemas
 - ✅ No string concatenation in SQL
 
 **A07 - Authentication Failures:**
+
 - ✅ Rate limiting implemented (5 attempts/15 minutes)
 - ⚠️ **ISSUE FOUND:** Session timeout set to 7 days (too long)
 - ✅ Password requirements enforced (12 chars min)
@@ -68,7 +76,7 @@ Checked `src/api/auth.ts`:
 // File: src/api/auth.ts:45
 async function getUserWithPosts(userId: string) {
   const user = await User.findOne({ where: { id: userId } });
-  const posts = await Post.find({ where: { userId } });  // 🔴 N+1 potential
+  const posts = await Post.find({ where: { userId } }); // 🔴 N+1 potential
   return { ...user, posts };
 }
 ```
@@ -85,7 +93,7 @@ async function getUserWithPosts(userId: string) {
 
 ### Review Report Generated
 
-```markdown
+````markdown
 # Code Review Report: User Authentication API
 
 **Reviewed by:** Claude (code-reviewer skill)
@@ -103,6 +111,7 @@ async function getUserWithPosts(userId: string) {
 Solid authentication implementation with proper security practices. Two medium-priority issues identified that should be fixed before merge.
 
 **Key Metrics:**
+
 - **Files Modified:** 2
 - **Lines Changed:** +150/-30
 - **Estimated Risk:** 🟡 Medium
@@ -130,13 +139,16 @@ Solid authentication implementation with proper security practices. Two medium-p
 **Location:** `src/api/auth.ts:23`
 
 **Issue:**
+
 ```typescript
 const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
 ```
+````
 
 Session timeout of 7 days is excessive and increases risk if token is compromised.
 
 **Recommendation:**
+
 ```typescript
 const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' });
 ```
@@ -154,6 +166,7 @@ Change to 24 hours (or 1 hour for high-security applications).
 **Location:** `src/api/auth.ts:45-48`
 
 **Issue:**
+
 ```typescript
 async function getUserWithPosts(userId: string) {
   const user = await User.findOne({ where: { id: userId } });
@@ -165,11 +178,12 @@ async function getUserWithPosts(userId: string) {
 If this function is called in a loop, it will create N+1 queries.
 
 **Recommendation:**
+
 ```typescript
 async function getUserWithPosts(userId: string) {
   const user = await User.findOne({
     where: { id: userId },
-    relations: ['posts']
+    relations: ['posts'],
   });
   return user;
 }
@@ -190,12 +204,13 @@ Use TypeORM relations to fetch in single query.
 **Location:** `src/api/auth.ts:78`
 
 ```typescript
-console.log('User logged in:', user.email);  // Remove this
+console.log('User logged in:', user.email); // Remove this
 ```
 
 Replace with proper logging or remove.
 
 **Recommendation:**
+
 ```typescript
 logger.info('User logged in', { userId: user.id });
 ```
@@ -232,10 +247,12 @@ This PR demonstrates strong security practices and code quality. The two medium-
 Once fixes are committed, this PR is ready to merge.
 
 **Next Steps:**
+
 1. Author: Fix session timeout and N+1 query
 2. Author: Push fixes to PR
 3. Reviewer: Quick re-review of changes
 4. Merge to main
+
 ```
 
 ---
@@ -250,8 +267,10 @@ Once fixes are committed, this PR is ready to merge.
 
 ### User Request
 ```
+
 "Security audit for the payment processing code before we deploy to production"
-```
+
+````
 
 ### Review Process
 
@@ -265,11 +284,12 @@ app.post('/api/payments/:userId', async (req, res) => {
   const payment = await processPayment(userId, req.body);
   res.json(payment);
 });
-```
+````
 
 **PROBLEM:** Any authenticated user can process payment for ANY user by changing userId in URL!
 
 **FIX REQUIRED:**
+
 ```typescript
 app.post('/api/payments/:userId', authenticateUser, async (req, res) => {
   const { userId } = req.params;
@@ -285,22 +305,25 @@ app.post('/api/payments/:userId', authenticateUser, async (req, res) => {
 ```
 
 **A02 - Cryptographic Failures:**
+
 ```typescript
 // 🔴 CRITICAL ISSUE FOUND
 const creditCard = {
-  number: req.body.cardNumber,  // Stored in plain text!
-  cvv: req.body.cvv,           // CVV stored (PCI-DSS violation!)
-  exp: req.body.expiry
+  number: req.body.cardNumber, // Stored in plain text!
+  cvv: req.body.cvv, // CVV stored (PCI-DSS violation!)
+  exp: req.body.expiry,
 };
 await db.save('credit_cards', creditCard);
 ```
 
 **PROBLEMS:**
+
 1. Credit card stored in plain text
 2. CVV stored at all (never allowed under PCI-DSS)
 3. No encryption
 
 **FIX REQUIRED:**
+
 ```typescript
 // Use payment processor API instead of storing cards
 const stripeToken = await stripe.tokens.create({
@@ -308,15 +331,15 @@ const stripeToken = await stripe.tokens.create({
     number: req.body.cardNumber,
     exp_month: req.body.expMonth,
     exp_year: req.body.expYear,
-    cvc: req.body.cvv  // Stripe handles this, we never store it
-  }
+    cvc: req.body.cvv, // Stripe handles this, we never store it
+  },
 });
 
 // Store only the token (not the actual card)
 await db.save('payment_methods', {
   userId: req.user.id,
   stripeToken: stripeToken.id,
-  lastFour: req.body.cardNumber.slice(-4)  // Only last 4 digits
+  lastFour: req.body.cardNumber.slice(-4), // Only last 4 digits
 });
 ```
 
@@ -325,17 +348,19 @@ await db.save('payment_methods', {
 ✅ Input validated with Zod
 
 **A04 - Insecure Design:**
+
 ```typescript
 // 🟠 HIGH PRIORITY ISSUE
 async function processPayment(userId, amount) {
   await debitAccount(userId, amount);
-  await creditMerchant(amount);  // No transaction wrapper!
+  await creditMerchant(amount); // No transaction wrapper!
 }
 ```
 
 **PROBLEM:** If `creditMerchant` fails, user is charged but merchant isn't paid.
 
 **FIX REQUIRED:**
+
 ```typescript
 async function processPayment(userId, amount) {
   const transaction = await db.transaction();
@@ -387,6 +412,7 @@ Any user can process payments for other users by changing userId in URL.
 Credit cards stored in plain text, CVV stored (never allowed).
 
 **Impact:**
+
 - PCI-DSS compliance failure
 - Legal liability
 - Massive fines if breached
@@ -416,10 +442,12 @@ No database transaction wrapping payment operations.
 **DO NOT DEPLOY THIS CODE TO PRODUCTION**
 
 The critical security issues pose immediate risk:
+
 1. Financial fraud (access control issue)
 2. Legal liability (PCI-DSS violation)
 
 **Required Actions:**
+
 1. Fix IDOR vulnerability (10 min)
 2. Integrate Stripe/payment processor (2 hours)
 3. Add transaction wrapping (30 min)
@@ -436,9 +464,11 @@ The critical security issues pose immediate risk:
 ## Example 3: Bad Review (What NOT to Do)
 
 ### Context
+
 Same authentication PR from Example 1
 
 ### User Request
+
 ```
 "Review this authentication PR"
 ```
@@ -503,30 +533,36 @@ Compare to Example 1:
 ### Good Code Review Checklist
 
 ✅ **Run automated tools first**
+
 - npm audit, ESLint, TypeScript checks
 - Review tool output systematically
 
 ✅ **Check security (OWASP Top 10)**
+
 - Don't skip this even if tools pass
 - Manual review catches business logic issues
 
 ✅ **Analyze performance**
+
 - Look for N+1 queries
 - Check algorithm complexity
 - Review database indexes
 
 ✅ **Provide specific feedback**
+
 - File names and line numbers
 - Code snippets showing issue
 - Code snippets showing fix
 
 ✅ **Classify severity**
+
 - Critical: Block deployment
 - High: Fix within 48h
 - Medium: Fix this sprint
 - Low: Nice to have
 
 ✅ **Be constructive**
+
 - Suggest solutions, not just problems
 - Acknowledge good practices too
 - Be specific and helpful

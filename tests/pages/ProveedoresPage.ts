@@ -81,7 +81,9 @@ export class ProveedoresPage {
 
     const scroller = this.page.getByTestId('virtuoso-scroller');
     if (await scroller.isVisible()) {
-      await scroller.evaluate(node => { node.scrollTop = node.scrollHeight; });
+      await scroller.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
       await this.page.waitForTimeout(200);
     }
 
@@ -168,7 +170,7 @@ export class ProveedoresPage {
 
   obtenerFilaPorNombre(nombre: string): Locator {
     return this.page.getByRole('row').filter({
-      has: this.page.getByText(nombre, { exact: true }).or(this.page.getByTitle(nombre, { exact: true }))
+      has: this.page.getByText(nombre, { exact: true }).or(this.page.getByTitle(nombre, { exact: true })),
     });
   }
 }

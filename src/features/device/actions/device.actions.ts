@@ -26,13 +26,13 @@ export async function fetchDevices(): Promise<DeviceDef[]> {
 export async function toggleDeviceActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    
+
     return await db.transaction(async (tx) => {
       await deviceRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'DEVICE', id, { active: isActive }, tx);
-      return { 
-        success: true, 
-        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Equipo') : MESSAGES.SUCCESS.DEACTIVATED('Equipo') 
+      return {
+        success: true,
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Equipo') : MESSAGES.SUCCESS.DEACTIVATED('Equipo'),
       };
     });
   } catch (error: any) {
@@ -50,15 +50,22 @@ export async function createDeviceAction(input: DeviceInput): Promise<ActionResu
       const result = await deviceRepository.createDevice(parsed.data, tx);
       const wasReactivated = (result as any).wasInactive;
 
-      await recordAuditLog(caller.id, 'CREAR', 'DEVICE', result.id, { 
-        name: result.name,
-        note: wasReactivated ? 'Equipo reactivado' : 'Nuevo registro' 
-      }, tx);
+      await recordAuditLog(
+        caller.id,
+        'CREAR',
+        'DEVICE',
+        result.id,
+        {
+          name: result.name,
+          note: wasReactivated ? 'Equipo reactivado' : 'Nuevo registro',
+        },
+        tx
+      );
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Equipo') : MESSAGES.SUCCESS.CREATED('Equipo'),
-        data: result as DeviceDef
+        data: result as DeviceDef,
       };
     });
   } catch (error: any) {
@@ -75,10 +82,10 @@ export async function updateDeviceAction(id: string, input: DeviceUpdateInput): 
     return await db.transaction(async (tx) => {
       const updated = await deviceRepository.updateDevice(id, parsed.data, tx);
       await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, parsed.data, tx);
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: MESSAGES.SUCCESS.UPDATED('Equipo'),
-        data: updated as DeviceDef
+        data: updated as DeviceDef,
       };
     });
   } catch (error: any) {
@@ -110,7 +117,7 @@ export async function fetchLandingCategories(): Promise<DeviceDef[]> {
   try {
     const devicesList = await deviceRepository.getAllDevices();
     // Only return active categories for the landing page
-    const active = devicesList.filter(d => d.isActive);
+    const active = devicesList.filter((d) => d.isActive);
     return z.array(deviceDefSchema).parse(active);
   } catch (error) {
     console.error('fetchLandingCategories error:', error);

@@ -210,13 +210,7 @@ export function LogPanel() {
                     </div>
                     <div className="space-y-0.5">
                       <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Entidad Específica</span>
-                      <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                        {selectedLog.product?.device?.name ||
-                          selectedLog.customer?.name ||
-                          selectedLog.provider?.name ||
-                          selectedLog.device?.name ||
-                          (selectedLog.sale ? `VENTA $${selectedLog.sale.total}` : '--')}
-                      </span>
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400">{selectedLog.product?.device?.name || selectedLog.customer?.name || selectedLog.provider?.name || selectedLog.device?.name || (selectedLog.sale ? `VENTA $${selectedLog.sale.total}` : '--')}</span>
                     </div>
                     <div className="space-y-0.5">
                       <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">ID de Referencia</span> <span className="text-[12px] font-mono text-zinc-500 break-all">{selectedLog.entityId || '--'}</span>

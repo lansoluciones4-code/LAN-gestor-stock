@@ -21,6 +21,7 @@
 **When to use:** 5+ data items, arrays >20 lines, config objects
 
 **Before (Bad):**
+
 ```typescript
 // UserProfile.tsx (280 lines)
 const UserProfile = () => {
@@ -35,6 +36,7 @@ const UserProfile = () => {
 ```
 
 **After (Good):**
+
 ```typescript
 // data/user-profile-data.tsx (if contains JSX) or .ts
 export const badges = [
@@ -56,6 +58,7 @@ const UserProfile = () => {
 **When to use:** Distinct UI sections, modal/dialog, complex list items
 
 **Before (Bad):**
+
 ```typescript
 // Dashboard.tsx (350 lines)
 const Dashboard = () => {
@@ -78,6 +81,7 @@ const Dashboard = () => {
 ```
 
 **After (Good):**
+
 ```typescript
 // Dashboard.tsx (150 lines)
 import { DashboardChart } from './DashboardChart';
@@ -106,6 +110,7 @@ export const DashboardModal = () => { /* modal logic */ }
 **When to use:** 4+ useState, complex logic, reusable state management
 
 **Before (Bad):**
+
 ```typescript
 // UserForm.tsx (300 lines)
 const UserForm = () => {
@@ -126,6 +131,7 @@ const UserForm = () => {
 ```
 
 **After (Good):**
+
 ```typescript
 // hooks/useUserForm.ts (100 lines)
 export const useUserForm = () => {
@@ -160,6 +166,7 @@ const UserForm = () => {
 **When to use:** Component will be >200 lines even after basic extraction
 
 **Structure:**
+
 ```
 features/MyFeature/
 ├── index.tsx              # Main export (<50 lines)
@@ -171,6 +178,7 @@ features/MyFeature/
 ```
 
 **Example:**
+
 ```typescript
 // features/Analytics/index.tsx
 export { Analytics } from './Analytics';
@@ -198,6 +206,7 @@ export const Analytics = () => {
 ### Performance Rules for React
 
 **ALWAYS use React.memo() for:**
+
 - Components with Framer Motion animations
 - List item components
 - Modal/Dialog components
@@ -220,10 +229,10 @@ const handleClick = useCallback((id) => { /* handle */ }, []);
 
 ```typescript
 // ✅ CORRECT: No file extension in imports
-import { data } from '@/data/component-data'
+import { data } from '@/data/component-data';
 
 // ❌ WRONG: Don't include extension
-import { data } from '@/data/component-data.tsx'
+import { data } from '@/data/component-data.tsx';
 ```
 
 ---
@@ -235,6 +244,7 @@ import { data } from '@/data/component-data.tsx'
 **When to use:** Class >300 lines, multiple responsibilities, too many methods
 
 **Before (Bad):**
+
 ```python
 # analytics.py (450 lines)
 class Analytics:
@@ -262,6 +272,7 @@ class Analytics:
 ```
 
 **After (Good):**
+
 ```python
 # analytics/fetcher.py (100 lines)
 class AnalyticsFetcher:
@@ -314,6 +325,7 @@ class Analytics:
 **When to use:** Function >50 lines, multiple responsibilities, complex logic
 
 **Before (Bad):**
+
 ```python
 # report_generator.py
 def generate_report(data):
@@ -343,6 +355,7 @@ def generate_report(data):
 ```
 
 **After (Good):**
+
 ```python
 # report_generator.py (main orchestrator)
 def generate_report(data):
@@ -384,6 +397,7 @@ def create_report_output(formatted_data):
 **When to use:** 5+ config variables, magic numbers, environment settings
 
 **Before (Bad):**
+
 ```python
 # database_manager.py (300 lines)
 class DatabaseManager:
@@ -403,6 +417,7 @@ class DatabaseManager:
 ```
 
 **After (Good):**
+
 ```python
 # database_config.py
 DATABASE_CONFIG = {
@@ -446,6 +461,7 @@ class DatabaseManager:
 **When to use:** Module >400 lines, multiple distinct areas, growing complexity
 
 **Before (Bad):**
+
 ```python
 # user_service.py (500 lines)
 class UserService:
@@ -457,6 +473,7 @@ class UserService:
 ```
 
 **After (Good):**
+
 ```python
 # user_service/
 # ├── __init__.py
@@ -501,6 +518,7 @@ class UserCRUD:
 **When to use:** Deep inheritance hierarchies, class getting too large
 
 **Before (Bad):**
+
 ```python
 # Base class keeps growing (200 lines)
 class BaseService:
@@ -515,6 +533,7 @@ class UserService(BaseService):
 ```
 
 **After (Good):**
+
 ```python
 # Use composition with focused classes
 class DatabaseMixin:
@@ -554,6 +573,7 @@ class UserService:
 **Universal principle across all languages**
 
 **Before (Bad):**
+
 ```
 // Multiple files with duplicate validation
 if (input.length < 3 || input.length > 50) {
@@ -563,6 +583,7 @@ if (input.length < 3 || input.length > 50) {
 ```
 
 **After (Good):**
+
 ```
 // Create shared utility/helper
 function validateLength(input, min=3, max=50) {
@@ -581,6 +602,7 @@ const error = validateLength(input)
 **Use dispatch tables, strategy pattern, or polymorphism**
 
 **Before (Bad):**
+
 ```
 if (type === 'A') {
     // 20 lines
@@ -595,18 +617,20 @@ if (type === 'A') {
 ```
 
 **After (Good - JavaScript/TypeScript):**
+
 ```typescript
 const handlers = {
-    'A': handleTypeA,
-    'B': handleTypeB,
-    'C': handleTypeC,
-    'D': handleTypeD
+  A: handleTypeA,
+  B: handleTypeB,
+  C: handleTypeC,
+  D: handleTypeD,
 };
 
 const result = handlers[type]?.() ?? handleDefault();
 ```
 
 **After (Good - Python):**
+
 ```python
 handlers = {
     'A': handle_type_a,
@@ -623,6 +647,7 @@ result = handlers.get(type, handle_default)()
 **Reduce nesting depth by using early returns and guard clauses**
 
 **Before (Bad):**
+
 ```
 function process(data) {
     if (data) {
@@ -640,6 +665,7 @@ function process(data) {
 ```
 
 **After (Good):**
+
 ```
 function process(data) {
     if (!data) return null;
@@ -696,12 +722,14 @@ function process(data) {
 ## File Naming Conventions
 
 ### JavaScript/TypeScript
+
 - **Files:** kebab-case (`user-service.ts`)
 - **Components:** PascalCase (`UserProfile.tsx`)
 - **Hooks:** camelCase with 'use' prefix (`useUserProfile.ts`)
 - **Data files:** kebab-case with `-data` suffix (`user-profile-data.tsx`)
 
 ### Python
+
 - **Files:** snake_case (`user_service.py`)
 - **Classes:** PascalCase (`UserService`)
 - **Functions:** snake_case (`get_user_data`)
@@ -736,6 +764,7 @@ npm run test        # Must pass before starting
 ```
 
 **If any check fails:**
+
 ```
 ❌ "Cannot start refactoring - tests/lint failing.
     Please fix these issues first, then I can proceed."
@@ -750,10 +779,11 @@ npm run test        # Must pass before starting
 ### Step 1/3: Extract Data File
 
 Creating: [new-data-file]
+
 - Moving [X] lines of data/config
 - Updating imports in [original-file]
 
-*Executes using Write and Edit tools*
+_Executes using Write and Edit tools_
 
 ✅ Created [new-data-file]
 ✅ Updated [original-file]
@@ -773,6 +803,7 @@ git commit -m "refactor([filename]): extract data to separate file"
 ```
 
 **Repeat for each step:**
+
 - Extract → Verify → Commit
 - Extract → Verify → Commit
 - Extract → Verify → Commit
@@ -817,6 +848,7 @@ git log -1  # Should show "backup: before refactoring"
 ```
 
 **Report to user:**
+
 ```
 ❌ Refactoring failed at step [X]: [error message]
 
@@ -836,24 +868,28 @@ What would you like to do?
 ### Safety Measures Checklist
 
 #### Before Execution:
+
 - [ ] User gave explicit "Yes" approval
 - [ ] Starting state is clean (lint/type-check/test pass)
 - [ ] Backup commit created
 - [ ] Git working directory is clean (no uncommitted changes)
 
 #### During Execution:
+
 - [ ] Each step is atomic (one logical change)
 - [ ] Each step is verified (lint/type-check/test)
 - [ ] Each step is committed (can rollback to any point)
 - [ ] Stop immediately if any verification fails
 
 #### After Execution:
+
 - [ ] Full test suite passes
 - [ ] Build succeeds (if applicable)
 - [ ] All imports/references updated correctly
 - [ ] Documentation updated if needed
 
 #### Rollback Triggers:
+
 - ❌ Lint fails after any step
 - ❌ Type check fails after any step
 - ❌ Tests fail after any step
@@ -962,6 +998,7 @@ Skill: "Step 1/3: Extracting data..."
 ### When to Use Audit Mode
 
 **Use this mode when:**
+
 - User asks to "audit the codebase" or "find large files"
 - User mentions "technical debt" or "existing problems"
 - User says "scan for refactoring opportunities"
@@ -986,6 +1023,7 @@ bash ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/analy
 #### Step 2: Categorize Issues
 
 Group files by severity:
+
 - 🛑 **CRITICAL** (>300 lines): Immediate attention needed
 - 🚨 **HIGH** (200-300 lines): Should refactor soon
 - ⚠️ **MEDIUM** (150-200 lines): Monitor before changes
@@ -995,13 +1033,14 @@ Group files by severity:
 
 Use this prioritization matrix:
 
-| File | Size | Change Frequency | Business Impact | Priority |
-|------|------|------------------|-----------------|----------|
-| File A | 450 lines | High (weekly) | Critical feature | P0 |
-| File B | 380 lines | Medium (monthly) | Important feature | P1 |
-| File C | 320 lines | Low (rare) | Minor feature | P2 |
+| File   | Size      | Change Frequency | Business Impact   | Priority |
+| ------ | --------- | ---------------- | ----------------- | -------- |
+| File A | 450 lines | High (weekly)    | Critical feature  | P0       |
+| File B | 380 lines | Medium (monthly) | Important feature | P1       |
+| File C | 320 lines | Low (rare)       | Minor feature     | P2       |
 
 **Priority Formula:**
+
 ```
 Priority Score = (Size / 100) + (Change Frequency × 2) + (Business Impact × 3)
 
@@ -1017,14 +1056,17 @@ P3 (Low): Score <4 - Fix when convenient
 ## Codebase Refactoring Roadmap
 
 ### Sprint 1 (Week 1-2): Critical Files (P0)
+
 - [ ] analytics.tsx (450 lines) - 8 hours
 - [ ] dashboard.py (420 lines) - 6 hours
 
 ### Sprint 2 (Week 3-4): High Priority (P1)
+
 - [ ] user-service.tsx (380 lines) - 5 hours
 - [ ] report-generator.py (350 lines) - 4 hours
 
 ### Sprint 3 (Month 2): Medium Priority (P2)
+
 - [ ] settings.tsx (320 lines) - 3 hours
 - [ ] data-processor.py (290 lines) - 3 hours
 
@@ -1055,30 +1097,31 @@ P3 (Low): Score <4 - Fix when convenient
 
 ### Summary Statistics
 
-| Metric | Count |
-|--------|-------|
-| 🛑 Critical files (>300 lines) | [X] files |
-| 🚨 High priority (200-300 lines) | [X] files |
-| ⚠️ Medium priority (150-200 lines) | [X] files |
-| ✅ Healthy files (<150 lines) | [X] files |
-| **Total files needing attention** | **[X] files** |
+| Metric                             | Count         |
+| ---------------------------------- | ------------- |
+| 🛑 Critical files (>300 lines)     | [X] files     |
+| 🚨 High priority (200-300 lines)   | [X] files     |
+| ⚠️ Medium priority (150-200 lines) | [X] files     |
+| ✅ Healthy files (<150 lines)      | [X] files     |
+| **Total files needing attention**  | **[X] files** |
 
 ---
 
 ### Top 10 Files Needing Refactoring
 
-| Rank | File | Lines | Type | Last Changed | Priority |
-|------|------|-------|------|--------------|----------|
-| 1 | [file1] | 450 | React | 2 days ago | P0 |
-| 2 | [file2] | 420 | Python | 1 week ago | P0 |
-| 3 | [file3] | 380 | React | 2 weeks ago | P1 |
-| ... | ... | ... | ... | ... | ... |
+| Rank | File    | Lines | Type   | Last Changed | Priority |
+| ---- | ------- | ----- | ------ | ------------ | -------- |
+| 1    | [file1] | 450   | React  | 2 days ago   | P0       |
+| 2    | [file2] | 420   | Python | 1 week ago   | P0       |
+| 3    | [file3] | 380   | React  | 2 weeks ago  | P1       |
+| ...  | ...     | ...   | ...    | ...          | ...      |
 
 ---
 
 ### Refactoring Recommendations by Priority
 
 #### 🛑 P0 - Critical (Fix within 1 week)
+
 1. **[file1.tsx]** (450 lines)
    - Issues: Too many hooks (6+), large data arrays
    - Recommendations: Extract custom hook, data file, sub-components
@@ -1092,9 +1135,11 @@ P3 (Low): Score <4 - Fix when convenient
    - Impact: High - critical business logic
 
 #### 🚨 P1 - High Priority (Fix within 1 month)
+
 [Continue for P1 files...]
 
 #### ⚠️ P2 - Medium Priority (Fix within quarter)
+
 [Continue for P2 files...]
 
 ---
@@ -1102,16 +1147,19 @@ P3 (Low): Score <4 - Fix when convenient
 ### Recommended Approach
 
 **Phase 1 (Weeks 1-2): Critical Files**
+
 - Focus on P0 files only
 - Estimated time: [X] hours
 - Expected outcome: [X] files under 200 lines
 
 **Phase 2 (Weeks 3-6): High Priority Files**
+
 - Address P1 files
 - Estimated time: [X] hours
 - Expected outcome: [X] files refactored
 
 **Phase 3 (Months 2-3): Medium Priority Files**
+
 - Tackle P2 files opportunistically
 - Refactor when making other changes
 - Estimated time: [X] hours
@@ -1123,6 +1171,7 @@ P3 (Low): Score <4 - Fix when convenient
 ### Long-Term Maintenance
 
 **To prevent new technical debt:**
+
 - ✅ Auto-invoke this skill before editing files
 - ✅ Monitor file sizes during creation
 - ✅ Quarterly codebase audits
@@ -1164,6 +1213,7 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 ### Integration with Existing Workflow
 
 **When conducting audit, also:**
+
 1. Check git history for frequently changed large files (higher priority)
 2. Look for duplicate code patterns across files
 3. Identify missing tests in large files
@@ -1182,11 +1232,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Code has little or no automated tests
 
 **Why Skip:**
+
 - Refactoring without tests = Breaking code blindly
 - No way to verify functionality unchanged
 - High risk of introducing bugs
 
 **What to Do Instead:**
+
 1. Write tests first (characterization tests)
 2. Get to >70% coverage
 3. THEN refactor safely
@@ -1200,11 +1252,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Code will never change again or is in maintenance-only mode
 
 **Why Skip:**
+
 - No ROI - refactoring yields zero business value
 - Risk of breaking stable code
 - Wastes time that could be spent on active features
 
 **What to Do Instead:**
+
 - Leave it alone
 - Document known issues
 - Only fix critical bugs
@@ -1218,11 +1272,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** System is down or experiencing critical issues
 
 **Why Skip:**
+
 - Time-critical situation
 - Refactoring adds risk
 - Focus should be on restoration
 
 **What to Do Instead:**
+
 1. Fix the incident (quick and dirty if needed)
 2. Restore service
 3. Add incident fix to refactoring backlog
@@ -1235,12 +1291,14 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Sprint deadline in 2 days, or multiple developers working on same file
 
 **Why Skip:**
+
 - Refactoring takes time
 - Blocks other work
 - Merge conflicts
 - Pressure leads to mistakes
 
 **What to Do Instead:**
+
 - Schedule refactoring for next sprint
 - Create technical debt ticket
 - Prioritize delivery now, refactor later
@@ -1255,12 +1313,14 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Planning to refactor entire module/package in one go
 
 **Why Skip:**
+
 - High risk of breaking everything
 - Blocks all development
 - Hard to review
 - Can't roll back partially
 
 **What to Do Instead:**
+
 - Break into small incremental refactorings
 - One class/file at a time
 - Commit after each step
@@ -1275,11 +1335,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** First week on new project, trying to understand code
 
 **Why Skip:**
+
 - Don't understand domain yet
 - Might break important (but ugly-looking) code
 - Could be misunderstanding the "right" design
 
 **What to Do Instead:**
+
 1. Read code first (weeks/months)
 2. Ask questions about why it's structured this way
 3. Make small, safe changes
@@ -1294,12 +1356,14 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Code works fine, you just want it "prettier"
 
 **Why Skip:**
+
 - Perfectionism trap
 - No measurable benefit
 - Risk introduction of bugs
 - Code is never 100% perfect
 
 **What to Do Instead:**
+
 - Define specific improvement goal (faster? more testable? easier to extend?)
 - If no clear goal, skip it
 - Move on to impactful work
@@ -1313,11 +1377,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Core architecture is wrong, refactoring won't fix it
 
 **Why Skip:**
+
 - Refactoring treats symptoms, not cause
 - Need architectural redesign instead
 - Wastes effort on wrong solution
 
 **What to Do Instead:**
+
 - Document architectural issues
 - Plan rewrite or major redesign
 - Get buy-in from stakeholders
@@ -1332,11 +1398,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Code you don't control (vendor libraries, code generators)
 
 **Why Skip:**
+
 - Changes will be overwritten
 - Not your responsibility
 - Breaks support/warranties
 
 **What to Do Instead:**
+
 - Wrapper pattern around third-party code
 - Adapter pattern for generated code
 - Submit fixes upstream
@@ -1349,11 +1417,13 @@ find src -name "*.tsx" -mtime -7 -exec wc -l {} \; | awk '$1 > 200'
 **Situation:** Code seems wrong but you don't know the business rules
 
 **Why Skip:**
+
 - What looks like a bug might be a feature
 - Could break compliance/regulatory requirements
 - Might affect revenue
 
 **What to Do Instead:**
+
 1. Ask product owner / domain expert
 2. Understand WHY code is this way
 3. Get approval before changing
@@ -1370,6 +1440,7 @@ Sometimes you have no choice. Here's how to reduce risk:
 ### Emergency Refactoring Checklist
 
 **If you must refactor when tests are missing:**
+
 - [ ] Document current behavior in detail
 - [ ] Get pair programming partner
 - [ ] Make smallest possible changes
@@ -1377,12 +1448,14 @@ Sometimes you have no choice. Here's how to reduce risk:
 - [ ] Have rollback plan ready
 
 **If you must refactor under tight deadline:**
+
 - [ ] Get stakeholder approval for deadline extension
 - [ ] Use feature flags to hide incomplete work
 - [ ] Time-box refactoring (max 2 hours)
 - [ ] If not done in time-box, revert and defer
 
 **If you must refactor during concurrent work:**
+
 - [ ] Communicate with team
 - [ ] Lock file or use branches
 - [ ] Coordinate merge timing
@@ -1392,15 +1465,15 @@ Sometimes you have no choice. Here's how to reduce risk:
 
 ## 📊 Decision Matrix: Should I Refactor?
 
-| Factor | Refactor Now | Defer | Skip Entirely |
-|--------|--------------|-------|---------------|
-| **Test coverage** | >70% | 40-70% (add tests first) | <40% (risky) |
-| **Code activity** | Changed weekly | Changed monthly | Rarely/never changed |
-| **Business value** | Enables features | Improves quality | No benefit |
-| **Deadline pressure** | None | 1-2 weeks away | <1 week |
-| **Understanding** | Fully understand | Mostly understand | Learning codebase |
-| **Team availability** | Available | Partially available | All busy |
-| **Risk level** | Low (small changes) | Medium (need planning) | High (deep changes) |
+| Factor                | Refactor Now        | Defer                    | Skip Entirely        |
+| --------------------- | ------------------- | ------------------------ | -------------------- |
+| **Test coverage**     | >70%                | 40-70% (add tests first) | <40% (risky)         |
+| **Code activity**     | Changed weekly      | Changed monthly          | Rarely/never changed |
+| **Business value**    | Enables features    | Improves quality         | No benefit           |
+| **Deadline pressure** | None                | 1-2 weeks away           | <1 week              |
+| **Understanding**     | Fully understand    | Mostly understand        | Learning codebase    |
+| **Team availability** | Available           | Partially available      | All busy             |
+| **Risk level**        | Low (small changes) | Medium (need planning)   | High (deep changes)  |
 
 **Green zone (3+ "Refactor Now"):** Go ahead!
 **Yellow zone (Mixed):** Defer to better time
@@ -1413,26 +1486,31 @@ Sometimes you have no choice. Here's how to reduce risk:
 When you can't refactor, consider these alternatives:
 
 ### 1. Strangler Fig Pattern
+
 - Build new system alongside old
 - Gradually migrate functionality
 - Retire old code piece by piece
 
 ### 2. Facade Pattern
+
 - Create clean interface around ugly code
 - Isolate mess behind boundary
 - New code uses facade, old code untouched
 
 ### 3. Documentation
+
 - Can't fix code? Document it
 - Explain why it's complex
 - Warn future developers
 
 ### 4. Feature Flags
+
 - Hide refactored code behind flag
 - Test in production safely
 - Roll back instantly if issues
 
 ### 5. Technical Debt Register
+
 - Document what needs refactoring
 - Prioritize by business impact
 - Schedule for future sprints
@@ -1442,12 +1520,14 @@ When you can't refactor, consider these alternatives:
 ## 🎯 The Pragmatic Approach
 
 **Remember:**
+
 - Code doesn't need to be perfect
 - Refactoring has costs (time, risk)
 - Focus on value, not aesthetics
 - Sometimes "leave it alone" is the right answer
 
 **Quote from Martin Fowler:**
+
 > "Refactoring isn't a goal in itself. The goal is to deliver software faster with less pain. If refactoring doesn't help with that, don't do it."
 
 ---
@@ -1486,11 +1566,13 @@ When you can't refactor, consider these alternatives:
 **Purpose:** Define what success looks like BEFORE writing code
 
 **Steps:**
+
 1. Write test for new behavior
 2. Run test → should fail (red)
 3. Verify test failure is for RIGHT reason
 
 **Example (JavaScript/Jest):**
+
 ```javascript
 // RED: Test fails because calculateDiscount doesn't exist yet
 describe('User', () => {
@@ -1498,7 +1580,7 @@ describe('User', () => {
     const user = new User({
       orders: 15,
       totalSpent: 2000,
-      membershipYears: 3
+      membershipYears: 3,
     });
 
     const discountedPrice = user.applyLoyaltyDiscount(100);
@@ -1517,11 +1599,13 @@ describe('User', () => {
 **Purpose:** Get to working code as fast as possible
 
 **Steps:**
+
 1. Write minimum code to pass test
 2. Don't worry about elegance yet
 3. Run test → should pass (green)
 
 **Example:**
+
 ```javascript
 // GREEN: Minimum code to pass (not pretty, but works!)
 class User {
@@ -1552,12 +1636,14 @@ class User {
 **🎯 THIS IS WHERE OUR CODE-REFACTORING SKILL OPERATES**
 
 **Steps:**
+
 1. Code works (tests green)
 2. Now make it clean
 3. Run tests after EACH tiny change
 4. Tests must stay green throughout
 
 **Example:**
+
 ```javascript
 // REFACTOR: Extract magic numbers and improve readability
 class User {
@@ -1565,7 +1651,7 @@ class User {
     minOrders: 10,
     minSpent: 1000,
     minYears: 2,
-    discountRate: 0.2
+    discountRate: 0.2,
   };
 
   constructor(data) {
@@ -1576,9 +1662,7 @@ class User {
 
   isEligibleForLoyaltyDiscount() {
     const thresholds = User.LOYALTY_THRESHOLDS;
-    return this.orders > thresholds.minOrders &&
-           this.totalSpent > thresholds.minSpent &&
-           this.membershipYears > thresholds.minYears;
+    return this.orders > thresholds.minOrders && this.totalSpent > thresholds.minSpent && this.membershipYears > thresholds.minYears;
   }
 
   applyLoyaltyDiscount(price) {
@@ -1593,6 +1677,7 @@ class User {
 ```
 
 **Further refactoring:**
+
 ```javascript
 // Extract discount logic to separate class
 class LoyaltyDiscount {
@@ -1600,7 +1685,7 @@ class LoyaltyDiscount {
     minOrders: 10,
     minSpent: 1000,
     minYears: 2,
-    discountRate: 0.2
+    discountRate: 0.2,
   };
 
   constructor(user) {
@@ -1608,9 +1693,7 @@ class LoyaltyDiscount {
   }
 
   isEligible() {
-    return this.user.orders > LoyaltyDiscount.THRESHOLDS.minOrders &&
-           this.user.totalSpent > LoyaltyDiscount.THRESHOLDS.minSpent &&
-           this.user.membershipYears > LoyaltyDiscount.THRESHOLDS.minYears;
+    return this.user.orders > LoyaltyDiscount.THRESHOLDS.minOrders && this.user.totalSpent > LoyaltyDiscount.THRESHOLDS.minSpent && this.user.membershipYears > LoyaltyDiscount.THRESHOLDS.minYears;
   }
 
   apply(price) {
@@ -1641,13 +1724,16 @@ class User {
 **Our skill enhances the TDD workflow:**
 
 #### During RED Phase:
+
 - Skill is dormant - focus on writing test
 
 #### During GREEN Phase:
+
 - Skill is dormant - focus on passing test quickly
 - Code might get messy - that's OK!
 
 #### During REFACTOR Phase:
+
 - **Skill activates!**
 - Checks file size
 - Suggests extractions
@@ -1656,6 +1742,7 @@ class User {
 - If tests fail → automatic rollback
 
 **Workflow integration:**
+
 ```
 User: "Add loyalty discount feature" (TDD approach)
 
@@ -1684,21 +1771,25 @@ Phase 3 - REFACTOR:
 ### TDD Benefits for Refactoring
 
 **1. Safety Net:**
+
 - Tests verify refactoring doesn't break functionality
 - Instant feedback on every change
 - Confidence to make bold improvements
 
 **2. Better Design:**
+
 - TDD forces you to think about API before implementation
 - Leads to more testable code
 - Refactoring is easier with good tests
 
 **3. Regression Prevention:**
+
 - Tests catch bugs immediately
 - No "it worked yesterday" mysteries
 - Refactoring becomes low-risk
 
 **4. Documentation:**
+
 - Tests show how code is meant to be used
 - Living documentation that can't get outdated
 - Examples for future developers
@@ -1710,6 +1801,7 @@ Phase 3 - REFACTOR:
 If you inherit code without tests:
 
 **Step 1: Write Characterization Tests**
+
 ```javascript
 // Document current behavior (even if buggy!)
 it('should return 0 for negative prices (current behavior)', () => {
@@ -1719,11 +1811,13 @@ it('should return 0 for negative prices (current behavior)', () => {
 ```
 
 **Step 2: Get to acceptable coverage**
+
 - Aim for 70%+ before refactoring
 - Focus on critical paths first
 - Use code coverage tools
 
 **Step 3: NOW refactor safely**
+
 - With tests in place, proceed as normal
 - Use our skill's execution phase
 - Tests prevent regressions
@@ -1732,12 +1826,12 @@ it('should return 0 for negative prices (current behavior)', () => {
 
 ### Quick Reference: TDD + Refactoring Skill
 
-| TDD Phase | Skill Status | Action |
-|-----------|--------------|--------|
-| RED (failing test) | Inactive | Write test |
-| GREEN (minimum code) | Inactive | Pass test quickly |
-| REFACTOR | **Active** | Skill suggests and executes refactoring |
-| Next cycle | Reset | Repeat RED-GREEN-REFACTOR |
+| TDD Phase            | Skill Status | Action                                  |
+| -------------------- | ------------ | --------------------------------------- |
+| RED (failing test)   | Inactive     | Write test                              |
+| GREEN (minimum code) | Inactive     | Pass test quickly                       |
+| REFACTOR             | **Active**   | Skill suggests and executes refactoring |
+| Next cycle           | Reset        | Repeat RED-GREEN-REFACTOR               |
 
 **Remember:** In TDD, refactoring is BUILT INTO the workflow. It's not a separate activity you do "later" - it's phase 3 of every cycle!
 
@@ -1745,9 +1839,9 @@ it('should return 0 for negative prices (current behavior)', () => {
 
 ## Additional TDD Resources
 
-- **Kent Beck:** *Test-Driven Development: By Example*
-- **Martin Fowler:** *Refactoring* (assumes TDD workflow)
-- **Robert Martin:** *Clean Code* (TDD chapters)
+- **Kent Beck:** _Test-Driven Development: By Example_
+- **Martin Fowler:** _Refactoring_ (assumes TDD workflow)
+- **Robert Martin:** _Clean Code_ (TDD chapters)
 
 ---
 

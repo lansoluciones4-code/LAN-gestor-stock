@@ -74,11 +74,18 @@ export async function logSessionRestoredAction() {
     const user = await verifyAuthOrAdmin(false);
     if (user) {
       return await db.transaction(async (tx) => {
-        await recordAuditLog(user.id, 'LOGIN', 'USER', user.id, {
-          method: 'cookie',
-          username: user.username,
-          message: 'Sesión restaurada automáticamente',
-        }, tx);
+        await recordAuditLog(
+          user.id,
+          'LOGIN',
+          'USER',
+          user.id,
+          {
+            method: 'cookie',
+            username: user.username,
+            message: 'Sesión restaurada automáticamente',
+          },
+          tx
+        );
         return { success: true };
       });
     }

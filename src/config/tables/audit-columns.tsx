@@ -37,7 +37,10 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
         return (
           <div className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap truncate">
             {dateString}
-            <span title={timeString} className="text-indigo-600 dark:text-indigo-400 ml-1">
+            <span
+              title={timeString}
+              className="text-indigo-600 dark:text-indigo-400 ml-1"
+            >
               {timeString}
             </span>
           </div>
@@ -47,16 +50,19 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
     {
       header: 'Operador',
       cellClassName: 'font-bold text-zinc-700 dark:text-zinc-300 uppercase text-[15px] max-w-[120px] truncate',
-      cell: (log) => (
-        <span title={log.user?.username || 'SISTEMA'}>
-          {log.user?.username || 'SISTEMA'}
-        </span>
-      ),
+      cell: (log) => <span title={log.user?.username || 'SISTEMA'}>{log.user?.username || 'SISTEMA'}</span>,
     },
     {
       header: 'Acción',
       cellClassName: 'max-w-[120px] truncate',
-      cell: (log) => <span className={`px-2.5 py-1 rounded border font-black tracking-widest text-[13px] truncate block w-full text-center ${getActionColor(log.action)}`} title={log.action}>{log.action}</span>,
+      cell: (log) => (
+        <span
+          className={`px-2.5 py-1 rounded border font-black tracking-widest text-[13px] truncate block w-full text-center ${getActionColor(log.action)}`}
+          title={log.action}
+        >
+          {log.action}
+        </span>
+      ),
     },
     {
       header: 'Entidad',
@@ -79,21 +85,12 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
       headerClassName: 'w-[280px] font-bold',
       cellClassName: 'w-[280px] font-bold text-[15px] truncate',
       cell: (log) => {
-        const name = log.product?.device?.name || 
-                     log.customer?.name || 
-                     log.provider?.name || 
-                     log.device?.name || 
-                     log.targetUser?.username ||
-                     (log.sale ? `$${Number(log.sale.total).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : null);
+        const name = log.product?.device?.name || log.customer?.name || log.provider?.name || log.device?.name || log.targetUser?.username || (log.sale ? `$${Number(log.sale.total).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : null);
 
         const displayName = name || log.entityId?.substring(0, 8).toUpperCase() || '--';
         const fullTitle = name ? `${name} (${log.entityId})` : log.entityId || '--';
 
-        return (
-          <span title={fullTitle}>
-            {displayName}
-          </span>
-        );
+        return <span title={fullTitle}>{displayName}</span>;
       },
     },
     {

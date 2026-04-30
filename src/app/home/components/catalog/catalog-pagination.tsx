@@ -10,14 +10,10 @@ interface CatalogPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function CatalogPagination({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: CatalogPaginationProps) {
+export function CatalogPagination({ currentPage, totalPages, onPageChange }: CatalogPaginationProps) {
   const pages = useMemo(() => {
     const totalSlots = 7;
-    
+
     if (totalPages <= totalSlots) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
@@ -42,7 +38,7 @@ export function CatalogPagination({
   if (totalPages <= 1) return null;
 
   return (
-    <nav 
+    <nav
       className="flex items-center justify-center gap-1 sm:gap-2 mt-2 md:pb-2 px-4"
       aria-label="Navegación de páginas"
     >
@@ -61,8 +57,8 @@ export function CatalogPagination({
         {pages.map((page, idx) => {
           if (page === 'dots') {
             return (
-              <div 
-                key={`dots-${idx}`} 
+              <div
+                key={`dots-${idx}`}
                 className="w-6 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-zinc-300 dark:text-zinc-700 tracking-widest text-[10px]"
               >
                 •••
@@ -77,10 +73,7 @@ export function CatalogPagination({
               onClick={() => onPageChange(page as number)}
               className={`
                 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-xs sm:text-sm font-bold transition-all duration-200 border
-                ${isActive 
-                  ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 border-zinc-200 dark:border-zinc-700 shadow-sm' 
-                  : 'text-zinc-500 dark:text-zinc-400 border-transparent hover:bg-white/50 dark:hover:bg-zinc-800/50 hover:text-indigo-600 dark:hover:text-indigo-400'
-                }
+                ${isActive ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 border-zinc-200 dark:border-zinc-700 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 border-transparent hover:bg-white/50 dark:hover:bg-zinc-800/50 hover:text-indigo-600 dark:hover:text-indigo-400'}
               `}
               aria-current={isActive ? 'page' : undefined}
             >

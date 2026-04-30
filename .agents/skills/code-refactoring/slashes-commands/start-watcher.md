@@ -13,12 +13,14 @@ After showing the scan results, ask the user:
 "I found [X] CRITICAL files, [Y] ALERT files, and [Z] WARNING files that need attention. The background watcher has been started.
 
 Would you like to:
+
 1. **Refactor these files NOW** - I'll help you break down the largest/most critical files
 2. **Deal with them LATER** - The watcher will alert me in chat when you edit these files
 
 What would you prefer?"
 
 Wait for user response:
+
 - If "now" or "1" or "refactor now": Help them refactor the critical files, starting with the largest
 - If "later" or "2" or similar: Confirm the watcher is running and explain: "The watcher is now monitoring in the background. When you edit problematic files, I'll show you an alert right here in chat with options to refactor."
 

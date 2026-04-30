@@ -19,18 +19,7 @@ interface CatalogControlsProps {
   onMaxPriceChange: (val: string) => void;
 }
 
-export function CatalogControls({
-  search,
-  onSearchChange,
-  onOpenFilters,
-  selectedCategory,
-  categories,
-  onClearCategory,
-  minPrice,
-  onMinPriceChange,
-  maxPrice,
-  onMaxPriceChange,
-}: CatalogControlsProps) {
+export function CatalogControls({ search, onSearchChange, onOpenFilters, selectedCategory, categories, onClearCategory, minPrice, onMinPriceChange, maxPrice, onMaxPriceChange }: CatalogControlsProps) {
   const selectedCategoryName = categories.find((c) => c.id === selectedCategory)?.name;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,5 +111,3 @@ export function CatalogControls({
     </div>
   );
 }
-
-

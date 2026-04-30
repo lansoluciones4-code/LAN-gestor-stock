@@ -26,13 +26,13 @@ export async function fetchProviders(): Promise<ProviderDef[]> {
 export async function toggleProviderActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    
+
     return await db.transaction(async (tx) => {
       await providerRepository.updateActiveStatus(id, isActive, tx);
       await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'PROVIDER', id, { active: isActive }, tx);
-      return { 
-        success: true, 
-        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Proveedor') : MESSAGES.SUCCESS.DEACTIVATED('Proveedor') 
+      return {
+        success: true,
+        message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Proveedor') : MESSAGES.SUCCESS.DEACTIVATED('Proveedor'),
       };
     });
   } catch (error: any) {
@@ -50,15 +50,22 @@ export async function createProviderAction(input: ProviderInput): Promise<Action
       const result = await providerRepository.createProvider(parsed.data, tx);
       const wasReactivated = (result as any).wasInactive;
 
-      await recordAuditLog(caller.id, 'CREAR', 'PROVIDER', result.id, { 
-        name: result.name,
-        note: wasReactivated ? 'Proveedor reactivado' : 'Nuevo registro'
-      }, tx);
+      await recordAuditLog(
+        caller.id,
+        'CREAR',
+        'PROVIDER',
+        result.id,
+        {
+          name: result.name,
+          note: wasReactivated ? 'Proveedor reactivado' : 'Nuevo registro',
+        },
+        tx
+      );
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: wasReactivated ? MESSAGES.SUCCESS.REACTIVATED('Proveedor') : MESSAGES.SUCCESS.CREATED('Proveedor'),
-        data: result as ProviderDef
+        data: result as ProviderDef,
       };
     });
   } catch (error: any) {
@@ -75,10 +82,10 @@ export async function updateProviderAction(id: string, input: ProviderUpdateInpu
     return await db.transaction(async (tx) => {
       const updated = await providerRepository.updateProvider(id, parsed.data, tx);
       await recordAuditLog(caller.id, 'ACTUALIZAR', 'PROVIDER', id, parsed.data, tx);
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: MESSAGES.SUCCESS.UPDATED('Proveedor'),
-        data: updated as ProviderDef
+        data: updated as ProviderDef,
       };
     });
   } catch (error: any) {

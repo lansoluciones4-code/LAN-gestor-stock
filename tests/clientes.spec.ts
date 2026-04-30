@@ -1,8 +1,6 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { ClientesPage } from './pages/ClientesPage';
 import { MESSAGES } from '@/config/messages';
-
 
 // =========================================================================
 // VARIABLES PARA COMPLETAR POR EL USUARIO
@@ -25,24 +23,33 @@ const UI = {
   BTN_ACTUALIZAR: 'Actualizar Ficha', // Ajustar al botón de guardar edición
   BTN_DESACTIVAR: 'Desactivar',
   BTN_VER_INACTIVOS: 'Ver Inactivos',
-  BTN_ACTIVAR: 'Activar'
+  BTN_ACTIVAR: 'Activar',
 };
 
 const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería requerir campos obligatorios',
-    nombre: 'Cliente Valido', telefono: '', correo: '', dni: '',
-    erroresEsperados: ['El teléfono es obligatorio', 'Formato de correo electrónico', 'El DNI es obligatorio']
+    nombre: 'Cliente Valido',
+    telefono: '',
+    correo: '',
+    dni: '',
+    erroresEsperados: ['El teléfono es obligatorio', 'Formato de correo electrónico', 'El DNI es obligatorio'],
   },
   {
     descripcion: 'Debería requerir un nombre de al menos 2 caracteres',
-    nombre: 'a', telefono: '291 718-1273', correo: 'correo@ejemplo.com', dni: '12345678',
-    erroresEsperados: ['El nombre debe tener al menos']
+    nombre: 'a',
+    telefono: '291 718-1273',
+    correo: 'correo@ejemplo.com',
+    dni: '12345678',
+    erroresEsperados: ['El nombre debe tener al menos'],
   },
   {
     descripcion: 'Debería requerir un teléfono valido',
-    nombre: 'ab', telefono: 'abc', correo: 'correo@ejemplo.com', dni: '12345678',
-    erroresEsperados: ['Formato de teléfono inválido']
+    nombre: 'ab',
+    telefono: 'abc',
+    correo: 'correo@ejemplo.com',
+    dni: '12345678',
+    erroresEsperados: ['Formato de teléfono inválido'],
   },
   {
     descripcion: 'Debería respetar límites máximos',
@@ -52,13 +59,8 @@ const CASOS_DE_VALIDACION = [
     telefono: '1234567890123456789012345678901',
     correo: 'largo'.repeat(21) + '@correo.com', // largo
     dni: '123456789012345678901', // 21 caracteres
-    erroresEsperados: [
-      'Nombre demasiado largo',
-      'Número de teléfono demasiado',
-      'El correo electrónico es',
-      'Documento demasiado largo'
-    ]
-  }
+    erroresEsperados: ['Nombre demasiado largo', 'Número de teléfono demasiado', 'El correo electrónico es', 'Documento demasiado largo'],
+  },
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -67,7 +69,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
-
   for (const caso of CASOS_DE_VALIDACION) {
     test(`Validación: ${caso.descripcion}`, async ({ page }) => {
       const clientesPage = new ClientesPage(page);
@@ -160,7 +161,7 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
       nombre: 'Cliente ocupa dni desactivado',
       telefono: '291 1112222',
       correo: 'base@reactivado.com',
-      dni: dni
+      dni: dni,
     };
 
     await clientesPage.buscarCliente(nombreAntiguo);
@@ -186,7 +187,7 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
       nombreEditado: 'ClienteEditado',
       telefonoEditado: '291 999-9999',
       correoEditado: 'editado@correo.com',
-      dniEditado: '99999999'
+      dniEditado: '99999999',
     };
 
     await clientesPage.crearCliente(testEntity.nombre, testEntity.telefono, testEntity.correo, testEntity.dni);
@@ -194,7 +195,6 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
     await clientesPage.buscarCliente(testEntity.nombre);
     await expect(page.getByText(testEntity.nombre, { exact: true })).toBeVisible();
   });
-
 
   test('Debería editar exitosamente los datos', async ({ page }) => {
     const clientesPage = new ClientesPage(page);
@@ -204,15 +204,10 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
       nombreEditado: 'ClienteEditado',
       telefonoEditado: '291 999-9999',
       correoEditado: 'editado@correo.com',
-      dniEditado: dni
+      dniEditado: dni,
     };
 
-    await clientesPage.editarCliente(
-      testEntity.nombreOriginal,
-      testEntity.nombreEditado,
-      testEntity.telefonoEditado,
-      testEntity.correoEditado,
-      testEntity.dniEditado);
+    await clientesPage.editarCliente(testEntity.nombreOriginal, testEntity.nombreEditado, testEntity.telefonoEditado, testEntity.correoEditado, testEntity.dniEditado);
 
     await clientesPage.buscarCliente(testEntity.nombreOriginal);
     await expect(page.getByText(testEntity.nombreOriginal, { exact: true })).toBeHidden();

@@ -26,12 +26,8 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     startTransition(async () => {
       invalidateAllCaches();
 
-      const [updatedS, updatedP, updatedC] = await Promise.all([
-        fetchSales(),
-        fetchProducts(),
-        fetchCustomers()
-      ]);
-      
+      const [updatedS, updatedP, updatedC] = await Promise.all([fetchSales(), fetchProducts(), fetchCustomers()]);
+
       setSales(updatedS);
       setProducts(updatedP);
       setCustomers(updatedC);

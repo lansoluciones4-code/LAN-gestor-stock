@@ -98,14 +98,17 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Información de Pago</span>
               <div className="flex flex-col gap-1">
                 {sale.payments?.map((p: any, i: number) => (
-                  <div key={i} className="flex justify-between items-center text-[11px] font-bold text-zinc-700 max-w-[200px]">
+                  <div
+                    key={i}
+                    className="flex justify-between items-center text-[11px] font-bold text-zinc-700 max-w-[200px]"
+                  >
                     <span className="uppercase">{p.type}</span>
                     <span>${p.amount.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 ))}
               </div>
             </div>
-            
+
             <div className="flex flex-col items-end gap-2 flex-1 min-w-[250px]">
               {((sale.discountAmount ?? 0) > 0 || (sale.discountPercentage ?? 0) > 0) && (
                 <>
@@ -129,9 +132,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
               )}
               <div className="flex justify-between w-full items-center mt-2">
                 <span className="text-xl font-black uppercase text-zinc-900 pt-2">Total</span>
-                <span className="text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300">
-                  ${sale.total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
+                <span className="text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300">${sale.total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { ProveedoresPage } from './pages/ProveedoresPage';
 import { EquiposPage } from './pages/EquiposPage';
@@ -6,7 +5,6 @@ import { ProductosPage } from './pages/ProductosPage';
 import { MESSAGES } from '@/config/messages';
 
 test.describe.serial('Pruebas Compuestas: Restricciones de Eliminación', () => {
-
   test('Debería impedir eliminar un proveedor o equipo si están vinculados a un producto', async ({ page }) => {
     const productosPage = new ProductosPage(page);
     await productosPage.goto();

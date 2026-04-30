@@ -58,7 +58,7 @@ export async function createSaleAction(input: SaleInput): Promise<ActionResult<{
 export async function deleteSaleAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    
+
     return await db.transaction(async (tx) => {
       await saleRepository.deleteSale(id, tx);
       await recordAuditLog(caller.id, 'ELIMINAR', 'SALE', id, { note: 'Venta anulada. Stock restablecido.' }, tx);

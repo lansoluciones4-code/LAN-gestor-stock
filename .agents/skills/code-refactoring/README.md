@@ -36,6 +36,7 @@ This skill helps you maintain clean, maintainable code by:
 ### Automatic Triggering
 
 The skill automatically invokes when:
+
 - You're about to edit a file >200 lines
 - A file reaches 150 lines during creation
 - You read a file >300 lines
@@ -44,6 +45,7 @@ The skill automatically invokes when:
 ### 🎯 Path-Based Thresholds (NEW in v2.0!)
 
 Context-aware file size limits based on file purpose:
+
 - **Pages** (`page.tsx`): 300/500/800 lines - Educational content allowed
 - **Data files** (`data/**/*.tsx`): 250/400/600 lines - Mostly static content
 - **Components** (`components/**/*.tsx`): 150/200/300 lines - Standard threshold
@@ -89,16 +91,19 @@ Context-aware file size limits based on file purpose:
 - ✅ **Slash commands** (optional) are copied to individual projects as needed
 
 **You do NOT need to:**
+
 - ❌ Install this skill in every project
 - ❌ Copy the skill folder to your project directory
 - ❌ Configure it per project (unless using optional auto-start feature)
 
 **Typical setup:**
+
 1. Install skill ONCE to `~/.claude/plugins/marketplaces/custom-skills/` (global)
 2. (Optional) Copy slash commands to any project where you want quick access
 3. The skill automatically works in ALL projects when invoked by Claude
 
 **Visual representation:**
+
 ```
 ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/  ← GLOBAL (install once)
     ├── SKILL.md                    ← Used by ALL projects
@@ -127,6 +132,7 @@ Both projects use the SAME global skill!
 **1. Install the skill to your global Claude plugins directory**
 
 The skill should be installed at:
+
 ```
 ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/
 ```
@@ -142,6 +148,7 @@ npm install
 ```
 
 **What happens:**
+
 - npm reads `scripts/package.json` to see what packages are needed
 - Downloads `node-notifier` and its dependencies
 - Creates `scripts/node_modules/` folder (~6 MB) in the GLOBAL skill location
@@ -162,6 +169,7 @@ cp ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/slashes-command
 **Now the skill works in ALL projects, and slash commands work in projects where you installed them!**
 
 **Why node_modules isn't in the repository:**
+
 - Too large (6 MB) to include in git
 - You generate it locally with `npm install`
 - Standard practice for all Node.js projects
@@ -179,17 +187,20 @@ cp ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/slashes-command
 **Step 1: Test the skill auto-invokes**
 
 Open Claude Code and create a test file:
+
 ```bash
 # Create a large test file (300 lines)
 for i in {1..300}; do echo "// Line $i" >> test-large-file.js; done
 ```
 
 Ask Claude to edit it:
+
 ```
 "Add a comment to test-large-file.js"
 ```
 
 **Expected Result:**
+
 - ✅ Claude should invoke the code-refactoring skill
 - ✅ You should see: "🛑 test-large-file.js is 300 lines"
 - ✅ Skill suggests refactoring before editing
@@ -201,6 +212,7 @@ Ask Claude to edit it:
 ```
 
 **Expected Result:**
+
 - ✅ Shows scan results for your current directory
 - ✅ Asks if you want to refactor now or later
 - ✅ No errors about missing scripts or dependencies
@@ -210,6 +222,7 @@ Ask Claude to edit it:
 Edit a large file and save it.
 
 **Expected Result:**
+
 - ✅ Desktop notification appears: "File exceeds size threshold"
 - ✅ Check alerts: `/check-refactor-alerts` shows the alert
 
@@ -223,15 +236,16 @@ Edit a large file and save it.
 
 **This skill works on all major platforms:**
 
-| Platform | Supported | Script Type | Notes |
-|----------|-----------|-------------|-------|
-| **Windows** | ✅ Yes | `.bat` files | Native batch scripts, double-click supported |
-| **macOS** | ✅ Yes | `.sh` files | Bash shell scripts, requires `chmod +x` |
-| **Linux** | ✅ Yes | `.sh` files | Bash shell scripts, requires `chmod +x` |
-| **WSL** | ✅ Yes | `.sh` files | Windows Subsystem for Linux |
-| **Node.js** | ✅ Yes | `.js` files | Universal (works on any OS with Node.js) |
+| Platform    | Supported | Script Type  | Notes                                        |
+| ----------- | --------- | ------------ | -------------------------------------------- |
+| **Windows** | ✅ Yes    | `.bat` files | Native batch scripts, double-click supported |
+| **macOS**   | ✅ Yes    | `.sh` files  | Bash shell scripts, requires `chmod +x`      |
+| **Linux**   | ✅ Yes    | `.sh` files  | Bash shell scripts, requires `chmod +x`      |
+| **WSL**     | ✅ Yes    | `.sh` files  | Windows Subsystem for Linux                  |
+| **Node.js** | ✅ Yes    | `.js` files  | Universal (works on any OS with Node.js)     |
 
 **Installation requirements:**
+
 - **All platforms:** Claude Code installed
 - **For file watcher features:** Node.js v14+ (see installation steps below)
 
@@ -255,6 +269,7 @@ rm scripts/*.bat
 **Note:** The `.js` (Node.js) scripts work on all platforms, so `.bat` and `.sh` files are optional convenience wrappers for command-line use.
 
 **Important:** If you delete platform files:
+
 - Most slash commands use `.js` files and will continue working
 - `/stop-watcher` slash command references both `.bat` and `.sh` - you may need to manually run the correct one for your platform if you delete files
 - Alternatively, keep all files (they're small) or use `node scripts/*.js` directly
@@ -267,24 +282,28 @@ rm scripts/*.bat
 The file watcher requires Node.js packages to be installed:
 
 **Windows:**
+
 ```batch
 cd %USERPROFILE%\.claude\plugins\marketplaces\custom-skills\code-refactoring\scripts
 npm install
 ```
 
 **macOS/Linux:**
+
 ```bash
 cd ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts
 npm install
 ```
 
 **What this does:**
+
 - Downloads `node-notifier` package (for desktop notifications)
 - Creates `scripts/node_modules/` folder (~6 MB) in the same directory as `package.json`
 - Installs 9 total packages (node-notifier + its dependencies)
 - Enables background file watcher features
 
 **Where the files go:**
+
 ```
 scripts/
 ├── package.json        ← Already in repository (tells npm what to install)
@@ -296,6 +315,7 @@ scripts/
 ```
 
 **Important notes:**
+
 - ✅ `node_modules/` is **not** included in this repository (too large - 6 MB)
 - ✅ You create it locally by running `npm install`
 - ✅ The `.gitignore` file prevents it from being committed to git
@@ -312,6 +332,7 @@ scripts/
 <summary><b>🪟 Windows Users</b></summary>
 
 Use `.bat` files:
+
 ```batch
 # Start file watcher
 C:\Users\YourName\.claude\plugins\marketplaces\custom-skills\code-refactoring\scripts\start-watcher.bat
@@ -324,23 +345,27 @@ C:\Users\YourName\.claude\plugins\marketplaces\custom-skills\code-refactoring\sc
 ```
 
 Or use slash commands in Claude Code:
+
 ```
 /start-watcher
 /stop-watcher
 /scan-code-size
 ```
+
 </details>
 
 <details>
 <summary><b>🍎 macOS / 🐧 Linux Users</b></summary>
 
 **First time setup** (make scripts executable):
+
 ```bash
 cd ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts
 chmod +x *.sh
 ```
 
 **Then use `.sh` files:**
+
 ```bash
 # Start file watcher
 ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/start-watcher.sh
@@ -353,17 +378,20 @@ chmod +x *.sh
 ```
 
 Or use slash commands in Claude Code:
+
 ```
 /start-watcher
 /stop-watcher
 /scan-code-size
 ```
+
 </details>
 
 <details>
 <summary><b>🌐 Universal (Node.js)</b></summary>
 
 If you have Node.js installed, these work on **any platform**:
+
 ```bash
 # Auto-start (universal)
 node ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/auto-start-watcher.js
@@ -374,6 +402,7 @@ node ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/start
 # Check alerts
 node ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/check-alerts.js
 ```
+
 </details>
 
 ---
@@ -458,6 +487,7 @@ npm install
 ```
 
 **Note:** Your slash commands in projects are just copies - update them if command syntax changed:
+
 ```bash
 # In your project
 cp ~/.claude/plugins/.../slashes-commands/*.md .claude/commands/
@@ -507,6 +537,7 @@ The skill triggers **automatically** and monitors **constantly**. Just work norm
 **You don't need to ask Claude to check file sizes** - the background watcher is always monitoring your `/src` directory and the skill is always aware of your code size.
 
 **Example:**
+
 ```
 You: "Add analytics to Dashboard.tsx"
 Claude: *Checks file size first*
@@ -556,6 +587,7 @@ bash ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/check
 ### What It Does
 
 The file watcher runs in the background and:
+
 - Monitors all code files in your `/src` directory (`.js`, `.jsx`, `.ts`, `.tsx`, `.py`)
 - **Constantly checks file sizes** - The skill is ALWAYS aware of your code size
 - Detects when you edit files that exceed size thresholds
@@ -568,6 +600,7 @@ The file watcher runs in the background and:
 ### Why Only `/src` Directory?
 
 The watcher focuses on `/src` because:
+
 - ✅ **Source code matters** - This is where your application logic lives
 - ✅ **Excludes noise** - Ignores generated files, dependencies, build artifacts
 - ✅ **Better performance** - Monitoring thousands of `node_modules` files would slow things down
@@ -604,12 +637,15 @@ The watcher is configured to **automatically start** when you launch Claude Code
 If you haven't seen alerts in a while and want to check manually:
 
 **Option 1: Ask Claude directly** (Easiest)
+
 ```
 Just ask: "Any refactoring alerts?"
 ```
+
 Claude will automatically check the background watcher and show you any pending alerts.
 
 **Option 2: Invoke the skill manually**
+
 ```
 Just talk to Claude normally - the skill auto-checks alerts when invoked
 ```
@@ -627,28 +663,34 @@ Just talk to Claude normally - the skill auto-checks alerts when invoked
 Instead of treating all files the same, the watcher now understands that different file types have different acceptable sizes:
 
 **Pages Can Be Larger:**
+
 - `page.tsx` files: 300/500/800 lines
 - **Why?** Educational content, demos, and tutorial pages often contain lots of text and examples
 
 **Data Files Get Special Treatment:**
+
 - `data/**/*.tsx` files: 250/400/600 lines
 - **Why?** Mostly static content, configuration, and data structures
 
 **Components Stay Standard:**
+
 - `components/**/*.tsx` files: 150/200/300 lines
 - **Why?** UI components should stay focused and reusable
 
 **Utilities Must Be Small:**
+
 - `lib/**/*.ts` & `utils/**/*.ts`: 100/150/200 lines
 - **Why?** Logic and utility files should be **strict** - complex logic needs to stay small and testable
 
 **API Routes Stay Thin:**
+
 - `api/**/*.ts` files: 100/150/250 lines
 - **Why?** Thin controllers are preferred - business logic should be in services
 
 ### Example: Before vs After v2.0
 
 **Before v2.0 (Extension-based only):**
+
 ```
 app/rag-playground/page.tsx (1,246 lines)
 → CRITICAL ❌ (>300 lines for .tsx files)
@@ -656,6 +698,7 @@ app/rag-playground/page.tsx (1,246 lines)
 ```
 
 **After v2.0 (Path-based intelligence):**
+
 ```
 app/rag-playground/page.tsx (1,246 lines)
 → ALERT ⚠️ (>500, <800 for page.tsx files) [path-based (Page component)]
@@ -663,6 +706,7 @@ app/rag-playground/page.tsx (1,246 lines)
 ```
 
 **Similarly for utilities:**
+
 ```
 utils/helper.ts (250 lines)
 → CRITICAL 🛑 (>200 for utilities) [path-based (Utility/logic file)]
@@ -683,11 +727,13 @@ Want to add your own path patterns? Edit `scripts/file-watcher.js`:
 pathBased: [
   {
     pattern: /\/migrations\/.*\.ts$/i,
-    warning: 400, alert: 600, critical: 1000,
-    reason: 'Database migration (can be large)'
+    warning: 400,
+    alert: 600,
+    critical: 1000,
+    reason: 'Database migration (can be large)',
   },
   // Add your custom patterns here
-]
+];
 ```
 
 ---
@@ -695,6 +741,7 @@ pathBased: [
 ## 🎮 Slash Commands (3 Core + 1 Optional)
 
 ### `/start-watcher`
+
 **Start background file monitoring**
 
 ```bash
@@ -702,17 +749,20 @@ pathBased: [
 ```
 
 **What it does:**
+
 - Starts real-time file monitoring
 - Shows initial scan results (critical/alert/warning files)
 - Creates PID file for process management
 - Runs continuously until stopped
 
 **When to use:**
+
 - Manually start if watcher isn't auto-started
 - Restart after stopping
 - Troubleshooting
 
 **Output example:**
+
 ```
 ✓ File watcher started successfully!
   PID: 68280
@@ -727,6 +777,7 @@ pathBased: [
 ---
 
 ### `/stop-watcher`
+
 **Stop background file monitoring**
 
 ```bash
@@ -734,11 +785,13 @@ pathBased: [
 ```
 
 **What it does:**
+
 - Stops the running file watcher process
 - Removes PID file
 - Preserves existing alerts (can still be checked later)
 
 **When to use:**
+
 - End of coding session
 - Disable monitoring temporarily
 - Troubleshooting
@@ -746,6 +799,7 @@ pathBased: [
 ---
 
 ### `/scan-code-size`
+
 **One-time codebase scan (no background monitoring)**
 
 ```bash
@@ -753,18 +807,21 @@ pathBased: [
 ```
 
 **What it does:**
+
 - Performs quick one-time scan
 - Generates detailed report
 - Saves to `code-size-report-[timestamp].txt`
 - **Does NOT start background monitoring**
 
 **When to use:**
+
 - Quick audit of new codebase
 - Pre-release checks
 - Planning refactoring initiatives
 - When you want a report without continuous monitoring
 
 **Output example:**
+
 ```
 📊 Scan Results:
    🛑 Critical: 23 files
@@ -782,6 +839,7 @@ Top 5 Largest:
 ---
 
 ### `/check-refactor-alerts` (Optional)
+
 **Manually check file watcher alerts**
 
 ```bash
@@ -789,20 +847,24 @@ Top 5 Largest:
 ```
 
 **What it does:**
+
 - Reads unread alerts from background file watcher
 - Shows files that exceeded thresholds since last check
 - Offers refactoring options (now/review/dismiss)
 
 **When to use:**
+
 - Manually check accumulated alerts
 - Catch up on alerts before starting work session
 
 **⚠️ Note: This command is OPTIONAL**
+
 - The code-refactoring skill automatically checks alerts when invoked
 - The `/start-watcher` command also checks alerts automatically
 - Only install this if you want explicit manual control over alert checking
 
 **Output example:**
+
 ```
 🚨 File Watcher Alerts
 
@@ -841,6 +903,7 @@ For full installation instructions, see [`slashes-commands/README.md`](slashes-c
 **Want to check manually?** Just ask Claude: "Any refactoring alerts?"
 
 ### Workflow 2: Quick Audit Without Monitoring
+
 ```
 1. /scan-code-size
 2. Review report
@@ -851,6 +914,7 @@ For full installation instructions, see [`slashes-commands/README.md`](slashes-c
 **When to use:** One-time codebase audits, new projects, pre-release checks.
 
 ### Workflow 3: Manual Skill Invocation
+
 ```
 1. Open large file
 2. Ask Claude: "Check if this file needs refactoring"
@@ -868,12 +932,14 @@ For full installation instructions, see [`slashes-commands/README.md`](slashes-c
 <summary><b>Why isn't node_modules in the repository?</b></summary>
 
 **Answer:** The `node_modules/` folder contains 6 MB of downloaded packages - too large to include in git. Instead:
+
 - We include `package.json` (59 bytes) - tells npm what to install
 - We include `package-lock.json` (3.5 KB) - locks exact versions
 - You run `npm install` to create `node_modules/` locally
 - This is standard practice for all Node.js projects
 
 **Result:** Clean repository (no bloat), users get identical packages.
+
 </details>
 
 <details>
@@ -888,10 +954,12 @@ scripts/
 ```
 
 When you run:
+
 ```bash
 cd scripts/          # ← Go to this directory FIRST
 npm install          # ← Creates node_modules HERE
 ```
+
 </details>
 
 <details>
@@ -900,6 +968,7 @@ npm install          # ← Creates node_modules HERE
 **Answer:** **No!** You only run `npm install` **once** after cloning the repository. The `node_modules/` folder stays there permanently unless you delete it.
 
 **Timeline:**
+
 - First time: Clone repo → Run `npm install` → Use skill forever
 - Later sessions: Just use the skill (packages already installed)
 </details>
@@ -915,6 +984,7 @@ npm install
 ```
 
 It will recreate the exact same packages (thanks to `package-lock.json`).
+
 </details>
 
 <details>
@@ -927,12 +997,14 @@ rm -rf scripts/node_modules/    # Frees 6 MB
 ```
 
 **But:** The file watcher won't work until you reinstall:
+
 ```bash
 cd scripts/
 npm install                      # Restore functionality
 ```
 
 **Recommendation:** Keep it installed (6 MB is small on modern systems).
+
 </details>
 
 ---
@@ -942,7 +1014,6 @@ npm install                      # Restore functionality
 - **Slash Commands Installation:** See [`slashes-commands/README.md`](slashes-commands/README.md) for installation guide and usage
 - **Slash Commands Reference:** See `COMMANDS_REFERENCE.md` for detailed command documentation
 - **Advanced Auto-Start:** See "Advanced Configuration" section below for optional automatic startup
-
 
 ## ✨ Execution Phase (NEW!)
 
@@ -1044,6 +1115,7 @@ Skill: "❌ Step 2 failed: Tests failing
 ### Main Instructions (SKILL.md)
 
 Contains the core skill logic:
+
 - When to auto-invoke
 - Size thresholds by language
 - Pattern detection rules
@@ -1056,6 +1128,7 @@ Contains the core skill logic:
 ### Detailed Reference (REFERENCE.md)
 
 Language-specific patterns and examples:
+
 - JavaScript/TypeScript/React patterns (data extraction, sub-components, custom hooks)
 - Python patterns (class splitting, function extraction, config management)
 - General patterns (duplicate code, conditionals, nested logic)
@@ -1071,6 +1144,7 @@ Language-specific patterns and examples:
 ### Templates & Checklists (FORMS.md)
 
 Ready-to-use templates:
+
 - Refactoring analysis template
 - Pre-refactoring checklist
 - Execution plan
@@ -1086,11 +1160,13 @@ Ready-to-use templates:
 ### Code Smell Detection (NEW!)
 
 **Based on Martin Fowler's "Refactoring" and Refactoring.guru:**
+
 - ✅ **21 Code Smells** across 5 categories (Bloaters, OO Abusers, Change Preventers, Dispensables, Couplers)
 - ✅ Automatic detection via pattern matching
 - ✅ Detailed catalog in `resources/code-smells-catalog.md`
 
 **Examples:**
+
 - Long Method (>50 lines), Large Class (>300 lines)
 - Primitive Obsession, Long Parameter List, Data Clumps
 - Switch Statements, Feature Envy, Message Chains
@@ -1123,6 +1199,7 @@ Ready-to-use templates:
 ### TDD Integration (NEW!)
 
 **Red-Green-Refactor workflow:**
+
 - ✅ Skill activates during REFACTOR phase (phase 3 of TDD cycle)
 - ✅ Tests kept green throughout refactoring
 - ✅ Automatic rollback if tests fail
@@ -1209,12 +1286,14 @@ Should I explain the file AND provide refactoring plan?
 #### Why You Might Adjust Thresholds
 
 **Stricter (smaller files):**
+
 - Microservices architecture (prefer 100/150/200)
 - Junior developer team (easier to understand)
 - High-churn codebase (smaller = easier to change)
 - Functional programming style (smaller functions/modules)
 
 **Looser (larger files):**
+
 - Mature, stable codebase (250/350/500)
 - Senior developer team (can handle complexity)
 - Rapid prototyping phase (optimize later)
@@ -1223,6 +1302,7 @@ Should I explain the file AND provide refactoring plan?
 #### How to Change Thresholds
 
 **Step 1:** Edit `SKILL.md` in your skill directory:
+
 ```bash
 # Open SKILL.md for editing
 code ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/SKILL.md
@@ -1234,17 +1314,20 @@ code ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/SKILL.md
 ## 📏 File Size Guidelines (Language-Specific)
 
 ### JavaScript/TypeScript/React Components
-- **100-200 lines**: ✅ Perfect for most components    # Change these numbers
-- **200-300 lines**: ⚠️ Good for complex components    # to your preference
+
+- **100-200 lines**: ✅ Perfect for most components # Change these numbers
+- **200-300 lines**: ⚠️ Good for complex components # to your preference
 - **300+ lines**: 🛑 MUST split into sub-components
 
 ### Python Modules
+
 - **150-250 lines**: ✅ Good module size
 - **250-400 lines**: ⚠️ Consider splitting
 - **400+ lines**: 🛑 Split into multiple modules
 ```
 
 **Step 3:** Also update the auto-invoke bash commands to match:
+
 ```bash
 # Find this section in SKILL.md:
 # If result:
@@ -1256,6 +1339,7 @@ code ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/SKILL.md
 ```
 
 **Step 4:** Update the analyze-codebase.sh script to match:
+
 ```bash
 # Edit the script
 nano ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/analyze-codebase.sh
@@ -1277,11 +1361,13 @@ elif [ $lines -gt 150 ]; then  # Change to your medium threshold
 ### Microservices Configuration (Stricter)
 
 ### JavaScript/TypeScript/React Components
+
 - **75-150 lines**: ✅ Perfect size for microservices
 - **150-200 lines**: ⚠️ Getting large, consider splitting
 - **200+ lines**: 🛑 Too large for microservice architecture
 
 ### Python Modules
+
 - **100-200 lines**: ✅ Good module size
 - **200-300 lines**: ⚠️ Consider splitting
 - **300+ lines**: 🛑 Definitely split
@@ -1293,11 +1379,13 @@ elif [ $lines -gt 150 ]; then  # Change to your medium threshold
 ### Prototype Mode (Looser - Optimize Later)
 
 ### JavaScript/TypeScript/React Components
+
 - **150-250 lines**: ✅ OK for prototyping
 - **250-400 lines**: ⚠️ Consider refactoring before production
 - **400+ lines**: 🛑 Must refactor before merging to main
 
 ### Python Modules
+
 - **200-350 lines**: ✅ Acceptable for prototypes
 - **350-500 lines**: ⚠️ Getting unwieldy
 - **500+ lines**: 🛑 Too large, hard to understand
@@ -1315,6 +1403,7 @@ elif [ $lines -gt 150 ]; then  # Change to your medium threshold
 - **150-200 lines**: ⚠️ Warning
 - **200+ lines**: 🛑 Critical
 ```
+
 </details>
 
 <details>
@@ -1325,6 +1414,7 @@ elif [ $lines -gt 150 ]; then  # Change to your medium threshold
 - **200-300 lines**: ⚠️ Warning
 - **300+ lines**: 🛑 Critical
 ```
+
 </details>
 
 <details>
@@ -1335,6 +1425,7 @@ elif [ $lines -gt 150 ]; then  # Change to your medium threshold
 - **300-400 lines**: ⚠️ Warning
 - **400+ lines**: 🛑 Critical
 ```
+
 </details>
 
 <details>
@@ -1345,6 +1436,7 @@ elif [ $lines -gt 150 ]; then  # Change to your medium threshold
 - **400-600 lines**: ⚠️ Warning
 - **600+ lines**: 🛑 Critical
 ```
+
 </details>
 
 ---
@@ -1357,16 +1449,19 @@ You can also set **different thresholds for different languages**:
 ## 📏 File Size Guidelines (Per-Language)
 
 ### JavaScript/TypeScript/React (Strict)
+
 - **100-200 lines**: ✅ Good
 - **200-300 lines**: ⚠️ Warning
 - **300+ lines**: 🛑 Critical
 
 ### Python (Moderate)
+
 - **150-250 lines**: ✅ Good
 - **250-400 lines**: ⚠️ Warning
 - **400+ lines**: 🛑 Critical
 
 ### Configuration Files (Relaxed)
+
 - **200-400 lines**: ✅ Good
 - **400-600 lines**: ⚠️ Warning
 - **600+ lines**: 🛑 Critical
@@ -1404,12 +1499,14 @@ You can also set **different thresholds for different languages**:
 ## 📊 Typical Results
 
 **Before using this skill:**
+
 - Discover 400+ line components after they're already complex
 - Spend hours on "emergency refactors"
 - Break functionality during rushed refactoring
 - Accumulate technical debt
 
 **After using this skill:**
+
 - Get alerted at 150-200 lines
 - Refactor incrementally in 15-30 minute sessions
 - Maintain functionality throughout refactoring
@@ -1422,6 +1519,7 @@ You can also set **different thresholds for different languages**:
 This skill is part of a personal skills collection but can be shared!
 
 **To improve this skill:**
+
 1. Add new language patterns to `REFERENCE.md`
 2. Add new templates to `FORMS.md`
 3. Enhance auto-detection in `SKILL.md`
@@ -1432,6 +1530,7 @@ This skill is part of a personal skills collection but can be shared!
 ## 📝 Version History
 
 **v2.0.0** (Current - October 31, 2025) 🎯
+
 - ✨ **NEW: Path-Based Thresholds** - Major intelligence upgrade!
   - File watcher now uses context-aware thresholds based on file location
   - `page.tsx` files: 300/500/800 lines (educational content allowed)
@@ -1447,6 +1546,7 @@ This skill is part of a personal skills collection but can be shared!
 - 🔄 **No migration needed** - Automatic detection, backward compatible
 
 **v1.1.1** (October 30, 2025)
+
 - 🚀 **OPTIMIZATION:** Refactored for skill-builder compliance
 - 📉 Reduced SKILL.md from 903 → 413 lines (54% reduction)
 - 📉 Reduced token count from ~22,500 → ~6,500 (71% reduction)
@@ -1462,6 +1562,7 @@ This skill is part of a personal skills collection but can be shared!
 - 🏆 **100% coverage** against industry best practices
 
 **v1.1.0** (October 30, 2025)
+
 - ✨ **NEW:** Execution phase with user approval
 - ✨ **NEW:** Step-by-step automated refactoring
 - ✨ **NEW:** Incremental commits with rollback support
@@ -1470,6 +1571,7 @@ This skill is part of a personal skills collection but can be shared!
 - Enhanced documentation with execution examples
 
 **v1.0.0** (October 30, 2025)
+
 - Initial release
 - JavaScript/TypeScript/React support
 - Python support
@@ -1492,11 +1594,13 @@ This skill is part of a personal skills collection but can be shared!
 Instead of manually typing `/start-watcher` each time, the file watcher automatically starts when you launch Claude Code.
 
 **Pros:**
+
 - ✅ Never forget to start monitoring
 - ✅ Always protected from size violations
 - ✅ Zero manual intervention
 
 **Cons:**
+
 - ⚠️ Requires manual file editing (one-time setup)
 - ⚠️ Runs on every Claude Code session (might not want that for all projects)
 - ⚠️ Less control than slash commands
@@ -1517,6 +1621,7 @@ If the file doesn't exist, create it with `{}` inside.
 Add this to `settings.json`:
 
 **Windows:**
+
 ```json
 {
   "hooks": {
@@ -1536,6 +1641,7 @@ Add this to `settings.json`:
 ```
 
 **macOS/Linux:**
+
 ```json
 {
   "hooks": {
@@ -1572,9 +1678,11 @@ You should see log entries showing the watcher started.
 By default, the watcher auto-detects your `src/` directory. To watch a specific directory:
 
 Add the directory path to the command:
+
 ```json
 "command": "node ~/.claude/plugins/.../auto-start-watcher.js \"/path/to/your/src\""
 ```
+
 </details>
 
 <details>
@@ -1591,6 +1699,7 @@ To disable automatic startup, remove or comment out the hooks section in `settin
 ```
 
 You can still use `/start-watcher` manually anytime.
+
 </details>
 
 <details>
@@ -1599,6 +1708,7 @@ You can still use `/start-watcher` manually anytime.
 **Watcher not starting automatically?**
 
 1. **Check hook is configured:**
+
    ```bash
    # Windows
    type %USERPROFILE%\.claude\settings.json | findstr "SessionStart"
@@ -1608,17 +1718,20 @@ You can still use `/start-watcher` manually anytime.
    ```
 
 2. **Check Node.js is installed:**
+
    ```bash
    node --version  # Should be v14 or higher
    ```
 
 3. **Check npm dependencies installed:**
+
    ```bash
    cd ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts
    npm install
    ```
 
 4. **Manually test the auto-start script:**
+
    ```bash
    # Windows
    node %USERPROFILE%\.claude\plugins\...\auto-start-watcher.js
@@ -1626,9 +1739,11 @@ You can still use `/start-watcher` manually anytime.
    # macOS/Linux
    node ~/.claude/plugins/.../auto-start-watcher.js
    ```
+
    Should start silently with no output.
 
 **Still not working?** Just use `/start-watcher` slash command instead - it's simpler!
+
 </details>
 
 ---
@@ -1643,12 +1758,14 @@ You can still use `/start-watcher` manually anytime.
 **Problem:** Node.js is not installed or not in PATH.
 
 **Solution:**
+
 1. Install Node.js v14 or higher: https://nodejs.org/
 2. Verify installation: `node --version` and `npm --version`
 3. Restart your terminal/Claude Code
 4. Try `npm install` again
 
 **Windows specific:** Make sure to check "Add to PATH" during Node.js installation.
+
 </details>
 
 <details>
@@ -1657,6 +1774,7 @@ You can still use `/start-watcher` manually anytime.
 **Problem:** Scripts don't have execute permissions (macOS/Linux).
 
 **Solution:**
+
 ```bash
 # Make scripts executable
 chmod +x ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/*.sh
@@ -1666,6 +1784,7 @@ chmod +x ~/.claude/plugins/.../scripts/start-watcher.sh
 ```
 
 **Windows:** This shouldn't happen. If it does, right-click script → Properties → Unblock.
+
 </details>
 
 <details>
@@ -1674,6 +1793,7 @@ chmod +x ~/.claude/plugins/.../scripts/start-watcher.sh
 **Problem:** Slash commands not installed in your project.
 
 **Solution:**
+
 ```bash
 # Copy slash commands to your project
 cd /path/to/your-project
@@ -1684,6 +1804,7 @@ ls .claude/commands/
 ```
 
 **Remember:** Slash commands are project-level, not global. You need to copy them to each project where you want them.
+
 </details>
 
 <details>
@@ -1692,6 +1813,7 @@ ls .claude/commands/
 **Problem:** Node.js dependencies not installed.
 
 **Solution:**
+
 ```bash
 # Navigate to scripts directory
 cd ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts
@@ -1702,6 +1824,7 @@ npm install
 # Verify
 ls node_modules/  # Should see node-notifier folder
 ```
+
 </details>
 
 <details>
@@ -1710,6 +1833,7 @@ ls node_modules/  # Should see node-notifier folder
 **Problem:** Watcher might have crashed or not started properly.
 
 **Solution:**
+
 ```bash
 # 1. Stop any existing watcher
 bash ~/.claude/plugins/.../scripts/stop-watcher.sh
@@ -1725,6 +1849,7 @@ ps aux | grep file-watcher.js
 ```
 
 **Alternative:** Use `/scan-code-size` for one-time scans without background monitoring.
+
 </details>
 
 <details>
@@ -1733,6 +1858,7 @@ ps aux | grep file-watcher.js
 **Problem:** Don't have write permissions to npm global directory.
 
 **Solution (Option 1 - Recommended):**
+
 ```bash
 # Use npm's built-in fix
 mkdir ~/.npm-global
@@ -1744,6 +1870,7 @@ echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 ```
 
 **Solution (Option 2 - If inside skill directory):**
+
 ```bash
 # You shouldn't need sudo for this since it's in your home directory
 # If you do, check ownership:
@@ -1752,6 +1879,7 @@ ls -la ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/
 # Fix ownership if needed:
 sudo chown -R $USER:$USER ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/
 ```
+
 </details>
 
 <details>
@@ -1760,9 +1888,11 @@ sudo chown -R $USER:$USER ~/.claude/plugins/marketplaces/custom-skills/code-refa
 **Problem:** Skill might not be properly registered or Claude Code needs restart.
 
 **Solution:**
+
 1. Verify skill location: `ls ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/SKILL.md`
 2. Restart Claude Code completely
 3. Try with a test file:
+
    ```bash
    # Create 300-line test file
    for i in {1..300}; do echo "// Line $i" >> test.js; done
@@ -1770,6 +1900,7 @@ sudo chown -R $USER:$USER ~/.claude/plugins/marketplaces/custom-skills/code-refa
    # Ask Claude to edit it
    "Add a comment to test.js"
    ```
+
 4. If still not working, manually invoke: "Use the code-refactoring skill to analyze test.js"
 </details>
 
@@ -1779,17 +1910,20 @@ sudo chown -R $USER:$USER ~/.claude/plugins/marketplaces/custom-skills/code-refa
 **Problem:** Git Bash or WSL not installed.
 
 **Solution (Option 1 - Install Git Bash):**
+
 1. Install Git for Windows: https://git-scm.com/download/win
 2. Git Bash is included
 3. Claude Code will use it automatically
 
 **Solution (Option 2 - Use .bat scripts directly):**
+
 ```bash
 # Instead of slash commands, run batch files directly
 C:\Users\YourUsername\.claude\plugins\...\scripts\start-watcher.bat
 ```
 
 **Solution (Option 3 - Use WSL):**
+
 1. Install WSL: `wsl --install`
 2. Claude Code can use WSL bash
 </details>
@@ -1802,6 +1936,7 @@ C:\Users\YourUsername\.claude\plugins\...\scripts\start-watcher.bat
 **Problem:** Watcher alerting on files you don't want monitored.
 
 **Solution (Option 1 - Use selective monitoring):**
+
 ```bash
 # Start watcher with specific directory
 /start-watcher
@@ -1809,6 +1944,7 @@ C:\Users\YourUsername\.claude\plugins\...\scripts\start-watcher.bat
 ```
 
 **Solution (Option 2 - Stop watcher):**
+
 ```bash
 # Stop background monitoring
 /stop-watcher
@@ -1819,6 +1955,7 @@ C:\Users\YourUsername\.claude\plugins\...\scripts\start-watcher.bat
 
 **Solution (Option 3 - Adjust thresholds):**
 Edit `SKILL.md` in the skill directory to increase size thresholds.
+
 </details>
 
 <details>
@@ -1827,6 +1964,7 @@ Edit `SKILL.md` in the skill directory to increase size thresholds.
 **Problem:** Auto-start hook + manual start = 2 watchers.
 
 **Solution:**
+
 ```bash
 # Kill all file-watcher processes
 pkill -f file-watcher.js
@@ -1839,6 +1977,7 @@ bash ~/.claude/plugins/.../scripts/stop-watcher.sh
 ```
 
 **Prevention:** If using auto-start hook, don't also run `/start-watcher` manually.
+
 </details>
 
 <details>
@@ -1847,6 +1986,7 @@ bash ~/.claude/plugins/.../scripts/stop-watcher.sh
 **Problem:** Monitoring too many files or directory is too large.
 
 **Solution:**
+
 ```bash
 # Stop watcher
 /stop-watcher
@@ -1859,11 +1999,13 @@ bash ~/.claude/plugins/.../scripts/stop-watcher.sh
 # Or use one-time scans instead of background monitoring
 /scan-code-size
 ```
+
 </details>
 
 ### Still Having Issues?
 
 **Check the logs:**
+
 ```bash
 # Watcher logs
 cat ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/watcher.log
@@ -1873,6 +2015,7 @@ cat ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/watche
 ```
 
 **Report an issue:**
+
 - GitHub Issues: https://github.com/mgbotoe/claude-code-share/issues
 - Include: OS, Node.js version, error messages, relevant logs
 
@@ -1881,6 +2024,7 @@ cat ~/.claude/plugins/marketplaces/custom-skills/code-refactoring/scripts/watche
 ## 🔗 Related Skills
 
 Works well with:
+
 - `ui-ux-audit` - Ensures UI components stay maintainable
 - `technical-writing` - Documents refactored structure
 - `qa-testing` - Tests refactored code
@@ -1898,11 +2042,13 @@ This skill was created using the `skill-builder` skill for Claude Code.
 **Installation Location:** `~/.claude/plugins/marketplaces/custom-skills/code-refactoring/` (GLOBAL - works across all projects)
 
 **License:** Creative Commons Attribution 4.0 International (CC BY 4.0)
+
 - Attribution required when sharing or modifying
 - Free to use in personal and commercial projects
 - See SKILL.md header for full license details
 
 **To test the skill:**
+
 ```
 Try asking Claude to edit a large file and watch it check the size first!
 ```

@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { MESSAGES } from '@/config/messages';
@@ -6,34 +5,40 @@ import { MESSAGES } from '@/config/messages';
 const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería requerir usuario de mínimo 3 caracteres',
-    username: 'ab', password: 'password123',
-    erroresEsperados: ['El usuario debe tener al']
+    username: 'ab',
+    password: 'password123',
+    erroresEsperados: ['El usuario debe tener al'],
   },
   {
     descripcion: 'Debería requerir contraseña de mínimo 6 caracteres',
-    username: 'vendedor_valido', password: '123',
-    erroresEsperados: ['La contraseña debe tener al menos 6 caracteres']
+    username: 'vendedor_valido',
+    password: '123',
+    erroresEsperados: ['La contraseña debe tener al menos 6 caracteres'],
   },
   {
     descripcion: 'Debería requerir contraseña',
-    username: 'vendedor_valido', password: '',
-    erroresEsperados: ['La contraseña debe tener al menos 6 caracteres']
+    username: 'vendedor_valido',
+    password: '',
+    erroresEsperados: ['La contraseña debe tener al menos 6 caracteres'],
   },
   {
     descripcion: 'Debería respetar límites máximos de username',
-    username: 'u'.repeat(51), password: 'password123',
-    erroresEsperados: ['Usuario demasiado largo']
+    username: 'u'.repeat(51),
+    password: 'password123',
+    erroresEsperados: ['Usuario demasiado largo'],
   },
   {
     descripcion: 'Debería fallar por duplicado',
-    username: 'admin', password: 'password123',
-    erroresEsperados: [MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION]
+    username: 'admin',
+    password: 'password123',
+    erroresEsperados: [MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION],
   },
   {
     descripcion: 'Debería fallar por duplicado (case insensitive)',
-    username: 'aDmIn', password: 'password123',
-    erroresEsperados: [MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION]
-  }
+    username: 'aDmIn',
+    password: 'password123',
+    erroresEsperados: [MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION],
+  },
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -42,7 +47,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe.parallel('Gestión de Usuarios:', () => {
-
   for (const caso of CASOS_DE_VALIDACION) {
     test(`Validación: ${caso.descripcion}`, async ({ page }) => {
       const usuariosPage = new UsuariosPage(page);
@@ -95,7 +99,7 @@ test.describe.parallel('Gestión de Usuarios:', () => {
     const username = await usuariosPage.inyectarUsuarioEfimero();
 
     // Filtramos el caso de contraseña obligatoria, ya que en edición dejarla en blanco es válido (no la modifica)
-    const CASOS_EDICION = CASOS_DE_VALIDACION.filter(caso => caso.descripcion !== 'Debería requerir contraseña');
+    const CASOS_EDICION = CASOS_DE_VALIDACION.filter((caso) => caso.descripcion !== 'Debería requerir contraseña');
 
     for (const caso of CASOS_EDICION) {
       await usuariosPage.editarUsuario(username, caso.username, caso.password);
@@ -106,7 +110,6 @@ test.describe.parallel('Gestión de Usuarios:', () => {
       await usuariosPage.btnCancelar.click();
     }
   });
-
 
   test('Debería crear un nuevo usuario', async ({ page }) => {
     const testEntity = {

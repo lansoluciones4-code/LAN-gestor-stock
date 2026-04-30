@@ -23,8 +23,8 @@ const CONFIG = {
   watchDir: process.argv[2] || process.cwd(),
   quiet: process.argv.includes('--quiet'),
   notify: process.argv.includes('--notify'),
-  logFile: process.argv.find(arg => arg.startsWith('--log='))?.split('=')[1],
-  threshold: parseInt(process.argv.find(arg => arg.startsWith('--threshold='))?.split('=')[1] || '150'),
+  logFile: process.argv.find((arg) => arg.startsWith('--log='))?.split('=')[1],
+  threshold: parseInt(process.argv.find((arg) => arg.startsWith('--threshold='))?.split('=')[1] || '150'),
 
   // File patterns to watch
   patterns: {
@@ -41,28 +41,38 @@ const CONFIG = {
     pathBased: [
       {
         pattern: /page\.tsx$/i,
-        warning: 300, alert: 500, critical: 800,
-        reason: 'Page component (educational content/demos allowed)'
+        warning: 300,
+        alert: 500,
+        critical: 800,
+        reason: 'Page component (educational content/demos allowed)',
       },
       {
         pattern: /[/\\]data[/\\].*\.(tsx|ts)$/i,
-        warning: 250, alert: 400, critical: 600,
-        reason: 'Data file (mostly static content)'
+        warning: 250,
+        alert: 400,
+        critical: 600,
+        reason: 'Data file (mostly static content)',
       },
       {
         pattern: /[/\\]components[/\\].*\.(tsx|jsx)$/i,
-        warning: 150, alert: 200, critical: 300,
-        reason: 'Component file (standard threshold)'
+        warning: 150,
+        alert: 200,
+        critical: 300,
+        reason: 'Component file (standard threshold)',
       },
       {
         pattern: /[/\\](lib|utils)[/\\].*\.(ts|js)$/i,
-        warning: 100, alert: 150, critical: 200,
-        reason: 'Utility/logic file (strict - should be small)'
+        warning: 100,
+        alert: 150,
+        critical: 200,
+        reason: 'Utility/logic file (strict - should be small)',
       },
       {
         pattern: /[/\\]api[/\\].*\.(ts|js)$/i,
-        warning: 100, alert: 150, critical: 250,
-        reason: 'API route (thin controller preferred)'
+        warning: 100,
+        alert: 150,
+        critical: 250,
+        reason: 'API route (thin controller preferred)',
       },
     ],
 
@@ -77,18 +87,7 @@ const CONFIG = {
   },
 
   // Directories to ignore
-  ignore: [
-    'node_modules',
-    '.git',
-    'dist',
-    'build',
-    'out',
-    '.next',
-    'coverage',
-    '.vercel',
-    '__pycache__',
-    '.pytest_cache',
-  ],
+  ignore: ['node_modules', '.git', 'dist', 'build', 'out', '.next', 'coverage', '.vercel', '__pycache__', '.pytest_cache'],
 };
 
 // Colors for console output
@@ -162,7 +161,7 @@ function getThresholds(filePath) {
  */
 function shouldIgnore(filePath) {
   const relativePath = path.relative(CONFIG.watchDir, filePath);
-  return CONFIG.ignore.some(ignored => relativePath.includes(ignored));
+  return CONFIG.ignore.some((ignored) => relativePath.includes(ignored));
 }
 
 /**
@@ -286,7 +285,7 @@ function writeAlertToClaudeChat(filePath, lines, level, lineGrowth) {
       lines: lines,
       level: level,
       lineGrowth: lineGrowth,
-      read: false
+      read: false,
     };
 
     alerts.push(alert);
@@ -327,9 +326,9 @@ function handleFileChange(eventType, filePath) {
 
     // Severity-based reminder frequency (for vibe coders who add lots of code quickly)
     const reminderIntervals = {
-      critical: 300000,   // 5 minutes - CRITICAL files need frequent reminders!
-      alert: 900000,      // 15 minutes - ALERT files
-      warning: 1800000,   // 30 minutes - WARNING files
+      critical: 300000, // 5 minutes - CRITICAL files need frequent reminders!
+      alert: 900000, // 15 minutes - ALERT files
+      warning: 1800000, // 30 minutes - WARNING files
     };
 
     const reminderInterval = reminderIntervals[tracked.level] || 3600000;

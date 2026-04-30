@@ -143,13 +143,9 @@ export function ProductsPanel() {
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
 
-        const combinedText = [
-          normalizeForSearch(p.device?.name),
-          normalizeForSearch(p.description),
-          role === 'admin' ? normalizeForSearch(p.provider?.name) : ''
-        ].join(' ');
+        const combinedText = [normalizeForSearch(p.device?.name), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
 
-        const matchesSearch = terms.every(word => combinedText.includes(word));
+        const matchesSearch = terms.every((word) => combinedText.includes(word));
         return matchesSearch && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
       })
       .sort((a, b) => {
@@ -163,13 +159,13 @@ export function ProductsPanel() {
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
     if (item) {
-      reset({ 
-        deviceId: item.deviceId, 
-        providerId: item.providerId, 
-        description: item.description || '', 
-        purchasePrice: item.purchasePrice.toFixed(2).replace('.', ','), 
-        salePrice: item.salePrice.toFixed(2).replace('.', ','), 
-        stock: item.stock 
+      reset({
+        deviceId: item.deviceId,
+        providerId: item.providerId,
+        description: item.description || '',
+        purchasePrice: item.purchasePrice.toFixed(2).replace('.', ','),
+        salePrice: item.salePrice.toFixed(2).replace('.', ','),
+        stock: item.stock,
       } as any);
     } else {
       reset({ deviceId: '', providerId: '', description: '', purchasePrice: '0,00', salePrice: '0,00', stock: 1 } as any);
@@ -194,7 +190,10 @@ export function ProductsPanel() {
   });
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden outline-none" tabIndex={-1}>
+    <div
+      className="flex flex-col flex-1 h-full overflow-hidden outline-none"
+      tabIndex={-1}
+    >
       {initialLoading ? (
         <div className="mt-8 animate-in fade-in duration-500">
           <TableSkeleton />
@@ -206,7 +205,7 @@ export function ProductsPanel() {
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={role === 'admin' ? "Buscar por equipo, descripción o proveedor" : "Buscar por equipo o descripción"}
+                placeholder={role === 'admin' ? 'Buscar por equipo, descripción o proveedor' : 'Buscar por equipo o descripción'}
                 className="h-11"
                 data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
@@ -294,7 +293,7 @@ export function ProductsPanel() {
                 const changedData: any = {
                   version: editingItem.version,
                   deviceVersion: editingItem.device?.version,
-                  providerVersion: editingItem.provider?.version
+                  providerVersion: editingItem.provider?.version,
                 };
 
                 let hasChanges = false;
@@ -326,9 +325,7 @@ export function ProductsPanel() {
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Modelo / Equipo</label>
                 <Combobox
-                  options={devices
-                    .filter((d) => d.isActive || d.id === editingItem?.deviceId)
-                    .map((d) => ({ id: d.id, name: d.name }))}
+                  options={devices.filter((d) => d.isActive || d.id === editingItem?.deviceId).map((d) => ({ id: d.id, name: d.name }))}
                   value={selectedDeviceId}
                   onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
                   placeholder="Seleccionar Equipo"
@@ -339,9 +336,7 @@ export function ProductsPanel() {
                 <div className="col-span-1 md:col-span-2">
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Proveedor Entrante</label>
                   <Combobox
-                    options={suppliers
-                      .filter((s) => s.isActive || s.id === editingItem?.providerId)
-                      .map((s) => ({ id: s.id, name: s.name }))}
+                    options={suppliers.filter((s) => s.isActive || s.id === editingItem?.providerId).map((s) => ({ id: s.id, name: s.name }))}
                     value={selectedProviderId}
                     onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
                     placeholder="Seleccionar Proveedor"
@@ -369,20 +364,14 @@ export function ProductsPanel() {
                       onChange: (e) => {
                         const val = e.target.value.replace(/\./g, '');
                         setValue('purchasePrice', val);
-                      }
+                      },
                     })}
                     onKeyDown={(e) => {
                       if (e.key === ',' && e.currentTarget.value.includes(',')) {
                         e.preventDefault();
                         return;
                       }
-                      if (
-                        !/^[0-9]$/.test(e.key) &&
-                        e.key !== ',' &&
-                        !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
-                        !e.ctrlKey &&
-                        !e.metaKey
-                      ) {
+                      if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
                         e.preventDefault();
                       }
                     }}
@@ -403,20 +392,14 @@ export function ProductsPanel() {
                       onChange: (e) => {
                         const val = e.target.value.replace(/\./g, '');
                         setValue('salePrice', val);
-                      }
+                      },
                     })}
                     onKeyDown={(e) => {
                       if (e.key === ',' && e.currentTarget.value.includes(',')) {
                         e.preventDefault();
                         return;
                       }
-                      if (
-                        !/^[0-9]$/.test(e.key) &&
-                        e.key !== ',' &&
-                        !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
-                        !e.ctrlKey &&
-                        !e.metaKey
-                      ) {
+                      if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
                         e.preventDefault();
                       }
                     }}
@@ -470,7 +453,10 @@ export function ProductsPanel() {
             <ErrorAlert error={serverError} />
             <div className="p-3 mb-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg">
               <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">Producto</p>
-              <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate" title={`${lossProduct?.device?.name} - ${lossProduct?.description}`}>
+              <p
+                className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate"
+                title={`${lossProduct?.device?.name} - ${lossProduct?.description}`}
+              >
                 {lossProduct?.device?.name} - {lossProduct?.description}
               </p>
               <p className="text-xs text-zinc-500 mt-1">

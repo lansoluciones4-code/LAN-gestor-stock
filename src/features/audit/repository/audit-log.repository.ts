@@ -32,17 +32,13 @@ export class AuditLogRepository {
             { label: 'borrado', value: 'ELIMINAR' },
             { label: 'baja', value: 'ELIMINAR' },
           ];
-          
+
           const searchNormalized = normalizeForSearch(search);
           const s = `%${searchNormalized}%`;
-          
-          const matchingEntities = entityMapping
-            .filter(m => normalizeForSearch(m.label).includes(searchNormalized))
-            .map(m => m.value);
 
-          const matchingActions = actionMapping
-            .filter(m => normalizeForSearch(m.label).includes(searchNormalized))
-            .map(m => m.value);
+          const matchingEntities = entityMapping.filter((m) => normalizeForSearch(m.label).includes(searchNormalized)).map((m) => m.value);
+
+          const matchingActions = actionMapping.filter((m) => normalizeForSearch(m.label).includes(searchNormalized)).map((m) => m.value);
 
           const searchConditions = [
             sql`unaccent(${logs.action}) ilike unaccent(${s})`,
@@ -52,58 +48,56 @@ export class AuditLogRepository {
             sql`${logs.entityId}::text ilike ${s}`,
             // Match operator username
             exists(
-              db.select({ id: users.id })
+              db
+                .select({ id: users.id })
                 .from(users)
                 .where(and(eq(users.id, logs.userId), sql`unaccent(${users.username}) ilike unaccent(${s})`))
             ),
             // Match Product Name via Device
             exists(
-              db.select({ id: products.id })
+              db
+                .select({ id: products.id })
                 .from(products)
                 .innerJoin(devices, eq(products.deviceId, devices.id))
-                .where(
-                  and(
-                    eq(products.id, logs.entityId),
-                    or(
-                      sql`unaccent(${devices.name}) ilike unaccent(${s})`,
-                      sql`unaccent(${products.description}) ilike unaccent(${s})`
-                    )
-                  )
-                )
+                .where(and(eq(products.id, logs.entityId), or(sql`unaccent(${devices.name}) ilike unaccent(${s})`, sql`unaccent(${products.description}) ilike unaccent(${s})`)))
             ),
             // Match Customer Name
             exists(
-              db.select({ id: customers.id })
+              db
+                .select({ id: customers.id })
                 .from(customers)
                 .where(and(eq(customers.id, logs.entityId), sql`unaccent(${customers.name}) ilike unaccent(${s})`))
             ),
             // Match Provider Name
             exists(
-              db.select({ id: providers.id })
+              db
+                .select({ id: providers.id })
                 .from(providers)
                 .where(and(eq(providers.id, logs.entityId), sql`unaccent(${providers.name}) ilike unaccent(${s})`))
             ),
             // Match Device Name
             exists(
-              db.select({ id: devices.id })
+              db
+                .select({ id: devices.id })
                 .from(devices)
                 .where(and(eq(devices.id, logs.entityId), sql`unaccent(${devices.name}) ilike unaccent(${s})`))
             ),
             // Match Target User Name
             exists(
-              db.select({ id: users.id })
+              db
+                .select({ id: users.id })
                 .from(users)
                 .where(and(eq(users.id, logs.entityId), sql`unaccent(${users.username}) ilike unaccent(${s})`))
             ),
           ];
 
           if (matchingEntities.length > 0) {
-            const entCond = or(...matchingEntities.map(val => eq(logs.entity, val)));
+            const entCond = or(...matchingEntities.map((val) => eq(logs.entity, val)));
             if (entCond) searchConditions.push(entCond);
           }
 
           if (matchingActions.length > 0) {
-            const actCond = or(...matchingActions.map(val => eq(logs.action, val)));
+            const actCond = or(...matchingActions.map((val) => eq(logs.action, val)));
             if (actCond) searchConditions.push(actCond);
           }
 

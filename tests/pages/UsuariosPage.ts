@@ -9,7 +9,7 @@ export const USER_ROLES = {
   VENDEDOR: 'vendedor',
 } as const;
 
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export class UsuariosPage {
   static readonly ROLES = USER_ROLES;
@@ -98,7 +98,9 @@ export class UsuariosPage {
 
     const scroller = this.page.getByTestId('virtuoso-scroller');
     if (await scroller.isVisible()) {
-      await scroller.evaluate(node => { node.scrollTop = node.scrollHeight; });
+      await scroller.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
       await this.page.waitForTimeout(200);
     }
 
@@ -207,7 +209,7 @@ export class UsuariosPage {
    */
   obtenerFilaPorNombre(username: string): Locator {
     return this.page.getByRole('row').filter({
-      has: this.page.getByText(username, { exact: true }).or(this.page.getByTitle(username, { exact: true }))
+      has: this.page.getByText(username, { exact: true }).or(this.page.getByTitle(username, { exact: true })),
     });
   }
 }

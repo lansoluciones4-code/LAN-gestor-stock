@@ -17,7 +17,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   const [payments, setPayments] = useState<SalePaymentInput[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  
+
   // Internal form state
   const [type, setType] = useState<'efectivo' | 'transferencia'>('efectivo');
   const [amount, setAmount] = useState<string>('');
@@ -53,11 +53,12 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
     if (editingIndex !== null) {
       const otherPaymentsTotal = payments.filter((_, i) => i !== editingIndex).reduce((acc, p) => acc + p.amount, 0);
-      if (otherPaymentsTotal + numAmount > total + 0.001) { // small epsilon
+      if (otherPaymentsTotal + numAmount > total + 0.001) {
+        // small epsilon
         setError(`El total excede los $${total.toLocaleString('es-AR')}`);
         return;
       }
-      
+
       const newPayments = [...payments];
       newPayments[editingIndex] = { type, amount: numAmount };
       setPayments(newPayments);
@@ -67,9 +68,9 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
         setError(`El total excede los $${total.toLocaleString('es-AR')}`);
         return;
       }
-      
+
       // Check if type already exists (max 2 rule but different types)
-      const exists = payments.some(p => p.type === type);
+      const exists = payments.some((p) => p.type === type);
       if (exists) {
         setError(`Ya existe un pago en ${type}`);
         return;
@@ -77,7 +78,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
       setPayments([...payments, { type, amount: numAmount }]);
     }
-    
+
     setIsAdding(false);
     setError(null);
   };
@@ -173,11 +174,12 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
           <div className="space-y-2">
             {payments.map((p, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg group">
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg group"
+              >
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10' : 'bg-blue-100 text-blue-600 dark:bg-blue-500/10'}`}>
-                    {p.type === 'efectivo' ? <Banknote className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
-                  </div>
+                  <div className={`p-2 rounded-full ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10' : 'bg-blue-100 text-blue-600 dark:bg-blue-500/10'}`}>{p.type === 'efectivo' ? <Banknote className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}</div>
                   <div>
                     <p className="text-xs font-bold uppercase text-zinc-900 dark:text-zinc-100 tracking-tight">{p.type}</p>
                     <p className="text-sm font-black text-indigo-600">${p.amount.toLocaleString('es-AR')}</p>
@@ -237,13 +239,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                           e.preventDefault();
                           return;
                         }
-                        if (
-                          !/^[0-9]$/.test(e.key) &&
-                          e.key !== ',' &&
-                          !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) &&
-                          !e.ctrlKey &&
-                          !e.metaKey
-                        ) {
+                        if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
                           e.preventDefault();
                         }
                       }}

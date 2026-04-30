@@ -15,6 +15,7 @@
 [2-3 sentence summary of what was reviewed and overall quality]
 
 **Key Metrics:**
+
 - **Files Modified:** X
 - **Lines Changed:** +Y/-Z
 - **Estimated Risk:** 🟢 Low | 🟡 Medium | 🔴 High
@@ -32,6 +33,7 @@
 **Location:** `file.ts:line`
 
 **Issue:**
+
 ```language
 [Code snippet showing the problem]
 ```
@@ -40,6 +42,7 @@
 [Explanation of the security/functional impact]
 
 **Recommendation:**
+
 ```language
 [Code snippet showing the fix]
 ```
@@ -112,6 +115,7 @@
 ## Detailed Analysis
 
 ### Security Review (OWASP Top 10)
+
 - **A01 - Broken Access Control:** [Status]
 - **A02 - Cryptographic Failures:** [Status]
 - **A03 - Injection:** [Status]
@@ -119,11 +123,13 @@
 - **A05 - Security Misconfiguration:** [Status]
 
 ### Performance Analysis
+
 - **Database Queries:** [No N+1 issues | Issues found]
 - **Algorithm Complexity:** [O(n) | Issues found]
 - **Memory Usage:** [Efficient | Concerns noted]
 
 ### Code Quality
+
 - **TypeScript Compliance:** [Strict mode | Issues]
 - **Test Coverage:** [X%]
 - **Complexity:** [Functions < 50 lines | Issues]
@@ -136,15 +142,18 @@
 [If tools were run, include results]
 
 ### npm audit
+
 - **Critical:** X
 - **High:** Y
 - **Medium:** Z
 
 ### ESLint
+
 - **Errors:** X
 - **Warnings:** Y
 
 ### TypeScript
+
 - **Type Errors:** X
 
 ---
@@ -152,10 +161,12 @@
 ## Recommendations Summary
 
 **Before Merge:**
+
 1. [Action item with estimated time]
 2. [Action item with estimated time]
 
 **After Merge (Follow-up):**
+
 1. [Optional improvement]
 2. [Optional refactoring]
 
@@ -166,16 +177,19 @@
 ## Next Steps
 
 **If Approved (✅):**
+
 1. Merge the PR
 2. Monitor deployment
 3. Update metrics
 
 **If Approved with Reservations (⚠️):**
+
 1. Fix critical/high issues
 2. Re-review changes
 3. Merge when fixes confirmed
 
 **If Requires Revision (❌):**
+
 1. Author: Address all critical issues
 2. Author: Push fixes
 3. Reviewer: Full re-review required

@@ -1,8 +1,6 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { EquiposPage } from './pages/EquiposPage';
 import { MESSAGES } from '@/config/messages';
-
 
 // =========================================================================
 // VARIABLES PARA COMPLETAR POR EL USUARIO
@@ -30,13 +28,13 @@ const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería requerir el nombre',
     nombre: '',
-    erroresEsperados: ['El nombre es obligatorio']
+    erroresEsperados: ['El nombre es obligatorio'],
   },
   {
     descripcion: 'Debería respetar el límite máximo',
     nombre: 'e'.repeat(101),
-    erroresEsperados: ['El nombre no puede exceder']
-  }
+    erroresEsperados: ['El nombre no puede exceder'],
+  },
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -45,7 +43,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe.parallel('Gestión de Equipos: Validaciones y Lógica', () => {
-
   for (const caso of CASOS_DE_VALIDACION) {
     test(`Validación: ${caso.descripcion}`, async ({ page }) => {
       const equiposPage = new EquiposPage(page);

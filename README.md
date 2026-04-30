@@ -15,6 +15,7 @@ Welcome to the Phone Center project. This document is your single source of trut
 This project leverages the bleeding edge of the JavaScript/TypeScript ecosystem to deliver uncompromising performance and type safety.
 
 ### Core Frameworks & UI
+
 - **[Next.js 16 (App Router)](https://nextjs.org/)**: The backbone of the application. We use React Server Components (RSC) and **Server Actions** to unify the backend and frontend execution models, explicitly avoiding standalone API routes.
 - **[React 19](https://react.dev/)**: Utilizing concurrent rendering features and hooks (`useTransition`, `useActionState`).
 - **[Tailwind CSS v4](https://tailwindcss.com/)**: Utility-first CSS engine handling layout constraints and responsive design.
@@ -22,10 +23,12 @@ This project leverages the bleeding edge of the JavaScript/TypeScript ecosystem 
 - **[Playwright](https://playwright.dev/)**: End-to-End (E2E) testing framework guaranteeing critical business flows.
 
 ### State Management & Forms
+
 - **[Zustand](https://github.com/pmndrs/zustand)**: Lightweight global state management. Used primarily for client-side entity synchronization (e.g., `useSaleStore`, `useProductStore`) avoiding deeply nested React Contexts.
 - **[React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)**: End-to-end type safety. Zod schemas bridge the client payload into backend Server Actions with rigorous validation.
 
 ### Back-End Engine & Infrastructure
+
 - **[PostgreSQL](https://www.postgresql.org/)**: Relational database orchestrating transactional integrity.
 - **[Drizzle ORM](https://orm.drizzle.team/)**: High-performance, edge-ready Object Relational Mapper bridging TypeScript schemas with Postgres.
 - **[jose](https://github.com/panva/jose) & [bcrypt](https://www.npmjs.com/package/bcrypt)**: Cryptographically secure password hashing and Edge-compatible JSON Web Tokens (JWT) for authentication.
@@ -37,6 +40,7 @@ This project leverages the bleeding edge of the JavaScript/TypeScript ecosystem 
 The project strictly follows a **Feature-Oriented Clean Architecture**. Code is grouped by business capability (feature) rather than technical role.
 
 ### Directory Structure
+
 ```text
 src/
   app/              # Next.js App Router (Pages, Layouts, Routing)
@@ -52,21 +56,21 @@ src/
 ```
 
 ### Strict Layer Separation
+
 - **Domain Layer (`domain/`)**: Pure business logic and data shapes (Zod schemas). Zero external dependencies.
 - **Infrastructure Layer (`repository/`)**: Database access via Drizzle. **Repositories never handle HTTP or UI logic.**
 - **Application Layer (`actions/`)**: Thin Server Actions that validate input (via Zod), call the repository, and return a typed `ActionResult`. **Business logic never lives in UI components.**
 - **Presentation Layer (`app/` & `ui/`)**: React components. They consume Server Actions and Zustand stores. They never query the database directly.
 
 ### Coding Standards
+
 1. **SOLID Principles**: Single Responsibility (functions do one thing), Dependency Inversion (depend on abstractions).
-2. **Type-Safety (Zod)**: We use a dual-schema pattern. 
+2. **Type-Safety (Zod)**: We use a dual-schema pattern.
    - `InputSchema` (e.g., `userSchema`): Validates incoming data from forms.
    - `DefSchema` (e.g., `userDefSchema`): The Source of Truth representing the database record.
 3. **Action Results**: All Server Actions must return a standardized `ActionResult<T>` type instead of throwing raw errors to the client:
    ```typescript
-   type ActionResult<T = void> = 
-     | { success: true; data: T } 
-     | { success: false; error: string };
+   type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string };
    ```
 4. **Zustand Naming**: Store hooks must use singular naming conventions (e.g., `useCustomerStore` instead of `useCustomersStore`).
 5. **Concurrency**: Assume operations run concurrently. Use `Promise.all` for independent async operations.
@@ -76,22 +80,29 @@ src/
 ## 📜 Business Rules
 
 ### 1. Dual-Layer Security & RBAC
+
 Security enforces Strict Role-Based Access Control (`admin` vs `vendedor`).
+
 - **Edge Middleware (`middleware.ts`)**: Evaluates HttpOnly Session Cookies. Unauthenticated users are redirected to `/login`.
 - **Action Authorization**: Every mutation validates permissions (`verifyAuthOrAdmin`). `vendedor` roles cannot mock backend payloads to execute admin-only actions.
 
 ### 2. Relational Integrity & Soft Deletes
-To preserve Foreign Key (FK) integrity and historical audit data, the system relies on **Conditional Soft Deletes**. 
+
+To preserve Foreign Key (FK) integrity and historical audit data, the system relies on **Conditional Soft Deletes**.
 If an entity (Provider, Device, Customer) has been part of a transaction, it is restricted to a Soft Delete (`isActive: false`). It is removed from operational views but kept intact for the database.
 
 ### 3. Point of Sale (POS) & Stock Automation
+
 When a sale is confirmed via the POS interface, the system processes a database transaction that:
+
 1. Records the sale and associates it with the vendor and customer.
 2. Automatically decrements `stock` for all purchased products.
 3. Registers the sale revenue in the dashboard analytics.
 
 ### 4. High-Fidelity Audit Logging
+
 Every critical operation (`CREAR`, `ACTUALIZAR`, `ELIMINAR`, `LOGIN`, `PÉRDIDA`) is recorded in the Audit Log.
+
 - The log captures the User ID, Entity ID, timestamp, and a JSON payload of the affected data.
 - The Audit Panel allows filtering by generic terms (e.g., searching "baja" will find "ELIMINAR" events) using the Postgres `unaccent` extension for robust, accent-insensitive search.
 
@@ -114,10 +125,12 @@ Every critical operation (`CREAR`, `ACTUALIZAR`, `ELIMINAR`, `LOGIN`, `PÉRDIDA`
 ## 🚀 Local Development Setup
 
 ### Prerequisites
+
 - Node.js >= 18
 - Docker & Docker Compose (for PostgreSQL)
 
 ### 1. Clone & Install
+
 ```bash
 git clone <repository-url>
 cd StockManagementApp
@@ -125,7 +138,9 @@ npm install
 ```
 
 ### 2. Environment Configuration
+
 Create a `.env` file at the root of the project:
+
 ```env
 # Connects to the local Docker Postgres instance on port 5433
 DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
@@ -133,13 +148,17 @@ JWT_SECRET=super_secret_dev_key_change_me_later
 ```
 
 ### 3. Spawn Database Infrastructure
+
 Start the PostgreSQL container (binds to port `5433` to prevent clashes with local DBs):
+
 ```bash
 docker compose up -d
 ```
 
 ### 4. Database Setup & Seeding
+
 Generate the schema, apply migrations, enable the unaccent extension, and seed the initial data:
+
 ```bash
 # Push SQL schemas to the database
 npm run db:generate
@@ -153,12 +172,15 @@ npm run db:seed
 ```
 
 ### 5. Start the Development Server
+
 ```bash
 npm run dev
 ```
+
 Navigate to `http://localhost:3000`.
 
 **Default Administrative Credentials:**
+
 - **User:** `admin`
 - **Pass:** `admin`
 
@@ -168,19 +190,19 @@ Navigate to `http://localhost:3000`.
 
 The `package.json` includes several utility scripts to streamline your workflow:
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Starts the Next.js development server with Turbopack. |
-| `npm run build` | Creates an optimized production build. |
-| `npm run lint` | Runs ESLint to verify code quality. |
-| `npm run db:generate` | Generates Drizzle SQL migration files based on schema changes. |
-| `npm run db:migrate` | Applies pending Drizzle migrations to the database. |
-| `npm run db:seed` | Injects foundational data (like the master admin account). |
-| `npm run db:reset-data` | Clears and resets standard operational data (useful for dev testing). |
-| `npm run db:reset-full` | Wipes the entire database completely (Warning: Destructive). |
+| Command                  | Description                                                           |
+| ------------------------ | --------------------------------------------------------------------- |
+| `npm run dev`            | Starts the Next.js development server with Turbopack.                 |
+| `npm run build`          | Creates an optimized production build.                                |
+| `npm run lint`           | Runs ESLint to verify code quality.                                   |
+| `npm run db:generate`    | Generates Drizzle SQL migration files based on schema changes.        |
+| `npm run db:migrate`     | Applies pending Drizzle migrations to the database.                   |
+| `npm run db:seed`        | Injects foundational data (like the master admin account).            |
+| `npm run db:reset-data`  | Clears and resets standard operational data (useful for dev testing). |
+| `npm run db:reset-full`  | Wipes the entire database completely (Warning: Destructive).          |
 | `npm run db:stress-test` | Runs a script to flood the DB with mock data for performance testing. |
-| `npx playwright test` | Executes the End-to-End (E2E) test suite via Playwright. |
+| `npx playwright test`    | Executes the End-to-End (E2E) test suite via Playwright.              |
 
 ---
 
-*Code is meant to be read by humans, and occasionally compiled by machines. Prioritize the clean code lifecycle.*
+_Code is meant to be read by humans, and occasionally compiled by machines. Prioritize the clean code lifecycle._

@@ -1,4 +1,3 @@
-
 import { MESSAGES } from '@/config/messages';
 
 /**
@@ -9,14 +8,9 @@ export function handleDatabaseError(error: any, entityName: string): string {
   const code = error.code || error.originalError?.code || '';
   const message = (error.message || '').toLowerCase();
   const detail = (error.detail || error.originalError?.detail || '').toLowerCase();
-  
+
   // El código 23503 es el estándar de Postgres para Foreign Key Violation
-  const isForeignKey = code === '23503' || 
-                       message.includes('23503') || 
-                       message.includes('foreign key') || 
-                       message.includes('violates foreign key constraint') ||
-                       detail.includes('foreign key') ||
-                       detail.includes('violates foreign key constraint');
+  const isForeignKey = code === '23503' || message.includes('23503') || message.includes('foreign key') || message.includes('violates foreign key constraint') || detail.includes('foreign key') || detail.includes('violates foreign key constraint');
 
   if (isForeignKey) {
     return MESSAGES.ERROR.DATABASE.RELATION_NOT_FOUND;

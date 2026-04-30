@@ -5,6 +5,7 @@ description: Check file watcher alerts for oversized files needing refactoring
 Check for unread alerts from the background file watcher that monitors code file sizes in real-time.
 
 **When to use this:**
+
 - You want to see if any files you recently edited exceeded size thresholds
 - You want to check alerts before starting a work session
 - The watcher has been running and you want to catch up on alerts

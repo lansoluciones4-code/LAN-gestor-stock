@@ -66,7 +66,7 @@ function displayAlerts() {
   }
 
   // Filter unread alerts
-  const unreadAlerts = alerts.filter(alert => !alert.read);
+  const unreadAlerts = alerts.filter((alert) => !alert.read);
 
   // No unread alerts
   if (unreadAlerts.length === 0) {
@@ -78,9 +78,9 @@ function displayAlerts() {
 
   // Group alerts by severity
   const grouped = {
-    critical: unreadAlerts.filter(a => a.level === 'critical'),
-    alert: unreadAlerts.filter(a => a.level === 'alert'),
-    warning: unreadAlerts.filter(a => a.level === 'warning'),
+    critical: unreadAlerts.filter((a) => a.level === 'critical'),
+    alert: unreadAlerts.filter((a) => a.level === 'alert'),
+    warning: unreadAlerts.filter((a) => a.level === 'warning'),
   };
 
   // Display header
@@ -93,7 +93,7 @@ function displayAlerts() {
   // Display critical alerts
   if (grouped.critical.length > 0) {
     console.log(`${colors.red}${colors.bold}CRITICAL (🛑 Must refactor immediately):${colors.reset}`);
-    grouped.critical.forEach(alert => {
+    grouped.critical.forEach((alert) => {
       const growth = alert.lineGrowth ? ` - grew by ${alert.lineGrowth} lines` : '';
       console.log(`${colors.red}  • ${alert.file}${colors.reset} (${alert.lines} lines)${growth}`);
     });
@@ -103,7 +103,7 @@ function displayAlerts() {
   // Display alert-level alerts
   if (grouped.alert.length > 0) {
     console.log(`${colors.yellow}${colors.bold}ALERT (⚠️  Should refactor before adding more):${colors.reset}`);
-    grouped.alert.forEach(alert => {
+    grouped.alert.forEach((alert) => {
       const growth = alert.lineGrowth ? ` - grew by ${alert.lineGrowth} lines` : '';
       console.log(`${colors.yellow}  • ${alert.file}${colors.reset} (${alert.lines} lines)${growth}`);
     });
@@ -113,7 +113,7 @@ function displayAlerts() {
   // Display warnings
   if (grouped.warning.length > 0) {
     console.log(`${colors.cyan}${colors.bold}WARNING (💡 Watch closely):${colors.reset}`);
-    grouped.warning.forEach(alert => {
+    grouped.warning.forEach((alert) => {
       const growth = alert.lineGrowth ? ` - grew by ${alert.lineGrowth} lines` : '';
       console.log(`${colors.cyan}  • ${alert.file}${colors.reset} (${alert.lines} lines)${growth}`);
     });
@@ -132,7 +132,7 @@ function displayAlerts() {
   console.log('');
 
   // Mark alerts as read
-  alerts.forEach(alert => {
+  alerts.forEach((alert) => {
     if (!alert.read && unreadAlerts.includes(alert)) {
       alert.read = true;
     }

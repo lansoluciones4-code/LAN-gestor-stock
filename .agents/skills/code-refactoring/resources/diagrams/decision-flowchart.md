@@ -254,18 +254,21 @@ flowchart TD
 ## 📖 How to Read These Diagrams
 
 **Shapes:**
+
 - `([Start/End])` - Start or end point
 - `[Action]` - Action to take
 - `{Decision?}` - Decision point
 - `[[Process]]` - Sub-process
 
 **Colors (in Mermaid renderers):**
+
 - Green - Success/good state
 - Yellow - Warning/caution
 - Red - Error/stop
 - Blue - Process/action
 
 **Arrows:**
+
 - `-->` - Flow direction
 - `|Label|` - Condition or note
 
@@ -274,12 +277,14 @@ flowchart TD
 ## 🔗 Usage
 
 **Copy these diagrams into:**
+
 - GitHub/GitLab wikis (supports Mermaid)
 - Documentation sites (most support Mermaid)
 - Presentations (render as images)
 - README files (GitHub supports Mermaid)
 
 **Online editors:**
+
 - https://mermaid.live/ - Test and export diagrams
 - https://www.mermaidchart.com/ - Create and share
 

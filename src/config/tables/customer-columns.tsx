@@ -14,7 +14,10 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
       header: 'Nombre / Cliente',
       cellClassName: 'max-w-[200px]',
       cell: (c) => (
-        <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0" title={c.name}>
+        <div
+          className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0"
+          title={c.name}
+        >
           <span className="truncate">{c.name}</span>
           {!c.isActive && <span className="shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
         </div>
@@ -33,11 +36,7 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
     {
       header: 'Email',
       cellClassName: 'text-zinc-500 max-w-[150px] truncate',
-      cell: (c) => (
-        <span title={c.email || '--'}>
-          {c.email || '--'}
-        </span>
-      ),
+      cell: (c) => <span title={c.email || '--'}>{c.email || '--'}</span>,
     },
     {
       header: 'Acciones',

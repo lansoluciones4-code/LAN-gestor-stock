@@ -77,13 +77,9 @@ export function ProvidersPanel() {
     return displayProviders
       .filter((p) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        const combinedText = [
-          normalizeForSearch(p.name),
-          normalizeForSearch(p.email),
-          normalizeForSearch(p.phone)
-        ].join(' ');
+        const combinedText = [normalizeForSearch(p.name), normalizeForSearch(p.email), normalizeForSearch(p.phone)].join(' ');
 
-        const matchesSearch = terms.every(word => combinedText.includes(word));
+        const matchesSearch = terms.every((word) => combinedText.includes(word));
         const matchesStatus = showInactive ? true : p.isActive;
         return matchesSearch && matchesStatus;
       })

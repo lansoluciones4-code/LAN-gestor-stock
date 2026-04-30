@@ -6,10 +6,7 @@ import { ConcurrencyError } from '@/lib/errors';
 
 export class ProductRepository {
   async checkHasRelations(id: string, dbtx: any = db) {
-    const [item, loss] = await Promise.all([
-      dbtx.query.saleItems.findFirst({ where: (items: any, { eq }: any) => eq(items.productId, id) }), 
-      dbtx.query.productLosses.findFirst({ where: (l: any, { eq }: any) => eq(l.productId, id) })
-    ]);
+    const [item, loss] = await Promise.all([dbtx.query.saleItems.findFirst({ where: (items: any, { eq }: any) => eq(items.productId, id) }), dbtx.query.productLosses.findFirst({ where: (l: any, { eq }: any) => eq(l.productId, id) })]);
     return !!item || !!loss;
   }
 
@@ -78,9 +75,9 @@ export class ProductRepository {
   }
 
   async updateProduct(id: string, input: ProductUpdateInput, dbtx: any = db) {
-    const updateData: any = { 
+    const updateData: any = {
       updatedAt: sql`NOW()`,
-      version: sql`${products.version} + 1`
+      version: sql`${products.version} + 1`,
     };
 
     if (input.deviceId !== undefined) updateData.deviceId = input.deviceId;
@@ -88,7 +85,7 @@ export class ProductRepository {
     if (input.description !== undefined) updateData.description = input.description;
     if (input.purchasePrice !== undefined) updateData.purchasePrice = input.purchasePrice?.toString();
     if (input.salePrice !== undefined) updateData.salePrice = input.salePrice?.toString();
-    
+
     if (input.stockDelta !== undefined) {
       updateData.stock = sql`${products.stock} + ${input.stockDelta}`;
     } else if (input.stock !== undefined) {

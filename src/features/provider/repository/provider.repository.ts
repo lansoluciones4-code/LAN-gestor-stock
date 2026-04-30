@@ -22,10 +22,10 @@ export class ProviderRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(providers)
-      .set({ 
-        isActive, 
+      .set({
+        isActive,
         updatedAt: sql`NOW()`,
-        version: sql`${providers.version} + 1` 
+        version: sql`${providers.version} + 1`,
       })
       .where(eq(providers.id, id))
       .returning();
@@ -73,9 +73,9 @@ export class ProviderRepository {
   }
 
   async updateProvider(id: string, input: ProviderUpdateInput, dbtx: any = db) {
-    const updateData: any = { 
+    const updateData: any = {
       updatedAt: sql`NOW()`,
-      version: sql`${providers.version} + 1`
+      version: sql`${providers.version} + 1`,
     };
 
     if (input.name !== undefined) {

@@ -9,6 +9,7 @@ This skill helps Claude create frontend UIs that avoid generic "AI slop" pattern
 ## The Problem This Solves
 
 Without explicit guidance, Claude tends to default to:
+
 - Generic fonts (Inter, Roboto, Arial)
 - Predictable color schemes (white backgrounds with purple accents)
 - Conservative layouts lacking visual interest
@@ -54,24 +55,28 @@ You should see the SKILL.md file.
 The skill provides guidance on **four key design dimensions**:
 
 ### 1. Typography
+
 - Distinctive font alternatives to overused choices
 - High-contrast pairing strategies
 - Extreme weight variations for visual hierarchy
 - Dramatic size jumps (3x+, not 1.5x)
 
 ### 2. Color & Theme
+
 - Cohesive aesthetic themes (Cyberpunk, Brutalist, Terminal, etc.)
 - Dominant colors with sharp accents
 - CSS variable strategies for consistency
 - IDE-inspired color palettes
 
 ### 3. Motion
+
 - CSS-only animations for HTML
 - Framer Motion patterns for React
 - High-impact orchestrated page loads
 - Staggered reveal techniques
 
 ### 4. Backgrounds
+
 - Layered CSS gradients
 - Geometric patterns (grids, dots, stripes)
 - Contextual effects matching aesthetics
@@ -103,23 +108,29 @@ When you request a UI, Claude will:
 ## Key Features
 
 ### Avoid "AI Slop"
+
 The skill includes explicit warnings against:
+
 - Overused fonts (Inter, Roboto, Arial)
 - Clichéd color schemes (purple on white)
 - Predictable layouts and patterns
 - Generic designs lacking character
 
 ### Theme Variety
+
 Includes guidance for diverse aesthetics:
+
 - **Tech**: Terminal, Cyberpunk, Hacker
 - **Creative**: Vaporwave, Memphis, Brutalist
 - **Professional**: Swiss, Minimalist, Editorial
 - **Organic**: Solarpunk, Nature-inspired
 
 ### Font Rotation
+
 Provides 6+ distinctive font combination sets to ensure variety across projects
 
 ### Technical Best Practices
+
 - CSS custom properties for theming
 - Responsive mobile-first design
 - Performance-conscious animations
@@ -128,6 +139,7 @@ Provides 6+ distinctive font combination sets to ensure variety across projects
 ## Examples
 
 ### Developer Portfolio (Terminal Aesthetic)
+
 ```
 Theme: Terminal/Hacker with green accents
 Fonts: JetBrains Mono throughout
@@ -137,6 +149,7 @@ Background: Grid pattern with scanlines
 ```
 
 ### Creative Agency (Brutalist)
+
 ```
 Theme: Swiss Brutalist
 Fonts: Clash Display (900) + Space Grotesk (300)
@@ -146,6 +159,7 @@ Background: Noise texture
 ```
 
 ### App Dashboard (Neo-Tokyo)
+
 ```
 Theme: Neo-Tokyo night
 Fonts: Outfit + IBM Plex Mono
@@ -164,6 +178,7 @@ Background: Radial gradient with grid
 ## Quality Standards
 
 Every UI created with this skill is checked against:
+
 - Font distinctiveness
 - Color scheme originality
 - Typography contrast (weight and size)
@@ -175,6 +190,7 @@ Every UI created with this skill is checked against:
 ## Research Foundation
 
 This skill is based on:
+
 - [Anthropic's Frontend Aesthetics Cookbook](https://github.com/anthropics/claude-cookbooks/blob/main/coding/prompting_for_frontend_aesthetics.ipynb)
 - Research on Claude's default design tendencies
 - Comparative testing of prompting strategies

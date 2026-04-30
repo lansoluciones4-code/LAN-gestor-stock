@@ -35,7 +35,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-8 animate-in fade-in duration-500 overflow-y-auto pr-2 custom-scrollbar pb-10 outline-none ring-0 focus:ring-0 focus-visible:ring-0" tabIndex={-1}>
+    <div
+      className="flex flex-col h-full space-y-8 animate-in fade-in duration-500 overflow-y-auto pr-2 custom-scrollbar pb-10 outline-none ring-0 focus:ring-0 focus-visible:ring-0"
+      tabIndex={-1}
+    >
       {/* Header & Filter */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 shrink-0">
         <div>
@@ -200,7 +203,12 @@ export default function DashboardPage() {
                     <td className="px-8 py-5 flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 font-bold">{seller.username[0].toUpperCase()}</div>
                       <div className="min-w-0">
-                        <p className="font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px]" title={seller.username}>{seller.username}</p>
+                        <p
+                          className="font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px]"
+                          title={seller.username}
+                        >
+                          {seller.username}
+                        </p>
                         <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter truncate max-w-[180px]">Responsable de Ventas</p>
                       </div>
                     </td>

@@ -99,19 +99,14 @@ export class SaleRepository {
           version: sql`${products.version} + 1`,
           updatedAt: sql`NOW()`,
         })
-        .where(
-          and(
-            eq(products.id, item.productId),
-            gte(products.stock, item.quantity)
-          )
-        )
+        .where(and(eq(products.id, item.productId), gte(products.stock, item.quantity)))
         .returning();
 
       if (updated.length === 0) {
         throw new Error('Conflicto de stock: el inventario cambió durante la operación.');
       }
     }
-    
+
     // 4. Insert payments
     if (input.payments && input.payments.length > 0) {
       for (const p of input.payments) {

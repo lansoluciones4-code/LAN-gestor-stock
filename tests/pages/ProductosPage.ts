@@ -84,7 +84,7 @@ export class ProductosPage {
 
   async hacerScrollHastaVisible(nombre: string) {
     const fila = this.page.getByRole('row').filter({
-      has: this.page.getByText(nombre, { exact: true }).or(this.page.getByTitle(nombre, { exact: true }))
+      has: this.page.getByText(nombre, { exact: true }).or(this.page.getByTitle(nombre, { exact: true })),
     });
     if (await fila.isVisible()) return;
 
@@ -95,7 +95,9 @@ export class ProductosPage {
 
     const scroller = this.page.getByTestId('virtuoso-scroller');
     if (await scroller.isVisible()) {
-      await scroller.evaluate(node => { node.scrollTop = node.scrollHeight; });
+      await scroller.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
       await this.page.waitForTimeout(200);
     }
 
@@ -226,9 +228,9 @@ export class ProductosPage {
     const fila = this.obtenerFila(equipo, proveedor, descActual);
     // Asumimos que hay un switch o botón relacionado a la visibilidad en la landing
     await fila.getByRole('button', { name: ProductosPage.UI.BTN_OCULTAR, exact: true }).click();
-    
+
     // Esperar un momento si hay una mutación optimista o un guardado automático
-    await this.page.waitForTimeout(500); 
+    await this.page.waitForTimeout(500);
     await this.borrarBusqueda();
   }
 
@@ -246,7 +248,7 @@ export class ProductosPage {
     await this.btnSincronizar.click();
   }
 
-  async inyectarProductoEfimero(): Promise<{ descripcion: string, equipo: string, proveedor: string, stock: number, purchasePrice: string, salePrice: string }> {
+  async inyectarProductoEfimero(): Promise<{ descripcion: string; equipo: string; proveedor: string; stock: number; purchasePrice: string; salePrice: string }> {
     const hash = Math.random().toString(36).substring(2, 8);
     const equipo = `Eq Efim ${hash}`;
     const proveedor = {
@@ -275,7 +277,12 @@ export class ProductosPage {
 
     await this.sincronizar();
     return {
-      descripcion, equipo, proveedor: proveedor.name, stock, purchasePrice, salePrice
+      descripcion,
+      equipo,
+      proveedor: proveedor.name,
+      stock,
+      purchasePrice,
+      salePrice,
     };
   }
 
@@ -292,19 +299,19 @@ export class ProductosPage {
 
     if (equipo) {
       fila = fila.filter({
-        has: this.page.getByText(equipo, { exact: true }).or(this.page.getByTitle(equipo, { exact: true }))
+        has: this.page.getByText(equipo, { exact: true }).or(this.page.getByTitle(equipo, { exact: true })),
       });
     }
 
     if (proveedor) {
       fila = fila.filter({
-        has: this.page.getByText(proveedor, { exact: true }).or(this.page.getByTitle(proveedor, { exact: true }))
+        has: this.page.getByText(proveedor, { exact: true }).or(this.page.getByTitle(proveedor, { exact: true })),
       });
     }
 
     if (desc) {
       fila = fila.filter({
-        has: this.page.getByText(desc, { exact: true }).or(this.page.getByTitle(desc, { exact: true }))
+        has: this.page.getByText(desc, { exact: true }).or(this.page.getByTitle(desc, { exact: true })),
       });
     }
 

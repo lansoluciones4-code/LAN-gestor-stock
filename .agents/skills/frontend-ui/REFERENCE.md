@@ -7,6 +7,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ### Monospace Fonts
 
 **For code, technical, or terminal aesthetics**:
+
 - JetBrains Mono - Clean, developer-focused
 - Fira Code - Programming ligatures
 - IBM Plex Mono - Corporate tech feel
@@ -18,6 +19,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ### Display/Geometric Fonts
 
 **For bold headings and modern aesthetics**:
+
 - Clash Display - Sharp, geometric
 - Epilogue - Versatile display font
 - Syne - Unusual letterforms
@@ -29,6 +31,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ### Serif Fonts
 
 **For elegance, editorial, or classic aesthetics**:
+
 - Playfair Display - High contrast, elegant
 - Crimson Pro - Book-style serif
 - Libre Baskerville - Traditional
@@ -39,14 +42,14 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 
 ### Font Pairing Matrix
 
-| Heading | Body | Style | Use Case |
-|---------|------|-------|----------|
-| Clash Display | JetBrains Mono | Geometric + Mono | Tech products, dev tools |
-| Playfair Display | Space Grotesk | Serif + Geometric | Editorial, portfolios |
-| Syne | Fira Code | Unusual + Mono | Experimental, creative tech |
-| Crimson Pro | Outfit | Serif + Sans | Professional, elegant |
-| Space Mono | Space Mono | Mono + Mono | Terminal, retro-future |
-| Clash Display | Manrope | Display + Rounded | Modern apps, SaaS |
+| Heading          | Body           | Style             | Use Case                    |
+| ---------------- | -------------- | ----------------- | --------------------------- |
+| Clash Display    | JetBrains Mono | Geometric + Mono  | Tech products, dev tools    |
+| Playfair Display | Space Grotesk  | Serif + Geometric | Editorial, portfolios       |
+| Syne             | Fira Code      | Unusual + Mono    | Experimental, creative tech |
+| Crimson Pro      | Outfit         | Serif + Sans      | Professional, elegant       |
+| Space Mono       | Space Mono     | Mono + Mono       | Terminal, retro-future      |
+| Clash Display    | Manrope        | Display + Rounded | Modern apps, SaaS           |
 
 ## Theme Library
 
@@ -162,10 +165,18 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-.stagger-item:nth-child(1) { animation-delay: 0.1s; }
-.stagger-item:nth-child(2) { animation-delay: 0.2s; }
-.stagger-item:nth-child(3) { animation-delay: 0.3s; }
-.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stagger-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stagger-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stagger-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
 @keyframes fadeInUp {
   from {
@@ -186,17 +197,25 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
   overflow: hidden;
   border-right: 2px solid;
   white-space: nowrap;
-  animation: typing 3s steps(40) 1s forwards, blink 0.75s step-end infinite;
+  animation:
+    typing 3s steps(40) 1s forwards,
+    blink 0.75s step-end infinite;
   width: 0;
 }
 
 @keyframes typing {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 @keyframes blink {
-  50% { border-color: transparent; }
+  50% {
+    border-color: transparent;
+  }
 }
 ```
 
@@ -208,7 +227,8 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 }
 
 @keyframes glowPulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(0, 255, 159, 0.5);
   }
   50% {
@@ -250,9 +270,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 
 ```css
 .grid-bg {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 50px 50px;
 }
 ```
@@ -261,11 +279,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 
 ```css
 .dots-bg {
-  background-image: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.1) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 ```
@@ -274,13 +288,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 
 ```css
 .stripes-bg {
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    rgba(255, 255, 255, 0.05) 10px,
-    rgba(255, 255, 255, 0.05) 20px
-  );
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 20px);
 }
 ```
 
@@ -288,18 +296,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 
 ```css
 .gradient-layers {
-  background:
-    radial-gradient(
-      circle at 20% 50%,
-      rgba(120, 0, 255, 0.3) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 80%,
-      rgba(0, 255, 200, 0.2) 0%,
-      transparent 50%
-    ),
-    linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+  background: radial-gradient(circle at 20% 50%, rgba(120, 0, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(0, 255, 200, 0.2) 0%, transparent 50%), linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
 }
 ```
 
@@ -326,13 +323,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15) 0px,
-    transparent 1px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.15) 3px
-  );
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, transparent 1px, transparent 2px, rgba(0, 0, 0, 0.15) 3px);
   pointer-events: none;
 }
 ```
@@ -412,37 +403,43 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 /* Base styles: Mobile (< 640px) */
 
 /* Tablet */
-@media (min-width: 640px) { }
+@media (min-width: 640px) {
+}
 
 /* Laptop */
-@media (min-width: 1024px) { }
+@media (min-width: 1024px) {
+}
 
 /* Desktop */
-@media (min-width: 1280px) { }
+@media (min-width: 1280px) {
+}
 
 /* Large Desktop */
-@media (min-width: 1536px) { }
+@media (min-width: 1536px) {
+}
 ```
 
 ## Typography Scale
 
 ### Extreme Contrast Scale
+
 ```css
 :root {
-  --text-xs: 0.75rem;    /* 12px */
-  --text-sm: 0.875rem;   /* 14px */
-  --text-base: 1rem;     /* 16px */
-  --text-lg: 1.25rem;    /* 20px */
-  --text-xl: 1.5rem;     /* 24px */
-  --text-2xl: 2rem;      /* 32px */
-  --text-3xl: 3rem;      /* 48px */
-  --text-4xl: 4rem;      /* 64px */
-  --text-5xl: 6rem;      /* 96px */
-  --text-6xl: 8rem;      /* 128px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.25rem; /* 20px */
+  --text-xl: 1.5rem; /* 24px */
+  --text-2xl: 2rem; /* 32px */
+  --text-3xl: 3rem; /* 48px */
+  --text-4xl: 4rem; /* 64px */
+  --text-5xl: 6rem; /* 96px */
+  --text-6xl: 8rem; /* 128px */
 }
 ```
 
 ### Weight Variations
+
 ```css
 :root {
   --weight-thin: 100;
@@ -460,11 +457,13 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ## Accessibility Guidelines
 
 ### Minimum Contrast Ratios
+
 - Normal text: 4.5:1
 - Large text (18pt+): 3:1
 - Interactive elements: 3:1
 
 ### Focus States
+
 ```css
 *:focus-visible {
   outline: 2px solid var(--accent-primary);
@@ -473,6 +472,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ```
 
 ### Motion Preferences
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -488,12 +488,15 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ## Performance Tips
 
 ### Efficient Animations
+
 ```css
 /* Use transform and opacity - these don't trigger layout */
 .efficient-animation {
   transform: translateX(0);
   opacity: 1;
-  transition: transform 0.3s, opacity 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
 }
 
 /* Avoid animating these properties */
@@ -501,6 +504,7 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ```
 
 ### GPU Acceleration
+
 ```css
 .gpu-accelerated {
   will-change: transform;
@@ -509,10 +513,21 @@ Extended reference for creating aesthetically distinctive frontend interfaces.
 ```
 
 ### Font Loading Strategy
+
 ```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Font+Name:wght@100;900&display=swap" rel="stylesheet">
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+/>
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Font+Name:wght@100;900&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 ## Quick Reference Checklist
@@ -543,4 +558,4 @@ Creating a new UI? Use this checklist:
 
 ---
 
-*Based on Anthropic's Frontend Aesthetics Research*
+_Based on Anthropic's Frontend Aesthetics Research_

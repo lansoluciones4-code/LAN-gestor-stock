@@ -1,14 +1,12 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { ProveedoresPage } from './pages/ProveedoresPage';
 
-
 /**
  * Suite de Pruebas E2E: Gestión de Proveedores
- * 
+ *
  * Este archivo de pruebas verifica la gestión de proveedores, asegurando
  * que la base de datos retorne a su estado original al finalizar.
- * 
+ *
  * Cobertura de pruebas:
  * - Autenticación y navegación inicial.
  * - Validaciones de formulario (campos requeridos, límites de longitud).
@@ -19,46 +17,60 @@ import { ProveedoresPage } from './pages/ProveedoresPage';
 const CASOS_DE_VALIDACION = [
   {
     descripcion: 'Debería requerir todos los campos',
-    nombre: '', telefono: '', correo: '',
-    erroresEsperados: ['El nombre debe tener al menos', 'El teléfono es obligatorio', 'Formato de correo electrónico']
+    nombre: '',
+    telefono: '',
+    correo: '',
+    erroresEsperados: ['El nombre debe tener al menos', 'El teléfono es obligatorio', 'Formato de correo electrónico'],
   },
   {
     descripcion: 'Debería requerir el nombre',
-    nombre: '', telefono: '291 7181273', correo: 'correo@ejemplo.com',
-    erroresEsperados: ['El nombre debe tener al menos']
+    nombre: '',
+    telefono: '291 7181273',
+    correo: 'correo@ejemplo.com',
+    erroresEsperados: ['El nombre debe tener al menos'],
   },
   {
     descripcion: 'Debería requerir el teléfono',
-    nombre: 'Proveedor de Prueba', telefono: '', correo: 'correo@ejemplo.com',
-    erroresEsperados: ['El teléfono es obligatorio']
+    nombre: 'Proveedor de Prueba',
+    telefono: '',
+    correo: 'correo@ejemplo.com',
+    erroresEsperados: ['El teléfono es obligatorio'],
   },
   {
     descripcion: 'Debería requerir el correo',
-    nombre: 'Proveedor de Prueba', telefono: '291 7181273', correo: '',
-    erroresEsperados: ['Formato de correo electrónico']
+    nombre: 'Proveedor de Prueba',
+    telefono: '291 7181273',
+    correo: '',
+    erroresEsperados: ['Formato de correo electrónico'],
   },
   {
     descripcion: 'Debería requerir nombre y teléfono',
-    nombre: '', telefono: '', correo: 'correo@ejemplo.com',
-    erroresEsperados: ['El nombre debe tener al menos', 'El teléfono es obligatorio']
+    nombre: '',
+    telefono: '',
+    correo: 'correo@ejemplo.com',
+    erroresEsperados: ['El nombre debe tener al menos', 'El teléfono es obligatorio'],
   },
   {
     descripcion: 'Debería requerir nombre y correo',
-    nombre: '', telefono: '291 7181273', correo: '',
-    erroresEsperados: ['El nombre debe tener al menos', 'Formato de correo electrónico']
+    nombre: '',
+    telefono: '291 7181273',
+    correo: '',
+    erroresEsperados: ['El nombre debe tener al menos', 'Formato de correo electrónico'],
   },
   {
     descripcion: 'Debería requerir teléfono y correo',
-    nombre: 'Proveedor de Prueba', telefono: '', correo: '',
-    erroresEsperados: ['El teléfono es obligatorio', 'Formato de correo electrónico']
+    nombre: 'Proveedor de Prueba',
+    telefono: '',
+    correo: '',
+    erroresEsperados: ['El teléfono es obligatorio', 'Formato de correo electrónico'],
   },
   {
     descripcion: 'Debería respetar los límites de longitud máxima de los campos',
     nombre: 'erroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadosaaaaa',
     telefono: '1234567891234567890012345678901',
     correo: 'erroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsperadoserroresEsper@algo.com',
-    erroresEsperados: ['Nombre demasiado largo', 'Número de teléfono demasiado', 'El correo electrónico es']
-  }
+    erroresEsperados: ['Nombre demasiado largo', 'Número de teléfono demasiado', 'El correo electrónico es'],
+  },
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -67,7 +79,6 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe.parallel('Gestión de Proveedores: Validaciones y Lógica', () => {
-
   for (const caso of CASOS_DE_VALIDACION) {
     test(`Validación: ${caso.descripcion}`, async ({ page }) => {
       const proveedoresPage = new ProveedoresPage(page);
@@ -159,7 +170,7 @@ test.describe.parallel('Gestión de Proveedores: Validaciones y Lógica', () => 
       nombreOriginal: nombre,
       nombreEditado: nombre + nombre,
       telefonoEditado: '291 9999999',
-      correoEditado: 'editado@correo.com'
+      correoEditado: 'editado@correo.com',
     };
 
     await proveedoresPage.editarProveedor(proveedorTest.nombreOriginal, proveedorTest.nombreEditado, proveedorTest.telefonoEditado, proveedorTest.correoEditado);

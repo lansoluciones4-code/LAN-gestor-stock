@@ -13,25 +13,44 @@ export const productSchema = createInsertSchema(products)
     deviceId: z.string().trim().min(1, 'Debes seleccionar un equipo válido'),
     providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
     description: z.string().trim().max(255, 'La descripción es demasiado larga').optional(),
-    purchasePrice: z.any().transform((v) => {
-      if (typeof v === 'string') return Number(v.replace(',', '.'));
-      return Number(v);
-    }).pipe(z.number().gt(0, 'El precio de compra debe ser mayor a 0').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
-    salePrice: z.any().transform((v) => {
-      if (typeof v === 'string') return Number(v.replace(',', '.'));
-      return Number(v);
-    }).pipe(z.number().gt(0, 'El precio de venta debe ser mayor a 0').refine(v => isValidDecimal(v, 2), 'Máximo 2 decimales')),
-    stock: z.any().transform((v, ctx) => {
-      const parsed = Number(v);
-      if (v === '' || v === null || v === undefined || Number.isNaN(parsed)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Debe ingresar una cantidad válida',
-        });
-        return z.NEVER;
-      }
-      return Math.floor(parsed);
-    }).pipe(z.number().min(0, 'El stock no puede ser negativo')),
+    purchasePrice: z
+      .any()
+      .transform((v) => {
+        if (typeof v === 'string') return Number(v.replace(',', '.'));
+        return Number(v);
+      })
+      .pipe(
+        z
+          .number()
+          .gt(0, 'El precio de compra debe ser mayor a 0')
+          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+      ),
+    salePrice: z
+      .any()
+      .transform((v) => {
+        if (typeof v === 'string') return Number(v.replace(',', '.'));
+        return Number(v);
+      })
+      .pipe(
+        z
+          .number()
+          .gt(0, 'El precio de venta debe ser mayor a 0')
+          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+      ),
+    stock: z
+      .any()
+      .transform((v, ctx) => {
+        const parsed = Number(v);
+        if (v === '' || v === null || v === undefined || Number.isNaN(parsed)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Debe ingresar una cantidad válida',
+          });
+          return z.NEVER;
+        }
+        return Math.floor(parsed);
+      })
+      .pipe(z.number().min(0, 'El stock no puede ser negativo')),
   });
 
 export type ProductInput = z.infer<typeof productSchema>;

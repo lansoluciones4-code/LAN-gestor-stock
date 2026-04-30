@@ -22,10 +22,10 @@ export class DeviceRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(devices)
-      .set({ 
-        isActive, 
+      .set({
+        isActive,
         updatedAt: sql`NOW()`,
-        version: sql`${devices.version} + 1`
+        version: sql`${devices.version} + 1`,
       })
       .where(eq(devices.id, id))
       .returning();
@@ -63,18 +63,21 @@ export class DeviceRepository {
       }
     }
 
-    const result = await dbtx.insert(devices).values({ 
-      name: input.name, 
-      isActive: true,
-      version: 1
-    }).returning();
+    const result = await dbtx
+      .insert(devices)
+      .values({
+        name: input.name,
+        isActive: true,
+        version: 1,
+      })
+      .returning();
     return result[0];
   }
 
   async updateDevice(id: string, input: DeviceUpdateInput, dbtx: any = db) {
-    const updateData: any = { 
+    const updateData: any = {
       updatedAt: sql`NOW()`,
-      version: sql`${devices.version} + 1`
+      version: sql`${devices.version} + 1`,
     };
     if (input.name !== undefined) {
       const existing = await dbtx.query.devices.findFirst({

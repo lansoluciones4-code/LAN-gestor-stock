@@ -51,10 +51,10 @@ export class UserRepository {
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(users)
-      .set({ 
-        isActive, 
+      .set({
+        isActive,
         updatedAt: sql`NOW()`,
-        version: sql`${users.version} + 1`
+        version: sql`${users.version} + 1`,
       })
       .where(eq(users.id, id))
       .returning();
