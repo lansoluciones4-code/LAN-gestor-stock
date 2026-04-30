@@ -39,27 +39,27 @@ export function CatalogPagination({ currentPage, totalPages, onPageChange }: Cat
 
   return (
     <nav
-      className="flex items-center justify-center gap-1 sm:gap-2 mt-2 md:pb-2 px-4"
-      aria-label="Navegación de páginas"
+      className='flex items-center justify-center gap-1 sm:gap-2 mt-2 md:pb-2 px-4'
+      aria-label='Navegación de páginas'
     >
       {/* Botón Anterior */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none"
+        className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none'
         data-testid={TEST_IDS.landing.btnAnteriorPag}
       >
-        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+        <ChevronLeft className='w-4 h-4 sm:w-5 sm:h-5' />
       </button>
 
       {/* Números de Página */}
-      <div className="flex items-center gap-0.5 sm:gap-1">
+      <div className='flex items-center gap-0.5 sm:gap-1'>
         {pages.map((page, idx) => {
           if (page === 'dots') {
             return (
               <div
                 key={`dots-${idx}`}
-                className="w-6 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-zinc-300 dark:text-zinc-700 tracking-widest text-[10px]"
+                className='w-6 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-zinc-300 dark:text-zinc-700 tracking-widest text-[10px]'
               >
                 •••
               </div>
@@ -87,10 +87,10 @@ export function CatalogPagination({ currentPage, totalPages, onPageChange }: Cat
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none"
+        className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none'
         data-testid={TEST_IDS.landing.btnSiguientePag}
       >
-        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+        <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5' />
       </button>
     </nav>
   );

@@ -91,7 +91,7 @@ export function SalesPanel() {
 
   if (initialLoading) {
     return (
-      <div className="mt-8 animate-in fade-in duration-500">
+      <div className='mt-8 animate-in fade-in duration-500'>
         <TableSkeleton />
       </div>
     );
@@ -160,7 +160,7 @@ export function SalesPanel() {
   return (
     <>
       <div
-        className="flex flex-col flex-1 h-full overflow-hidden outline-none"
+        className='flex flex-col flex-1 h-full overflow-hidden outline-none'
         tabIndex={-1}
       >
         <SalesListView
@@ -190,9 +190,9 @@ export function SalesPanel() {
         isOpen={!!itemToDelete}
         onClose={() => setItemToDelete(null)}
         onConfirm={() => confirmDelete(itemToDelete as string)}
-        title="Anular Venta"
-        description="¿Deseas anular esta venta? El stock de los productos asociados será repuesto automáticamente. Esta acción no se puede deshacer."
-        submitLabel="Confirmar Anulación"
+        title='Anular Venta'
+        description='¿Deseas anular esta venta? El stock de los productos asociados será repuesto automáticamente. Esta acción no se puede deshacer.'
+        submitLabel='Confirmar Anulación'
         isPending={isPending}
       />
     </>

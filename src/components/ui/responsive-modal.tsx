@@ -32,23 +32,23 @@ export function ResponsiveModal({ isOpen, onClose, title, icon, children, width 
       {onSubmit ? (
         <form
           onSubmit={onSubmit}
-          className="flex flex-col"
+          className='flex flex-col'
           noValidate
         >
           <ModalContent>{children}</ModalContent>
           <ModalFooter>
             <button
-              type="button"
+              type='button'
               onClick={onClose}
-              className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium shadow-sm"
+              className='px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium shadow-sm'
               data-testid={cancelTestId}
             >
               {cancelLabel}
             </button>
             <button
-              type="submit"
+              type='submit'
               disabled={isPending}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm"
+              className='px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm'
               data-testid={submitTestId}
             >
               {submitLabel}
@@ -80,21 +80,21 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      width="sm"
+      width='sm'
     >
-      <ModalContent className="p-6">
-        <div className="flex items-center text-red-500 mb-4">
-          <div className="p-2 bg-red-100 dark:bg-red-500/10 rounded-full mr-3">
-            <Trash2 className="w-6 h-6" />
+      <ModalContent className='p-6'>
+        <div className='flex items-center text-red-500 mb-4'>
+          <div className='p-2 bg-red-100 dark:bg-red-500/10 rounded-full mr-3'>
+            <Trash2 className='w-6 h-6' />
           </div>
-          <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{title}</h3>
+          <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>{title}</h3>
         </div>
-        <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6">{description}</p>
-        <div className="flex justify-end gap-3">
+        <p className='text-zinc-500 dark:text-zinc-400 text-sm mb-6'>{description}</p>
+        <div className='flex justify-end gap-3'>
           <button
             onClick={onClose}
             disabled={isPending}
-            className="px-4 py-2 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors font-medium shadow-sm"
+            className='px-4 py-2 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors font-medium shadow-sm'
             data-testid={cancelTestId}
           >
             {cancelLabel}
@@ -102,7 +102,7 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
           <button
             onClick={onConfirm}
             disabled={isPending}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-70"
+            className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-70'
             data-testid={submitTestId}
           >
             {submitLabel}

@@ -15,11 +15,11 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
       cellClassName: 'max-w-[200px]',
       cell: (c) => (
         <div
-          className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0"
+          className='flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0'
           title={c.name}
         >
-          <span className="truncate">{c.name}</span>
-          {!c.isActive && <span className="shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
+          <span className='truncate'>{c.name}</span>
+          {!c.isActive && <span className='shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase'>Inactivo</span>}
         </div>
       ),
     },
@@ -55,10 +55,10 @@ export function getCustomerColumns({ role, onEdit, onToggleActive }: ColumnActio
           )}
           <button
             onClick={() => onEdit(c)}
-            className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
-            title="Editar Profile"
+            className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition'
+            title='Editar Profile'
           >
-            <Edit className="w-4 h-4" />
+            <Edit className='w-4 h-4' />
           </button>
         </>
       ),

@@ -96,10 +96,10 @@ test('renders button with text', async ({ mount }) => {
 test('renders with all props', async ({ mount }) => {
   const component = await mount(
     <Button
-      variant="primary"
-      size="large"
+      variant='primary'
+      size='large'
       disabled={false}
-      icon="check"
+      icon='check'
     >
       Submit
     </Button>
@@ -192,7 +192,7 @@ test('controlled input', async ({ mount }) => {
   // For controlled components, update with new value
   await component.update(
     <Input
-      value="hello"
+      value='hello'
       onChange={(e) => (externalValue = e.target.value)}
     />
   );
@@ -337,7 +337,7 @@ test('renders named slots', async ({ mount }) => {
 
 ```tsx
 test('render prop pattern', async ({ mount }) => {
-  const component = await mount(<DataFetcher url="/api/users">{({ data, loading }) => (loading ? <span>Loading...</span> : <span>{data.name}</span>)}</DataFetcher>);
+  const component = await mount(<DataFetcher url='/api/users'>{({ data, loading }) => (loading ? <span>Loading...</span> : <span>{data.name}</span>)}</DataFetcher>);
 
   // Initially loading
   await expect(component.getByText('Loading...')).toBeVisible();

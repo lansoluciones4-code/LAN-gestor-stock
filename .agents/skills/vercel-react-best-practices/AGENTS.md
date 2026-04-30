@@ -2294,16 +2294,16 @@ Many browsers don't have hardware acceleration for CSS3 animations on SVG elemen
 function LoadingSpinner() {
   return (
     <svg
-      className="animate-spin"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
+      className='animate-spin'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
     >
       <circle
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
+        cx='12'
+        cy='12'
+        r='10'
+        stroke='currentColor'
       />
     </svg>
   );
@@ -2315,17 +2315,17 @@ function LoadingSpinner() {
 ```tsx
 function LoadingSpinner() {
   return (
-    <div className="animate-spin">
+    <div className='animate-spin'>
       <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
+        width='24'
+        height='24'
+        viewBox='0 0 24 24'
       >
         <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
+          cx='12'
+          cy='12'
+          r='10'
+          stroke='currentColor'
         />
       </svg>
     </div>
@@ -2355,11 +2355,11 @@ Apply `content-visibility: auto` to defer off-screen rendering.
 ```tsx
 function MessageList({ messages }: { messages: Message[] }) {
   return (
-    <div className="overflow-y-auto h-screen">
+    <div className='overflow-y-auto h-screen'>
       {messages.map((msg) => (
         <div
           key={msg.id}
-          className="message-item"
+          className='message-item'
         >
           <Avatar user={msg.author} />
           <div>{msg.content}</div>
@@ -2382,7 +2382,7 @@ Extract static JSX outside components to avoid re-creation.
 
 ```tsx
 function LoadingSkeleton() {
-  return <div className="animate-pulse h-20 bg-gray-200" />;
+  return <div className='animate-pulse h-20 bg-gray-200' />;
 }
 
 function Container() {
@@ -2393,7 +2393,7 @@ function Container() {
 **Correct: reuses same element**
 
 ```tsx
-const loadingSkeleton = <div className="animate-pulse h-20 bg-gray-200" />;
+const loadingSkeleton = <div className='animate-pulse h-20 bg-gray-200' />;
 
 function Container() {
   return <div>{loading && loadingSkeleton}</div>;
@@ -2473,7 +2473,7 @@ Component first renders with default value (`light`), then updates after hydrati
 function ThemeWrapper({ children }: { children: ReactNode }) {
   return (
     <>
-      <div id="theme-wrapper">{children}</div>
+      <div id='theme-wrapper'>{children}</div>
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -2559,8 +2559,8 @@ export default function Document() {
   return (
     <html>
       <head>
-        <script src="https://example.com/analytics.js" />
-        <script src="/scripts/utils.js" />
+        <script src='https://example.com/analytics.js' />
+        <script src='/scripts/utils.js' />
       </head>
       <body>{/* content */}</body>
     </html>
@@ -2577,12 +2577,12 @@ export default function Page() {
   return (
     <>
       <Script
-        src="https://example.com/analytics.js"
-        strategy="afterInteractive"
+        src='https://example.com/analytics.js'
+        strategy='afterInteractive'
       />
       <Script
-        src="/scripts/utils.js"
-        strategy="beforeInteractive"
+        src='/scripts/utils.js'
+        strategy='beforeInteractive'
       />
     </>
   );
@@ -2603,7 +2603,7 @@ Use explicit ternary operators (`? :`) instead of `&&` for conditional rendering
 
 ```tsx
 function Badge({ count }: { count: number }) {
-  return <div>{count && <span className="badge">{count}</span>}</div>;
+  return <div>{count && <span className='badge'>{count}</span>}</div>;
 }
 
 // When count = 0, renders: <div>0</div>
@@ -2614,7 +2614,7 @@ function Badge({ count }: { count: number }) {
 
 ```tsx
 function Badge({ count }: { count: number }) {
-  return <div>{count > 0 ? <span className="badge">{count}</span> : null}</div>;
+  return <div>{count > 0 ? <span className='badge'>{count}</span> : null}</div>;
 }
 
 // When count = 0, renders: <div></div>
@@ -2685,7 +2685,7 @@ function Navigation() {
   return (
     <nav>
       <a
-        href="/dashboard"
+        href='/dashboard'
         onMouseEnter={preloadDashboard}
       >
         Dashboard

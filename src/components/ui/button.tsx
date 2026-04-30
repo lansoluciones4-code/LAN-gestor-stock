@@ -33,7 +33,7 @@ export function Button({ children, variant = 'primary', fullWidth = false, leftI
       className={`${baseStyles} ${sizes[size]} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
       {...props}
     >
-      {leftIcon && <span className="mr-2">{leftIcon}</span>}
+      {leftIcon && <span className='mr-2'>{leftIcon}</span>}
       {children}
     </button>
   );

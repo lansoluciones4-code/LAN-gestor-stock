@@ -23,10 +23,10 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
   const { search, setSearch, selectedCategory, setSelectedCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, page, setPage, totalPages, paginatedProducts, clearFilters } = useCatalogFilters({ products, itemsPerPage });
 
   return (
-    <div className="h-full max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col min-h-0">
-      <div className="flex flex-col lg:flex-row gap-10 h-full min-h-0">
+    <div className='h-full max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col min-h-0'>
+      <div className='flex flex-col lg:flex-row gap-10 h-full min-h-0'>
         {/* Sidebar container - Fixed height matching parent */}
-        <aside className="hidden lg:block w-72 shrink-0 h-full">
+        <aside className='hidden lg:block w-72 shrink-0 h-full'>
           <CatalogSidebar
             categories={categories}
             selectedCategory={selectedCategory}
@@ -34,9 +34,9 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
           />
         </aside>
 
-        <main className="flex-1 flex flex-col min-h-0 space-y-8 lg:overflow-y-auto pr-0 lg:pr-6 custom-scrollbar pb-8 lg:pb-0 relative">
+        <main className='flex-1 flex flex-col min-h-0 space-y-8 lg:overflow-y-auto pr-0 lg:pr-6 custom-scrollbar pb-8 lg:pb-0 relative'>
           {/* Sticky Controls */}
-          <div className="sticky top-0 z-10 bg-[#F5F5F7] dark:bg-zinc-950 pt-2 pb-4 -mx-2 px-2">
+          <div className='sticky top-0 z-10 bg-[#F5F5F7] dark:bg-zinc-950 pt-2 pb-4 -mx-2 px-2'>
             <CatalogControls
               search={search}
               onSearchChange={setSearch}
@@ -51,7 +51,7 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
             />
           </div>
 
-          <div className="flex-1">
+          <div className='flex-1'>
             <CatalogGrid
               products={paginatedProducts}
               onResetFilters={clearFilters}

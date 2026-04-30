@@ -703,7 +703,7 @@ itself.
 <Composer
   isThread
   isEditing={false}
-  channelId="abc"
+  channelId='abc'
   showAttachments
   showFormatting={false}
 />
@@ -834,7 +834,7 @@ function ComposerFrame({ children }: { children: React.ReactNode }) {
 }
 
 function ComposerFooter({ children }: { children: React.ReactNode }) {
-  return <footer className="flex">{children}</footer>;
+  return <footer className='flex'>{children}</footer>;
 }
 
 // Usage is flexible

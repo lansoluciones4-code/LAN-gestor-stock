@@ -35,11 +35,11 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
         const timeString = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 
         return (
-          <div className="font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap truncate">
+          <div className='font-bold text-zinc-900 dark:text-zinc-100 whitespace-nowrap truncate'>
             {dateString}
             <span
               title={timeString}
-              className="text-indigo-600 dark:text-indigo-400 ml-1"
+              className='text-indigo-600 dark:text-indigo-400 ml-1'
             >
               {timeString}
             </span>
@@ -103,10 +103,10 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
             e.stopPropagation();
             onView(log);
           }}
-          className="p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm"
-          title="Ver Detalle"
+          className='p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm'
+          title='Ver Detalle'
         >
-          <Eye className="w-4 h-4" />
+          <Eye className='w-4 h-4' />
         </button>
       ),
     },

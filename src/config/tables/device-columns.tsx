@@ -11,11 +11,11 @@ export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { r
       cellClassName: 'max-w-[300px]',
       cell: (row: DeviceDef) => (
         <div
-          className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0"
+          className='flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0'
           title={row.name}
         >
-          <span className="truncate">{row.name}</span>
-          {!row.isActive && <span className="shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase">Inactivo</span>}
+          <span className='truncate'>{row.name}</span>
+          {!row.isActive && <span className='shrink-0 px-1.5 py-0.5 bg-zinc-100 text-zinc-500 dark:bg-zinc-800 text-[10px] font-bold rounded uppercase'>Inactivo</span>}
         </div>
       ),
     },
@@ -36,17 +36,17 @@ export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { r
                 </button>
                 <button
                   onClick={() => onEdit(row)}
-                  className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition"
-                  title="Editar Ficha"
+                  className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition'
+                  title='Editar Ficha'
                 >
-                  <Edit className="w-4 h-4" />
+                  <Edit className='w-4 h-4' />
                 </button>
                 <button
                   onClick={() => onDelete(row.id)}
-                  className="p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition"
-                  title="Eliminar"
+                  className='p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition'
+                  title='Eliminar'
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className='w-4 h-4' />
                 </button>
               </>
             ),

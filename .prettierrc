@@ -8,5 +8,6 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "bracketSameLine": false,
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "jsxSingleQuote": true
 }

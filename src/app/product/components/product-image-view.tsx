@@ -17,12 +17,12 @@ export function ProductImageView({ imagePath, deviceName, isOutOfStock }: Produc
   }, [imagePath]);
 
   return (
-    <div className="relative aspect-square rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center overflow-hidden p-12 shadow-sm w-full max-w-xl mx-auto">
+    <div className='relative aspect-square rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center overflow-hidden p-12 shadow-sm w-full max-w-xl mx-auto'>
       {/* Placeholder / Icono de Error (Package) */}
       {imageStatus !== 'loaded' && (
-        <div className="flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300">
-          <Package className="w-16 h-16 stroke-[1.5] mb-4" />
-          <span className="text-xs font-medium tracking-widest uppercase">Pronto</span>
+        <div className='flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300'>
+          <Package className='w-16 h-16 stroke-[1.5] mb-4' />
+          <span className='text-xs font-medium tracking-widest uppercase'>Pronto</span>
         </div>
       )}
 
@@ -38,8 +38,8 @@ export function ProductImageView({ imagePath, deviceName, isOutOfStock }: Produc
       )}
 
       {isOutOfStock && (
-        <div className="absolute top-8 right-8">
-          <span className="bg-zinc-900 dark:bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] shadow-2xl">Agotado</span>
+        <div className='absolute top-8 right-8'>
+          <span className='bg-zinc-900 dark:bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] shadow-2xl'>Agotado</span>
         </div>
       )}
     </div>

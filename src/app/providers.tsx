@@ -7,8 +7,8 @@ import { SessionInitializer } from '@/features/auth/ui/auth/session-initializer'
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
+      attribute='class'
+      defaultTheme='system'
       enableSystem
     >
       <SessionInitializer />

@@ -23,7 +23,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
             {dateString}
             <span
               title={timeString}
-              className="text-indigo-600 dark:text-indigo-400 ml-1 font-bold"
+              className='text-indigo-600 dark:text-indigo-400 ml-1 font-bold'
             >
               {timeString}
             </span>
@@ -41,7 +41,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
       cellClassName: 'max-w-[70px] truncate',
       cell: (s) => (
         <span
-          className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[13px] font-black rounded uppercase truncate block w-fit"
+          className='px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[13px] font-black rounded uppercase truncate block w-fit'
           title={s.vendor?.username || 'Sistema'}
         >
           {s.vendor?.username || 'Sistema'}
@@ -52,7 +52,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
       header: 'Pago',
       cellClassName: 'whitespace-nowrap',
       cell: (s) => (
-        <div className="flex gap-1">
+        <div className='flex gap-1'>
           {s.payments?.map((p, i) => (
             <span
               key={i}
@@ -61,7 +61,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
               {p.type === 'efectivo' ? 'EF' : 'TR'}
             </span>
           ))}
-          {(!s.payments || s.payments.length === 0) && <span className="text-[10px] text-zinc-400 font-bold italic">--</span>}
+          {(!s.payments || s.payments.length === 0) && <span className='text-[10px] text-zinc-400 font-bold italic'>--</span>}
         </div>
       ),
     },
@@ -70,10 +70,10 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
       headerClassName: 'text-right',
       cellClassName: 'text-right whitespace-nowrap',
       cell: (s) => (
-        <div className="flex flex-col items-end gap-0.5 text-[14px] font-bold">
-          {s.discountPercentage > 0 && <span className="text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">-{s.discountPercentage}%</span>}
-          {s.discountAmount > 0 && <span className="text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">-${s.discountAmount.toLocaleString('es-AR')}</span>}
-          {s.discountPercentage === 0 && s.discountAmount === 0 && <span className="text-zinc-300 dark:text-zinc-700">--</span>}
+        <div className='flex flex-col items-end gap-0.5 text-[14px] font-bold'>
+          {s.discountPercentage > 0 && <span className='text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded'>-{s.discountPercentage}%</span>}
+          {s.discountAmount > 0 && <span className='text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded'>-${s.discountAmount.toLocaleString('es-AR')}</span>}
+          {s.discountPercentage === 0 && s.discountAmount === 0 && <span className='text-zinc-300 dark:text-zinc-700'>--</span>}
         </div>
       ),
     },
@@ -91,18 +91,18 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
         <>
           <button
             onClick={() => onPrint(s)}
-            className="p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors"
-            title="Imprimir Factura"
+            className='p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors'
+            title='Imprimir Factura'
           >
-            <FileText className="w-4 h-4" />
+            <FileText className='w-4 h-4' />
           </button>
           {role === 'admin' && (
             <button
               onClick={() => onDelete(s.id!)}
-              className="p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-              title="Anular Venta"
+              className='p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors'
+              title='Anular Venta'
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className='w-4 h-4' />
             </button>
           )}
         </>

@@ -85,8 +85,8 @@ Import CSS files instead of using `<link>` tags. Next.js handles bundling and op
 ```tsx
 // Bad: Manual link tag
 <link
-  rel="stylesheet"
-  href="/styles.css"
+  rel='stylesheet'
+  href='/styles.css'
 />;
 
 // Good: Import CSS
@@ -104,7 +104,7 @@ Already included: `Array.from`, `Object.assign`, `Promise`, `fetch`, `Map`, `Set
 
 ```tsx
 // Bad: Redundant polyfills
-<script src="https://polyfill.io/v3/polyfill.min.js?features=fetch,Promise,Array.from" />
+<script src='https://polyfill.io/v3/polyfill.min.js?features=fetch,Promise,Array.from' />
 
 // Good: Next.js includes these automatically
 ```

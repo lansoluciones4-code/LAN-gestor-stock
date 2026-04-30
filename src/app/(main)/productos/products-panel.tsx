@@ -191,81 +191,81 @@ export function ProductsPanel() {
 
   return (
     <div
-      className="flex flex-col flex-1 h-full overflow-hidden outline-none"
+      className='flex flex-col flex-1 h-full overflow-hidden outline-none'
       tabIndex={-1}
     >
       {initialLoading ? (
-        <div className="mt-8 animate-in fade-in duration-500">
+        <div className='mt-8 animate-in fade-in duration-500'>
           <TableSkeleton />
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
-            <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
+            <div className='flex flex-col sm:flex-row gap-2 flex-1'>
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={role === 'admin' ? 'Buscar por equipo, descripción o proveedor' : 'Buscar por equipo o descripción'}
-                className="h-11"
+                className='h-11'
                 data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
-              <div className="flex items-center gap-2">
-                <div className="relative w-[110px] sm:max-w-[130px]">
-                  <DollarSign className="absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400" />
+              <div className='flex items-center gap-2'>
+                <div className='relative w-[110px] sm:max-w-[130px]'>
+                  <DollarSign className='absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400' />
                   <input
-                    type="number"
-                    placeholder="Min"
+                    type='number'
+                    placeholder='Min'
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ''))}
                     onKeyDown={(e) => {
                       if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                     }}
-                    className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
+                    className='w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm'
                     data-testid={TEST_IDS.productos.inputBusquedaPrecioMin}
                   />
                 </div>
-                <div className="relative w-[110px] sm:max-w-[130px]">
-                  <DollarSign className="absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400" />
+                <div className='relative w-[110px] sm:max-w-[130px]'>
+                  <DollarSign className='absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400' />
                   <input
-                    type="number"
-                    placeholder="Max"
+                    type='number'
+                    placeholder='Max'
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value.replace(/\D/g, ''))}
                     onKeyDown={(e) => {
                       if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                     }}
-                    className="w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
+                    className='w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm'
                     data-testid={TEST_IDS.productos.inputBusquedaPrecioMax}
                   />
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className='flex items-center gap-2 sm:gap-4'>
               {role === 'admin' && (
                 <ToggleFilter
-                  id="showZeroStock"
+                  id='showZeroStock'
                   checked={showZeroStock}
                   onChange={setShowZeroStock}
-                  label="Ver sin stock"
+                  label='Ver sin stock'
                   data-testid={TEST_IDS.general.btnVerOcultos}
                 />
               )}
               <Button
-                variant="secondary"
-                size="icon"
+                variant='secondary'
+                size='icon'
                 onClick={() => syncData(true)}
                 disabled={isPending}
-                title="Sincronizar"
-                className="h-11 w-11"
+                title='Sincronizar'
+                className='h-11 w-11'
                 data-testid={TEST_IDS.general.btnSincronizar}
               >
                 <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
               </Button>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={() => handleEditClick()}
-                leftIcon={<Plus className="w-5 h-5" />}
-                className="h-11"
+                leftIcon={<Plus className='w-5 h-5' />}
+                className='h-11'
                 data-testid={TEST_IDS.general.btnAgregar}
               >
                 Ingresar Stock
@@ -279,15 +279,15 @@ export function ProductsPanel() {
             columns={columns}
             data={filteredProducts}
             isLoading={isPending}
-            emptyMessage="No se han encontrado productos coincidentes."
+            emptyMessage='No se han encontrado productos coincidentes.'
           />
 
           <ResponsiveModal
             isOpen={isModalOpen}
             onClose={closeFormModal}
             title={editingItem ? 'Editar Producto / Stock' : 'Añadir Nuevo Lote'}
-            icon={<PackageOpen className="w-6 h-6 text-indigo-500" />}
-            width="2xl"
+            icon={<PackageOpen className='w-6 h-6 text-indigo-500' />}
+            width='2xl'
             onSubmit={handleSubmit((data) => {
               if (editingItem) {
                 const changedData: any = {
@@ -317,49 +317,49 @@ export function ProductsPanel() {
                 handleEditSubmit(data);
               }
             })}
-            submitLabel="Confirmar Inventario"
+            submitLabel='Confirmar Inventario'
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Modelo / Equipo</label>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='col-span-1 md:col-span-2'>
+                <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Modelo / Equipo</label>
                 <Combobox
                   options={devices.filter((d) => d.isActive || d.id === editingItem?.deviceId).map((d) => ({ id: d.id, name: d.name }))}
                   value={selectedDeviceId}
                   onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
-                  placeholder="Seleccionar Equipo"
+                  placeholder='Seleccionar Equipo'
                 />
-                {errors.deviceId && <p className="text-red-500 text-xs mt-1.5">{errors.deviceId.message}</p>}
+                {errors.deviceId && <p className='text-red-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
               </div>
               {role === 'admin' && (
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Proveedor Entrante</label>
+                <div className='col-span-1 md:col-span-2'>
+                  <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Proveedor Entrante</label>
                   <Combobox
                     options={suppliers.filter((s) => s.isActive || s.id === editingItem?.providerId).map((s) => ({ id: s.id, name: s.name }))}
                     value={selectedProviderId}
                     onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
-                    placeholder="Seleccionar Proveedor"
+                    placeholder='Seleccionar Proveedor'
                   />
-                  {errors.providerId && <p className="text-red-500 text-xs mt-1.5">{errors.providerId.message}</p>}
+                  {errors.providerId && <p className='text-red-500 text-xs mt-1.5'>{errors.providerId.message}</p>}
                 </div>
               )}
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm font-medium mb-1.5">Descripción Física (Color, Memoria)</label>
+              <div className='col-span-1 md:col-span-2'>
+                <label className='block text-sm font-medium mb-1.5'>Descripción Física (Color, Memoria)</label>
                 <input
-                  type="text"
+                  type='text'
                   {...register('description')}
-                  placeholder="Ej: Negro, 256GB - Kit Funda"
-                  className="w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700"
+                  placeholder='Ej: Negro, 256GB - Kit Funda'
+                  className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Precio de Costo ($)</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+                <label className='block text-sm font-medium mb-1.5'>Precio de Costo ($)</label>
+                <div className='relative'>
+                  <DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
                   <input
-                    type="text"
-                    inputMode="decimal"
+                    type='text'
+                    inputMode='decimal'
                     {...register('purchasePrice', {
                       onChange: (e) => {
                         const val = e.target.value.replace(/\./g, '');
@@ -375,19 +375,19 @@ export function ProductsPanel() {
                         e.preventDefault();
                       }
                     }}
-                    placeholder="0,00"
-                    className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
+                    placeholder='0,00'
+                    className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500'
                   />
                 </div>
-                {errors.purchasePrice && <p className="text-red-500 text-xs mt-1">{errors.purchasePrice.message}</p>}
+                {errors.purchasePrice && <p className='text-red-500 text-xs mt-1'>{errors.purchasePrice.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Precio de Venta ($)</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-2.5 h-4 w-4 text-emerald-500" />
+                <label className='block text-sm font-medium mb-1.5'>Precio de Venta ($)</label>
+                <div className='relative'>
+                  <DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-emerald-500' />
                   <input
-                    type="text"
-                    inputMode="decimal"
+                    type='text'
+                    inputMode='decimal'
                     {...register('salePrice', {
                       onChange: (e) => {
                         const val = e.target.value.replace(/\./g, '');
@@ -403,26 +403,26 @@ export function ProductsPanel() {
                         e.preventDefault();
                       }
                     }}
-                    placeholder="0,00"
-                    className="w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
+                    placeholder='0,00'
+                    className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500'
                   />
                 </div>
-                {errors.salePrice && <p className="text-red-500 text-xs mt-1">{errors.salePrice.message}</p>}
+                {errors.salePrice && <p className='text-red-500 text-xs mt-1'>{errors.salePrice.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Stock Inicial Lote</label>
+                <label className='block text-sm font-medium mb-1.5'>Stock Inicial Lote</label>
                 <input
-                  type="number"
+                  type='number'
                   {...register('stock', { valueAsNumber: true })}
                   onKeyDown={(e) => {
                     if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                   }}
-                  min="0"
-                  step="1"
-                  placeholder="1"
-                  className="w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500"
+                  min='0'
+                  step='1'
+                  placeholder='1'
+                  className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500'
                 />
-                {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock.message}</p>}
+                {errors.stock && <p className='text-red-500 text-xs mt-1'>{errors.stock.message}</p>}
               </div>
             </div>
           </ResponsiveModal>
@@ -431,62 +431,62 @@ export function ProductsPanel() {
             isOpen={!!itemToDelete}
             onClose={() => setItemToDelete(null)}
             onConfirm={() => handleDelete(itemToDelete as string)}
-            title="Borrar Inventario"
-            description="¿Deseas eliminar físicamente este lote del inventario? Toda la trazabilidad de esta ID se perderá."
-            submitLabel="Purgar Stock"
+            title='Borrar Inventario'
+            description='¿Deseas eliminar físicamente este lote del inventario? Toda la trazabilidad de esta ID se perderá.'
+            submitLabel='Purgar Stock'
             isPending={isPending}
           />
 
           <ResponsiveModal
             isOpen={!!lossProduct}
             onClose={lossClose}
-            title="Registrar Pérdida"
-            icon={<PackageX className="w-5 h-5 text-amber-500" />}
-            width="md"
+            title='Registrar Pérdida'
+            icon={<PackageX className='w-5 h-5 text-amber-500' />}
+            width='md'
             onSubmit={(e) => {
               e.preventDefault();
               handleLoss(lossProduct!, lossQuantity, lossReason, lossClose);
             }}
-            submitLabel="Confirmar Pérdida"
+            submitLabel='Confirmar Pérdida'
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />
-            <div className="p-3 mb-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg">
-              <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1">Producto</p>
+            <div className='p-3 mb-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg'>
+              <p className='text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1'>Producto</p>
               <p
-                className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate"
+                className='text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate'
                 title={`${lossProduct?.device?.name} - ${lossProduct?.description}`}
               >
                 {lossProduct?.device?.name} - {lossProduct?.description}
               </p>
-              <p className="text-xs text-zinc-500 mt-1">
+              <p className='text-xs text-zinc-500 mt-1'>
                 Stock actual:
                 {lossProduct?.stock} Uds
               </p>
             </div>
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Cantidad perdida</label>
+                <label className='block text-sm font-medium mb-1.5'>Cantidad perdida</label>
                 <input
-                  type="number"
+                  type='number'
                   value={lossQuantity}
                   onChange={(e) => setLossQuantity(e.target.value)}
                   onKeyDown={(e) => {
                     if (['-', '.', ',', 'e', 'E', '+'].includes(e.key)) e.preventDefault();
                   }}
-                  min="1"
-                  step="1"
-                  placeholder="Ej: 1"
-                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500"
+                  min='1'
+                  step='1'
+                  placeholder='Ej: 1'
+                  className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500'
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Motivo / Razón</label>
+                <label className='block text-sm font-medium mb-1.5'>Motivo / Razón</label>
                 <textarea
                   value={lossReason}
                   onChange={(e) => setLossReason(e.target.value)}
-                  placeholder="Ej: Pantalla rota al desembalar"
-                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm"
+                  placeholder='Ej: Pantalla rota al desembalar'
+                  className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm'
                 />
               </div>
             </div>

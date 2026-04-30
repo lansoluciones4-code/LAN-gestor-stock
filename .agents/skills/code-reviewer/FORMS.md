@@ -310,9 +310,9 @@ _Review completed in X minutes_
 ```markdown
 # Quick Code Review Checklist
 
-**File/Feature:** ******\_\_\_******
-**Reviewer:** ******\_\_\_******
-**Date:** ******\_\_\_******
+**File/Feature:** **\*\***\_\_\_**\*\***
+**Reviewer:** **\*\***\_\_\_**\*\***
+**Date:** **\*\***\_\_\_**\*\***
 
 ## Security (30 seconds)
 
@@ -374,9 +374,9 @@ _Review completed in X minutes_
 ```markdown
 # Security-Focused Code Review
 
-**Feature:** ******\_\_\_******
-**Reviewer:** ******\_\_\_******
-**Date:** ******\_\_\_******
+**Feature:** **\*\***\_\_\_**\*\***
+**Reviewer:** **\*\***\_\_\_**\*\***
+**Date:** **\*\***\_\_\_**\*\***
 **Risk Level:** 🟢 Low | 🟡 Medium | 🔴 High | ⚫ Critical
 
 ---
@@ -391,7 +391,7 @@ _Review completed in X minutes_
 - [ ] File path traversal prevented (`../` blocked)?
 - [ ] API rate limiting implemented?
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 **Risk:** 🟢 🟡 🔴 ⚫
 
 ---
@@ -404,7 +404,7 @@ _Review completed in X minutes_
 - [ ] Sensitive data encrypted at rest?
 - [ ] TLS 1.2+ enforced (no SSL, TLS 1.0, TLS 1.1)?
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 **Risk:** 🟢 🟡 🔴 ⚫
 
 ---
@@ -417,7 +417,7 @@ _Review completed in X minutes_
 - [ ] NoSQL injection prevented?
 - [ ] XML injection prevented (XXE attacks)?
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 **Risk:** 🟢 🟡 🔴 ⚫
 
 ---
@@ -429,7 +429,7 @@ _Review completed in X minutes_
 - [ ] `dangerouslySetInnerHTML` avoided or sanitized (DOMPurify)?
 - [ ] JSON responses have proper Content-Type?
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 **Risk:** 🟢 🟡 🔴 ⚫
 
 ---
@@ -442,7 +442,7 @@ _Review completed in X minutes_
 - [ ] Account lockout after failed attempts?
 - [ ] Password reset tokens expire after use?
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 **Risk:** 🟢 🟡 🔴 ⚫
 
 ---
@@ -454,7 +454,7 @@ _Review completed in X minutes_
 - [ ] Logs include timestamp, user ID, IP, action?
 - [ ] Alerting configured for suspicious activity?
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 **Risk:** 🟢 🟡 🔴 ⚫
 
 ---
@@ -473,8 +473,8 @@ _Review completed in X minutes_
 - [ ] API abuse
 - [ ] Data exfiltration
 
-**Highest Risk Attack:** ******\_\_\_******
-**Mitigation Status:** ******\_\_\_******
+**Highest Risk Attack:** **\*\***\_\_\_**\*\***
+**Mitigation Status:** **\*\***\_\_\_**\*\***
 
 ---
 
@@ -521,9 +521,9 @@ _Review completed in X minutes_
 ```markdown
 # Performance-Focused Code Review
 
-**Feature:** ******\_\_\_******
-**Reviewer:** ******\_\_\_******
-**Date:** ******\_\_\_******
+**Feature:** **\*\***\_\_\_**\*\***
+**Reviewer:** **\*\***\_\_\_**\*\***
+**Date:** **\*\***\_\_\_**\*\***
 **Expected Load:** \_\_\_ requests/second
 
 ---
@@ -570,7 +570,7 @@ _Review completed in X minutes_
 - [ ] Streams properly closed
 - [ ] Caches have max size limits
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 
 ---
 
@@ -600,7 +600,7 @@ _Review completed in X minutes_
 - [ ] Expensive calculations memoized (useMemo)
 - [ ] Virtual scrolling for long lists
 
-**Findings:** ******\_\_\_******
+**Findings:** **\*\***\_\_\_**\*\***
 
 ---
 
@@ -742,9 +742,9 @@ This is a great example of [best practice] because [reason]. Keep it up!
 ```markdown
 # SAST Integration Report
 
-**Project:** ******\_\_\_******
-**Scan Date:** ******\_\_\_******
-**Scanned By:** ******\_\_\_******
+**Project:** **\*\***\_\_\_**\*\***
+**Scan Date:** **\*\***\_\_\_**\*\***
+**Scanned By:** **\*\***\_\_\_**\*\***
 
 ---
 
@@ -756,7 +756,7 @@ This is a great example of [best practice] because [reason]. Keep it up!
 - [x] SonarQube
 - [x] CodeQL
 - [x] Snyk
-- [ ] Other: ******\_\_\_******
+- [ ] Other: **\*\***\_\_\_**\*\***
 
 ---
 

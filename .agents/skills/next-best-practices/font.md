@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="en"
+      lang='en'
       className={inter.className}
     >
       <body>{children}</body>
@@ -40,7 +40,7 @@ const robotoMono = Roboto_Mono({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="en"
+      lang='en'
       className={`${inter.variable} ${robotoMono.variable}`}
     >
       <body>{children}</body>
@@ -135,7 +135,7 @@ const inter = Inter({
 export default function RootLayout({ children }) {
   return (
     <html
-      lang="en"
+      lang='en'
       className={inter.variable}
     >
       <body>{children}</body>

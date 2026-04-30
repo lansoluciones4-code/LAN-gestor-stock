@@ -104,49 +104,49 @@ export function DevicePanel() {
   });
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className='flex flex-col flex-1 h-full overflow-hidden'>
       {initialLoading ? (
-        <div className="mt-8 animate-in fade-in duration-500">
+        <div className='mt-8 animate-in fade-in duration-500'>
           <TableSkeleton />
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
-            <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
+            <div className='flex flex-col sm:flex-row gap-2 flex-1'>
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar modelos por marca, versión o nombre..."
-                className="h-11"
+                placeholder='Buscar modelos por marca, versión o nombre...'
+                className='h-11'
                 data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
-                id="showInactive"
+                id='showInactive'
                 checked={showInactive}
                 onChange={setShowInactive}
-                label="Ver Inactivos"
+                label='Ver Inactivos'
                 data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
             {role === 'admin' && (
-              <div className="flex items-center gap-2 sm:gap-4">
+              <div className='flex items-center gap-2 sm:gap-4'>
                 <Button
-                  variant="secondary"
-                  size="icon"
+                  variant='secondary'
+                  size='icon'
                   onClick={() => syncData(true)}
                   disabled={isPending}
-                  title="Sincronizar"
-                  className="h-11 w-11"
+                  title='Sincronizar'
+                  className='h-11 w-11'
                   data-testid={TEST_IDS.general.btnSincronizar}
                 >
                   <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
                 </Button>
                 <Button
                   onClick={() => handleEditClick()}
-                  variant="primary"
-                  leftIcon={<Plus className="w-5 h-5" />}
-                  className="h-11"
+                  variant='primary'
+                  leftIcon={<Plus className='w-5 h-5' />}
+                  className='h-11'
                   data-testid={TEST_IDS.general.btnAgregar}
                 >
                   Agregar Categoría
@@ -161,15 +161,15 @@ export function DevicePanel() {
             columns={columns}
             data={filteredDevices}
             isLoading={isPending}
-            emptyMessage="No hay categorías registradas."
+            emptyMessage='No hay categorías registradas.'
           />
 
           <ResponsiveModal
             isOpen={isModalOpen}
             onClose={closeFormModal}
             title={editingItem ? 'Actualizar Categoría' : 'Nueva Categoría en Catálogo'}
-            icon={<MonitorSmartphone className="w-5 h-5 text-indigo-500" />}
-            width="sm"
+            icon={<MonitorSmartphone className='w-5 h-5 text-indigo-500' />}
+            width='sm'
             onSubmit={handleSubmit((data) => {
               if (editingItem) {
                 const changedData: any = { version: editingItem.version };
@@ -195,17 +195,17 @@ export function DevicePanel() {
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />
-            <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
+            <div className='max-h-[60vh] overflow-y-auto px-1 space-y-4'>
               <div>
-                <label className="block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nombre / Modelo / Marca</label>
+                <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Nombre / Modelo / Marca</label>
                 <input
-                  type="text"
+                  type='text'
                   {...register('name')}
                   autoFocus
-                  placeholder="Ej: iPhone 15 Pro Max"
+                  placeholder='Ej: iPhone 15 Pro Max'
                   className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
                 />
-                {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name.message}</p>}
+                {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
               </div>
             </div>
           </ResponsiveModal>
@@ -214,9 +214,9 @@ export function DevicePanel() {
             isOpen={!!itemToDelete}
             onClose={() => setItemToDelete(null)}
             onConfirm={() => handleDelete(itemToDelete as string)}
-            title="Inhabilitar / Eliminar Modelo"
-            description="¿Confirmar operación? El modelo no se borrará si tiene inventario existente por cuestiones de seguridad."
-            submitLabel="Eliminar"
+            title='Inhabilitar / Eliminar Modelo'
+            description='¿Confirmar operación? El modelo no se borrará si tiene inventario existente por cuestiones de seguridad.'
+            submitLabel='Eliminar'
             submitTestId={TEST_IDS.general.btnSubmitModal}
             isPending={isPending}
           />

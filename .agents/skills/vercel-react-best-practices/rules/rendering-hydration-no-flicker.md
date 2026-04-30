@@ -48,7 +48,7 @@ Component first renders with default value (`light`), then updates after hydrati
 function ThemeWrapper({ children }: { children: ReactNode }) {
   return (
     <>
-      <div id="theme-wrapper">{children}</div>
+      <div id='theme-wrapper'>{children}</div>
       <script
         dangerouslySetInnerHTML={{
           __html: `

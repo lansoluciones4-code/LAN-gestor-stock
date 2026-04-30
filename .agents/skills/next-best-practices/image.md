@@ -7,15 +7,15 @@ Use `next/image` for automatic image optimization.
 ```tsx
 // Bad: Avoid native img
 <img
-  src="/hero.png"
-  alt="Hero"
+  src='/hero.png'
+  alt='Hero'
 />;
 
 // Good: Use next/image
 import Image from 'next/image';
 <Image
-  src="/hero.png"
-  alt="Hero"
+  src='/hero.png'
+  alt='Hero'
   width={800}
   height={400}
 />;
@@ -164,8 +164,8 @@ When using `output: 'export'`, use `unoptimized` or custom loader:
 ```tsx
 // Option 1: Disable optimization
 <Image
-  src="/hero.png"
-  alt="Hero"
+  src='/hero.png'
+  alt='Hero'
   width={800}
   height={400}
   unoptimized
@@ -185,8 +185,8 @@ const cloudinaryLoader = ({ src, width, quality }) => {
 
 <Image
   loader={cloudinaryLoader}
-  src="sample.jpg"
-  alt="Sample"
+  src='sample.jpg'
+  alt='Sample'
   width={800}
   height={400}
 />;

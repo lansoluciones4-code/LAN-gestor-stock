@@ -85,10 +85,10 @@ export default function NewPost() {
   return (
     <form action={createPost}>
       <input
-        name="title"
+        name='title'
         required
       />
-      <button type="submit">Create</button>
+      <button type='submit'>Create</button>
     </form>
   );
 }

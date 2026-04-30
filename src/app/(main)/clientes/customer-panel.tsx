@@ -93,48 +93,48 @@ export function CustomerPanel() {
   };
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className='flex flex-col flex-1 h-full overflow-hidden'>
       {initialLoading ? (
-        <div className="mt-8 animate-in fade-in duration-500">
+        <div className='mt-8 animate-in fade-in duration-500'>
           <TableSkeleton />
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
-            <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
+            <div className='flex flex-col sm:flex-row gap-2 flex-1'>
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar clientes por nombre, mail o DNI..."
-                className="h-11"
+                placeholder='Buscar clientes por nombre, mail o DNI...'
+                className='h-11'
                 data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
-                id="showInactive"
+                id='showInactive'
                 checked={showInactive}
                 onChange={setShowInactive}
-                label="Ver Inactivos"
+                label='Ver Inactivos'
                 data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className='flex items-center gap-2 sm:gap-4'>
               <Button
-                variant="secondary"
-                size="icon"
+                variant='secondary'
+                size='icon'
                 onClick={() => syncData(true)}
                 disabled={isPending}
-                title="Sincronizar"
-                className="h-11 w-11"
+                title='Sincronizar'
+                className='h-11 w-11'
                 data-testid={TEST_IDS.general.btnSincronizar}
               >
                 <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
               </Button>
               <Button
                 onClick={() => handleEditClick()}
-                variant="primary"
-                leftIcon={<Plus className="w-5 h-5" />}
-                className="h-11"
+                variant='primary'
+                leftIcon={<Plus className='w-5 h-5' />}
+                className='h-11'
                 data-testid={TEST_IDS.general.btnAgregar}
               >
                 Registrar Cliente
@@ -148,7 +148,7 @@ export function CustomerPanel() {
             columns={columns}
             data={filteredCustomers}
             isLoading={isPending}
-            emptyMessage="No se han encontrado clientes."
+            emptyMessage='No se han encontrado clientes.'
           />
 
           <CustomerModal

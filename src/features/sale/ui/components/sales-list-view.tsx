@@ -57,18 +57,18 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
   });
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden animate-in fade-in duration-300">
-      <div className="flex flex-col lg:flex-row gap-4 mb-6 shrink-0">
-        <div className="flex-1">
+    <div className='flex flex-col flex-1 h-full overflow-hidden animate-in fade-in duration-300'>
+      <div className='flex flex-col lg:flex-row gap-4 mb-6 shrink-0'>
+        <div className='flex-1'>
           <SearchBar
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Filtrar ventas por cliente o vendedor..."
+            placeholder='Filtrar ventas por cliente o vendedor...'
             data-testid={TEST_IDS.general.inputBusquedaTabla}
           />
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className='flex gap-2 items-center'>
           <DateRangePicker
             startDate={startDate}
             endDate={endDate}
@@ -78,20 +78,20 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
           />
 
           <Button
-            variant="secondary"
-            size="icon"
+            variant='secondary'
+            size='icon'
             onClick={() => onSync()}
             disabled={isPending}
-            title="Sincronizar"
+            title='Sincronizar'
             data-testid={TEST_IDS.general.btnSincronizar}
           >
             <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
           </Button>
 
           <Button
-            variant="primary"
+            variant='primary'
             onClick={onNewSale}
-            leftIcon={<Plus className="w-5 h-5" />}
+            leftIcon={<Plus className='w-5 h-5' />}
             data-testid={TEST_IDS.general.btnAgregar}
           >
             Nueva Venta
@@ -105,7 +105,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
         columns={columns}
         data={filteredSales}
         isLoading={isPending}
-        emptyMessage="No hay operaciones que coincidan con los filtros."
+        emptyMessage='No hay operaciones que coincidan con los filtros.'
       />
     </div>
   );

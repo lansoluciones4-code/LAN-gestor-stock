@@ -107,46 +107,46 @@ export function ProvidersPanel() {
   });
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className='flex flex-col flex-1 h-full overflow-hidden'>
       {initialLoading ? (
-        <div className="mt-8 animate-in fade-in duration-500">
+        <div className='mt-8 animate-in fade-in duration-500'>
           <TableSkeleton />
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
-            <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
+            <div className='flex flex-col sm:flex-row gap-2 flex-1'>
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar distribuidor por nombre, teléfono o email..."
+                placeholder='Buscar distribuidor por nombre, teléfono o email...'
                 data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
-                id="showInactive"
+                id='showInactive'
                 checked={showInactive}
                 onChange={setShowInactive}
-                label="Ver Inactivos"
+                label='Ver Inactivos'
                 data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
             {role === 'admin' && (
-              <div className="flex items-center gap-2 sm:gap-4">
+              <div className='flex items-center gap-2 sm:gap-4'>
                 <Button
-                  variant="secondary"
-                  size="icon"
+                  variant='secondary'
+                  size='icon'
                   onClick={() => syncData(true)}
                   disabled={isPending}
-                  title="Sincronizar Datos"
+                  title='Sincronizar Datos'
                   data-testid={TEST_IDS.general.btnSincronizar}
                 >
                   <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
                 </Button>
                 <Button
-                  variant="primary"
+                  variant='primary'
                   onClick={() => handleEditClick()}
-                  leftIcon={<Plus className="w-5 h-5" />}
+                  leftIcon={<Plus className='w-5 h-5' />}
                   data-testid={TEST_IDS.general.btnAgregar}
                 >
                   Agregar Proveedor
@@ -161,15 +161,15 @@ export function ProvidersPanel() {
             columns={columns}
             data={filteredProviders}
             isLoading={isPending}
-            emptyMessage="No se han encontrado proveedores."
+            emptyMessage='No se han encontrado proveedores.'
           />
 
           <ResponsiveModal
             isOpen={isModalOpen}
             onClose={closeFormModal}
             title={editingItem ? 'Editar Proveedor' : 'Nuevo Proveedor Local'}
-            icon={<Store className="w-5 h-5 text-indigo-500" />}
-            width="md"
+            icon={<Store className='w-5 h-5 text-indigo-500' />}
+            width='md'
             onSubmit={handleSubmit((data) => {
               if (editingItem) {
                 const changedData: any = { version: editingItem.version };
@@ -194,41 +194,41 @@ export function ProvidersPanel() {
             isPending={isPending}
           >
             <ErrorAlert error={serverError} />
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Razón Social / Identificador</label>
+                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Razón Social / Identificador</label>
                 <input
-                  type="text"
+                  type='text'
                   {...register('name')}
-                  placeholder="Ej: Accesorios del Sur SRL"
+                  placeholder='Ej: Accesorios del Sur SRL'
                   className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
                 />
-                {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name.message}</p>}
+                {errors.name && <p className='text-red-500 text-xs mt-1.5'>{errors.name.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Línea Telefónica Directa</label>
+                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Línea Telefónica Directa</label>
                 <input
-                  type="text"
+                  type='text'
                   {...register('phone')}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9\+\s]/g, '');
                     e.target.value = val;
                     register('phone').onChange(e);
                   }}
-                  placeholder="+54 9 11 1234-5678"
+                  placeholder='+54 9 11 1234-5678'
                   className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.phone ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
                 />
-                {errors.phone && <p className="text-red-500 text-xs mt-1.5">{errors.phone.message}</p>}
+                {errors.phone && <p className='text-red-500 text-xs mt-1.5'>{errors.phone.message}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">Correo Electrónico Comercial</label>
+                <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Correo Electrónico Comercial</label>
                 <input
-                  type="email"
+                  type='email'
                   {...register('email')}
-                  placeholder="ventas@distribuidora.com"
+                  placeholder='ventas@distribuidora.com'
                   className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-700'}`}
                 />
-                {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
+                {errors.email && <p className='text-red-500 text-xs mt-1.5'>{errors.email.message}</p>}
               </div>
             </div>
           </ResponsiveModal>
@@ -237,9 +237,9 @@ export function ProvidersPanel() {
             isOpen={!!itemToDelete}
             onClose={() => setItemToDelete(null)}
             onConfirm={() => handleDelete(itemToDelete as string)}
-            title="Eliminar Firma Proveedor"
-            description="Esta acción es permanente y eliminará el registro físico de la base de datos. Solo recomendado si lo creaste por error y aún no tiene productos asociados."
-            submitLabel="Desvincular"
+            title='Eliminar Firma Proveedor'
+            description='Esta acción es permanente y eliminará el registro físico de la base de datos. Solo recomendado si lo creaste por error y aún no tiene productos asociados.'
+            submitLabel='Desvincular'
             isPending={isPending}
           />
         </>

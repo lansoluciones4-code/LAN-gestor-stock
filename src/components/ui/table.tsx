@@ -6,20 +6,20 @@ export interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(({ className, headers, isPending, children, ...props }, ref) => (
-  <div className="relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar">
+  <div className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar'>
     <table
       ref={ref}
       className={`w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400 ${className || ''}`}
       {...props}
     >
       {headers && (
-        <thead className="sticky top-0 z-10 text-sm uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm">
+        <thead className='sticky top-0 z-10 text-sm uppercase bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 shadow-sm'>
           <tr>
             {headers.map((h, i) => (
               <th
                 key={i}
-                className="px-6 py-4 font-medium"
-                scope="col"
+                className='px-6 py-4 font-medium'
+                scope='col'
               >
                 {h}
               </th>
@@ -62,7 +62,7 @@ TableRow.displayName = 'TableRow';
 const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(({ className, ...props }, ref) => (
   <th
     ref={ref}
-    scope="col"
+    scope='col'
     className={`px-6 py-4 ${className || ''}`}
     {...props}
   />

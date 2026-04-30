@@ -66,14 +66,14 @@ Provides actionable patterns for responsive, accessible UIs with Tailwind CSS v4
 ```tsx
 function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden sm:flex">
+    <div className='bg-white rounded-lg shadow-lg overflow-hidden sm:flex'>
       <img
-        className="h-48 w-full object-cover sm:h-auto sm:w-48"
+        className='h-48 w-full object-cover sm:h-auto sm:w-48'
         src={product.image}
       />
-      <div className="p-6">
-        <h3 className="text-lg font-semibold">{product.name}</h3>
-        <button className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add to Cart</button>
+      <div className='p-6'>
+        <h3 className='text-lg font-semibold'>{product.name}</h3>
+        <button className='mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700'>Add to Cart</button>
       </div>
     </div>
   );

@@ -102,48 +102,48 @@ export function UserPanel() {
   };
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className='flex flex-col flex-1 h-full overflow-hidden'>
       {initialLoading ? (
-        <div className="mt-8 animate-in fade-in duration-500">
+        <div className='mt-8 animate-in fade-in duration-500'>
           <TableSkeleton />
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row gap-4 mb-6 shrink-0">
-            <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
+            <div className='flex flex-col sm:flex-row gap-2 flex-1'>
               <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar usuarios por nombre o rol..."
-                className="h-11"
+                placeholder='Buscar usuarios por nombre o rol...'
+                className='h-11'
                 data-testid={TEST_IDS.general.inputBusquedaTabla}
               />
               <ToggleFilter
-                id="showInactives"
+                id='showInactives'
                 checked={showInactives}
                 onChange={setShowInactives}
-                label="Ver Inactivos"
+                label='Ver Inactivos'
                 data-testid={TEST_IDS.general.btnVerOcultos}
               />
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className='flex items-center gap-2 sm:gap-4'>
               <Button
-                variant="secondary"
-                size="icon"
+                variant='secondary'
+                size='icon'
                 onClick={() => syncData(true)}
                 disabled={isPending}
-                title="Sincronizar"
-                className="h-11 w-11"
+                title='Sincronizar'
+                className='h-11 w-11'
                 data-testid={TEST_IDS.general.btnSincronizar}
               >
                 <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
               </Button>
               <Button
                 onClick={() => handleEditClick()}
-                variant="primary"
-                leftIcon={<Plus className="w-5 h-5" />}
-                className="h-11"
+                variant='primary'
+                leftIcon={<Plus className='w-5 h-5' />}
+                className='h-11'
                 data-testid={TEST_IDS.general.btnAgregar}
               >
                 Crear Credencial
@@ -157,7 +157,7 @@ export function UserPanel() {
             columns={columns}
             data={filteredUsers}
             isLoading={isPending}
-            emptyMessage="No se han encontrado usuarios con credenciales activas."
+            emptyMessage='No se han encontrado usuarios con credenciales activas.'
           />
 
           <UserModal
@@ -173,9 +173,9 @@ export function UserPanel() {
             isOpen={!!itemToDelete}
             onClose={() => setItemToDelete(null)}
             onConfirm={() => handleDelete(itemToDelete as string)}
-            title="Eliminar Credencial"
-            description="Esta acción retirará todos los permisos de acceso de este usuario. Solo se recomienda si la cuenta nunca registró movimientos."
-            submitLabel="Eliminar Acceso"
+            title='Eliminar Credencial'
+            description='Esta acción retirará todos los permisos de acceso de este usuario. Solo se recomienda si la cuenta nunca registró movimientos.'
+            submitLabel='Eliminar Acceso'
             isPending={isPending}
           />
         </>
