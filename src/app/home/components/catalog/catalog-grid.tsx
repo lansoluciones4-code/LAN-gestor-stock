@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { PackageSearch } from 'lucide-react';
-import { type ProductDef } from '@/schemas/product.schema';
+import { type ProductDef } from '@/features/product/domain/product.schema';
 import { ProductCard } from '../product-card';
 
 interface CatalogGridProps {

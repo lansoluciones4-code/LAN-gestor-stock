@@ -10,10 +10,10 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
-import { deviceSchema, type DeviceInput, type DeviceDef, type DeviceUpdateInput } from '@/schemas/device.schema';
-import { createDeviceAction, updateDeviceAction, deleteDeviceAction, fetchDevices, toggleDeviceActiveAction } from '@/server/actions/device.actions';
-import { useAuthStore } from '@/stores/auth.store';
-import { useDevicesStore } from '@/stores/devices.store';
+import { deviceSchema, type DeviceInput, type DeviceDef, type DeviceUpdateInput } from '@/features/device/domain/device.schema';
+import { createDeviceAction, updateDeviceAction, deleteDeviceAction, fetchDevices, toggleDeviceActiveAction } from '@/features/device/actions/device.actions';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { useDeviceStore } from '@/features/device/store/device.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -25,7 +25,7 @@ import { TEST_IDS } from '@/constants/test-ids';
 export function DevicePanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
-  const { devices, setDevices, isLoaded } = useDevicesStore();
+  const { devices, setDevices, isLoaded } = useDeviceStore();
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<DeviceDef>();
 

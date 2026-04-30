@@ -4,17 +4,17 @@ import { useState, useEffect, useMemo, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, DollarSign, PackageOpen, PackageX, RefreshCcw } from 'lucide-react';
-import { productSchema, type ProductInput, type ProductDef, type ProductUpdateInput } from '@/schemas/product.schema';
-import { useAuthStore } from '@/stores/auth.store';
-import { useProductsStore } from '@/stores/products.store';
-import { useDevicesStore } from '@/stores/devices.store';
-import { useProvidersStore } from '@/stores/providers.store';
+import { productSchema, type ProductInput, type ProductDef, type ProductUpdateInput } from '@/features/product/domain/product.schema';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { useProductStore } from '@/features/product/store/product.store';
+import { useDeviceStore } from '@/features/device/store/device.store';
+import { useProviderStore } from '@/features/provider/store/provider.store';
 import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/server/actions/product.actions';
+import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/features/product/actions/product.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
@@ -29,9 +29,9 @@ export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  const { products, setProducts, isLoaded: prodsLoaded } = useProductsStore();
-  const { devices, setDevices, isLoaded: devicesLoaded } = useDevicesStore();
-  const { providers: suppliers, setProviders: setSuppliers, isLoaded: supsLoaded } = useProvidersStore();
+  const { products, setProducts, isLoaded: prodsLoaded } = useProductStore();
+  const { devices, setDevices, isLoaded: devicesLoaded } = useDeviceStore();
+  const { providers: suppliers, setProviders: setSuppliers, isLoaded: supsLoaded } = useProviderStore();
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<ProductDef>();
 

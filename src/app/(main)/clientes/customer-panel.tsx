@@ -7,22 +7,22 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/schemas/customer.schema';
-import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetchCustomers, toggleCustomerActiveAction } from '@/server/actions/customer.actions';
-import { useAuthStore } from '@/stores/auth.store';
-import { useCustomersStore } from '@/stores/customers.store';
+import { type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/features/customer/domain/customer.schema';
+import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetchCustomers, toggleCustomerActiveAction } from '@/features/customer/actions/customer.actions';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { useCustomerStore } from '@/features/customer/store/customer.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeForSearch } from '@/lib/utils';
-import { CustomerModal } from '@/components/modals/customer-modal';
+import { CustomerModal } from '@/features/customer/ui/components/customer-modal';
 import { GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 
 export function CustomerPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
-  const { customers, setCustomers, isLoaded } = useCustomersStore();
+  const { customers, setCustomers, isLoaded } = useCustomerStore();
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<CustomerDef>();
 

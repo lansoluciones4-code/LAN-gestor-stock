@@ -1,4 +1,4 @@
-import { type SaleDef } from '@/schemas/sale.schema';
+import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { FileText, Trash2 } from 'lucide-react';
 

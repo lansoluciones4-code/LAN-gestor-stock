@@ -7,16 +7,16 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { SearchBar } from '@/components/ui/search-bar';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { type AuditLogDef } from '@/schemas/audit-log.schema';
-import { fetchAuditLogs } from '@/server/actions/audit.actions';
-import { useLogsStore } from '@/stores/logs.store';
+import { type AuditLogDef } from '@/features/audit/domain/audit-log.schema';
+import { fetchAuditLogs } from '@/features/audit/actions/audit.actions';
+import { useAuditStore } from '@/features/audit/store/audit.store';
 import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { getAuditColumns } from '@/config/tables/audit-columns';
 import { TEST_IDS } from '@/constants/test-ids';
 
 export function LogPanel() {
-  const { logs, setLogs, appendLogs, isLoaded } = useLogsStore();
+  const { logs, setLogs, appendLogs, isLoaded } = useAuditStore();
 
   const [initialLoading, setInitialLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);

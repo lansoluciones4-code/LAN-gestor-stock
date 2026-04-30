@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { type ProductDef } from '@/schemas/product.schema';
+import { type ProductDef } from '@/features/product/domain/product.schema';
 import { Package } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/utils';

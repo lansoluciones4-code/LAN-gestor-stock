@@ -1,4 +1,4 @@
-import { type ProductDef } from '@/schemas/product.schema';
+import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { PackageX, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 

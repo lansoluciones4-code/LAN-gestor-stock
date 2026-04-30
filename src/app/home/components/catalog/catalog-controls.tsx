@@ -2,7 +2,7 @@
 
 import { SearchBar } from '@/components/ui/search-bar';
 import { Filter, Tag, X } from 'lucide-react';
-import { type DeviceDef } from '@/schemas/device.schema';
+import { type DeviceDef } from '@/features/device/domain/device.schema';
 import { toSentenceCase } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 

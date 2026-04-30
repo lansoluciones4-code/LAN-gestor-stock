@@ -1,4 +1,4 @@
-import { type ProviderDef } from '@/schemas/provider.schema';
+import { type ProviderDef } from '@/features/provider/domain/provider.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 

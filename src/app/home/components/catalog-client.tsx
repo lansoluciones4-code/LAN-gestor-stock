@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { type ProductDef } from '@/schemas/product.schema';
-import { type DeviceDef } from '@/schemas/device.schema';
+import { type ProductDef } from '@/features/product/domain/product.schema';
+import { type DeviceDef } from '@/features/device/domain/device.schema';
 
 import { useCatalogFilters } from './catalog/use-catalog-filters';
 import { CatalogSidebar } from './catalog/catalog-sidebar';

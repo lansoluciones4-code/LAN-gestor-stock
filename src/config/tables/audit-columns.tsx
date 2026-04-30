@@ -1,4 +1,4 @@
-import { type AuditLogDef } from '@/schemas/audit-log.schema';
+import { type AuditLogDef } from '@/features/audit/domain/audit-log.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Eye } from 'lucide-react';
 

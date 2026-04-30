@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { loginSchema, LoginInput } from '@/schemas/auth.schema';
-import { loginAction } from '@/server/actions/auth.actions';
-import { useAuthStore } from '@/stores/auth.store';
+import { loginSchema, LoginInput } from '@/features/auth/domain/auth.schema';
+import { loginAction } from '@/features/auth/actions/auth.actions';
+import { useAuthStore } from '@/features/auth/store/auth.store';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {

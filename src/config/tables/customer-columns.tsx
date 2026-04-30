@@ -1,4 +1,4 @@
-import { type CustomerDef } from '@/schemas/customer.schema';
+import { type CustomerDef } from '@/features/customer/domain/customer.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit } from 'lucide-react';
 

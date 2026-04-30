@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useDeferredValue } from 'react';
-import { type ProductDef } from '@/schemas/product.schema';
+import { type ProductDef } from '@/features/product/domain/product.schema';
 import { normalizeForSearch } from '@/lib/utils';
 
 interface UseCatalogFiltersProps {

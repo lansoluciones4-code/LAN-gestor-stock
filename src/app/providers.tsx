@@ -2,7 +2,7 @@
 
 import { ThemeProvider } from 'next-themes';
 import { ReactNode } from 'react';
-import { SessionInitializer } from '@/components/auth/session-initializer';
+import { SessionInitializer } from '@/features/auth/ui/auth/session-initializer';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (

@@ -4,10 +4,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Store, RefreshCcw } from 'lucide-react';
-import { providerSchema, type ProviderInput, type ProviderDef, type ProviderUpdateInput } from '@/schemas/provider.schema';
-import { useAuthStore } from '@/stores/auth.store';
-import { useProvidersStore } from '@/stores/providers.store';
-import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/server/actions/provider.actions';
+import { providerSchema, type ProviderInput, type ProviderDef, type ProviderUpdateInput } from '@/features/provider/domain/provider.schema';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { useProviderStore } from '@/features/provider/store/provider.store';
+import { fetchProviders, createProviderAction, updateProviderAction, deleteProviderAction, toggleProviderActiveAction } from '@/features/provider/actions/provider.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
 import { useEntityManager } from '@/hooks/use-entity-manager';
@@ -24,7 +24,7 @@ import { TEST_IDS } from '@/constants/test-ids';
 export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
-  const { providers, setProviders, isLoaded } = useProvidersStore();
+  const { providers, setProviders, isLoaded } = useProviderStore();
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<ProviderDef>();
 

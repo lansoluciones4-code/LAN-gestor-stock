@@ -1,4 +1,4 @@
-import { type DeviceDef } from '@/schemas/device.schema';
+import { type DeviceDef } from '@/features/device/domain/device.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 

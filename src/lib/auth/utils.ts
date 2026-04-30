@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/jwt';
-import { userRepository } from '@/server/repositories/user.repository';
+import { userRepository } from '@/features/user/repository/user.repository';
 
 export async function verifyAuthOrAdmin(requireAdmin = true) {
   const cookieStore = await cookies();

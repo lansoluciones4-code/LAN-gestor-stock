@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { UserSession, userSessionSchema } from '@/schemas/auth.schema';
+import { UserSession, userSessionSchema } from '@/features/auth/domain/auth.schema';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'AuAsL3XRmf7g2XG7e82Pfwlj6xeytKUJu0ZxpJmAG6S';
 const secretKey = new TextEncoder().encode(JWT_SECRET);

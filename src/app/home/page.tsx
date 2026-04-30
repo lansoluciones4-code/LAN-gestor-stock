@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { fetchLandingProducts } from '@/server/actions/product.actions';
-import { fetchLandingCategories } from '@/server/actions/device.actions';
+import { fetchLandingProducts } from '@/features/product/actions/product.actions';
+import { fetchLandingCategories } from '@/features/device/actions/device.actions';
 import { CatalogClient } from './components/catalog-client';
 
 export const metadata: Metadata = {

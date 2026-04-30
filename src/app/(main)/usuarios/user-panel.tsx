@@ -7,16 +7,16 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { SearchBar } from '@/components/ui/search-bar';
 import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
-import { type UserInput, type UserDef, type UserUpdateInput } from '@/schemas/user.schema';
-import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/server/actions/user.actions';
-import { useAuthStore } from '@/stores/auth.store';
-import { useUsersStore } from '@/stores/users.store';
+import { type UserInput, type UserDef, type UserUpdateInput } from '@/features/user/domain/user.schema';
+import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/features/user/actions/user.actions';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { useUserStore } from '@/features/user/store/user.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeForSearch } from '@/lib/utils';
 
-import { UserModal } from '@/components/modals/user-modal';
+import { UserModal } from '@/features/user/ui/components/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
 import { GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
@@ -26,7 +26,7 @@ export function UserPanel() {
   const role = useAuthStore((s) => s.user?.role);
 
   const [initialLoading, setInitialLoading] = useState(true);
-  const { users, setUsers, isLoaded } = useUsersStore();
+  const { users, setUsers, isLoaded } = useUserStore();
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<UserDef>();
 

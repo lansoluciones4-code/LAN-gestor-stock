@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X } from 'lucide-react';
 
-import { useAuthStore } from '@/stores/auth.store';
-import { logoutAction } from '@/server/actions/auth.actions';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { logoutAction } from '@/features/auth/actions/auth.actions';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['admin'] },

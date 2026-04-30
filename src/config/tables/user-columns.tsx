@@ -1,4 +1,4 @@
-import { type UserDef } from '@/schemas/user.schema';
+import { type UserDef } from '@/features/user/domain/user.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 

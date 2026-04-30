@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, Tag, ChevronRight } from 'lucide-react';
-import { type DeviceDef } from '@/schemas/device.schema';
+import { type DeviceDef } from '@/features/device/domain/device.schema';
 import { toSentenceCase } from '@/lib/utils';
 import { useEffect } from 'react';
 

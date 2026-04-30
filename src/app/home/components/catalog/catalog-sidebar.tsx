@@ -1,6 +1,6 @@
 'use client';
 
-import { type DeviceDef } from '@/schemas/device.schema';
+import { type DeviceDef } from '@/features/device/domain/device.schema';
 import { Tag, ChevronRight } from 'lucide-react';
 import { toSentenceCase } from '@/lib/utils';
 
