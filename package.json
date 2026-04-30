@@ -9,7 +9,7 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx src/lib/db/scripts/seed.ts",
+    "db:seed": "tsx src/lib/db/scripts/setup-initial-data.ts",
     "db:reset-data": "tsx src/lib/db/scripts/setup-initial-data.ts",
     "db:reset-full": "tsx src/lib/db/scripts/reset-full.ts",
     "db:stress-test": "tsx src/lib/db/scripts/seed-stress-test.ts"
