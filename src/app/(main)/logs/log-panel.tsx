@@ -67,6 +67,7 @@ export function LogPanel() {
       setHasMore(logs.length > 0 && logs.length % 50 === 0);
       setInitialLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, logs.length]);
 
   // Filter changes - debounced
@@ -85,6 +86,7 @@ export function LogPanel() {
       loadData(true);
     }, 500);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, startDate, endDate, initialLoading]);
 
   // Pagination
@@ -92,6 +94,7 @@ export function LogPanel() {
     if (page > 1 && !initialLoading) {
       loadData(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, initialLoading]);
 
   useEffect(() => {

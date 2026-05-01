@@ -62,7 +62,7 @@ export function UserPanel() {
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded]);
+  }, [isLoaded, setUsers]);
 
   const filteredUsers = useMemo(() => {
     return users

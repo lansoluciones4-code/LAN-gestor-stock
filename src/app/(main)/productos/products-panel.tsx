@@ -154,7 +154,7 @@ export function ProductsPanel() {
         if (a.stock === 0 && b.stock > 0) return 1;
         return 0;
       });
-  }, [displayProducts, search, minPrice, maxPrice, showZeroStock]);
+  }, [displayProducts, search, minPrice, maxPrice, showZeroStock, role]);
 
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);

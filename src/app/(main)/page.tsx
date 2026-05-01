@@ -27,6 +27,7 @@ export default function DashboardPage() {
     if (!isLoaded) {
       loadStats();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
 
   const handleSync = () => {
