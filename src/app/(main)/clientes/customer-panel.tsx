@@ -58,7 +58,7 @@ export function CustomerPanel() {
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded]);
+  }, [isLoaded, setCustomers]);
 
   const filteredCustomers = useMemo(() => {
     return customers

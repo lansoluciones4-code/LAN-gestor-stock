@@ -60,7 +60,7 @@ export function DevicePanel() {
       setInitialLoading(false);
     }
     loadInitial();
-  }, [isLoaded]);
+  }, [isLoaded, setDevices]);
 
   const {
     register,
