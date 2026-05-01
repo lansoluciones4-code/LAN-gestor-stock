@@ -2,10 +2,8 @@ import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { customers } from '@/lib/db/schema';
 
-/**
- * Input Schema for creating/updating customers.
- */
-export const customerSchema = createInsertSchema(customers, {
+/** Input schema for creating a customer (form → server). */
+export const customerCreateSchema = createInsertSchema(customers, {
   name: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'Nombre demasiado largo'),
   phone: z
     .string()
@@ -21,20 +19,27 @@ export const customerSchema = createInsertSchema(customers, {
     id: z.string().optional(),
   });
 
-export type CustomerInput = z.infer<typeof customerSchema>;
+export type CustomerInput = z.infer<typeof customerCreateSchema>;
 
-export const customerUpdateSchema = customerSchema.partial().extend({
+/** Input schema for updating a customer (partial fields + version). */
+export const customerUpdateSchema = customerCreateSchema.partial().extend({
   version: z.number().int().min(1),
 });
 export type CustomerUpdateInput = z.infer<typeof customerUpdateSchema>;
 
-/**
- * Definition schema for reading customers.
- */
-export const customerDefSchema = createSelectSchema(customers).extend({
+/** Row schema for reading a customer from the DB. */
+export const customerRowSchema = createSelectSchema(customers).extend({
   version: z.number(),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });
 
-export type CustomerDef = z.infer<typeof customerDefSchema>;
+export type CustomerDef = z.infer<typeof customerRowSchema>;
+
+// ---------------------------------------------------------------------------
+// Back-compat aliases
+// ---------------------------------------------------------------------------
+/** @deprecated use customerCreateSchema */
+export const customerSchema = customerCreateSchema;
+/** @deprecated use customerRowSchema */
+export const customerDefSchema = customerRowSchema;

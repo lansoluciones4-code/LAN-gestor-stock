@@ -2,9 +2,9 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X, UserCog } from 'lucide-react';
+import { UserCog } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { userSchema, userEditFormSchema, type UserInput, type UserDef, type UserUpdateInput } from '@/features/user/domain/user.schema';
+import { userFormSchema, type UserFormInput, type UserInput, type UserDef, type UserUpdateInput } from '@/features/user/domain/user.schema';
 import { useEffect } from 'react';
 import { ErrorAlert } from '@/components/ui/alert';
 
@@ -23,31 +23,41 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
     handleSubmit,
     reset,
     formState: { errors, dirtyFields },
-  } = useForm<UserInput>({
-    resolver: zodResolver(editingItem ? userEditFormSchema : userSchema),
-    defaultValues: { role: 'vendedor' },
+  } = useForm<UserFormInput>({
+    resolver: zodResolver(userFormSchema),
+    defaultValues: { role: 'vendedor', isEditing: false },
   });
 
   useEffect(() => {
-    if (isOpen) {
-      if (editingItem) {
-        reset({
-          username: editingItem.username,
-          role: editingItem.role,
-          password: '',
-        });
-      } else {
-        reset({
-          username: '',
-          role: 'vendedor',
-          password: '',
-        });
-      }
+    if (!isOpen) return;
+    if (editingItem) {
+      reset({ username: editingItem.username, role: editingItem.role, password: '', isEditing: true });
+    } else {
+      reset({ username: '', role: 'vendedor', password: '', isEditing: false });
     }
   }, [isOpen, editingItem, reset]);
 
-  const handleInnerSubmit = (data: UserInput | UserUpdateInput) => {
-    onSubmit(data);
+  const handleInnerSubmit = (formData: UserFormInput) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { isEditing, ...rest } = formData;
+
+    if (editingItem) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const changedData: any = { version: editingItem.version };
+      let hasChanges = false;
+
+      Object.keys(dirtyFields).forEach((key) => {
+        if (key === 'isEditing') return;
+        const k = key as keyof typeof rest;
+        changedData[k] = rest[k as keyof typeof rest];
+        hasChanges = true;
+      });
+
+      if (!hasChanges) { onClose(); return; }
+      onSubmit(changedData);
+    } else {
+      onSubmit(rest as UserInput);
+    }
   };
 
   return (
@@ -57,27 +67,8 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
       title={editingItem ? 'Editar Perfil de Seguridad' : 'Nueva Credencial de Acceso'}
       icon={<UserCog className='w-5 h-5 text-indigo-500' />}
       width='md'
-      onSubmit={handleSubmit((data) => {
-        if (editingItem) {
-          const changedData: any = { version: editingItem.version };
-          let hasChanges = false;
-
-          Object.keys(dirtyFields).forEach((key) => {
-            const k = key as keyof UserInput;
-            (changedData as any)[k] = data[k];
-            hasChanges = true;
-          });
-
-          if (!hasChanges) {
-            onClose();
-            return;
-          }
-          handleInnerSubmit(changedData);
-        } else {
-          handleInnerSubmit(data);
-        }
-      })}
-      submitLabel={editingItem ? 'Confirmar Credencial' : 'Confirmar Credencial'}
+      onSubmit={handleSubmit(handleInnerSubmit)}
+      submitLabel='Confirmar Credencial'
       isPending={isPending}
     >
       <div className='p-1 space-y-5'>

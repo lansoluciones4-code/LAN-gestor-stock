@@ -2,50 +2,33 @@ import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { products } from '@/lib/db/schema';
 import { isValidDecimal } from '@/lib/utils';
+import { toNumber } from '@/lib/zod-helpers';
 
-/**
- * Input Schema for creating/updating products.
- */
-export const productSchema = createInsertSchema(products)
+const priceField = (label: string) =>
+  toNumber().pipe(
+    z
+      .number()
+      .gt(0, `${label} debe ser mayor a 0`)
+      .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+  );
+
+/** Input schema for creating a product batch (form → server). */
+export const productCreateSchema = createInsertSchema(products)
   .pick({ deviceId: true, providerId: true, description: true, purchasePrice: true, salePrice: true, stock: true })
   .extend({
     id: z.string().optional(),
     deviceId: z.string().trim().min(1, 'Debes seleccionar un equipo válido'),
     providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
     description: z.string().trim().max(255, 'La descripción es demasiado larga').optional(),
-    purchasePrice: z
-      .any()
-      .transform((v) => {
-        if (typeof v === 'string') return Number(v.replace(',', '.'));
-        return Number(v);
-      })
-      .pipe(
-        z
-          .number()
-          .gt(0, 'El precio de compra debe ser mayor a 0')
-          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-      ),
-    salePrice: z
-      .any()
-      .transform((v) => {
-        if (typeof v === 'string') return Number(v.replace(',', '.'));
-        return Number(v);
-      })
-      .pipe(
-        z
-          .number()
-          .gt(0, 'El precio de venta debe ser mayor a 0')
-          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-      ),
+    purchasePrice: priceField('El precio de compra'),
+    salePrice: priceField('El precio de venta'),
     stock: z
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .any()
-      .transform((v, ctx) => {
+      .transform((v: any, ctx) => {
         const parsed = Number(v);
         if (v === '' || v === null || v === undefined || Number.isNaN(parsed)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Debe ingresar una cantidad válida',
-          });
+          ctx.addIssue({ code: 'custom', message: 'Debe ingresar una cantidad válida' });
           return z.NEVER;
         }
         return Math.floor(parsed);
@@ -53,19 +36,17 @@ export const productSchema = createInsertSchema(products)
       .pipe(z.number().min(0, 'El stock no puede ser negativo')),
   });
 
-export type ProductInput = z.infer<typeof productSchema>;
+export type ProductInput = z.infer<typeof productCreateSchema>;
 
-export const productUpdateSchema = productSchema.partial().extend({
+/** Input schema for updating a product (partial fields + version). */
+export const productUpdateSchema = productCreateSchema.partial().extend({
   version: z.number().int().min(1),
   stockDelta: z.number().int().optional(),
 });
 export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 
-/**
- * Definition schema for reading products.
- * Includes nested relations for the UI.
- */
-export const productDefSchema = createSelectSchema(products).extend({
+/** Row schema for reading a product from the DB (with relations). */
+export const productRowSchema = createSelectSchema(products).extend({
   purchasePrice: z.number(),
   salePrice: z.number(),
   showOnLanding: z.boolean(),
@@ -76,4 +57,12 @@ export const productDefSchema = createSelectSchema(products).extend({
   updatedAt: z.union([z.date(), z.string()]),
 });
 
-export type ProductDef = z.infer<typeof productDefSchema>;
+export type ProductDef = z.infer<typeof productRowSchema>;
+
+// ---------------------------------------------------------------------------
+// Back-compat aliases — remove once all consumers updated in this same commit
+// ---------------------------------------------------------------------------
+/** @deprecated use productCreateSchema */
+export const productSchema = productCreateSchema;
+/** @deprecated use productRowSchema */
+export const productDefSchema = productRowSchema;

@@ -2,13 +2,21 @@ import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { users } from '@/lib/db/schema';
 
-/**
- * Input Schema for creating/updating users.
- * Built from the DB schema but limited to UI-allowed fields.
- */
-export const userSchema = createInsertSchema(users, {
-  username: z.string().trim().min(3, 'El usuario debe tener al menos 3 caracteres').max(50, 'Usuario demasiado largo'),
-  role: z.enum(['admin', 'vendedor']),
+const usernameField = z
+  .string()
+  .trim()
+  .min(3, 'El usuario debe tener al menos 3 caracteres')
+  .max(50, 'Usuario demasiado largo');
+
+const roleField = z.enum(['admin', 'vendedor']);
+
+const passwordMinLength = (v: string) =>
+  v.length >= 6 || 'La contraseña debe tener al menos 6 caracteres';
+
+/** Input schema for creating a user (form → server). Password is required. */
+export const userCreateSchema = createInsertSchema(users, {
+  username: usernameField,
+  role: roleField,
 })
   .pick({ username: true, role: true })
   .extend({
@@ -16,33 +24,74 @@ export const userSchema = createInsertSchema(users, {
     password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres'),
   });
 
-export type UserInput = z.infer<typeof userSchema>;
+export type UserInput = z.infer<typeof userCreateSchema>;
 
-export const userUpdateSchema = userSchema.partial().extend({
+/** Input schema for updating a user (partial fields + version). Password optional. */
+export const userUpdateSchema = userCreateSchema.partial().extend({
   version: z.number().int().min(1),
-  password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres').optional().or(z.literal('')),
+  password: z
+    .string()
+    .trim()
+    .refine((v) => v === '' || passwordMinLength(v) === true, 'La contraseña debe tener al menos 6 caracteres')
+    .optional(),
 });
 export type UserUpdateInput = z.infer<typeof userUpdateSchema>;
 
 /**
- * Validation schema for the UI form when editing.
- * Similar to userSchema but with password being optional.
+ * Form validation schema shared by create and edit flows.
+ * Uses superRefine to apply mode-aware password rules:
+ *   - Creating (isEditing=false): password must be ≥6 chars
+ *   - Editing  (isEditing=true) : password may be empty (keep existing) or ≥6 chars
+ *
+ * Strip `isEditing` from the payload before sending to the server action.
  */
-export const userEditFormSchema = userSchema.extend({
-  password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres').or(z.literal('')),
-});
+export const userFormSchema = z
+  .object({
+    username: usernameField,
+    role: roleField,
+    password: z.string().trim(),
+    isEditing: z.boolean().optional(),
+  })
+  .superRefine(({ password, isEditing }, ctx) => {
+    const isEmpty = password === '';
+    const tooShort = password.length < 6;
 
-/**
- * Definition schema automatically inferred from DB Columns.
- * Used for reading data with full type safety.
- */
-export const userDefSchema = createSelectSchema(users)
+    if (!isEditing && tooShort) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['password'],
+        message: 'La contraseña debe tener al menos 6 caracteres',
+      });
+    }
+
+    if (isEditing && !isEmpty && tooShort) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['password'],
+        message: 'La contraseña debe tener al menos 6 caracteres',
+      });
+    }
+  });
+
+export type UserFormInput = z.infer<typeof userFormSchema>;
+
+/** Row schema for reading a user from the DB. */
+export const userRowSchema = createSelectSchema(users)
   .omit({ passwordHash: true })
   .extend({
     version: z.number(),
-    // Override or add specific client-side requirements if needed
     createdAt: z.union([z.date(), z.string()]),
     updatedAt: z.union([z.date(), z.string()]),
   });
 
-export type UserDef = z.infer<typeof userDefSchema>;
+export type UserDef = z.infer<typeof userRowSchema>;
+
+// ---------------------------------------------------------------------------
+// Back-compat aliases — remove once consumers updated in this same commit
+// ---------------------------------------------------------------------------
+/** @deprecated use userCreateSchema */
+export const userSchema = userCreateSchema;
+/** @deprecated use userRowSchema */
+export const userDefSchema = userRowSchema;
+/** @deprecated use userFormSchema */
+export const userEditFormSchema = userFormSchema;

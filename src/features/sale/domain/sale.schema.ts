@@ -2,11 +2,17 @@ import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { sales, saleItems } from '@/lib/db/schema';
 import { isValidDecimal } from '@/lib/utils';
+import { toNumber } from '@/lib/zod-helpers';
 
-/**
- * Sale Item Schema
- */
-export const saleItemSchema = createInsertSchema(saleItems, {
+const moneyField = toNumber().pipe(
+  z
+    .number()
+    .min(0)
+    .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+);
+
+/** Input schema for a single sale line item (form → server). */
+export const saleItemInputSchema = createInsertSchema(saleItems, {
   quantity: z.number().int().min(1, 'La cantidad debe ser al menos 1'),
   unitPrice: z
     .number()
@@ -18,113 +24,50 @@ export const saleItemSchema = createInsertSchema(saleItems, {
     .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
 }).pick({ productId: true, quantity: true, unitPrice: true, subtotal: true });
 
-export type SaleItemInput = z.infer<typeof saleItemSchema>;
+export type SaleItemInput = z.infer<typeof saleItemInputSchema>;
 
-/**
- * Sale Payment Schema
- */
-export const salePaymentSchema = z.object({
+/** Input schema for a single payment method entry. */
+export const salePaymentInputSchema = z.object({
   type: z.enum(['efectivo', 'transferencia']),
-  amount: z
-    .any()
-    .transform((v) => {
-      if (typeof v === 'string') return Number(v.replace(',', '.'));
-      return Number(v);
-    })
-    .pipe(
-      z
-        .number()
-        .min(0, 'El monto no puede ser negativo')
-        .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-    ),
+  amount: moneyField,
 });
 
-export type SalePaymentInput = z.infer<typeof salePaymentSchema>;
+export type SalePaymentInput = z.infer<typeof salePaymentInputSchema>;
 
-/**
- * Sale Input Schema
- */
-export const saleSchema = createInsertSchema(sales)
+/** Input schema for creating a sale (form → server). */
+export const saleCreateSchema = createInsertSchema(sales)
   .pick({ customerId: true, total: true, discountAmount: true, discountPercentage: true })
   .extend({
-    total: z
-      .any()
-      .transform((v) => {
-        if (typeof v === 'string') return Number(v.replace(',', '.'));
-        return Number(v);
-      })
-      .pipe(
-        z
-          .number()
-          .min(0, 'El total es requerido')
-          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-      ),
-    discountAmount: z
-      .any()
-      .transform((v) => {
-        if (typeof v === 'string') return Number(v.replace(',', '.') || '0');
-        return Number(v);
-      })
-      .pipe(
-        z
-          .number()
-          .min(0)
-          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-      ),
-    discountPercentage: z
-      .any()
-      .transform((v) => {
-        if (typeof v === 'string') return Number(v.replace(',', '.') || '0');
-        return Number(v);
-      })
-      .pipe(
-        z
-          .number()
-          .min(0)
-          .max(100)
-          .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-      ),
-    items: z
-      .array(
-        z.object({
-          productId: z.string().uuid(),
-          quantity: z.number().int().min(1),
-          unitPrice: z
-            .any()
-            .transform((v) => {
-              if (typeof v === 'string') return Number(v.replace(',', '.'));
-              return Number(v);
-            })
-            .pipe(
-              z
-                .number()
-                .min(0)
-                .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-            ),
-          subtotal: z
-            .any()
-            .transform((v) => {
-              if (typeof v === 'string') return Number(v.replace(',', '.'));
-              return Number(v);
-            })
-            .pipe(
-              z
-                .number()
-                .min(0)
-                .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
-            ),
-        })
-      )
-      .min(1, 'La venta debe tener al menos un producto'),
-    payments: z.array(salePaymentSchema).min(1, 'Debe especificar al menos un método de pago').max(2, 'Solo se permiten hasta dos métodos de pago'),
+    total: toNumber().pipe(
+      z
+        .number()
+        .min(0, 'El total es requerido')
+        .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+    ),
+    discountAmount: toNumber().pipe(
+      z
+        .number()
+        .min(0)
+        .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+    ),
+    discountPercentage: toNumber().pipe(
+      z
+        .number()
+        .min(0)
+        .max(100)
+        .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+    ),
+    items: z.array(saleItemInputSchema).min(1, 'La venta debe tener al menos un producto'),
+    payments: z
+      .array(salePaymentInputSchema)
+      .min(1, 'Debe especificar al menos un método de pago')
+      .max(2, 'Solo se permiten hasta dos métodos de pago'),
   });
 
-export type SaleInput = z.infer<typeof saleSchema>;
+export type SaleInput = z.infer<typeof saleCreateSchema>;
 
-/**
- * Sale Definition for UI
- */
-export const saleDefSchema = createSelectSchema(sales).extend({
+/** Row schema for reading a sale from the DB (with relations). */
+export const saleRowSchema = createSelectSchema(sales).extend({
   total: z.preprocess((val) => parseFloat(val as string), z.number()),
   discountAmount: z.preprocess((val) => parseFloat((val as string) || '0'), z.number()),
   discountPercentage: z.preprocess((val) => parseFloat((val as string) || '0'), z.number()),
@@ -160,4 +103,16 @@ export const saleDefSchema = createSelectSchema(sales).extend({
     .optional(),
 });
 
-export type SaleDef = z.infer<typeof saleDefSchema>;
+export type SaleDef = z.infer<typeof saleRowSchema>;
+
+// ---------------------------------------------------------------------------
+// Back-compat aliases
+// ---------------------------------------------------------------------------
+/** @deprecated use saleItemInputSchema */
+export const saleItemSchema = saleItemInputSchema;
+/** @deprecated use salePaymentInputSchema */
+export const salePaymentSchema = salePaymentInputSchema;
+/** @deprecated use saleCreateSchema */
+export const saleSchema = saleCreateSchema;
+/** @deprecated use saleRowSchema */
+export const saleDefSchema = saleRowSchema;
