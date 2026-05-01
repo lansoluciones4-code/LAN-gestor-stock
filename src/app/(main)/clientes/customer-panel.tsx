@@ -5,8 +5,8 @@ import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
-import { SearchBar } from '@/components/ui/search-bar';
-import { VirtualizedDataTable } from '@/components/ui/virtualized-data-table';
+import { PanelToolbar } from '@/components/ui/panel-toolbar';
+import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
 import { type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/features/customer/domain/customer.schema';
 import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetchCustomers, toggleCustomerActiveAction } from '@/features/customer/actions/customer.actions';
 import { useAuthStore } from '@/features/auth/store/auth.store';
@@ -18,24 +18,19 @@ import { normalizeForSearch } from '@/lib/utils';
 import { CustomerModal } from '@/features/customer/ui/components/customer-modal';
 import { GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
+import { renderCustomerCard } from '@/config/cards/customer-card';
 
 export function CustomerPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showInactive, setShowInactive] = useState(false);
   const { customers, setCustomers, isLoaded } = useCustomerStore();
 
-  const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } = useEntityManager<CustomerDef>();
-
-  const [showInactive, setShowInactive] = useState(false);
+  const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } =
+    useEntityManager<CustomerDef>();
 
   const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<CustomerDef, CustomerInput, CustomerUpdateInput>({
-    handlers: {
-      fetchData: fetchCustomers,
-      createAction: createCustomerAction,
-      updateAction: updateCustomerAction,
-      deleteAction: deleteCustomerAction,
-      toggleActiveAction: toggleCustomerActiveAction,
-    },
+    handlers: { fetchData: fetchCustomers, createAction: createCustomerAction, updateAction: updateCustomerAction, deleteAction: deleteCustomerAction, toggleActiveAction: toggleCustomerActiveAction },
     setStoreData: setCustomers,
     onSuccessMessage: (msg) => showGlobalMessage('success', msg),
     onErrorMessage: (msg) => showGlobalMessage('error', msg),
@@ -47,118 +42,65 @@ export function CustomerPanel() {
   });
 
   useEffect(() => {
-    async function loadInitial() {
-      if (isLoaded) {
-        setInitialLoading(false);
-        return;
-      }
-      setInitialLoading(true);
-      const res = await fetchCustomers();
-      setCustomers(res);
-      setInitialLoading(false);
-    }
-    loadInitial();
+    if (isLoaded) { setInitialLoading(false); return; }
+    fetchCustomers().then(setCustomers).finally(() => setInitialLoading(false));
   }, [isLoaded, setCustomers]);
 
-  const filteredCustomers = useMemo(() => {
-    return customers
+  const filteredCustomers = useMemo(() =>
+    customers
       .filter((c) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        const combinedText = [normalizeForSearch(c.name), normalizeForSearch(c.email), normalizeForSearch(c.phone), normalizeForSearch(c.documentNumber)].join(' ');
-
-        const matchesSearch = terms.every((word) => combinedText.includes(word));
-        const matchesStatus = showInactive ? true : c.isActive;
-        return matchesSearch && matchesStatus;
+        const text = [normalizeForSearch(c.name), normalizeForSearch(c.email), normalizeForSearch(c.phone), normalizeForSearch(c.documentNumber)].join(' ');
+        return terms.every((w) => text.includes(w)) && (showInactive || c.isActive);
       })
-      .sort((a, b) => {
-        if (a.isActive && !b.isActive) return -1;
-        if (!a.isActive && b.isActive) return 1;
-        return 0;
-      });
-  }, [customers, search, showInactive]);
+      .sort((a, b) => (a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1)),
+    [customers, search, showInactive]
+  );
 
-  const handleEditClick = (item?: CustomerDef) => {
-    openFormModal(item);
-  };
+  const columns = getCustomerColumns({ role, onEdit: openFormModal, onToggleActive: handleToggleActive });
 
-  const columns = getCustomerColumns({
-    role,
-    onEdit: handleEditClick,
-    onToggleActive: handleToggleActive,
-  });
-
-  const handleSuccess = (data: any) => {
-    showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado');
-    syncData();
-  };
+  if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
   return (
     <div className='flex flex-col flex-1 h-full overflow-hidden'>
-      {initialLoading ? (
-        <div className='mt-8 animate-in fade-in duration-500'>
-          <TableSkeleton />
-        </div>
-      ) : (
-        <>
-          <div className='flex flex-col sm:flex-row gap-4 mb-6 shrink-0'>
-            <div className='flex flex-col sm:flex-row gap-2 flex-1'>
-              <SearchBar
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder='Buscar clientes por nombre, mail o DNI...'
-                className='h-11'
-                data-testid={TEST_IDS.general.inputBusquedaTabla}
-              />
-              <ToggleFilter
-                id='showInactive'
-                checked={showInactive}
-                onChange={setShowInactive}
-                label='Ver Inactivos'
-                data-testid={TEST_IDS.general.btnVerOcultos}
-              />
-            </div>
+      <PanelToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder='Buscar clientes por nombre, mail o DNI...'
+        searchPlaceholderMobile='Buscar clientes...'
+        data-testid={TEST_IDS.general.inputBusquedaTabla}
+        filters={
+          <ToggleFilter id='showInactive-customer' checked={showInactive} onChange={setShowInactive} label='Ver Inactivos' data-testid={TEST_IDS.general.btnVerOcultos} />
+        }
+        actions={
+          <>
+            <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar' className='h-11 w-11' data-testid={TEST_IDS.general.btnSincronizar}>
+              <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button onClick={() => openFormModal()} variant='primary' leftIcon={<Plus className='w-5 h-5' />} className='h-11' data-testid={TEST_IDS.general.btnAgregar}>
+              <span className='hidden sm:inline'>Registrar Cliente</span>
+              <span className='sm:hidden'>Agregar</span>
+            </Button>
+          </>
+        }
+      />
 
-            <div className='flex items-center gap-2 sm:gap-4'>
-              <Button
-                variant='secondary'
-                size='icon'
-                onClick={() => syncData(true)}
-                disabled={isPending}
-                title='Sincronizar'
-                className='h-11 w-11'
-                data-testid={TEST_IDS.general.btnSincronizar}
-              >
-                <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-              </Button>
-              <Button
-                onClick={() => handleEditClick()}
-                variant='primary'
-                leftIcon={<Plus className='w-5 h-5' />}
-                className='h-11'
-                data-testid={TEST_IDS.general.btnAgregar}
-              >
-                Registrar Cliente
-              </Button>
-            </div>
-          </div>
+      <GlobalMessage message={globalMessage} />
 
-          <GlobalMessage message={globalMessage} />
+      <ResponsivePanelView
+        columns={columns}
+        data={filteredCustomers}
+        isLoading={isPending}
+        emptyMessage='No se han encontrado clientes.'
+        renderCard={renderCustomerCard({ onEdit: openFormModal, onToggleActive: handleToggleActive })}
+      />
 
-          <VirtualizedDataTable
-            columns={columns}
-            data={filteredCustomers}
-            isLoading={isPending}
-            emptyMessage='No se han encontrado clientes.'
-          />
-
-          <CustomerModal
-            isOpen={isModalOpen}
-            onClose={closeFormModal}
-            editingItem={editingItem}
-            onSuccess={handleSuccess}
-          />
-        </>
-      )}
+      <CustomerModal
+        isOpen={isModalOpen}
+        onClose={closeFormModal}
+        editingItem={editingItem}
+        onSuccess={() => { showGlobalMessage('success', editingItem ? 'Cliente actualizado' : 'Cliente registrado'); syncData(); }}
+      />
     </div>
   );
 }
