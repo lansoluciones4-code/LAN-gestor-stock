@@ -21,7 +21,6 @@ const eslintConfig = [
       '@typescript-eslint/no-unused-vars': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      'react/display-name': 'off',
       'react-hooks/set-state-in-effect': 'off',
       'react-hooks/static-components': 'off',
       'react-hooks/incompatible-library': 'off',

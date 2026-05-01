@@ -21,40 +21,49 @@ interface VirtualizedDataTableProps<T> {
   fixedItemHeight?: number;
 }
 
+const Scroller = React.forwardRef<HTMLDivElement, any>((props, ref) => (
+  <div
+    {...props}
+    ref={ref}
+    className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar scroll-smooth'
+  />
+));
+Scroller.displayName = 'Scroller';
+
+const VirtuosoTableHead = React.forwardRef<HTMLTableSectionElement, any>((props, ref) => (
+  <thead
+    {...props}
+    ref={ref}
+    className='sticky top-0 z-10 text-sm uppercase bg-zinc-50/95 dark:bg-zinc-800/95 backdrop-blur-sm text-zinc-500 dark:text-zinc-400 shadow-sm'
+  />
+));
+VirtuosoTableHead.displayName = 'VirtuosoTableHead';
+
+const VirtuosoTableBody = React.forwardRef<HTMLTableSectionElement, any>((props, ref) => (
+  <tbody
+    {...props}
+    ref={ref}
+    className='divide-y divide-zinc-200 dark:divide-zinc-800'
+  />
+));
+VirtuosoTableBody.displayName = 'VirtuosoTableBody';
+
 const VirtuosoComponents: TableComponents<any> = {
-  Scroller: React.forwardRef((props, ref) => (
-    <div
-      {...props}
-      ref={ref}
-      className='relative overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800 flex-1 bg-white dark:bg-zinc-900 custom-scrollbar scroll-smooth'
-    />
-  )),
+  Scroller,
   Table: (props) => (
     <table
       {...props}
       className='w-full text-[17px] text-left text-zinc-600 dark:text-zinc-400 border-separate border-spacing-0 table-fixed'
     />
   ),
-  TableHead: React.forwardRef((props, ref) => (
-    <thead
-      {...props}
-      ref={ref}
-      className='sticky top-0 z-10 text-sm uppercase bg-zinc-50/95 dark:bg-zinc-800/95 backdrop-blur-sm text-zinc-500 dark:text-zinc-400 shadow-sm'
-    />
-  )),
+  TableHead: VirtuosoTableHead,
   TableRow: (props) => (
     <tr
       {...props}
       className='hover:bg-zinc-50 dark:hover:bg-zinc-800/20 transition-colors group'
     />
   ),
-  TableBody: React.forwardRef((props, ref) => (
-    <tbody
-      {...props}
-      ref={ref}
-      className='divide-y divide-zinc-200 dark:divide-zinc-800'
-    />
-  )),
+  TableBody: VirtuosoTableBody,
 };
 
 export function VirtualizedDataTable<T extends { id: string | number }>({ columns, data, isLoading, emptyMessage = 'No se han encontrado resultados.', hasMore, onEndReached, fixedItemHeight = 64 }: VirtualizedDataTableProps<T>) {
