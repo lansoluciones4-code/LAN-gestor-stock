@@ -14,7 +14,7 @@ import { ActionResult } from '@/lib/action-result';
 
 export async function fetchCustomers(): Promise<CustomerDef[]> {
   try {
-    await verifyAuthOrAdmin(false); // Vendors can see customers
+    await verifyAuthOrAdmin(false); 
     const customersList = await customerRepository.getAllCustomers();
     return z.array(customerRowSchema).parse(customersList);
   } catch (error) {
@@ -25,7 +25,7 @@ export async function fetchCustomers(): Promise<CustomerDef[]> {
 
 export async function toggleCustomerActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
-    const caller = await verifyAuthOrAdmin(true); // Only admin for status toggle
+    const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
       await customerRepository.updateActiveStatus(id, isActive, tx);
