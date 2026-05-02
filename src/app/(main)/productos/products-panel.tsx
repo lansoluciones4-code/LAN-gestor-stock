@@ -150,7 +150,7 @@ export function ProductsPanel() {
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
   return (
-    <div className='flex flex-col flex-1 h-full overflow-hidden outline-none' tabIndex={-1}>
+    <div className='flex flex-col flex-1 h-full outline-none' tabIndex={-1}>
       <PanelToolbar
         search={search}
         onSearchChange={setSearch}
@@ -158,7 +158,7 @@ export function ProductsPanel() {
         searchPlaceholderMobile='Buscar productos...'
         data-testid={TEST_IDS.general.inputBusquedaTabla}
         filters={
-          <div className='flex items-center gap-2 flex-wrap'>
+          <>
             <div className='relative w-24 sm:w-28'>
               <DollarSign className='absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400' />
               <input type='number' placeholder='Min' value={minPrice} onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ''))}
@@ -179,7 +179,7 @@ export function ProductsPanel() {
                 <ToggleFilter id='showOnlyLanding' checked={showOnlyLanding} onChange={setShowOnlyLanding} label='Solo Landing' />
               </>
             )}
-          </div>
+          </>
         }
         sync={
           <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar' className='h-11 w-11 flex-none' data-testid={TEST_IDS.general.btnSincronizar}>

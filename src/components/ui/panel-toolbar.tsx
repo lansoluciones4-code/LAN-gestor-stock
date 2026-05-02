@@ -112,24 +112,34 @@ export function PanelToolbar({
         )}
       </div>
 
-      {/* Filter Popover (hidden on xl) */}
+      {/* Filter Popover / Mobile Drawer */}
       {showFilters && filters && (
-        <div className='xl:hidden absolute left-0 sm:left-0 top-full mt-2 w-full sm:w-[420px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-40 animate-in fade-in slide-in-from-top-2 duration-200'>
-          <div className='p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between'>
-            <span className='text-xs font-bold text-zinc-500 uppercase tracking-widest'>Filtros Activos</span>
-            <button
-              onClick={() => setShowFilters(false)}
-              className='text-red-500 hover:text-red-600 text-xs font-bold transition-colors'
-            >
-              Cerrar
-            </button>
-          </div>
-          <div className='p-4 bg-zinc-50/50 dark:bg-zinc-950/50 rounded-b-xl'>
-            <div className='flex flex-wrap gap-3'>
-              {filters}
+        <>
+          {/* Overlay for mobile drawer */}
+          <div 
+            className='xl:hidden fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50 animate-in fade-in duration-300' 
+            onClick={() => setShowFilters(false)}
+          />
+          <div className='xl:hidden fixed inset-x-0 bottom-0 z-50 p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 rounded-t-3xl shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] animate-in slide-in-from-bottom duration-300 ease-out'>
+            <div className='flex items-center justify-between mb-4 px-2'>
+              <div className='flex items-center gap-2'>
+                <Filter className='w-4 h-4 text-indigo-500' />
+                <span className='text-sm font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider'>Filtros</span>
+              </div>
+              <button
+                onClick={() => setShowFilters(false)}
+                className='px-4 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded-full transition-colors'
+              >
+                Hecho
+              </button>
+            </div>
+            <div className='max-h-[70vh] overflow-y-auto px-2 pb-10 scrollbar-none'>
+              <div className='flex flex-wrap gap-3'>
+                {filters}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
