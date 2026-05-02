@@ -99,7 +99,7 @@ export function CardAction({
       className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-sm font-medium transition-colors ${colors[variant]}`}
     >
       <span className='w-4 h-4 shrink-0'>{icon}</span>
-      <span className='leading-tight'>{label}</span>
+      <span className='leading-tight whitespace-nowrap'>{label}</span>
     </button>
   );
 }
