@@ -45,6 +45,7 @@ export function DevicePanel() {
 
   useEffect(() => {
     if (isLoaded) { setInitialLoading(false); return; }
+    setInitialLoading(true);
     fetchDevices().then(setDevices).finally(() => setInitialLoading(false));
   }, [isLoaded, setDevices]);
 

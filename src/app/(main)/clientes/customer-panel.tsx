@@ -43,6 +43,7 @@ export function CustomerPanel() {
 
   useEffect(() => {
     if (isLoaded) { setInitialLoading(false); return; }
+    setInitialLoading(true);
     fetchCustomers().then(setCustomers).finally(() => setInitialLoading(false));
   }, [isLoaded, setCustomers]);
 

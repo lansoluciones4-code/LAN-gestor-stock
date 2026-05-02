@@ -70,6 +70,7 @@ export function ProductsPanel() {
 
   useEffect(() => {
     if (prodsLoaded && devicesLoaded && supsLoaded) { setInitialLoading(false); return; }
+    setInitialLoading(true);
     const promises: Promise<unknown>[] = [];
     if (!prodsLoaded) promises.push(fetchProducts().then(setProducts));
     if (!devicesLoaded || !supsLoaded) promises.push(fetchSelectorData().then((res) => { setDevices(res.devices); setSuppliers(res.providers); }));

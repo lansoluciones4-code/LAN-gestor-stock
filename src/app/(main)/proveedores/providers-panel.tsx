@@ -45,6 +45,7 @@ export function ProvidersPanel() {
 
   useEffect(() => {
     if (isLoaded) { setInitialLoading(false); return; }
+    setInitialLoading(true);
     fetchProviders().then(setProviders).finally(() => setInitialLoading(false));
   }, [isLoaded, setProviders]);
 

@@ -9,7 +9,7 @@ interface PanelToolbarProps {
   searchPlaceholder?: string;
   searchPlaceholderMobile?: string;
   filters?: ReactNode;
-  sync?: ReactNode; // New slot for the sync/refresh button
+  sync?: ReactNode; 
   actions?: ReactNode;
   'data-testid'?: string;
 }

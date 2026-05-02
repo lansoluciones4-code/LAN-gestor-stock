@@ -45,6 +45,7 @@ export function UserPanel() {
 
   useEffect(() => {
     if (isLoaded) { setInitialLoading(false); return; }
+    setInitialLoading(true);
     fetchUsers().then(setUsers).finally(() => setInitialLoading(false));
   }, [isLoaded, setUsers]);
 
