@@ -208,12 +208,12 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
 
         <div className='pt-4 flex flex-col gap-3'>
           <Button
-            size='lg'
+            size='md'
             fullWidth
             onClick={validateAndConfirm}
             disabled={isPending || finalTotal < 0}
           >
-            Siguiente: Métodos de Pago
+            Continuar al Pago
           </Button>
           {(pVal > 0 || aVal > 0) && (
             <button
@@ -228,7 +228,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
               onClick={handleSkip}
               className='text-[10px] font-black uppercase text-indigo-400 hover:text-indigo-600 tracking-widest transition-colors mx-auto block'
             >
-              No Aplicar Descuentos (Omitir)
+              Omitir Descuentos
             </button>
           )}
         </div>

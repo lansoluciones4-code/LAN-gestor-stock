@@ -11,7 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ children, variant = 'primary', fullWidth = false, leftIcon, size = 'md', className = '', ...props }: ButtonProps) {
-  const baseStyles = 'flex items-center justify-center rounded-lg transition-colors shadow-sm whitespace-nowrap';
+  const baseStyles = 'flex items-center justify-center rounded-lg transition-colors shadow-sm';
 
   const sizes = {
     sm: 'px-3 py-1.5 text-xs',
