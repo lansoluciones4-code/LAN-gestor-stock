@@ -70,7 +70,7 @@ export default function DashboardPage() {
           <button
             onClick={handleSync}
             disabled={isPending}
-            className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
+            className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-base transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
           >
             {isPending ? (
               'Recalculando...'

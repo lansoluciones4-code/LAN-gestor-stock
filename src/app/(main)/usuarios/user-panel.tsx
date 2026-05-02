@@ -81,7 +81,7 @@ export function UserPanel() {
           </Button>
         }
         actions={
-          <Button onClick={() => openFormModal()} variant='primary' leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-lg' data-testid={TEST_IDS.general.btnAgregar}>
+          <Button onClick={() => openFormModal()} variant='primary' leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnAgregar}>
             <span className='hidden sm:inline'>Crear Credencial</span>
             <span className='sm:hidden'>Crear</span>
           </Button>
