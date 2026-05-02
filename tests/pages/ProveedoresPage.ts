@@ -45,13 +45,13 @@ export class ProveedoresPage {
     this.inputNombre = page.getByRole('textbox', { name: 'Ej: Accesorios del Sur SRL' });
     this.inputTelefono = page.getByRole('textbox', { name: '+54 9 11 1234-' });
     this.inputCorreo = page.getByRole('textbox', { name: 'ventas@distribuidora.com' });
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
     this.btnRegistrar = page.getByRole('button', { name: ProveedoresPage.UI.BTN_REGISTRAR, exact: true });
     this.btnActualizar = page.getByRole('button', { name: ProveedoresPage.UI.BTN_ACTUALIZAR, exact: true });
     this.btnCancelar = page.getByRole('button', { name: ProveedoresPage.UI.BTN_CANCELAR, exact: true });
-    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos);
+    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos).filter({ visible: true });
     this.btnDesvincular = page.getByRole('button', { name: ProveedoresPage.UI.BTN_DESVINCULAR, exact: true });
     this.btnSincronizar = page.getByTestId(TEST_IDS.general.btnSincronizar);
   }
@@ -79,7 +79,7 @@ export class ProveedoresPage {
       await this.page.mouse.move(viewport.width / 2, viewport.height / 2);
     }
 
-    const scroller = this.page.getByTestId('virtuoso-scroller');
+    const scroller = this.page.getByTestId('virtuoso-scroller').filter({ visible: true });
     if (await scroller.isVisible()) {
       await scroller.evaluate((node) => {
         node.scrollTop = node.scrollHeight;

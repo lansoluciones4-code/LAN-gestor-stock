@@ -49,12 +49,12 @@ export class ProductosPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
-    this.inputMinPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMin);
-    this.inputMaxPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMax);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
+    this.inputMinPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMin).filter({ visible: true });
+    this.inputMaxPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMax).filter({ visible: true });
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
-    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos);
+    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos).filter({ visible: true });
     this.inputDescripcion = page.getByRole('textbox', { name: 'Ej: Negro, 256GB - Kit Funda' });
     this.inputPrecioCompra = page.locator('input[name="purchasePrice"]');
     this.inputPrecioVenta = page.locator('input[name="salePrice"]');
@@ -93,7 +93,7 @@ export class ProductosPage {
       await this.page.mouse.move(viewport.width / 2, viewport.height / 2);
     }
 
-    const scroller = this.page.getByTestId('virtuoso-scroller');
+    const scroller = this.page.getByTestId('virtuoso-scroller').filter({ visible: true });
     if (await scroller.isVisible()) {
       await scroller.evaluate((node) => {
         node.scrollTop = node.scrollHeight;

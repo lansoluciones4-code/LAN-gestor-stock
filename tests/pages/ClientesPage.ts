@@ -44,13 +44,13 @@ export class ClientesPage {
     this.inputTelefono = page.getByRole('textbox', { name: '+54 9 11 9876-' });
     this.inputCorreo = page.getByRole('textbox', { name: 'cliente@correo.com' });
     this.inputDni = page.getByRole('textbox', { name: 'Ej: 35.123.456 o 20-35123456-' });
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
     this.btnRegistrar = page.getByRole('button', { name: ClientesPage.UI.BTN_REGISTRAR, exact: true });
     this.btnActualizar = page.getByRole('button', { name: ClientesPage.UI.BTN_ACTUALIZAR, exact: true });
     this.btnCancelar = page.getByRole('button', { name: ClientesPage.UI.BTN_CANCELAR, exact: true });
-    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos);
+    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos).filter({ visible: true });
     this.btnSincronizar = page.getByTestId(TEST_IDS.general.btnSincronizar);
   }
 
@@ -77,7 +77,7 @@ export class ClientesPage {
       await this.page.mouse.move(viewport.width / 2, viewport.height / 2);
     }
 
-    const scroller = this.page.getByTestId('virtuoso-scroller');
+    const scroller = this.page.getByTestId('virtuoso-scroller').filter({ visible: true });
     if (await scroller.isVisible()) {
       await scroller.evaluate((node) => {
         node.scrollTop = node.scrollHeight;

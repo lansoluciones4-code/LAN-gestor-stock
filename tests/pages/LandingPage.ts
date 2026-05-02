@@ -11,7 +11,7 @@ export class LandingPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
   }
 
   // =========================================================================

@@ -38,12 +38,12 @@ export class EquiposPage {
     this.page = page;
 
     this.inputNombre = page.getByRole('textbox', { name: 'Ej: iPhone 15 Pro Max' });
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
     this.btnRegistrar = page.getByTestId(TEST_IDS.general.btnSubmitModal);
     this.btnActualizar = page.getByTestId(TEST_IDS.general.btnSubmitModal);
-    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos);
+    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos).filter({ visible: true });
     this.btnCancelar = page.getByRole('button', { name: EquiposPage.UI.BTN_CANCELAR, exact: true });
     this.btnSincronizar = page.getByTestId(TEST_IDS.general.btnSincronizar);
   }
@@ -81,7 +81,7 @@ export class EquiposPage {
       await this.page.mouse.move(viewport.width / 2, viewport.height / 2);
     }
 
-    const scroller = this.page.getByTestId('virtuoso-scroller');
+    const scroller = this.page.getByTestId('virtuoso-scroller').filter({ visible: true });
     if (await scroller.isVisible()) {
       await scroller.evaluate((node) => {
         node.scrollTop = node.scrollHeight;
