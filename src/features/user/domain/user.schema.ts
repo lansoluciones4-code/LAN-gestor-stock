@@ -86,12 +86,4 @@ export const userRowSchema = createSelectSchema(users)
 
 export type UserDef = z.infer<typeof userRowSchema>;
 
-// ---------------------------------------------------------------------------
-// Back-compat aliases — remove once consumers updated in this same commit
-// ---------------------------------------------------------------------------
-/** @deprecated use userCreateSchema */
-export const userSchema = userCreateSchema;
-/** @deprecated use userRowSchema */
-export const userDefSchema = userRowSchema;
-/** @deprecated use userFormSchema */
-export const userEditFormSchema = userFormSchema;
+

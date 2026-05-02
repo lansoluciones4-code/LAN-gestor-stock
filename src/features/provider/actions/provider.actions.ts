@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { providerRepository } from '@/features/provider/repository/provider.repository';
-import { providerSchema, providerDefSchema, ProviderInput, type ProviderDef, providerUpdateSchema, type ProviderUpdateInput } from '@/features/provider/domain/provider.schema';
+import { providerCreateSchema, providerRowSchema, ProviderInput, type ProviderDef, providerUpdateSchema, type ProviderUpdateInput } from '@/features/provider/domain/provider.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 import { ConcurrencyError } from '@/lib/errors';
@@ -16,7 +16,7 @@ export async function fetchProviders(): Promise<ProviderDef[]> {
   try {
     await verifyAuthOrAdmin(false); // Vendors can see providers
     const providersList = await providerRepository.getAllProviders();
-    return z.array(providerDefSchema).parse(providersList);
+    return z.array(providerRowSchema).parse(providersList);
   } catch (error) {
     console.error('fetchProviders error:', error);
     return [];
@@ -43,7 +43,7 @@ export async function toggleProviderActiveAction(id: string, isActive: boolean):
 export async function createProviderAction(input: ProviderInput): Promise<ActionResult<ProviderDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    const parsed = providerSchema.safeParse(input);
+    const parsed = providerCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {

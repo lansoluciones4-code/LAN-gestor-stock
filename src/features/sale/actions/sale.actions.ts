@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { saleRepository } from '@/features/sale/repository/sale.repository';
-import { saleSchema, saleDefSchema, type SaleInput, type SaleDef } from '@/features/sale/domain/sale.schema';
+import { saleCreateSchema, saleRowSchema, type SaleInput, type SaleDef } from '@/features/sale/domain/sale.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
@@ -20,7 +20,7 @@ export async function fetchSales(): Promise<SaleDef[]> {
     const list = await saleRepository.getAllSales();
 
     // Zod will parse and convert strings to numbers
-    return z.array(saleDefSchema).parse(list);
+    return z.array(saleRowSchema).parse(list);
   } catch (error) {
     console.error('fetchSales error:', error);
     return [];
@@ -33,7 +33,7 @@ export async function fetchSales(): Promise<SaleDef[]> {
 export async function createSaleAction(input: SaleInput): Promise<ActionResult<{ id: string }>> {
   try {
     const caller = await verifyAuthOrAdmin(false);
-    const parsed = saleSchema.safeParse(input);
+    const parsed = saleCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {

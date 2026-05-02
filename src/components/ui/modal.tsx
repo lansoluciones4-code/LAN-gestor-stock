@@ -61,6 +61,6 @@ const ModalHeader = ({ title, icon, onClose, className = '', titleClassName = ''
 
 const ModalContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => <div className={`p-6 sm:p-8 space-y-6 ${className}`}>{children}</div>;
 
-const ModalFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => <div className={`flex justify-end px-6 sm:px-8 py-5 gap-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 ${className}`}>{children}</div>;
+const ModalFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => <div className={`flex justify-center sm:justify-end px-6 sm:px-8 py-5 gap-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 ${className}`}>{children}</div>;
 
 export { Modal, ModalHeader, ModalContent, ModalFooter };

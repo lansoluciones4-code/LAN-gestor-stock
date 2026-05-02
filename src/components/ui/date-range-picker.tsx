@@ -14,7 +14,6 @@ export function DateRangePicker({ startDate, endDate, onStartChange, onEndChange
   return (
     <div className='flex flex-wrap sm:flex-nowrap items-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm divide-y sm:divide-y-0 sm:divide-x divide-zinc-100 dark:divide-zinc-800 w-full sm:w-auto'>
       <div className='flex items-center px-3 py-1.5 flex-1 sm:flex-none'>
-        <Calendar className='w-4 h-4 text-indigo-500 mr-2 shrink-0' />
         <input
           type='date'
           value={startDate}

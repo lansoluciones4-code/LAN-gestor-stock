@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type DeviceDef } from '@/features/device/domain/device.schema';

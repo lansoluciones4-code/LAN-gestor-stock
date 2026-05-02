@@ -75,16 +75,16 @@ export function UserPanel() {
         filters={
           <ToggleFilter id='showInactives-user' checked={showInactives} onChange={setShowInactives} label='Ver Inactivos' data-testid={TEST_IDS.general.btnVerOcultos} />
         }
+        sync={
+          <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar' className='h-11 w-11 flex-none' data-testid={TEST_IDS.general.btnSincronizar}>
+            <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+          </Button>
+        }
         actions={
-          <>
-            <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar' className='h-11 w-11' data-testid={TEST_IDS.general.btnSincronizar}>
-              <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button onClick={() => openFormModal()} variant='primary' leftIcon={<Plus className='w-5 h-5' />} className='h-11' data-testid={TEST_IDS.general.btnAgregar}>
-              <span className='hidden sm:inline'>Crear Credencial</span>
-              <span className='sm:hidden'>Crear</span>
-            </Button>
-          </>
+          <Button onClick={() => openFormModal()} variant='primary' leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm' data-testid={TEST_IDS.general.btnAgregar}>
+            <span className='hidden sm:inline'>Crear Credencial</span>
+            <span className='sm:hidden'>Crear</span>
+          </Button>
         }
       />
 

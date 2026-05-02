@@ -39,13 +39,13 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
     {
       header: 'Acciones',
       headerClassName: 'text-right font-bold',
-      cellClassName: 'flex gap-2 justify-end',
+      cellClassName: 'flex gap-1 justify-end',
       cell: (u: UserDef) => (
         <>
           <button
             disabled={currentUserId === u.id}
             onClick={() => onToggleActive(u)}
-            className={`p-2 rounded-lg transition ${currentUserId === u.id ? 'opacity-20 cursor-not-allowed' : u.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`}
+            className={`p-1.5 rounded-lg transition ${currentUserId === u.id ? 'opacity-20 cursor-not-allowed' : u.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`}
             title={u.isActive ? 'Desactivar' : 'Activar'}
           >
             <Plus className={`w-4 h-4 ${u.isActive ? 'rotate-45' : ''}`} />
@@ -53,7 +53,7 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
 
           <button
             onClick={() => onEdit(u)}
-            className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition'
+            className='p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition'
             title='Editar Seguridad'
           >
             <Edit className='w-4 h-4' />
@@ -63,7 +63,7 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
             <button
               onClick={() => onDelete(u.id)}
               disabled={currentUserId === u.id}
-              className={`p-2 rounded-lg transition ${currentUserId === u.id ? 'opacity-30 cursor-not-allowed text-zinc-500' : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'}`}
+              className={`p-1.5 rounded-lg transition ${currentUserId === u.id ? 'opacity-30 cursor-not-allowed text-zinc-500' : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'}`}
               title='Retirar Acceso'
             >
               <Trash2 className='w-4 h-4' />

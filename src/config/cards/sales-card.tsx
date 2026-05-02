@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { FileText, Trash2 } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type SaleDef } from '@/features/sale/domain/sale.schema';

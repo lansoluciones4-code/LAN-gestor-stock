@@ -105,14 +105,4 @@ export const saleRowSchema = createSelectSchema(sales).extend({
 
 export type SaleDef = z.infer<typeof saleRowSchema>;
 
-// ---------------------------------------------------------------------------
-// Back-compat aliases
-// ---------------------------------------------------------------------------
-/** @deprecated use saleItemInputSchema */
-export const saleItemSchema = saleItemInputSchema;
-/** @deprecated use salePaymentInputSchema */
-export const salePaymentSchema = salePaymentInputSchema;
-/** @deprecated use saleCreateSchema */
-export const saleSchema = saleCreateSchema;
-/** @deprecated use saleRowSchema */
-export const saleDefSchema = saleRowSchema;
+

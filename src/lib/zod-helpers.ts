@@ -6,7 +6,7 @@ import { z } from 'zod';
  * Pipe to z.number() to apply further constraints.
  */
 export const toNumber = () =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   z.any().transform((v: any) => {
     if (typeof v === 'string') return Number(v.replace(',', '.'));
     return Number(v);

@@ -29,11 +29,3 @@ export const providerRowSchema = createSelectSchema(providers).extend({
 });
 
 export type ProviderDef = z.infer<typeof providerRowSchema>;
-
-// ---------------------------------------------------------------------------
-// Back-compat aliases
-// ---------------------------------------------------------------------------
-/** @deprecated use providerCreateSchema */
-export const providerSchema = providerCreateSchema;
-/** @deprecated use providerRowSchema */
-export const providerDefSchema = providerRowSchema;

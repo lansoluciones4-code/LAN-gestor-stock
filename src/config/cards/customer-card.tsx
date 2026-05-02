@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { Edit, ToggleLeft, ToggleRight } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type CustomerDef } from '@/features/customer/domain/customer.schema';

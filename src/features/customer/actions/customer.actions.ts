@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { customerRepository } from '@/features/customer/repository/customer.repository';
-import { customerSchema, customerDefSchema, CustomerInput, type CustomerDef, customerUpdateSchema, type CustomerUpdateInput } from '@/features/customer/domain/customer.schema';
+import { customerCreateSchema, customerRowSchema, CustomerInput, type CustomerDef, customerUpdateSchema, type CustomerUpdateInput } from '@/features/customer/domain/customer.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 import { ConcurrencyError } from '@/lib/errors';
@@ -16,7 +16,7 @@ export async function fetchCustomers(): Promise<CustomerDef[]> {
   try {
     await verifyAuthOrAdmin(false); // Vendors can see customers
     const customersList = await customerRepository.getAllCustomers();
-    return z.array(customerDefSchema).parse(customersList);
+    return z.array(customerRowSchema).parse(customersList);
   } catch (error) {
     console.error('fetchCustomers error:', error);
     return [];
@@ -43,7 +43,7 @@ export async function toggleCustomerActiveAction(id: string, isActive: boolean):
 export async function createCustomerAction(input: CustomerInput): Promise<ActionResult<CustomerDef>> {
   try {
     const caller = await verifyAuthOrAdmin(false); // Vendors can create customers
-    const parsed = customerSchema.safeParse(input);
+    const parsed = customerCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {

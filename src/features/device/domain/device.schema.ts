@@ -28,10 +28,4 @@ export const deviceRowSchema = createSelectSchema(devices).extend({
 
 export type DeviceDef = z.infer<typeof deviceRowSchema>;
 
-// ---------------------------------------------------------------------------
-// Back-compat aliases
-// ---------------------------------------------------------------------------
-/** @deprecated use deviceCreateSchema */
-export const deviceSchema = deviceCreateSchema;
-/** @deprecated use deviceRowSchema */
-export const deviceDefSchema = deviceRowSchema;
+

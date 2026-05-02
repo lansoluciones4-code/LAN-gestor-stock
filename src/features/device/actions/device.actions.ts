@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { deviceRepository } from '@/features/device/repository/device.repository';
-import { deviceSchema, deviceDefSchema, DeviceInput, type DeviceDef, deviceUpdateSchema, type DeviceUpdateInput } from '@/features/device/domain/device.schema';
+import { deviceCreateSchema, deviceRowSchema, DeviceInput, type DeviceDef, deviceUpdateSchema, type DeviceUpdateInput } from '@/features/device/domain/device.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 import { ConcurrencyError } from '@/lib/errors';
@@ -16,7 +16,7 @@ export async function fetchDevices(): Promise<DeviceDef[]> {
   try {
     await verifyAuthOrAdmin(false);
     const devicesList = await deviceRepository.getAllDevices();
-    return z.array(deviceDefSchema).parse(devicesList);
+    return z.array(deviceRowSchema).parse(devicesList);
   } catch (error) {
     console.error('fetchDevices error:', error);
     return [];
@@ -43,7 +43,7 @@ export async function toggleDeviceActiveAction(id: string, isActive: boolean): P
 export async function createDeviceAction(input: DeviceInput): Promise<ActionResult<DeviceDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    const parsed = deviceSchema.safeParse(input);
+    const parsed = deviceCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
@@ -118,7 +118,7 @@ export async function fetchLandingCategories(): Promise<DeviceDef[]> {
     const devicesList = await deviceRepository.getAllDevices();
     // Only return active categories for the landing page
     const active = devicesList.filter((d) => d.isActive);
-    return z.array(deviceDefSchema).parse(active);
+    return z.array(deviceRowSchema).parse(active);
   } catch (error) {
     console.error('fetchLandingCategories error:', error);
     return [];

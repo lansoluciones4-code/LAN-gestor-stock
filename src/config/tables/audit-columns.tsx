@@ -103,7 +103,7 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
             e.stopPropagation();
             onView(log);
           }}
-          className='p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm'
+          className='p-1.5 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm'
           title='Ver Detalle'
         >
           <Eye className='w-4 h-4' />

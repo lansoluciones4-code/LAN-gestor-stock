@@ -18,13 +18,18 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+
 export default async function HomePage() {
   const [products, categories] = await Promise.all([fetchLandingProducts(), fetchLandingCategories()]);
 
   return (
     <div className='lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-indigo-500/30 flex flex-col'>
       {/* Hero Section */}
-      <section className='relative pb-4 md:pb-10 pt-8 md:pt-10 overflow-hidden px-4 sm:px-8 shrink-0'>
+      <section className='relative pb-4 md:pb-10 pt-16 md:pt-12 overflow-hidden px-4 sm:px-8 shrink-0'>
+        <div className='absolute top-4 right-4 z-50'>
+          <ThemeToggle />
+        </div>
         <div className='max-w-6xl mx-auto text-center space-y-4 md:space-y-6'>
           <h1 className='text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white'>Phone Center</h1>
         </div>

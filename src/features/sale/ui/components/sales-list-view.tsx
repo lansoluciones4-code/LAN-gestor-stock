@@ -63,16 +63,16 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
             data-testid={TEST_IDS.ventas.inputFiltroFecha}
           />
         }
+        sync={
+          <Button variant='secondary' size='icon' onClick={onSync} disabled={isPending} title='Sincronizar' className='h-11 w-11 flex-none' data-testid={TEST_IDS.general.btnSincronizar}>
+            <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+          </Button>
+        }
         actions={
-          <>
-            <Button variant='secondary' size='icon' onClick={onSync} disabled={isPending} title='Sincronizar' data-testid={TEST_IDS.general.btnSincronizar}>
-              <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button variant='primary' onClick={onNewSale} leftIcon={<Plus className='w-5 h-5' />} data-testid={TEST_IDS.general.btnAgregar}>
-              <span className='hidden sm:inline'>Nueva Venta</span>
-              <span className='sm:hidden'>Nueva</span>
-            </Button>
-          </>
+          <Button variant='primary' onClick={onNewSale} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm' data-testid={TEST_IDS.general.btnAgregar}>
+            <span className='hidden sm:inline'>Nueva Venta</span>
+            <span className='sm:hidden'>Nueva</span>
+          </Button>
         }
       />
 

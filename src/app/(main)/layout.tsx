@@ -27,7 +27,7 @@ const adminNavigation = [
 export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -67,7 +67,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(false)}
-          className='lg:hidden p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
+          className='xl:hidden p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
         >
           <X className='w-6 h-6' />
         </button>
@@ -118,14 +118,14 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className='fixed inset-0 bg-zinc-900/80 z-40 lg:hidden backdrop-blur-sm'
+              className='fixed inset-0 bg-zinc-900/80 z-40 xl:hidden backdrop-blur-sm'
             />
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
-              className='fixed inset-y-0 left-0 w-[320px] z-50 lg:hidden'
+              className='fixed inset-y-0 left-0 w-[320px] z-50 xl:hidden'
             >
               <SidebarContent />
             </motion.div>
@@ -134,7 +134,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <div className='hidden lg:flex lg:shrink-0 lg:w-80 no-print'>
+      <div className='hidden xl:flex xl:shrink-0 xl:w-80 no-print'>
         <SidebarContent />
       </div>
 
@@ -147,7 +147,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <header className='shrink-0 h-16 flex items-center justify-between px-4 lg:px-8 transition-colors bg-transparent border-none no-print'>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className='lg:hidden p-2 -ml-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-100'
+            className='xl:hidden p-2 -ml-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-100'
           >
             <Menu className='w-6 h-6' />
           </button>
@@ -155,11 +155,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           <div className='flex items-center ml-auto'>
             {mounted && (
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 className='p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 rounded-full transition-colors'
                 aria-label='Alternar tema'
               >
-                {theme === 'dark' ? <Sun className='w-5 h-5' /> : <Moon className='w-5 h-5' />}
+                {resolvedTheme === 'dark' ? <Sun className='w-5 h-5' /> : <Moon className='w-5 h-5' />}
               </button>
             )}
           </div>

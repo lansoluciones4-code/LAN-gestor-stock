@@ -23,7 +23,7 @@ export const productCreateSchema = createInsertSchema(products)
     purchasePrice: priceField('El precio de compra'),
     salePrice: priceField('El precio de venta'),
     stock: z
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       .any()
       .transform((v: any, ctx) => {
         const parsed = Number(v);
@@ -59,10 +59,4 @@ export const productRowSchema = createSelectSchema(products).extend({
 
 export type ProductDef = z.infer<typeof productRowSchema>;
 
-// ---------------------------------------------------------------------------
-// Back-compat aliases — remove once all consumers updated in this same commit
-// ---------------------------------------------------------------------------
-/** @deprecated use productCreateSchema */
-export const productSchema = productCreateSchema;
-/** @deprecated use productRowSchema */
-export const productDefSchema = productRowSchema;
+

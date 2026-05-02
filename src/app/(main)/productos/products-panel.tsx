@@ -38,7 +38,8 @@ function blockInvalidPriceKey(e: React.KeyboardEvent<HTMLInputElement>) {
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [showZeroStock, setShowZeroStock] = useState(true);
+  const [showZeroStock, setShowZeroStock] = useState(false);
+  const [showOnlyLanding, setShowOnlyLanding] = useState(false);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [lossProduct, setLossProduct] = useState<ProductDef | null>(null);
@@ -89,16 +90,16 @@ export function ProductsPanel() {
         const text = [normalizeForSearch(p.device?.name), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
-        return terms.every((w) => text.includes(w)) && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0);
+        return terms.every((w) => text.includes(w)) && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0) && (!showOnlyLanding || p.showOnLanding);
       })
       .sort((a, b) => (a.stock > 0 && b.stock === 0 ? -1 : a.stock === 0 && b.stock > 0 ? 1 : 0));
-  }, [products, search, minPrice, maxPrice, showZeroStock, role]);
+  }, [products, search, minPrice, maxPrice, showZeroStock, showOnlyLanding, role]);
 
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     reset(item ? { deviceId: item.deviceId, providerId: item.providerId, description: item.description || '', purchasePrice: item.purchasePrice.toFixed(2).replace('.', ','), salePrice: item.salePrice.toFixed(2).replace('.', ','), stock: item.stock } as any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       : { deviceId: '', providerId: '', description: '', purchasePrice: '0,00', salePrice: '0,00', stock: 1 } as any);
   };
 
@@ -129,7 +130,7 @@ export function ProductsPanel() {
 
   const handleProductFormSubmit = (data: ProductInput) => {
     if (editingItem) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const changedData: any = { version: editingItem.version, deviceVersion: editingItem.device?.version, providerVersion: editingItem.provider?.version };
       let hasChanges = false;
       Object.keys(dirtyFields).forEach((key) => {
@@ -173,20 +174,23 @@ export function ProductsPanel() {
                 data-testid={TEST_IDS.productos.inputBusquedaPrecioMax} />
             </div>
             {role === 'admin' && (
-              <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' data-testid={TEST_IDS.general.btnVerOcultos} />
+              <>
+                <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' data-testid={TEST_IDS.general.btnVerOcultos} />
+                <ToggleFilter id='showOnlyLanding' checked={showOnlyLanding} onChange={setShowOnlyLanding} label='Solo Landing' />
+              </>
             )}
           </div>
         }
+        sync={
+          <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar' className='h-11 w-11 flex-none' data-testid={TEST_IDS.general.btnSincronizar}>
+            <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+          </Button>
+        }
         actions={
-          <>
-            <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar' className='h-11 w-11' data-testid={TEST_IDS.general.btnSincronizar}>
-              <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button variant='primary' onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11' data-testid={TEST_IDS.general.btnAgregar}>
-              <span className='hidden sm:inline'>Ingresar Stock</span>
-              <span className='sm:hidden'>Agregar</span>
-            </Button>
-          </>
+          <Button variant='primary' onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm' data-testid={TEST_IDS.general.btnAgregar}>
+            <span className='hidden sm:inline'>Ingresar Stock</span>
+            <span className='sm:hidden'>Agregar</span>
+          </Button>
         }
       />
 
@@ -223,7 +227,7 @@ export function ProductsPanel() {
           <div className='col-span-1 md:col-span-2'>
             <label className='block text-sm font-medium mb-1.5'>Descripción Física (Color, Memoria)</label>
             <input type='text' {...register('description')} placeholder='Ej: Negro, 256GB - Kit Funda'
-              className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700' />
+              className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700' />
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Precio de Costo ($)</label>
@@ -248,7 +252,7 @@ export function ProductsPanel() {
           <div>
             <label className='block text-sm font-medium mb-1.5'>Stock Inicial Lote</label>
             <input type='number' {...register('stock', { valueAsNumber: true })} onKeyDown={(e) => { if (PRICE_KEYS.includes(e.key)) e.preventDefault(); }}
-              min='0' step='1' placeholder='1' className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' />
+              min='0' step='1' placeholder='1' className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' />
             {errors.stock && <p className='text-red-500 text-xs mt-1'>{errors.stock.message}</p>}
           </div>
         </div>
@@ -275,12 +279,12 @@ export function ProductsPanel() {
             <label className='block text-sm font-medium mb-1.5'>Cantidad perdida</label>
             <input type='number' value={lossQuantity} onChange={(e) => setLossQuantity(e.target.value)}
               onKeyDown={(e) => { if (PRICE_KEYS.includes(e.key)) e.preventDefault(); }} min='1' step='1' placeholder='Ej: 1'
-              className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500' />
+              className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500' />
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Motivo / Razón</label>
             <textarea value={lossReason} onChange={(e) => setLossReason(e.target.value)} placeholder='Ej: Pantalla rota al desembalar'
-              className='w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm' />
+              className='w-full px-4 py-2 sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm' />
           </div>
         </div>
       </ResponsiveModal>

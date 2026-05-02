@@ -160,8 +160,8 @@ export function LogPanel() {
             data-testid={TEST_IDS.logPanel.inputFiltroFecha}
           />
         }
-        actions={
-          <Button variant='secondary' size='icon' onClick={handleSync} disabled={isPending} title='Sincronizar' className='h-11 w-11' data-testid={TEST_IDS.general.btnSincronizar}>
+        sync={
+          <Button variant='secondary' size='icon' onClick={handleSync} disabled={isPending} title='Sincronizar' className='h-11 w-11 flex-none' data-testid={TEST_IDS.general.btnSincronizar}>
             <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
           </Button>
         }

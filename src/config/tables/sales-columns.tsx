@@ -86,12 +86,12 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
     {
       header: 'Acciones',
       headerClassName: 'text-right',
-      cellClassName: 'flex gap-2 justify-end',
+      cellClassName: 'flex gap-1 justify-end',
       cell: (s: SaleDef) => (
         <>
           <button
             onClick={() => onPrint(s)}
-            className='p-2 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors'
+            className='p-1.5 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors'
             title='Imprimir Factura'
           >
             <FileText className='w-4 h-4' />
@@ -99,7 +99,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
           {role === 'admin' && (
             <button
               onClick={() => onDelete(s.id!)}
-              className='p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors'
+              className='p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors'
               title='Anular Venta'
             >
               <Trash2 className='w-4 h-4' />

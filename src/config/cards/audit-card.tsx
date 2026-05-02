@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { Eye } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type AuditLogDef } from '@/features/audit/domain/audit-log.schema';
@@ -56,8 +57,8 @@ export function renderAuditCard(actions: AuditCardActionsProps) {
         subtitle={`Por: ${log.user?.username ?? 'SISTEMA'}`}
         badges={
           <>
-            <span className={`px-2.5 py-0.5 rounded text-xs font-black tracking-widest uppercase ${actionColor}`}>
-              {log.action}
+            <span className={`px-2.5 py-1 rounded text-[10px] font-black tracking-widest uppercase leading-tight inline-block ${actionColor}`}>
+              {log.action.replace(/_/g, ' ')}
             </span>
             <span className='px-2.5 py-0.5 rounded text-xs font-black tracking-widest uppercase bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'>
               {ENTITY_LABELS[log.entity] ?? log.entity}

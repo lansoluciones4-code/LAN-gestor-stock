@@ -5,9 +5,9 @@ import { db } from '@/lib/db';
 import { productRepository } from '@/features/product/repository/product.repository';
 import { deviceRepository } from '@/features/device/repository/device.repository';
 import { providerRepository } from '@/features/provider/repository/provider.repository';
-import { productSchema, productDefSchema, ProductInput, type ProductDef, productUpdateSchema, type ProductUpdateInput } from '@/features/product/domain/product.schema';
-import { providerDefSchema, type ProviderDef } from '@/features/provider/domain/provider.schema';
-import { deviceDefSchema, type DeviceDef } from '@/features/device/domain/device.schema';
+import { productCreateSchema, productRowSchema, ProductInput, type ProductDef, productUpdateSchema, type ProductUpdateInput } from '@/features/product/domain/product.schema';
+import { providerRowSchema, type ProviderDef } from '@/features/provider/domain/provider.schema';
+import { deviceRowSchema, type DeviceDef } from '@/features/device/domain/device.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 import { ConcurrencyError } from '@/lib/errors';
@@ -24,7 +24,7 @@ export async function fetchProducts(): Promise<ProductDef[]> {
       salePrice: parseFloat(p.salePrice as any),
       purchasePrice: parseFloat(p.purchasePrice as any),
     }));
-    return z.array(productDefSchema).parse(formatted);
+    return z.array(productRowSchema).parse(formatted);
   } catch (error) {
     console.error('fetchProducts error:', error);
     return [];
@@ -37,8 +37,8 @@ export async function fetchSelectorData(): Promise<{ devices: DeviceDef[]; provi
     const providersList = await providerRepository.getAllProviders();
 
     return {
-      devices: z.array(deviceDefSchema).parse(devicesList),
-      providers: z.array(providerDefSchema).parse(providersList),
+      devices: z.array(deviceRowSchema).parse(devicesList),
+      providers: z.array(providerRowSchema).parse(providersList),
     };
   } catch (error) {
     console.error('fetchSelectorData error:', error);
@@ -49,7 +49,7 @@ export async function fetchSelectorData(): Promise<{ devices: DeviceDef[]; provi
 export async function createProductAction(input: ProductInput): Promise<ActionResult<ProductDef>> {
   try {
     const caller = await verifyAuthOrAdmin(false);
-    const parsed = productSchema.safeParse(input);
+    const parsed = productCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {
@@ -151,7 +151,7 @@ export async function fetchLandingProducts(): Promise<ProductDef[]> {
       salePrice: parseFloat(p.salePrice as any),
       purchasePrice: parseFloat(p.purchasePrice as any),
     }));
-    return z.array(productDefSchema).parse(formatted);
+    return z.array(productRowSchema).parse(formatted);
   } catch (error) {
     console.error('fetchLandingProducts error:', error);
     return [];
@@ -188,7 +188,7 @@ export async function fetchProductById(id: string): Promise<ProductDef | null> {
       purchasePrice: parseFloat(product.purchasePrice as any),
     };
 
-    return productDefSchema.parse(formatted);
+    return productRowSchema.parse(formatted);
   } catch (error) {
     console.error('fetchProductById error:', error);
     return null;

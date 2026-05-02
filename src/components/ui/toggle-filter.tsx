@@ -23,7 +23,7 @@ export function ToggleFilter({ id, checked, onChange, label, ...props }: ToggleF
       />
       <label
         htmlFor={id}
-        className='text-base font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none whitespace-nowrap'
+        className='text-base font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer select-none'
       >
         {label}
       </label>

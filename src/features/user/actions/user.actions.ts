@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { userRepository } from '@/features/user/repository/user.repository';
-import { userSchema, userDefSchema, UserInput, type UserDef, userUpdateSchema, type UserUpdateInput } from '@/features/user/domain/user.schema';
+import { userCreateSchema, userRowSchema, UserInput, type UserDef, userUpdateSchema, type UserUpdateInput } from '@/features/user/domain/user.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 import { ConcurrencyError } from '@/lib/errors';
@@ -17,7 +17,7 @@ export async function fetchUsers(): Promise<UserDef[]> {
   try {
     await verifyAuthOrAdmin(true);
     const usersList = await userRepository.getAllUsers();
-    return z.array(userDefSchema).parse(usersList);
+    return z.array(userRowSchema).parse(usersList);
   } catch (error) {
     console.error('fetchUsers error:', error);
     return [];
@@ -47,7 +47,7 @@ export async function toggleUserActiveAction(id: string, isActive: boolean): Pro
 export async function createUserAction(input: UserInput): Promise<ActionResult<UserDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    const parsed = userSchema.safeParse(input);
+    const parsed = userCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 
     return await db.transaction(async (tx) => {

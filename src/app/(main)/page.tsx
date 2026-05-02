@@ -70,7 +70,7 @@ export default function DashboardPage() {
           <button
             onClick={handleSync}
             disabled={isPending}
-            className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
+            className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
           >
             {isPending ? (
               'Recalculando...'
@@ -233,7 +233,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Informative Grid */}
-        <div className='lg:col-span-12 grid grid-cols-1 md:grid-cols-5 gap-6 px-2 pb-6'>
+        <div className='lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 px-2 pb-6'>
           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
             <div className='flex items-center gap-3 mb-4'>
               <Clock className='w-5 h-5 text-indigo-500' />

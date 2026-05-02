@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { PackageX, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type ProductDef } from '@/features/product/domain/product.schema';

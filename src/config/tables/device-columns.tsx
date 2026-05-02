@@ -24,26 +24,26 @@ export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { r
           {
             header: 'Acciones',
             headerClassName: 'text-right',
-            cellClassName: 'flex gap-2 justify-end',
+            cellClassName: 'flex gap-1 justify-end',
             cell: (row: DeviceDef) => (
               <>
                 <button
                   onClick={() => onToggleActive(row)}
-                  className={`p-2 rounded-lg transition ${row.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`}
+                  className={`p-1.5 rounded-lg transition ${row.isActive ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'}`}
                   title={row.isActive ? 'Desactivar' : 'Activar'}
                 >
                   <Plus className={`w-4 h-4 ${row.isActive ? 'rotate-45' : ''}`} />
                 </button>
                 <button
                   onClick={() => onEdit(row)}
-                  className='p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition'
+                  className='p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 rounded-lg transition'
                   title='Editar Ficha'
                 >
                   <Edit className='w-4 h-4' />
                 </button>
                 <button
                   onClick={() => onDelete(row.id)}
-                  className='p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition'
+                  className='p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition'
                   title='Eliminar'
                 >
                   <Trash2 className='w-4 h-4' />

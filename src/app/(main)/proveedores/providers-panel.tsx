@@ -83,17 +83,17 @@ export function ProvidersPanel() {
         filters={
           <ToggleFilter id='showInactive-provider' checked={showInactive} onChange={setShowInactive} label='Ver Inactivos' data-testid={TEST_IDS.general.btnVerOcultos} />
         }
-        actions={role === 'admin' ? (
-          <>
-            <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar Datos' className='h-11 w-11' data-testid={TEST_IDS.general.btnSincronizar}>
-              <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button variant='primary' onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11' data-testid={TEST_IDS.general.btnAgregar}>
-              <span className='hidden sm:inline'>Agregar Proveedor</span>
-              <span className='sm:hidden'>Agregar</span>
-            </Button>
-          </>
-        ) : null}
+        sync={role === 'admin' && (
+          <Button variant='secondary' size='icon' onClick={() => syncData(true)} disabled={isPending} title='Sincronizar Datos' className='h-11 w-11 flex-none' data-testid={TEST_IDS.general.btnSincronizar}>
+            <RefreshCcw className={`w-5 h-5 ${isPending ? 'animate-spin' : ''}`} />
+          </Button>
+        )}
+        actions={role === 'admin' && (
+          <Button variant='primary' onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm' data-testid={TEST_IDS.general.btnAgregar}>
+            <span className='hidden sm:inline'>Agregar Proveedor</span>
+            <span className='sm:hidden'>Agregar</span>
+          </Button>
+        )}
       />
 
       <GlobalMessage message={globalMessage} />
@@ -114,7 +114,7 @@ export function ProvidersPanel() {
         width='md'
         onSubmit={handleSubmit((data) => {
           if (editingItem) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             const changedData: any = { version: editingItem.version };
             let hasChanges = false;
             Object.keys(dirtyFields).forEach((key) => { changedData[key as keyof ProviderInput] = data[key as keyof ProviderInput]; hasChanges = true; });

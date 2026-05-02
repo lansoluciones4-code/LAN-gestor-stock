@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Users } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
-import { customerSchema, type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/features/customer/domain/customer.schema';
+import { customerCreateSchema, type CustomerInput, type CustomerDef, type CustomerUpdateInput } from '@/features/customer/domain/customer.schema';
 import { createCustomerAction, updateCustomerAction } from '@/features/customer/actions/customer.actions';
 import { invalidateAllCaches } from '@/stores';
 import { ErrorAlert } from '@/components/ui/alert';
@@ -27,7 +27,7 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
     reset,
     formState: { errors, dirtyFields },
   } = useForm<CustomerInput>({
-    resolver: zodResolver(customerSchema),
+    resolver: zodResolver(customerCreateSchema),
   });
 
   useEffect(() => {

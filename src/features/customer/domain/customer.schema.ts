@@ -36,10 +36,4 @@ export const customerRowSchema = createSelectSchema(customers).extend({
 
 export type CustomerDef = z.infer<typeof customerRowSchema>;
 
-// ---------------------------------------------------------------------------
-// Back-compat aliases
-// ---------------------------------------------------------------------------
-/** @deprecated use customerCreateSchema */
-export const customerSchema = customerCreateSchema;
-/** @deprecated use customerRowSchema */
-export const customerDefSchema = customerRowSchema;
+
