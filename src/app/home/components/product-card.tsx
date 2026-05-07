@@ -20,16 +20,16 @@ export function ProductCard({ product }: ProductCardProps) {
   const images = product.images || [];
   const hasImages = images.length > 0;
 
-  const nextImage = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigating to product detail
+  const nextImage = (e?: React.MouseEvent | TouchEvent | MouseEvent | PointerEvent) => {
+    if (e?.preventDefault) e.preventDefault(); // Prevent navigating to product detail
     if (images.length > 1) {
       setDirection(1);
       setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     }
   };
 
-  const prevImage = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigating to product detail
+  const prevImage = (e?: React.MouseEvent | TouchEvent | MouseEvent | PointerEvent) => {
+    if (e?.preventDefault) e.preventDefault(); // Prevent navigating to product detail
     if (images.length > 1) {
       setDirection(-1);
       setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -51,6 +51,20 @@ export function ProductCard({ product }: ProductCardProps) {
     })
   };
 
+  const handleDragEnd = (e: any, { offset, velocity }: any) => {
+    const swipe = swipePower(offset.x, velocity.x);
+    if (swipe < -swipeConfidenceThreshold) {
+      nextImage();
+    } else if (swipe > swipeConfidenceThreshold) {
+      prevImage();
+    }
+  };
+
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -63,7 +77,7 @@ export function ProductCard({ product }: ProductCardProps) {
         href={`/product/${product.id}`}
         className='flex flex-col flex-1'
       >
-        <div className='relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden'>
+        <div className='relative aspect-square w-full bg-white dark:bg-black flex items-center justify-center overflow-hidden'>
           {!hasImages ? (
             <div className='flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300'>
               <Package className='w-8 h-8 sm:w-12 sm:h-12 stroke-[1.5] mb-2 sm:mb-3' />
@@ -82,7 +96,11 @@ export function ProductCard({ product }: ProductCardProps) {
                     animate="center"
                     exit="exit"
                     transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
-                    className='object-contain w-full h-full absolute inset-0'
+                    drag={images.length > 1 ? "x" : false}
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={1}
+                    onDragEnd={handleDragEnd}
+                    className='object-contain w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
                   />
                 </AnimatePresence>
               

@@ -23,15 +23,15 @@ export async function proxy(request: NextRequest) {
       user = await verifyToken(token);
       isAuthenticated = true;
     } catch {
-      const response = NextResponse.redirect(new URL('/login', request.url));
+      const response = NextResponse.redirect(new URL('/home', request.url));
       response.cookies.delete('session');
       return response;
     }
   }
 
-  // 1. Redirigir a LOGIN si no está autenticado y no es ruta pública
+  // 1. Redirigir a HOME si no está autenticado y no es ruta pública
   if (!isAuthenticated && !isPublicPath) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/home', request.url));
   }
 
   // 2. Redirigir fuera de LOGIN si ya está autenticado
