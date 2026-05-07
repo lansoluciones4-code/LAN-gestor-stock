@@ -12,39 +12,59 @@ interface ProductImageViewProps {
 
 export function ProductImageView({ images = [], deviceName, isOutOfStock }: ProductImageViewProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const hasImages = images.length > 0;
 
   const nextImage = () => {
     if (images.length > 1) {
+      setDirection(1);
       setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     }
   };
 
   const prevImage = () => {
     if (images.length > 1) {
+      setDirection(-1);
       setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     }
   };
 
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? '100%' : '-100%',
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (dir: number) => ({
+      x: dir < 0 ? '100%' : '-100%',
+      opacity: 0
+    })
+  };
+
   return (
-    <div className='relative aspect-square rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center overflow-hidden p-12 shadow-sm w-full max-w-xl mx-auto group'>
+    <div className='relative aspect-square rounded-[2.5rem] bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center overflow-hidden shadow-sm w-full max-w-xl mx-auto group'>
       {!hasImages ? (
         <div className='flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300'>
           <Package className='w-16 h-16 stroke-[1.5] mb-4' />
           <span className='text-xs font-medium tracking-widest uppercase'>Pronto</span>
         </div>
       ) : (
-        <div className='relative w-full h-full'>
-          <AnimatePresence initial={false} mode="wait">
+        <div className='relative w-full h-full overflow-hidden'>
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <motion.img
               key={currentImageIndex}
               src={images[currentImageIndex].url}
               alt={`${deviceName} - ${currentImageIndex + 1}`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4 }}
-              className='object-contain w-full h-full absolute inset-0 p-12 transition-transform duration-700 hover:scale-105'
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "tween", duration: 0.4, ease: "easeInOut" }}
+              className='object-contain w-full h-full absolute inset-0'
             />
           </AnimatePresence>
 

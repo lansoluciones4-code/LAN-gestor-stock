@@ -13,6 +13,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const deviceName = product.device?.name || 'Accesorio Apple';
   const isOutOfStock = product.stock <= 0;
   
@@ -22,6 +23,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to product detail
     if (images.length > 1) {
+      setDirection(1);
       setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     }
   };
@@ -29,8 +31,24 @@ export function ProductCard({ product }: ProductCardProps) {
   const prevImage = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to product detail
     if (images.length > 1) {
+      setDirection(-1);
       setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     }
+  };
+
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? '100%' : '-100%',
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (dir: number) => ({
+      x: dir < 0 ? '100%' : '-100%',
+      opacity: 0
+    })
   };
 
   return (
@@ -45,26 +63,28 @@ export function ProductCard({ product }: ProductCardProps) {
         href={`/product/${product.id}`}
         className='flex flex-col flex-1'
       >
-        <div className='relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden p-3 sm:p-4'>
+        <div className='relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden'>
           {!hasImages ? (
             <div className='flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300'>
               <Package className='w-8 h-8 sm:w-12 sm:h-12 stroke-[1.5] mb-2 sm:mb-3' />
               <span className='text-[9px] sm:text-[10px] font-medium tracking-widest uppercase'>Pronto</span>
             </div>
           ) : (
-            <div className='relative w-full h-full'>
-              <AnimatePresence initial={false} mode="wait">
-                <motion.img
-                  key={currentImageIndex}
-                  src={images[currentImageIndex].url}
-                  alt={`${deviceName} - ${currentImageIndex + 1}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className='object-contain w-full h-full absolute inset-0 p-3 sm:p-4 group-hover:scale-105 transition-transform duration-500'
-                />
-              </AnimatePresence>
+              <div className='relative w-full h-full overflow-hidden'>
+                <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                  <motion.img
+                    key={currentImageIndex}
+                    src={images[currentImageIndex].url}
+                    alt={`${deviceName} - ${currentImageIndex + 1}`}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
+                    className='object-contain w-full h-full absolute inset-0'
+                  />
+                </AnimatePresence>
               
               {/* Carousel Controls */}
               {images.length > 1 && (
