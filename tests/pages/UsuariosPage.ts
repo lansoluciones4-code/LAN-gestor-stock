@@ -96,7 +96,7 @@ export class UsuariosPage {
       await this.page.mouse.move(viewport.width / 2, viewport.height / 2);
     }
 
-    const scroller = this.page.getByTestId('virtuoso-scroller');
+    const scroller = this.page.getByTestId('virtuoso-scroller').filter({ visible: true });
     if (await scroller.isVisible()) {
       await scroller.evaluate((node) => {
         node.scrollTop = node.scrollHeight;

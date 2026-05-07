@@ -126,6 +126,7 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
     await expect(page.getByText(nombre, { exact: true })).toBeVisible();
 
     await clientesPage.desactivarCliente(nombre);
+    await clientesPage.buscarCliente(nombre);
     await expect(page.getByText(nombre, { exact: true })).toBeHidden();
 
     await clientesPage.verInactivos();
@@ -166,6 +167,8 @@ test.describe.parallel('Gestión de Clientes: Validaciones y Lógica', () => {
 
     await clientesPage.buscarCliente(nombreAntiguo);
     await clientesPage.desactivarCliente(nombreAntiguo);
+    await clientesPage.buscarCliente(nombreAntiguo);
+    await expect(page.getByText(nombreAntiguo, { exact: true })).toBeHidden();
 
     await clientesPage.crearCliente(clienteBase.nombre, clienteBase.telefono, clienteBase.correo, clienteBase.dni);
 
