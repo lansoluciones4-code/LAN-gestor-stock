@@ -38,6 +38,6 @@ export async function deleteProductPhoto(publicId: string): Promise<ActionResult
     if (error instanceof ConcurrencyError) {
       return { success: false, error: error.message };
     }
-    return { success: false, error: 'Failed to delete product photo' };
+    return { success: false, error: 'No se pudo eliminar la foto del producto' };
   }
 }

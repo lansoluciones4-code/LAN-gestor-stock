@@ -11,7 +11,7 @@ export async function uploadProductPhoto(
 ): Promise<ActionResult<{ url: string; publicId: string }>> {
   try {
     if (!productId || !base64Image) {
-      return { success: false, error: 'Product ID and image data are required' };
+      return { success: false, error: 'El ID del producto y la imagen son obligatorios' };
     }
 
     // Upload to cloudinary
@@ -30,6 +30,6 @@ export async function uploadProductPhoto(
     return { success: true, data: inserted };
   } catch (error) {
     console.error('Error in uploadProductPhoto:', error);
-    return { success: false, error: 'Failed to upload product photo' };
+    return { success: false, error: 'No se pudo subir la foto del producto' };
   }
 }
