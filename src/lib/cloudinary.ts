@@ -19,8 +19,8 @@ export const cloudinaryService = {
         folder: `products/${productId}`,
         resource_type: 'image',
         transformation: [
-          // 'pad' con 'background: white' añade bordes blancos para hacer la foto cuadrada sin hacer zoom.
-          { width: 800, height: 800, crop: 'pad', background: 'white' }
+          // 'pad' con 'background: auto' detecta el color predominante de los bordes de la foto y rellena los huecos con ese mismo color.
+          { width: 800, height: 800, crop: 'pad', background: 'auto' }
         ]
       });
       return {
