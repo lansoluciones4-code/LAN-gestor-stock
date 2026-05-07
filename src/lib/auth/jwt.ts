@@ -27,6 +27,6 @@ export async function verifyToken(token: string): Promise<UserSession> {
     const { payload } = await jwtVerify(token, secretKey);
     return userSessionSchema.parse(payload);
   } catch (error) {
-    throw new Error('Invalid or expired token payload');
+    throw new Error('El token es inválido o ha expirado');
   }
 }
