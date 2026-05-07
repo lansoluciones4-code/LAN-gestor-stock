@@ -19,6 +19,25 @@ type LoginResult = {
   };
 };
 
+// --- IN-MEMORY RATE LIMITER ---
+const MAX_ATTEMPTS = 5;
+const BLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutos
+
+type RateLimitData = { count: number; blockedUntil: number | null };
+
+const globalForAuth = globalThis as unknown as { rateLimitCache: Map<string, RateLimitData> };
+const rateLimitCache = globalForAuth.rateLimitCache || new Map<string, RateLimitData>();
+if (process.env.NODE_ENV !== 'production') globalForAuth.rateLimitCache = rateLimitCache;
+
+function recordFailure(username: string, data: RateLimitData, now: number) {
+  data.count += 1;
+  if (data.count >= MAX_ATTEMPTS) {
+    data.blockedUntil = now + BLOCK_DURATION_MS;
+  }
+  rateLimitCache.set(username, data);
+}
+// ------------------------------
+
 /**
  * Handles the authentication process from the server side.
  */
@@ -29,12 +48,38 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
 
     const { username, password } = parsed.data;
 
+    // --- RATE LIMIT CHECK ---
+    const now = Date.now();
+    const limitData = rateLimitCache.get(username) || { count: 0, blockedUntil: null };
+
+    if (limitData.blockedUntil && now < limitData.blockedUntil) {
+      const remainingMinutes = Math.ceil((limitData.blockedUntil - now) / 60000);
+      return { success: false, message: `Demasiados intentos. Cuenta bloqueada temporalmente por ${remainingMinutes} minutos.` };
+    }
+
+    if (limitData.blockedUntil && now >= limitData.blockedUntil) {
+      // Unblock if time passed
+      limitData.count = 0;
+      limitData.blockedUntil = null;
+      rateLimitCache.set(username, limitData);
+    }
+    // ------------------------
+
     return await db.transaction(async (tx) => {
       const user = await userRepository.getUserByUsername(username, tx);
-      if (!user) return { success: false, message: 'Credenciales inválidas' };
+      if (!user) {
+        recordFailure(username, limitData, now);
+        return { success: false, message: 'Credenciales inválidas' };
+      }
 
       const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-      if (!isValidPassword) return { success: false, message: 'Credenciales inválidas' };
+      if (!isValidPassword) {
+        recordFailure(username, limitData, now);
+        return { success: false, message: 'Credenciales inválidas' };
+      }
+
+      // Success: Clear failed attempts
+      rateLimitCache.delete(username);
 
       const sessionPayload = { id: user.id, username: user.username, role: user.role as Role };
       const token = await signToken(sessionPayload);
