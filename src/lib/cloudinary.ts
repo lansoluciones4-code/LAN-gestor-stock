@@ -20,7 +20,8 @@ export const cloudinaryService = {
         resource_type: 'image',
         transformation: [
           // 'fill' recorta lo sobrante, y 'auto' usa IA para mantener el producto centrado sin cortar lo importante (efecto zoom/cover).
-          { width: 800, height: 800, crop: 'fill', gravity: 'auto' }
+          // 'fetch_format: auto' y 'quality: auto' reducen drásticamente el peso para ahorrar ancho de banda.
+          { width: 800, height: 800, crop: 'fill', gravity: 'auto', fetch_format: 'auto', quality: 'auto' }
         ]
       });
       return {
@@ -35,7 +36,7 @@ export const cloudinaryService = {
 
   /**
    * Deletes an image from Cloudinary using its public ID
-   * @param publicId The public ID of the image to delete
+   * @param publicId The public ID (Cloudinary ID) of the image to delete
    */
   async deleteImage(publicId: string) {
     try {
