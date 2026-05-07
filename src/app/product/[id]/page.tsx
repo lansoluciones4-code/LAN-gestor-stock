@@ -19,7 +19,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const deviceName = product.device?.name || 'Accesorio Apple';
   const isOutOfStock = product.stock <= 0;
-  const imagePath = `/products/${slugify(deviceName)}.webp`;
 
   return (
     <div className='lg:h-screen lg:overflow-hidden bg-white dark:bg-zinc-950 pt-8 md:pt-10 pb-4 md:pb-4 px-4 sm:px-6 flex flex-col'>
@@ -31,7 +30,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className='flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-24 overflow-hidden lg:overflow-visible'>
           <div className='flex items-center lg:justify-center justify-start'>
             <ProductImageView
-              imagePath={imagePath}
+              images={product.images || []}
               deviceName={deviceName}
               isOutOfStock={isOutOfStock}
             />

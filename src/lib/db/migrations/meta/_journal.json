@@ -15,6 +15,20 @@
       "when": 1777128430768,
       "tag": "0001_red_tyrannus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778176611128,
+      "tag": "0002_natural_vengeance",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778177296309,
+      "tag": "0003_dapper_jack_flag",
+      "breakpoints": true
     }
   ]
 }

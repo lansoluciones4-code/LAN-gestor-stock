@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { PackageX, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { PackageX, Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 
@@ -9,6 +9,7 @@ interface ProductCardActionsProps {
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (p: ProductDef) => void;
+  onManagePhotos: (p: ProductDef) => void;
 }
 
 function stockLabel(stock: number) {
@@ -86,6 +87,13 @@ export function renderProductCard(actions: ProductCardActionsProps) {
                 icon={<Edit className='w-4 h-4' />}
                 label='Editar'
                 onClick={() => actions.onEdit(product)}
+              />
+            )}
+            {actions.role === 'admin' && (
+              <CardAction
+                icon={<Camera className='w-4 h-4' />}
+                label='Gestionar Fotos'
+                onClick={() => actions.onManagePhotos(product)}
               />
             )}
             <CardAction

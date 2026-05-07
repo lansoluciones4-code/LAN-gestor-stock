@@ -3,6 +3,8 @@ import { fetchLandingProducts } from '@/features/product/actions/product.actions
 import { fetchLandingCategories } from '@/features/device/actions/device.actions';
 import { CatalogClient } from './components/catalog-client';
 
+export const revalidate = 30;
+
 export const metadata: Metadata = {
   title: 'Phone Center - Catalogo',
   description: 'Descubre nuestra colección exclusiva de fundas, cargadores, cables y accesorios premium diseñados para tus dispositivos Apple. Calidad superior, envío rápido y la mejor protección.',

@@ -24,6 +24,7 @@ import { TEST_IDS } from '@/constants/test-ids';
 import { renderProductCard } from '@/config/cards/product-card';
 import { ProductFormModal } from '@/features/product/ui/components/product-form-modal';
 import { ProductLossModal } from '@/features/product/ui/components/product-loss-modal';
+import { ProductPhotosManager } from '@/features/product/ui/components/product-photos-manager';
 
 
 
@@ -35,6 +36,7 @@ export function ProductsPanel() {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [lossProduct, setLossProduct] = useState<ProductDef | null>(null);
+  const [photoManageProduct, setPhotoManageProduct] = useState<ProductDef | null>(null);
   const [isPendingLocal, startTransition] = useTransition();
 
   const { products, setProducts, isLoaded: prodsLoaded } = useProductStore();
@@ -86,6 +88,8 @@ export function ProductsPanel() {
   };
 
   const handleLossOpen = (p: ProductDef) => { setLossProduct(p); setServerError(null); };
+  
+  const handleManagePhotosOpen = (p: ProductDef) => { setPhotoManageProduct(p); };
 
   const handleToggleVisibility = (p: ProductDef) => {
     startTransition(async () => {
@@ -109,7 +113,7 @@ export function ProductsPanel() {
     });
   };
 
-  const columns = getProductColumns({ role, onLoss: handleLossOpen, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility });
+  const columns = getProductColumns({ role, onLoss: handleLossOpen, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen });
 
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
@@ -165,7 +169,7 @@ export function ProductsPanel() {
         data={filteredProducts}
         isLoading={isPending}
         emptyMessage='No se han encontrado productos coincidentes.'
-        renderCard={renderProductCard({ role, onLoss: handleLossOpen, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility })}
+        renderCard={renderProductCard({ role, onLoss: handleLossOpen, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen })}
       />
 
       <ProductFormModal
@@ -191,6 +195,12 @@ export function ProductsPanel() {
         product={lossProduct}
         serverError={serverError}
         isPending={isPending}
+      />
+
+      <ProductPhotosManager
+        isOpen={!!photoManageProduct}
+        onClose={() => setPhotoManageProduct(null)}
+        product={photoManageProduct}
       />
     </div>
   );

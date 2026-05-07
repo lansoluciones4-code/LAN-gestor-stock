@@ -52,10 +52,17 @@ export const productRowSchema = createSelectSchema(products).extend({
   version: z.number(),
   device: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
   provider: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
+  images: z.array(z.object({ publicId: z.string(), url: z.string() })).optional(),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });
 
 export type ProductDef = z.infer<typeof productRowSchema>;
+
+export type ProductImage = {
+  publicId: string;
+  url: string;
+  createdAt: Date;
+};
 
 

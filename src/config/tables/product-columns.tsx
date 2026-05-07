@@ -1,6 +1,6 @@
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
-import { PackageX, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import { PackageX, Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
 
 interface ColumnActions {
   role?: string;
@@ -8,9 +8,10 @@ interface ColumnActions {
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (p: ProductDef) => void;
+  onManagePhotos: (p: ProductDef) => void;
 }
 
-export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisibility }: ColumnActions): ColumnDef<ProductDef>[] {
+export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisibility, onManagePhotos }: ColumnActions): ColumnDef<ProductDef>[] {
   return [
     {
       header: 'Equipo y Detalle',
@@ -62,7 +63,7 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisi
     {
       header: 'Acciones',
       headerClassName: 'text-right',
-      cellClassName: 'flex gap-1 justify-end',
+      cellClassName: 'flex gap-0 xl:gap-2 justify-end',
       cell: (p: ProductDef) => (
         <>
           {role === 'admin' && (
@@ -90,6 +91,15 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisi
               title='Editar'
             >
               <Edit className='w-4 h-4' />
+            </button>
+          ) : null}
+          {role === 'admin' ? (
+            <button
+              onClick={() => onManagePhotos(p)}
+              className='p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition'
+              title='Gestionar Fotos'
+            >
+              <Camera className='w-4 h-4' />
             </button>
           ) : null}
           <button
