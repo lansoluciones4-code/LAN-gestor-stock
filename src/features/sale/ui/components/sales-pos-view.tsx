@@ -6,6 +6,7 @@ import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type CustomerDef } from '@/features/customer/domain/customer.schema';
 import { type CartItem } from '../hooks/useCart';
 import { CustomerModal } from '@/features/customer/ui/components/customer-modal';
+import { TEST_IDS } from '@/constants/test-ids';
 
 interface SalesPOSViewProps {
   products: ProductDef[];
@@ -69,6 +70,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
           onClick={onCancel}
           leftIcon={<ArrowLeft className='w-4 h-4' />}
           className='w-full sm:w-auto font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md h-10'
+          data-testid={TEST_IDS.ventas.pos.btnCancelarCarrito}
         >
           <span className='hidden sm:inline'>Volver Al Listado</span>
           <span className='sm:hidden'>Volver</span>
@@ -91,6 +93,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm h-10'
                 value={saleSearch}
                 onChange={(e) => setSaleSearch(e.target.value)}
+                data-testid={TEST_IDS.ventas.pos.inputBusquedaProducto}
               />
             </div>
             <div className='w-full'>
@@ -106,6 +109,8 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 placeholder='Cliente de la operación...'
                 addNewLabel='+ Nuevo Cliente'
                 onAddNew={() => setIsCustomerModalOpen(true)}
+                data-testid={TEST_IDS.ventas.pos.comboClienteVenta}
+                searchTestId={TEST_IDS.ventas.pos.inputBusquedaCliente}
               />
             </div>
           </div>
@@ -117,6 +122,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 disabled={p.stock <= 0}
                 onClick={() => addToCart(p)}
                 className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-indigo-500 hover:shadow-md'}`}
+                data-testid={TEST_IDS.ventas.pos.btnAgregarProductoLista}
               >
                 <div className='text-left min-w-0 flex-1 mr-4'>
                   <h4
@@ -208,6 +214,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
               onClick={onConfirmSale}
               size='lg'
               disabled={cart.length === 0 || !selectedCustomerId || isPending}
+              data-testid={TEST_IDS.ventas.pos.btnConfirmarCarrito}
             >
               {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
             </Button>
