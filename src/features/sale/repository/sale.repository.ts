@@ -2,6 +2,7 @@ import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { sales, saleItems, products, customers, salePayments } from '@/lib/db/schema';
 import type { SaleInput } from '@/features/sale/domain/sale.schema';
+import { ConcurrencyError } from '@/lib/errors';
 
 export class SaleRepository {
   async getAllSales() {
@@ -122,6 +123,13 @@ export class SaleRepository {
   }
 
   async deleteSale(id: string, dbtx: any = db) {
+    // 1. Lock the sale to prevent double-deletion and race conditions
+    // Using FOR UPDATE ensures no other transaction can delete or modify this sale concurrently.
+    const lockedSale = await dbtx.select({ id: sales.id }).from(sales).where(eq(sales.id, id)).for('update');
+    if (lockedSale.length === 0) {
+      throw new ConcurrencyError();
+    }
+
     const items = await dbtx.query.saleItems.findMany({
       where: eq(saleItems.saleId, id),
     });
@@ -139,6 +147,8 @@ export class SaleRepository {
 
     await dbtx.delete(saleItems).where(eq(saleItems.saleId, id));
     await dbtx.delete(salePayments).where(eq(salePayments.saleId, id));
+    
+    // Final delete of the locked sale record
     await dbtx.delete(sales).where(eq(sales.id, id));
   }
 }
