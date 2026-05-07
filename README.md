@@ -104,7 +104,12 @@ When a sale is confirmed via the POS interface, the system processes a database 
 Every critical operation (`CREAR`, `ACTUALIZAR`, `ELIMINAR`, `LOGIN`, `PÉRDIDA`) is recorded in the Audit Log.
 
 - The log captures the User ID, Entity ID, timestamp, and a JSON payload of the affected data.
-- The Audit Panel allows filtering by generic terms (e.g., searching "baja" will find "ELIMINAR" events) using the Postgres `unaccent` extension for robust, accent-insensitive search.
+- **Filtered Search Mechanism**: 
+  - **Frontend Normalization**: The UI is designed to be user-friendly. Users can search using natural language terms to filter specific entities or actions.
+    - **Actions**: `creación`, `edición`, `borrado`, `baja`, `pérdida`
+    - **Entities**: `usuario`, `proveedor`, `producto`, `cliente`, `equipo`, `venta`
+  - **Backend Unaccent**: The backend queries the database using the Postgres `unaccent` extension paired with `ILIKE`. This ensures that searches are completely accent-insensitive (e.g., searching for "pérdida", "perdida", or "PERDIDA" all match the same logs).
+  - **IMPORTANT**: The `unaccent` extension is **not activated by default** in standard Postgres installations. To guarantee this search mechanism functions properly, you **must** manually activate the `unaccent` extension in your database (e.g. running `CREATE EXTENSION IF NOT EXISTS unaccent;`).
 
 ---
 
