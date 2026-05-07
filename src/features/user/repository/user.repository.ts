@@ -42,10 +42,12 @@ export class UserRepository {
   }
 
   async checkHasRelations(id: string, dbtx: any = db) {
-    const performedLog = await dbtx.query.auditLogs.findFirst({
-      where: (l: any, { eq }: any) => eq(l.userId, id),
-    });
-    return !!performedLog;
+    const [performedLog, sale, loss] = await Promise.all([
+      dbtx.query.auditLogs.findFirst({ where: (l: any, { eq }: any) => eq(l.userId, id) }),
+      dbtx.query.sales.findFirst({ where: (s: any, { eq }: any) => eq(s.vendorId, id) }),
+      dbtx.query.productLosses.findFirst({ where: (l: any, { eq }: any) => eq(l.userId, id) })
+    ]);
+    return !!performedLog || !!sale || !!loss;
   }
 
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {

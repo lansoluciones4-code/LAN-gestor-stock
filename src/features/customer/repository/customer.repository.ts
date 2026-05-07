@@ -12,11 +12,8 @@ export class CustomerRepository {
   }
 
   async checkHasRelations(id: string, dbtx: any = db) {
-    const [product, sale] = await Promise.all([
-      dbtx.query.products.findFirst({ where: (p: any, { eq }: any) => eq(p.customerId, id) }),
-      dbtx.query.sales.findFirst({ where: (s: any, { eq }: any) => eq(s.customerId, id) }),
-    ]);
-    return !!product || !!sale;
+    const sale = await dbtx.query.sales.findFirst({ where: (s: any, { eq }: any) => eq(s.customerId, id) });
+    return !!sale;
   }
 
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
