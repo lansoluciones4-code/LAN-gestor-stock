@@ -111,6 +111,12 @@ Every critical operation (`CREAR`, `ACTUALIZAR`, `ELIMINAR`, `LOGIN`, `PÉRDIDA`
   - **Backend Unaccent**: The backend queries the database using the Postgres `unaccent` extension paired with `ILIKE`. This ensures that searches are completely accent-insensitive (e.g., searching for "pérdida", "perdida", or "PERDIDA" all match the same logs).
   - **IMPORTANT**: The `unaccent` extension is **not activated by default** in standard Postgres installations. To guarantee this search mechanism functions properly, you **must** manually activate the `unaccent` extension in your database (e.g. running `CREATE EXTENSION IF NOT EXISTS unaccent;`).
 
+### 5. Product Image Management
+
+To ensure a consistent and premium visual experience across the application (especially on the landing page and product details), the frontend displays product images in a strict `1:1` (square) container to maintain layout uniformity.
+- **Client Recommendation:** Always take and upload product photos in a **1:1 aspect ratio** (e.g., using the "Square" mode on a smartphone camera).
+- **Fallback Behavior:** If non-square (rectangular) images are uploaded, the system utilizes an intelligent "zoom-to-fill" strategy (via CSS `object-cover` and Cloudinary's AI-driven `crop: 'fill'`). This guarantees that there are no empty gaps/letterboxing in the UI, but it may result in the edges of the image being cropped.
+
 ---
 
 ## 📦 System Modules
