@@ -4,6 +4,7 @@ import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { type SalePaymentInput } from '@/features/sale/domain/sale.schema';
 import { isValidDecimal } from '@/lib/utils';
+import { TEST_IDS } from '@/constants/test-ids';
 
 interface SalePaymentModalProps {
   isOpen: boolean;
@@ -166,6 +167,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                   setAmount(remaining.toFixed(2).replace('.', ','));
                 }}
                 leftIcon={<Plus className='w-3 h-3' />}
+                data-testid={TEST_IDS.ventas.payment.btnAddAnotherMetodoDePago}
               >
                 Añadir Otro
               </Button>
@@ -209,6 +211,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                     type='button'
                     onClick={() => setType('efectivo')}
                     className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'efectivo' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
+                    data-testid={TEST_IDS.ventas.payment.btnEfectivo}
                   >
                     <Banknote className='w-6 h-6 mb-1' />
                     <span className='text-[10px] font-black uppercase'>Efectivo</span>
@@ -217,6 +220,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                     type='button'
                     onClick={() => setType('transferencia')}
                     className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'transferencia' ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
+                    data-testid={TEST_IDS.ventas.payment.btnTranserencia}
                   >
                     <CreditCard className='w-6 h-6 mb-1' />
                     <span className='text-[10px] font-black uppercase'>Transferencia</span>
@@ -244,6 +248,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                         }
                       }}
                       placeholder='0,00'
+                      data-testid={TEST_IDS.ventas.payment.inputMonto}
                     />
                   </div>
                 </div>
@@ -264,12 +269,14 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                       setEditingIndex(null);
                       setError(null);
                     }}
+                    data-testid={TEST_IDS.ventas.payment.btnCancelarMetodoDePago}
                   >
                     Cancelar
                   </Button>
                   <Button
                     fullWidth
                     onClick={validateAndAdd}
+                    data-testid={TEST_IDS.ventas.payment.btnAddMetodoDePago}
                   >
                     {editingIndex !== null ? 'Actualizar' : 'Añadir'}
                   </Button>
@@ -298,6 +305,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
             fullWidth
             onClick={handleConfirm}
             disabled={isPending || isAdding}
+            data-testid={TEST_IDS.ventas.payment.btnFinalizarYFacturar}
           >
             {isPending ? 'Confirmando...' : 'Finalizar y Facturar'}
           </Button>
@@ -305,6 +313,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
             <button
               onClick={onClose}
               className='text-[10px] font-black uppercase text-zinc-400 hover:text-zinc-600 tracking-widest transition-colors'
+              data-testid={TEST_IDS.ventas.payment.btnVolverCarrito}
             >
               Volver al Carrito
             </button>

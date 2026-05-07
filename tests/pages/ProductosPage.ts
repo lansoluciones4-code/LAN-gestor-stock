@@ -158,6 +158,64 @@ export class ProductosPage {
     }
   }
 
+  async confirmarFormularioCreacion() {
+    await this.btnConfirmarInventario.click();
+  }
+
+  async abrirFormularioEdicion(equipo: string, proveedor: string, desc: string) {
+    if (desc) await this.buscarProducto(desc);
+    else if (equipo) await this.buscarProducto(equipo);
+
+    const fila = this.obtenerFila(equipo, proveedor, desc);
+    await fila.getByRole('button', { name: ProductosPage.UI.BTN_EDITAR, exact: true }).click();
+  }
+
+  async cancelarFormularioEdicion() {
+    await this.btnCancelar.click();
+  }
+
+  async completarFormularioEdicion(
+    equipoActual: string,
+    proveedorActual: string,
+    nuevoEquipo?: string,
+    nuevoProveedor?: string,
+    nuevaDesc?: string,
+    nuevoCompra?: string,
+    nuevoVenta?: string,
+    nuevasUnidades?: string
+  ) {
+    if (nuevoEquipo !== undefined) {
+      await this.page.getByRole('button', { name: equipoActual }).first().click();
+      await this.page.getByRole('button', { name: nuevoEquipo, exact: true }).click();
+    }
+
+    if (nuevoProveedor !== undefined) {
+      await this.page.getByRole('button', { name: proveedorActual }).first().click();
+      await this.page.getByRole('button', { name: nuevoProveedor, exact: true }).click();
+    }
+
+    if (nuevaDesc !== undefined) await this.inputDescripcion.fill(nuevaDesc);
+    
+    if (nuevoCompra !== undefined) {
+      await this.inputPrecioCompra.fill('');
+      await this.inputPrecioCompra.pressSequentially(nuevoCompra);
+    }
+    
+    if (nuevoVenta !== undefined) {
+      await this.inputPrecioVenta.fill('');
+      await this.inputPrecioVenta.pressSequentially(nuevoVenta);
+    }
+    
+    if (nuevasUnidades !== undefined) {
+      await this.inputUnidades.fill('');
+      await this.inputUnidades.pressSequentially(nuevasUnidades);
+    }
+  }
+
+  async confirmarFormularioEdicion() {
+    await this.btnConfirmarInventario.click();
+  }
+
   async verificarFormularioCreacionVacio() {
     await expect(this.inputDescripcion).toHaveValue('');
     await expect(this.inputUnidades).toHaveValue('1');

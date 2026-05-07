@@ -148,14 +148,39 @@ cd StockManagementApp
 npm install
 ```
 
-### 2. Environment Configuration
+### 2. Environment Configuration & Deployment Environments
 
-Create a `.env` file at the root of the project:
+The project relies on a strict `.env` hierarchy to prevent accidental modifications to production data. Thanks to the `.gitignore` configuration (`.env*`), **all environment files are safely ignored by Git**.
+
+#### A. Local Development (`.env.local`)
+Create a `.env.local` file at the root of the project. Next.js and Drizzle automatically prioritize this file when running standard commands (like `npm run dev`). Use this strictly for your local/development database and services.
 
 ```env
 # Connects to the local Docker Postgres instance on port 5433
-DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
+LOCAL_DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
 JWT_SECRET=super_secret_dev_key_change_me_later
+CLOUDINARY_URL=cloudinary://your_dev_key...
+```
+
+#### B. Production Scripts (`.env.prod`)
+Vercel handles the actual production environment variables securely via its dashboard. However, if you need to run local CLI commands against the production database (e.g., pushing schema migrations), create a `.env.prod` file:
+
+```env
+# Production Database Connection
+LOCAL_DATABASE_URL=postgresql://postgres:password@localhost:5433/
+DATABASE_URL=postgresql://postgres.your_project:password@aws-0-sa-east-1.pooler.supabase.com:6543/postgres
+CLOUDINARY_URL=cloudinary://your_prod_key...
+```
+
+**How to run scripts against production:**
+By default, all terminal commands use `.env.local`. To explicitly target production and avoid disastrous mistakes, use the installed `dotenv-cli` package to inject the production variables:
+
+```bash
+# Example: Migrate production database
+npx dotenv -e .env.prod -- npm run db:migrate
+
+# Example: Seed production database
+npx dotenv -e .env.prod -- npm run db:seed
 ```
 
 ### 3. Spawn Database Infrastructure

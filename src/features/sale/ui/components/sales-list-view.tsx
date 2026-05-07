@@ -60,7 +60,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
             endDate={endDate}
             onStartChange={setStartDate}
             onEndChange={setEndDate}
-            data-testid={TEST_IDS.ventas.inputFiltroFecha}
+            data-testid={TEST_IDS.ventas.page.inputFiltroFecha}
           />
         }
         sync={

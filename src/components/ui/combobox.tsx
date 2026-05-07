@@ -18,9 +18,11 @@ interface ComboboxProps {
   addNewLabel?: string;
   onAddNew?: () => void;
   className?: string;
+  'data-testid'?: string;
+  searchTestId?: string;
 }
 
-export function Combobox({ options, value, onChange, placeholder = 'Seleccionar...', searchPlaceholder = 'Buscar...', emptyMessage = 'No se encontraron resultados.', addNewLabel, onAddNew, className = '' }: ComboboxProps) {
+export function Combobox({ options, value, onChange, placeholder = 'Seleccionar...', searchPlaceholder = 'Buscar...', emptyMessage = 'No se encontraron resultados.', addNewLabel, onAddNew, className = '', 'data-testid': testId, searchTestId }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -43,6 +45,7 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
     <div
       className={`relative ${className}`}
       ref={containerRef}
+      data-testid={testId}
     >
       <button
         type='button'
@@ -63,6 +66,7 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoFocus
+              data-testid={searchTestId}
             />
             {search && (
               <button onClick={() => setSearch('')}>

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ProveedoresPage } from './pages/ProveedoresPage';
+import { ProductosPage } from './pages/ProductosPage';
 
 /**
  * Suite de Pruebas E2E: Gestión de Proveedores
@@ -179,5 +180,21 @@ test.describe.parallel('Gestión de Proveedores: Validaciones y Lógica', () => 
     await expect(page.getByText(proveedorTest.nombreOriginal, { exact: true })).toBeHidden();
     await proveedoresPage.buscarProveedor(proveedorTest.nombreEditado);
     await expect(page.getByText(proveedorTest.nombreEditado, { exact: true })).toBeVisible();
+  });
+
+  test('Debería mostrar un error si se intenta eliminar un proveedor que está asociado a un producto', async ({ page }) => {
+    const proveedoresPage = new ProveedoresPage(page);
+    const productosPage = new ProductosPage(page);
+
+    await productosPage.goto();
+    const producto = await productosPage.inyectarProductoEfimero();
+
+    await proveedoresPage.goto();
+    await proveedoresPage.eliminarProveedor(producto.proveedor);
+
+    await expect(page.getByText('No se puede completar la operación porque existen registros relacionados.')).toBeVisible();
+
+    await proveedoresPage.buscarProveedor(producto.proveedor);
+    await expect(page.getByText(producto.proveedor, { exact: true })).toBeVisible();
   });
 });

@@ -3,6 +3,7 @@ import { Tag, AlertCircle, Percent, DollarSign } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { isValidDecimal } from '@/lib/utils';
+import { TEST_IDS } from '@/constants/test-ids';
 
 interface SaleDiscountModalProps {
   isOpen: boolean;
@@ -156,6 +157,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                 className='w-full pl-3 pr-8 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 font-bold'
                 value={percentage}
                 onChange={(e) => handlePercentageChange(e.target.value)}
+                data-testid={TEST_IDS.ventas.discount.descuentoPorcentual}
                 onKeyDown={(e) => {
                   if (e.key === ',' && e.currentTarget.value.includes(',')) {
                     e.preventDefault();
@@ -184,6 +186,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                 className='w-full pl-7 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 font-bold'
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
+                data-testid={TEST_IDS.ventas.discount.descuentoAbsoluto}
                 onKeyDown={(e) => {
                   if (e.key === ',' && e.currentTarget.value.includes(',')) {
                     e.preventDefault();
@@ -212,6 +215,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
             fullWidth
             onClick={validateAndConfirm}
             disabled={isPending || finalTotal < 0}
+            data-testid={TEST_IDS.ventas.discount.btnConfirmarDescuento}
           >
             Continuar al Pago
           </Button>
@@ -219,6 +223,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
             <button
               onClick={handleSkip}
               className='text-[10px] font-black uppercase text-zinc-400 hover:text-zinc-600 tracking-widest transition-colors mx-auto block'
+              data-testid={TEST_IDS.ventas.discount.btnQuitarDescuento}
             >
               Quitar Descuentos
             </button>
@@ -227,6 +232,7 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
             <button
               onClick={handleSkip}
               className='text-[10px] font-black uppercase text-indigo-400 hover:text-indigo-600 tracking-widest transition-colors mx-auto block'
+              data-testid={TEST_IDS.ventas.discount.btnOmitirDescuento}
             >
               Omitir Descuentos
             </button>
