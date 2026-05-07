@@ -1,27 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { type ProductDef } from '@/features/product/domain/product.schema';
-import { Package } from 'lucide-react';
+import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { slugify } from '@/lib/utils';
 import { ContactButtons } from '@/components/contact/contact-buttons';
 
 interface ProductCardProps {
-  product: ProductDef;
+  product: ProductDef & { images?: { publicId: string; url: string }[] };
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [imageStatus, setImageStatus] = useState<'loading' | 'error' | 'loaded'>('loading');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const deviceName = product.device?.name || 'Accesorio Apple';
-
-  const imagePath = `/products/${slugify(deviceName)}.webp`;
   const isOutOfStock = product.stock <= 0;
+  
+  const images = product.images || [];
+  const hasImages = images.length > 0;
 
-  useEffect(() => {
-    setImageStatus('loading');
-  }, [imagePath]);
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to product detail
+    if (images.length > 1) {
+      setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigating to product detail
+    if (images.length > 1) {
+      setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    }
+  };
 
   return (
     <motion.div
@@ -36,23 +46,52 @@ export function ProductCard({ product }: ProductCardProps) {
         className='flex flex-col flex-1'
       >
         <div className='relative aspect-square w-full bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center overflow-hidden p-3 sm:p-4'>
-          {/* Placeholder / Icono de Error (Package) */}
-          {imageStatus !== 'loaded' && (
+          {!hasImages ? (
             <div className='flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-600 transition-opacity duration-300'>
               <Package className='w-8 h-8 sm:w-12 sm:h-12 stroke-[1.5] mb-2 sm:mb-3' />
               <span className='text-[9px] sm:text-[10px] font-medium tracking-widest uppercase'>Pronto</span>
             </div>
-          )}
-
-          {/* Imagen con fade-in */}
-          {imageStatus !== 'error' && (
-            <img
-              src={imagePath}
-              alt={deviceName}
-              className={`object-contain w-full h-full transition-all duration-500 group-hover:scale-105 absolute inset-0 p-3 sm:p-4 ${imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
-              onLoad={() => setImageStatus('loaded')}
-              onError={() => setImageStatus('error')}
-            />
+          ) : (
+            <div className='relative w-full h-full'>
+              <AnimatePresence initial={false} mode="wait">
+                <motion.img
+                  key={currentImageIndex}
+                  src={images[currentImageIndex].url}
+                  alt={`${deviceName} - ${currentImageIndex + 1}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className='object-contain w-full h-full absolute inset-0 p-3 sm:p-4 group-hover:scale-105 transition-transform duration-500'
+                />
+              </AnimatePresence>
+              
+              {/* Carousel Controls */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-black/50 p-1.5 rounded-full text-zinc-800 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-black/50 p-1.5 rounded-full text-zinc-800 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {images.map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${i === currentImageIndex ? 'bg-zinc-800 dark:bg-zinc-200' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           )}
 
           {isOutOfStock && (
@@ -83,3 +122,4 @@ export function ProductCard({ product }: ProductCardProps) {
     </motion.div>
   );
 }
+

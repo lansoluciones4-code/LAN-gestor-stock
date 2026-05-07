@@ -26,6 +26,7 @@ export class ProductRepository {
       with: {
         device: true,
         provider: true,
+        images: true,
       },
     });
   }
@@ -114,6 +115,7 @@ export class ProductRepository {
       where: (products, { eq }) => eq(products.showOnLanding, true),
       with: {
         device: true,
+        images: true,
       },
       orderBy: [desc(products.stock), desc(products.createdAt)],
     });
