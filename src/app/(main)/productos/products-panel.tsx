@@ -21,19 +21,12 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { getProductColumns } from '@/config/tables/product-columns';
-import { normalizeForSearch } from '@/lib/utils';
+import { normalizeForSearch, blockInvalidPriceKey, PRICE_BLOCKED_KEYS } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 import { renderProductCard } from '@/config/cards/product-card';
 
-const PRICE_KEYS = ['-', '.', ',', 'e', 'E', '+'];
 
-function blockInvalidPriceKey(e: React.KeyboardEvent<HTMLInputElement>) {
-  if (e.key === ',' && e.currentTarget.value.includes(',')) { e.preventDefault(); return; }
-  if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
-    e.preventDefault();
-  }
-}
 
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
@@ -163,14 +156,14 @@ export function ProductsPanel() {
             <div className='relative w-24 sm:w-28'>
               <DollarSign className='absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400' />
               <input type='number' placeholder='Min' value={minPrice} onChange={(e) => setMinPrice(e.target.value.replace(/\D/g, ''))}
-                onKeyDown={(e) => { if (PRICE_KEYS.includes(e.key)) e.preventDefault(); }}
+                onKeyDown={(e) => { if (PRICE_BLOCKED_KEYS.includes(e.key)) e.preventDefault(); }}
                 className='w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm'
                 data-testid={TEST_IDS.productos.inputBusquedaPrecioMin} />
             </div>
             <div className='relative w-24 sm:w-28'>
               <DollarSign className='absolute left-2.5 top-3.5 h-4 w-4 text-zinc-400' />
               <input type='number' placeholder='Max' value={maxPrice} onChange={(e) => setMaxPrice(e.target.value.replace(/\D/g, ''))}
-                onKeyDown={(e) => { if (PRICE_KEYS.includes(e.key)) e.preventDefault(); }}
+                onKeyDown={(e) => { if (PRICE_BLOCKED_KEYS.includes(e.key)) e.preventDefault(); }}
                 className='w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-indigo-500 transition-colors shadow-sm'
                 data-testid={TEST_IDS.productos.inputBusquedaPrecioMax} />
             </div>
@@ -252,7 +245,7 @@ export function ProductsPanel() {
           </div>
           <div>
             <label className='block text-sm font-medium mb-1.5'>Stock Inicial Lote</label>
-            <input type='number' {...register('stock', { valueAsNumber: true })} onKeyDown={(e) => { if (PRICE_KEYS.includes(e.key)) e.preventDefault(); }}
+            <input type='number' {...register('stock', { valueAsNumber: true })} onKeyDown={(e) => { if (PRICE_BLOCKED_KEYS.includes(e.key)) e.preventDefault(); }}
               min='0' step='1' placeholder='1' className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500' />
             {errors.stock && <p className='text-red-500 text-xs mt-1'>{errors.stock.message}</p>}
           </div>
@@ -279,7 +272,7 @@ export function ProductsPanel() {
           <div>
             <label className='block text-sm font-medium mb-1.5'>Cantidad perdida</label>
             <input type='number' value={lossQuantity} onChange={(e) => setLossQuantity(e.target.value)}
-              onKeyDown={(e) => { if (PRICE_KEYS.includes(e.key)) e.preventDefault(); }} min='1' step='1' placeholder='Ej: 1'
+              onKeyDown={(e) => { if (PRICE_BLOCKED_KEYS.includes(e.key)) e.preventDefault(); }} min='1' step='1' placeholder='Ej: 1'
               className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500' />
           </div>
           <div>

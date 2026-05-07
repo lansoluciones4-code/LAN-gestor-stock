@@ -29,6 +29,7 @@ export class ProviderRepository {
       })
       .where(eq(providers.id, id))
       .returning();
+    if (result.length === 0) throw new ConcurrencyError();
     return result[0];
   }
 
@@ -102,7 +103,8 @@ export class ProviderRepository {
   }
 
   async deleteProvider(id: string, dbtx: any = db) {
-    await dbtx.delete(providers).where(eq(providers.id, id));
+    const result = await dbtx.delete(providers).where(eq(providers.id, id)).returning();
+    if (result.length === 0) throw new ConcurrencyError();
   }
 }
 

@@ -12,17 +12,11 @@ export class CustomerRepository {
   }
 
   async checkHasRelations(id: string, dbtx: any = db) {
-    const productsList = await dbtx.query.products.findMany({
-      where: (p: any, { eq }: any) => eq(p.customerId, id),
-      limit: 1,
-    });
-
-    const salesList = await dbtx.query.sales.findMany({
-      where: (s: any, { eq }: any) => eq(s.customerId, id),
-      limit: 1,
-    });
-
-    return productsList.length > 0 || salesList.length > 0;
+    const [product, sale] = await Promise.all([
+      dbtx.query.products.findFirst({ where: (p: any, { eq }: any) => eq(p.customerId, id) }),
+      dbtx.query.sales.findFirst({ where: (s: any, { eq }: any) => eq(s.customerId, id) }),
+    ]);
+    return !!product || !!sale;
   }
 
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
@@ -35,6 +29,7 @@ export class CustomerRepository {
       })
       .where(eq(customers.id, id))
       .returning();
+    if (result.length === 0) throw new ConcurrencyError();
     return result[0];
   }
 
@@ -118,7 +113,8 @@ export class CustomerRepository {
   }
 
   async deleteCustomer(id: string, dbtx: any = db) {
-    await dbtx.delete(customers).where(eq(customers.id, id));
+    const result = await dbtx.delete(customers).where(eq(customers.id, id)).returning();
+    if (result.length === 0) throw new ConcurrencyError();
   }
 }
 

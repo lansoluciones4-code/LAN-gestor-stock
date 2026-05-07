@@ -16,7 +16,6 @@ const priceField = (label: string) =>
 export const productCreateSchema = createInsertSchema(products)
   .pick({ deviceId: true, providerId: true, description: true, purchasePrice: true, salePrice: true, stock: true })
   .extend({
-    id: z.string().optional(),
     deviceId: z.string().trim().min(1, 'Debes seleccionar un equipo válido'),
     providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
     description: z.string().trim().max(255, 'La descripción es demasiado larga').optional(),
@@ -47,8 +46,8 @@ export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
 
 /** Row schema for reading a product from the DB (with relations). */
 export const productRowSchema = createSelectSchema(products).extend({
-  purchasePrice: z.number(),
-  salePrice: z.number(),
+  purchasePrice: z.preprocess((val) => parseFloat(val as string), z.number()),
+  salePrice: z.preprocess((val) => parseFloat(val as string), z.number()),
   showOnLanding: z.boolean(),
   version: z.number(),
   device: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),

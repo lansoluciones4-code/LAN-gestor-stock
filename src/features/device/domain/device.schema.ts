@@ -5,11 +5,7 @@ import { devices } from '@/lib/db/schema';
 /** Input schema for creating a device/category (form → server). */
 export const deviceCreateSchema = createInsertSchema(devices, {
   name: z.string().trim().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede exceder los 100 caracteres'),
-})
-  .pick({ name: true })
-  .extend({
-    id: z.string().optional(),
-  });
+}).pick({ name: true });
 
 export type DeviceInput = z.infer<typeof deviceCreateSchema>;
 

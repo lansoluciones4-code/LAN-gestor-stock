@@ -19,12 +19,7 @@ import { ActionResult } from '@/lib/action-result';
 export async function fetchProducts(): Promise<ProductDef[]> {
   try {
     const products = await productRepository.getAllProducts();
-    const formatted = products.map((p) => ({
-      ...p,
-      salePrice: parseFloat(p.salePrice as any),
-      purchasePrice: parseFloat(p.purchasePrice as any),
-    }));
-    return z.array(productRowSchema).parse(formatted);
+    return z.array(productRowSchema).parse(products);
   } catch (error) {
     console.error('fetchProducts error:', error);
     return [];
@@ -146,12 +141,7 @@ export async function registerProductLossAction(productId: string, quantity: num
 export async function fetchLandingProducts(): Promise<ProductDef[]> {
   try {
     const products = await productRepository.getLandingProducts();
-    const formatted = products.map((p) => ({
-      ...p,
-      salePrice: parseFloat(p.salePrice as any),
-      purchasePrice: parseFloat(p.purchasePrice as any),
-    }));
-    return z.array(productRowSchema).parse(formatted);
+    return z.array(productRowSchema).parse(products);
   } catch (error) {
     console.error('fetchLandingProducts error:', error);
     return [];
@@ -181,14 +171,7 @@ export async function fetchProductById(id: string): Promise<ProductDef | null> {
   try {
     const product = await productRepository.getProductById(id);
     if (!product) return null;
-
-    const formatted = {
-      ...product,
-      salePrice: parseFloat(product.salePrice as any),
-      purchasePrice: parseFloat(product.purchasePrice as any),
-    };
-
-    return productRowSchema.parse(formatted);
+    return productRowSchema.parse(product);
   } catch (error) {
     console.error('fetchProductById error:', error);
     return null;

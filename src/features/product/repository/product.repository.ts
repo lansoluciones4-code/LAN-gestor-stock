@@ -105,7 +105,8 @@ export class ProductRepository {
   }
 
   async deleteProduct(id: string, dbtx: any = db) {
-    await dbtx.delete(products).where(eq(products.id, id));
+    const result = await dbtx.delete(products).where(eq(products.id, id)).returning();
+    if (result.length === 0) throw new ConcurrencyError();
   }
 
   async getLandingProducts() {
@@ -128,6 +129,7 @@ export class ProductRepository {
       })
       .where(eq(products.id, id))
       .returning();
+    if (result.length === 0) throw new ConcurrencyError();
     return result[0];
   }
 }

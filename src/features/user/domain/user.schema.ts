@@ -10,8 +10,6 @@ const usernameField = z
 
 const roleField = z.enum(['admin', 'vendedor']);
 
-const passwordMinLength = (v: string) =>
-  v.length >= 6 || 'La contraseña debe tener al menos 6 caracteres';
 
 /** Input schema for creating a user (form → server). Password is required. */
 export const userCreateSchema = createInsertSchema(users, {
@@ -20,7 +18,6 @@ export const userCreateSchema = createInsertSchema(users, {
 })
   .pick({ username: true, role: true })
   .extend({
-    id: z.string().optional(),
     password: z.string().trim().min(6, 'La contraseña debe tener al menos 6 caracteres'),
   });
 
@@ -32,7 +29,7 @@ export const userUpdateSchema = userCreateSchema.partial().extend({
   password: z
     .string()
     .trim()
-    .refine((v) => v === '' || passwordMinLength(v) === true, 'La contraseña debe tener al menos 6 caracteres')
+    .refine((v) => v === '' || v.length >= 6, 'La contraseña debe tener al menos 6 caracteres')
     .optional(),
 });
 export type UserUpdateInput = z.infer<typeof userUpdateSchema>;

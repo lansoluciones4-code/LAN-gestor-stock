@@ -58,6 +58,7 @@ export class UserRepository {
       })
       .where(eq(users.id, id))
       .returning();
+    if (result.length === 0) throw new ConcurrencyError();
     return result[0];
   }
 
@@ -137,7 +138,8 @@ export class UserRepository {
   }
 
   async deleteUser(id: string, dbtx: any = db) {
-    await dbtx.delete(users).where(eq(users.id, id));
+    const result = await dbtx.delete(users).where(eq(users.id, id)).returning();
+    if (result.length === 0) throw new ConcurrencyError();
   }
 }
 

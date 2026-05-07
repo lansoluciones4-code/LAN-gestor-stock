@@ -29,6 +29,7 @@ export class DeviceRepository {
       })
       .where(eq(devices.id, id))
       .returning();
+    if (result.length === 0) throw new ConcurrencyError();
     return result[0];
   }
 
@@ -100,7 +101,8 @@ export class DeviceRepository {
   }
 
   async deleteDevice(id: string, dbtx: any = db) {
-    await dbtx.delete(devices).where(eq(devices.id, id));
+    const result = await dbtx.delete(devices).where(eq(devices.id, id)).returning();
+    if (result.length === 0) throw new ConcurrencyError();
   }
 }
 
