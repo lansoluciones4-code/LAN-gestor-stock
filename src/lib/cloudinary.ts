@@ -19,9 +19,8 @@ export const cloudinaryService = {
         folder: `products/${productId}`,
         resource_type: 'image',
         transformation: [
-          // Fuerza a que la imagen sea un cuadrado perfecto (1:1) de alta resolución.
-          // 'fill' recorta lo sobrante, y 'auto' usa IA para mantener el producto centrado sin cortar lo importante.
-          { width: 800, height: 800, crop: 'fill', gravity: 'auto' }
+          // 'pad' con 'background: white' añade bordes blancos para hacer la foto cuadrada sin hacer zoom.
+          { width: 800, height: 800, crop: 'pad', background: 'white' }
         ]
       });
       return {

@@ -100,7 +100,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={1}
                     onDragEnd={handleDragEnd}
-                    className='object-cover w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
+                    className='object-contain w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
                   />
                 </AnimatePresence>
               
