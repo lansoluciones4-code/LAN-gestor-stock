@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  username: z.string().trim().min(1, 'Username is required').max(50, 'Username is too long'),
-  password: z.string().trim().min(1, 'Password is required'),
+  username: z.string().trim().min(1, 'El nombre de usuario es obligatorio').max(50, 'El nombre de usuario es demasiado largo'),
+  password: z.string().trim().min(1, 'La contraseña es obligatoria'),
 });
 
 export const userSessionSchema = z.object({
