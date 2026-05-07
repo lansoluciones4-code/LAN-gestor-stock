@@ -12,10 +12,7 @@ import { sql, eq } from 'drizzle-orm';
 // Scalar subquery
 const avgPrice = db.select({ value: avg(products.price) }).from(products);
 
-const expensiveProducts = await db
-  .select()
-  .from(products)
-  .where(gt(products.price, avgPrice));
+const expensiveProducts = await db.select().from(products).where(gt(products.price, avgPrice));
 
 // Correlated subquery
 const authorsWithPostCount = await db
@@ -81,21 +78,19 @@ const usersWhoCommented = await db
 import { sql } from 'drizzle-orm';
 
 const topAuthors = db.$with('top_authors').as(
-  db.select({
-    id: authors.id,
-    name: authors.name,
-    postCount: sql<number>`COUNT(${posts.id})`.as('post_count'),
-  })
+  db
+    .select({
+      id: authors.id,
+      name: authors.name,
+      postCount: sql<number>`COUNT(${posts.id})`.as('post_count'),
+    })
     .from(authors)
     .leftJoin(posts, eq(authors.id, posts.authorId))
     .groupBy(authors.id)
     .having(sql`COUNT(${posts.id}) > 10`)
 );
 
-const result = await db
-  .with(topAuthors)
-  .select()
-  .from(topAuthors);
+const result = await db.with(topAuthors).select().from(topAuthors);
 ```
 
 ### Recursive CTE
@@ -109,44 +104,41 @@ export const employees = pgTable('employees', {
 });
 
 const employeeHierarchy = db.$with('employee_hierarchy').as(
-  db.select({
-    id: employees.id,
-    name: employees.name,
-    managerId: employees.managerId,
-    level: sql<number>`1`.as('level'),
-  })
+  db
+    .select({
+      id: employees.id,
+      name: employees.name,
+      managerId: employees.managerId,
+      level: sql<number>`1`.as('level'),
+    })
     .from(employees)
     .where(isNull(employees.managerId))
     .unionAll(
-      db.select({
-        id: employees.id,
-        name: employees.name,
-        managerId: employees.managerId,
-        level: sql<number>`employee_hierarchy.level + 1`,
-      })
+      db
+        .select({
+          id: employees.id,
+          name: employees.name,
+          managerId: employees.managerId,
+          level: sql<number>`employee_hierarchy.level + 1`,
+        })
         .from(employees)
-        .innerJoin(
-          sql`employee_hierarchy`,
-          sql`${employees.managerId} = employee_hierarchy.id`
-        )
+        .innerJoin(sql`employee_hierarchy`, sql`${employees.managerId} = employee_hierarchy.id`)
     )
 );
 
-const hierarchy = await db
-  .with(employeeHierarchy)
-  .select()
-  .from(employeeHierarchy);
+const hierarchy = await db.with(employeeHierarchy).select().from(employeeHierarchy);
 ```
 
 ### Multiple CTEs
 
 ```typescript
-const activeUsers = db.$with('active_users').as(
-  db.select().from(users).where(eq(users.isActive, true))
-);
+const activeUsers = db.$with('active_users').as(db.select().from(users).where(eq(users.isActive, true)));
 
 const recentPosts = db.$with('recent_posts').as(
-  db.select().from(posts).where(gt(posts.createdAt, sql`NOW() - INTERVAL '30 days'`))
+  db
+    .select()
+    .from(posts)
+    .where(gt(posts.createdAt, sql`NOW() - INTERVAL '30 days'`))
 );
 
 const result = await db
@@ -168,14 +160,10 @@ import { sql } from 'drizzle-orm';
 
 // Parameterized query (safe from SQL injection)
 const userId = 123;
-const user = await db.execute(
-  sql`SELECT * FROM ${users} WHERE ${users.id} = ${userId}`
-);
+const user = await db.execute(sql`SELECT * FROM ${users} WHERE ${users.id} = ${userId}`);
 
 // Raw SQL with type safety
-const result = await db.execute<{ count: number }>(
-  sql`SELECT COUNT(*) as count FROM ${users}`
-);
+const result = await db.execute<{ count: number }>(sql`SELECT COUNT(*) as count FROM ${users}`);
 ```
 
 ### SQL Template Composition
@@ -228,10 +216,7 @@ function buildFilters(filters: Filters): SQL | undefined {
 
 // Usage
 const filters: Filters = { name: 'John', isActive: true };
-const users = await db
-  .select()
-  .from(users)
-  .where(buildFilters(filters));
+const users = await db.select().from(users).where(buildFilters(filters));
 ```
 
 ## Aggregations
@@ -325,12 +310,7 @@ const user2 = await getUserById.execute({ id: 2 });
 const searchUsers = db
   .select()
   .from(users)
-  .where(
-    and(
-      like(users.name, sql.placeholder('name')),
-      eq(users.role, sql.placeholder('role'))
-    )
-  )
+  .where(and(like(users.name, sql.placeholder('name')), eq(users.role, sql.placeholder('role'))))
   .prepare('search_users');
 
 const admins = await searchUsers.execute({ name: '%John%', role: 'admin' });
@@ -342,17 +322,21 @@ const admins = await searchUsers.execute({ name: '%John%', role: 'admin' });
 
 ```typescript
 // Insert multiple rows
-const newUsers = await db.insert(users).values([
-  { email: 'user1@example.com', name: 'User 1' },
-  { email: 'user2@example.com', name: 'User 2' },
-  { email: 'user3@example.com', name: 'User 3' },
-]).returning();
+const newUsers = await db
+  .insert(users)
+  .values([
+    { email: 'user1@example.com', name: 'User 1' },
+    { email: 'user2@example.com', name: 'User 2' },
+    { email: 'user3@example.com', name: 'User 3' },
+  ])
+  .returning();
 
 // Batch with onConflictDoNothing
 await db.insert(users).values(bulkUsers).onConflictDoNothing();
 
 // Batch with onConflictDoUpdate (upsert)
-await db.insert(users)
+await db
+  .insert(users)
   .values(bulkUsers)
   .onConflictDoUpdate({
     target: users.email,
@@ -366,9 +350,7 @@ await db.insert(users)
 // Update multiple specific rows
 await db.transaction(async (tx) => {
   for (const update of updates) {
-    await tx.update(users)
-      .set({ name: update.name })
-      .where(eq(users.id, update.id));
+    await tx.update(users).set({ name: update.name }).where(eq(users.id, update.id));
   }
 });
 
@@ -381,7 +363,10 @@ await db.execute(sql`
       sql.raw(' ')
     )}
   END
-  WHERE ${users.id} IN (${sql.join(updates.map((u) => u.id), sql.raw(', '))})
+  WHERE ${users.id} IN (${sql.join(
+    updates.map((u) => u.id),
+    sql.raw(', ')
+  )})
 `);
 ```
 
@@ -392,12 +377,7 @@ await db.execute(sql`
 await db.delete(users).where(inArray(users.id, [1, 2, 3, 4, 5]));
 
 // Conditional batch delete
-await db.delete(posts).where(
-  and(
-    lt(posts.createdAt, new Date('2023-01-01')),
-    eq(posts.isDraft, true)
-  )
-);
+await db.delete(posts).where(and(lt(posts.createdAt, new Date('2023-01-01')), eq(posts.isDraft, true)));
 ```
 
 ## LATERAL Joins
@@ -428,18 +408,13 @@ const authorsWithTopPosts = await db
 const allContent = await db
   .select({ id: posts.id, title: posts.title, type: sql<string>`'post'` })
   .from(posts)
-  .union(
-    db.select({ id: articles.id, title: articles.title, type: sql<string>`'article'` })
-      .from(articles)
-  );
+  .union(db.select({ id: articles.id, title: articles.title, type: sql<string>`'article'` }).from(articles));
 
 // UNION ALL (includes duplicates)
 const allItems = await db
   .select({ id: products.id, name: products.name })
   .from(products)
-  .unionAll(
-    db.select({ id: services.id, name: services.name }).from(services)
-  );
+  .unionAll(db.select({ id: services.id, name: services.name }).from(services));
 ```
 
 ## Distinct Queries
@@ -462,32 +437,20 @@ const latestPostPerAuthor = await db
 ```typescript
 // FOR UPDATE (pessimistic locking)
 await db.transaction(async (tx) => {
-  const user = await tx
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .for('update');
+  const user = await tx.select().from(users).where(eq(users.id, userId)).for('update');
 
   // Critical section - user row is locked
-  await tx.update(users)
+  await tx
+    .update(users)
     .set({ balance: user.balance - amount })
     .where(eq(users.id, userId));
 });
 
 // FOR SHARE (shared lock)
-const user = await db
-  .select()
-  .from(users)
-  .where(eq(users.id, userId))
-  .for('share');
+const user = await db.select().from(users).where(eq(users.id, userId)).for('share');
 
 // SKIP LOCKED
-const availableTask = await db
-  .select()
-  .from(tasks)
-  .where(eq(tasks.status, 'pending'))
-  .limit(1)
-  .for('update', { skipLocked: true });
+const availableTask = await db.select().from(tasks).where(eq(tasks.status, 'pending')).limit(1).for('update', { skipLocked: true });
 ```
 
 ## Query Builder Patterns
@@ -519,11 +482,7 @@ class UserQueryBuilder {
 }
 
 // Usage
-const admins = await new UserQueryBuilder()
-  .whereRole('admin')
-  .whereActive()
-  .orderByCreated()
-  .execute();
+const admins = await new UserQueryBuilder().whereRole('admin').whereActive().orderByCreated().execute();
 ```
 
 ## Best Practices
@@ -548,9 +507,7 @@ import DataLoader from 'dataloader';
 const postLoader = new DataLoader(async (authorIds: number[]) => {
   const posts = await db.select().from(posts).where(inArray(posts.authorId, authorIds));
 
-  const grouped = authorIds.map(id =>
-    posts.filter(post => post.authorId === id)
-  );
+  const grouped = authorIds.map((id) => posts.filter((post) => post.authorId === id));
 
   return grouped;
 });
@@ -564,14 +521,9 @@ await db.execute(sql`SET statement_timeout = '5s'`);
 
 // Per-query timeout
 const withTimeout = async <T>(promise: Promise<T>, ms: number): Promise<T> => {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('Query timeout')), ms)
-  );
+  const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Query timeout')), ms));
   return Promise.race([promise, timeout]);
 };
 
-const users = await withTimeout(
-  db.select().from(users),
-  5000
-);
+const users = await withTimeout(db.select().from(users), 5000);
 ```

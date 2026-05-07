@@ -35,14 +35,17 @@ Let me count the ways this review fails...
 ### ❌ Problem 1: No Specificity
 
 **What the reviewer said:**
+
 > "Looks good!"
 
 **What's wrong:**
+
 - Doesn't say WHAT looks good
 - Doesn't say WHAT was checked
 - Provides zero evidence of actual review
 
 **What SHOULD have been said:**
+
 > "I reviewed the authentication logic, input validation, and test coverage. The authorization check on line 45 properly prevents users from updating other profiles, and the 88% test coverage is excellent."
 
 ---
@@ -50,6 +53,7 @@ Let me count the ways this review fails...
 ### ❌ Problem 2: Missed Critical Security Issue
 
 **What the code has:**
+
 ```typescript
 router.put('/profile/:userId', authenticateUser, async (req, res) => {
   // NO RATE LIMITING!
@@ -62,6 +66,7 @@ router.put('/profile/:userId', authenticateUser, async (req, res) => {
 Nothing. Didn't catch it.
 
 **Impact of Missing This:**
+
 - Attackers can spam profile updates
 - DoS vulnerability
 - No protection against abuse
@@ -75,6 +80,7 @@ Nothing. Didn't catch it.
 ### ❌ Problem 3: Missed Performance Issue
 
 **What the code has:**
+
 ```typescript
 async getUserWithPreferences(userId: string) {
   const user = await User.findOne({ where: { id: userId } });
@@ -88,6 +94,7 @@ async getUserWithPreferences(userId: string) {
 Nothing. Didn't notice.
 
 **Impact of Missing This:**
+
 - Slow API responses
 - Database load increases
 - Will get worse as users grow
@@ -101,6 +108,7 @@ Nothing. Didn't notice.
 ### ❌ Problem 4: No Evidence of Testing
 
 **What the reviewer SHOULD have done:**
+
 ```bash
 # Pull the branch
 git checkout feature/profile-update
@@ -125,16 +133,19 @@ curl -X PUT http://localhost:3000/api/profile/123 \
 ### ❌ Problem 5: No Actionable Feedback
 
 **What was provided:**
+
 - "LGTM" (Looks Good To Me)
 - A thumbs up emoji
 
 **What's missing:**
+
 - No specific comments
 - No improvement suggestions
 - No educational value
 - Nothing for the author to learn from
 
 **Compare to a good review:**
+
 - "Great work on the authorization logic!"
 - "Consider adding DTOs for validation"
 - "Fix the N+1 query before merge"
@@ -147,6 +158,7 @@ curl -X PUT http://localhost:3000/api/profile/123 \
 Reviewer approved without actually reviewing.
 
 **Signs of rubber stamping:**
+
 - ✅ Instant approval (< 2 minutes for 120 lines)
 - ✅ Generic praise ("looks good")
 - ✅ No specific comments
@@ -154,6 +166,7 @@ Reviewer approved without actually reviewing.
 - ✅ No code snippets referenced
 
 **Impact:**
+
 - Bugs ship to production
 - Security vulnerabilities not caught
 - Team loses trust in code review process
@@ -165,18 +178,18 @@ Reviewer approved without actually reviewing.
 
 ### Same PR, Two Reviews
 
-| Aspect | Bad Review | Good Review |
-|--------|-----------|-------------|
-| **Time spent** | < 2 minutes | 12 minutes |
-| **Issues found** | 0 | 2 medium, 2 low |
-| **Security checks** | None | OWASP Top 10 |
-| **Performance analysis** | None | Found N+1 query |
-| **Specificity** | None | File:line numbers |
-| **Code snippets** | None | Problem + solution |
-| **Educational value** | Zero | High |
-| **Author learns** | Nothing | Multiple best practices |
-| **Verdict** | ✅ APPROVED | ⚠️ APPROVED WITH RESERVATIONS |
-| **Production risk** | HIGH | LOW (after fixes) |
+| Aspect                   | Bad Review  | Good Review                   |
+| ------------------------ | ----------- | ----------------------------- |
+| **Time spent**           | < 2 minutes | 12 minutes                    |
+| **Issues found**         | 0           | 2 medium, 2 low               |
+| **Security checks**      | None        | OWASP Top 10                  |
+| **Performance analysis** | None        | Found N+1 query               |
+| **Specificity**          | None        | File:line numbers             |
+| **Code snippets**        | None        | Problem + solution            |
+| **Educational value**    | Zero        | High                          |
+| **Author learns**        | Nothing     | Multiple best practices       |
+| **Verdict**              | ✅ APPROVED | ⚠️ APPROVED WITH RESERVATIONS |
+| **Production risk**      | HIGH        | LOW (after fixes)             |
 
 ---
 
@@ -185,12 +198,14 @@ Reviewer approved without actually reviewing.
 ### What Happened After This Bad Review
 
 **Week 1:**
+
 ```
 Production deployed ✅
 No immediate issues 😊
 ```
 
 **Week 2:**
+
 ```
 ⚠️ API response times increasing
 ⚠️ Database load spiking
@@ -198,6 +213,7 @@ No immediate issues 😊
 ```
 
 **Week 3:**
+
 ```
 🔴 Attacker discovers no rate limiting
 🔴 Spam attack: 10,000 profile updates in 5 minutes
@@ -206,6 +222,7 @@ No immediate issues 😊
 ```
 
 **Week 4:**
+
 ```
 💰 Incident post-mortem
 💰 Lost revenue: $50,000
@@ -227,6 +244,7 @@ No immediate issues 😊
 **Before approving ANY PR, you MUST:**
 
 1. **Pull and run the code**
+
    ```bash
    git checkout feature-branch
    npm install
@@ -234,6 +252,7 @@ No immediate issues 😊
    ```
 
 2. **Run automated tools**
+
    ```bash
    npm audit
    npm run lint
@@ -300,21 +319,25 @@ No immediate issues 😊
 ### Quick Improvement Plan
 
 **Week 1:** Commit to running automated tools
+
 ```bash
 npm audit && npm run lint && npm test
 ```
 
 **Week 2:** Add security checklist
+
 - Check for hardcoded secrets
 - Verify authentication/authorization
 - Review input validation
 
 **Week 3:** Add performance checklist
+
 - Look for N+1 queries
 - Check algorithm complexity
 - Review database queries
 
 **Week 4:** Provide specific feedback
+
 - Use file:line format
 - Include code snippets
 - Suggest improvements
@@ -326,12 +349,14 @@ npm audit && npm run lint && npm test
 **Bad reviews are worse than no reviews.**
 
 Why?
+
 - Creates false confidence ("it was reviewed")
 - Issues slip through
 - Author doesn't learn
 - Team culture suffers
 
 **Good reviews:**
+
 - Catch issues early
 - Educate the team
 - Improve code quality
@@ -342,6 +367,7 @@ Why?
 ## 🎯 Key Takeaways
 
 ### ❌ DON'T:
+
 - Rubber stamp with "LGTM"
 - Approve without running code
 - Skip security checks
@@ -349,6 +375,7 @@ Why?
 - Rush through reviews
 
 ### ✅ DO:
+
 - Run automated tools
 - Check OWASP Top 10
 - Analyze performance

@@ -29,6 +29,12 @@ select,
 input[type='checkbox'],
 input[type='radio'] {
   cursor: pointer;
+  outline: none !important;
+}
+
+button:focus,
+[role='button']:focus {
+  outline: none !important;
 }
 
 * {

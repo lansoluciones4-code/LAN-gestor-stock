@@ -72,7 +72,7 @@ async function setup() {
         phone: '1199887766',
         email: 'maria.garcia@example.com',
         documentNumber: '40987654',
-      }
+      },
     ];
     await db.insert(customers).values(customerList);
     console.log(`${customerList.length} customers created.`);
@@ -104,7 +104,7 @@ async function setup() {
     for (let i = 0; i < 5; i++) {
       const device = insertedDevices[i];
       const provider = insertedProviders[i % insertedProviders.length];
-      
+
       productList.push({
         deviceId: device.id,
         providerId: provider.id,

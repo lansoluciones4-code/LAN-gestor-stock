@@ -1,5 +1,4 @@
 export const TEST_IDS = {
-
   general: {
     btnSincronizar: 'btnSincronizar',
     btnAgregar: 'btnAgregar',
@@ -11,19 +10,19 @@ export const TEST_IDS = {
 
   productos: {
     inputBusquedaPrecioMin: 'inputBusquedaPrecioMin',
-    inputBusquedaPrecioMax: 'inputBusquedaPrecioMax'
+    inputBusquedaPrecioMax: 'inputBusquedaPrecioMax',
   },
 
   logPanel: {
-    inputFiltroFecha: 'inputFiltroFecha'
+    inputFiltroFecha: 'inputFiltroFecha',
   },
 
   ventas: {
-    inputFiltroFecha: 'inputFiltroFecha'
+    inputFiltroFecha: 'inputFiltroFecha',
   },
 
   landing: {
     btnSiguientePag: 'btnSiguientePag',
-    btnAnteriorPag: 'btnAnteriorPag'
-  }
+    btnAnteriorPag: 'btnAnteriorPag',
+  },
 } as const;

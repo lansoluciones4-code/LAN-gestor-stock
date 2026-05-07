@@ -25,30 +25,34 @@ A comprehensive catalog of 21 code smells organized into 5 categories, with dete
 **Smell:** Method/function exceeds reasonable length.
 
 **Detection Patterns:**
+
 - JavaScript/TypeScript: Function >50 lines
 - Python: Function >50 lines
 - React: Component render method >30 lines
 - Any language: Method requires scrolling to understand
 
 **Why It's Bad:**
+
 - Hard to understand
 - Difficult to test
 - Contains hidden bugs
 - Violates Single Responsibility Principle
 
 **Recommended Refactoring:**
+
 - **Extract Method:** Break into smaller methods
 - **Replace Temp with Query:** Remove temporary variables
 - **Introduce Parameter Object:** Group related parameters
 - **Preserve Whole Object:** Pass entire object instead of fields
 
 **Example (JavaScript):**
+
 ```javascript
 // ❌ BAD: Long method (100+ lines)
 function processOrder(order) {
   // 20 lines of validation
-  if (!order.customer) throw new Error("No customer");
-  if (!order.items || order.items.length === 0) throw new Error("No items");
+  if (!order.customer) throw new Error('No customer');
+  if (!order.items || order.items.length === 0) throw new Error('No items');
   // ... more validation
 
   // 30 lines of price calculation
@@ -60,7 +64,7 @@ function processOrder(order) {
 
   // 30 lines of shipping logic
   let shipping = 0;
-  if (order.customer.country === "US") {
+  if (order.customer.country === 'US') {
     shipping = subtotal > 100 ? 0 : 10;
   }
   // ... more shipping logic
@@ -80,8 +84,8 @@ function processOrder(order) {
 }
 
 function validateOrder(order) {
-  if (!order.customer) throw new Error("No customer");
-  if (!order.items || order.items.length === 0) throw new Error("No items");
+  if (!order.customer) throw new Error('No customer');
+  if (!order.items || order.items.length === 0) throw new Error('No items');
 }
 
 function calculateSubtotal(items) {
@@ -89,7 +93,7 @@ function calculateSubtotal(items) {
 }
 
 function calculateShipping(order, subtotal) {
-  if (order.customer.country === "US") {
+  if (order.customer.country === 'US') {
     return subtotal > 100 ? 0 : 10;
   }
   // ... other shipping logic
@@ -103,6 +107,7 @@ function calculateShipping(order, subtotal) {
 **Smell:** Class has too many instance variables or methods.
 
 **Detection Patterns:**
+
 - JavaScript/TypeScript: Class >200 lines
 - Python: Class >300 lines
 - More than 10-15 methods
@@ -110,18 +115,21 @@ function calculateShipping(order, subtotal) {
 - Class name includes "Manager", "Controller", or "Util" (often God classes)
 
 **Why It's Bad:**
+
 - Violates Single Responsibility Principle
 - Hard to understand and maintain
 - High coupling
 - Difficult to test
 
 **Recommended Refactoring:**
+
 - **Extract Class:** Split into multiple focused classes
 - **Extract Subclass:** For parts used in special cases
 - **Extract Interface:** If class has multiple responsibilities
 - **Replace Data Value with Object:** For groups of related data
 
 **Example (Python):**
+
 ```python
 # ❌ BAD: God class (400+ lines)
 class UserManager:
@@ -180,57 +188,55 @@ class UserService:
 **Smell:** Using primitives instead of small objects for simple tasks.
 
 **Detection Patterns:**
+
 - Strings/numbers used for complex data (phone numbers, currencies, addresses)
 - Constants used instead of enums
 - Type codes or flags instead of classes
 - Array indices used for field names
 
 **Why It's Bad:**
+
 - No type safety
 - No validation
 - No associated behavior
 - Hard to change format
 
 **Recommended Refactoring:**
+
 - **Replace Data Value with Object**
 - **Introduce Parameter Object**
 - **Replace Type Code with Class/Subclasses**
 
 **Example (TypeScript):**
+
 ```typescript
 // ❌ BAD: Primitives for complex data
-function createInvoice(
-  customerName: string,
-  customerEmail: string,
-  customerAddress: string,
-  customerPhone: string,
-  amount: number,
-  currency: string,
-  dueDate: string
-) {
+function createInvoice(customerName: string, customerEmail: string, customerAddress: string, customerPhone: string, amount: number, currency: string, dueDate: string) {
   // Validation scattered everywhere
-  if (!customerEmail.includes("@")) throw new Error("Invalid email");
-  if (currency !== "USD" && currency !== "EUR") throw new Error("Invalid currency");
+  if (!customerEmail.includes('@')) throw new Error('Invalid email');
+  if (currency !== 'USD' && currency !== 'EUR') throw new Error('Invalid currency');
   // ...
 }
 
 // ✅ GOOD: Value objects for complex data
 class Email {
   constructor(private value: string) {
-    if (!value.includes("@")) throw new Error("Invalid email");
+    if (!value.includes('@')) throw new Error('Invalid email');
   }
-  toString() { return this.value; }
+  toString() {
+    return this.value;
+  }
 }
 
 class Money {
   constructor(
     private amount: number,
-    private currency: "USD" | "EUR" | "GBP"
+    private currency: 'USD' | 'EUR' | 'GBP'
   ) {}
 
   add(other: Money): Money {
     if (this.currency !== other.currency) {
-      throw new Error("Cannot add different currencies");
+      throw new Error('Cannot add different currencies');
     }
     return new Money(this.amount + other.amount, this.currency);
   }
@@ -245,11 +251,7 @@ class Customer {
   ) {}
 }
 
-function createInvoice(
-  customer: Customer,
-  amount: Money,
-  dueDate: Date
-) {
+function createInvoice(customer: Customer, amount: Money, dueDate: Date) {
   // All validation happens in value object constructors
   // Type-safe, reusable, testable
 }
@@ -262,54 +264,34 @@ function createInvoice(
 **Smell:** Method has more than 3-4 parameters.
 
 **Detection Patterns:**
+
 - Function/method with >5 parameters
 - Parameters frequently change together
 - Same parameters passed to multiple methods
 - Primitive types where object would be better
 
 **Why It's Bad:**
+
 - Hard to remember parameter order
 - Easy to make mistakes
 - Hard to change
 - Often indicates missing abstraction
 
 **Recommended Refactoring:**
+
 - **Introduce Parameter Object**
 - **Preserve Whole Object**
 - **Replace Parameter with Method Call**
 
 **Example (JavaScript):**
+
 ```javascript
 // ❌ BAD: Too many parameters
-function createUser(
-  firstName,
-  lastName,
-  email,
-  phone,
-  street,
-  city,
-  state,
-  zipCode,
-  country,
-  isActive,
-  role
-) {
+function createUser(firstName, lastName, email, phone, street, city, state, zipCode, country, isActive, role) {
   // ...
 }
 
-createUser(
-  "John",
-  "Doe",
-  "john@example.com",
-  "555-1234",
-  "123 Main St",
-  "Springfield",
-  "IL",
-  "62701",
-  "USA",
-  true,
-  "admin"
-); // Easy to mix up order!
+createUser('John', 'Doe', 'john@example.com', '555-1234', '123 Main St', 'Springfield', 'IL', '62701', 'USA', true, 'admin'); // Easy to mix up order!
 
 // ✅ GOOD: Parameter object
 class UserParams {
@@ -321,7 +303,7 @@ class UserParams {
       city: data.city,
       state: data.state,
       zipCode: data.zipCode,
-      country: data.country
+      country: data.country,
     };
     this.isActive = data.isActive;
     this.role = data.role;
@@ -332,19 +314,21 @@ function createUser(params) {
   // Much clearer, easier to extend
 }
 
-createUser(new UserParams({
-  firstName: "John",
-  lastName: "Doe",
-  email: "john@example.com",
-  phone: "555-1234",
-  street: "123 Main St",
-  city: "Springfield",
-  state: "IL",
-  zipCode: "62701",
-  country: "USA",
-  isActive: true,
-  role: "admin"
-}));
+createUser(
+  new UserParams({
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    phone: '555-1234',
+    street: '123 Main St',
+    city: 'Springfield',
+    state: 'IL',
+    zipCode: '62701',
+    country: 'USA',
+    isActive: true,
+    role: 'admin',
+  })
+);
 ```
 
 ---
@@ -354,22 +338,26 @@ createUser(new UserParams({
 **Smell:** Same group of data items appears together in multiple places.
 
 **Detection Patterns:**
+
 - Same 3+ parameters passed together to multiple methods
 - Same fields in multiple classes
 - Deleting one item makes others meaningless
 
 **Why It's Bad:**
+
 - Duplication
 - Hard to change
 - Missing abstraction
 - Scattered validation
 
 **Recommended Refactoring:**
+
 - **Extract Class** for the clump
 - **Introduce Parameter Object**
 - **Preserve Whole Object**
 
 **Example (Python):**
+
 ```python
 # ❌ BAD: Data clumps
 def calculate_distance(x1, y1, z1, x2, y2, z2):
@@ -417,32 +405,36 @@ def draw_line(start: Point3D, end: Point3D, color):
 **Smell:** Complex switch/case or if-else chains based on object type.
 
 **Detection Patterns:**
+
 - Switch on type code or class type
 - Same switch appears in multiple places
 - New types require modifying switch statements
 - switch/if-else >5 branches
 
 **Why It's Bad:**
+
 - Violates Open/Closed Principle
 - Code duplication
 - Hard to extend
 - Easy to forget updating all switches
 
 **Recommended Refactoring:**
+
 - **Replace Type Code with Subclasses/State/Strategy**
 - **Replace Conditional with Polymorphism**
 - **Use dispatch table/map**
 
 **Example (TypeScript):**
+
 ```typescript
 // ❌ BAD: Switch statement scattered everywhere
 function getSpeed(vehicle) {
   switch (vehicle.type) {
-    case "car":
+    case 'car':
       return vehicle.engine * 2;
-    case "plane":
+    case 'plane':
       return vehicle.engine * 10;
-    case "boat":
+    case 'boat':
       return vehicle.engine * 1.5;
     default:
       return 0;
@@ -451,11 +443,11 @@ function getSpeed(vehicle) {
 
 function getFuelConsumption(vehicle) {
   switch (vehicle.type) {
-    case "car":
+    case 'car':
       return vehicle.engine / 10;
-    case "plane":
+    case 'plane':
       return vehicle.engine / 5;
-    case "boat":
+    case 'boat':
       return vehicle.engine / 8;
     default:
       return 0;
@@ -470,18 +462,30 @@ abstract class Vehicle {
 }
 
 class Car extends Vehicle {
-  getSpeed() { return this.engine * 2; }
-  getFuelConsumption() { return this.engine / 10; }
+  getSpeed() {
+    return this.engine * 2;
+  }
+  getFuelConsumption() {
+    return this.engine / 10;
+  }
 }
 
 class Plane extends Vehicle {
-  getSpeed() { return this.engine * 10; }
-  getFuelConsumption() { return this.engine / 5; }
+  getSpeed() {
+    return this.engine * 10;
+  }
+  getFuelConsumption() {
+    return this.engine / 5;
+  }
 }
 
 class Boat extends Vehicle {
-  getSpeed() { return this.engine * 1.5; }
-  getFuelConsumption() { return this.engine / 8; }
+  getSpeed() {
+    return this.engine * 1.5;
+  }
+  getFuelConsumption() {
+    return this.engine / 8;
+  }
 }
 
 // Adding new vehicle type = new class, no changes to existing code!
@@ -494,17 +498,20 @@ class Boat extends Vehicle {
 **Smell:** Object has fields that are only set under certain circumstances.
 
 **Detection Patterns:**
+
 - Fields that are null/undefined most of the time
 - Fields only used in specific algorithms
 - Complex conditionals checking if field is set
 
 **Why It's Bad:**
+
 - Confusing - why is this field here?
 - Hard to understand object state
 - Wastes memory
 - Often indicates missing class
 
 **Recommended Refactoring:**
+
 - **Extract Class** for temporary fields
 - **Introduce Null Object**
 - **Replace Method with Method Object**
@@ -516,16 +523,19 @@ class Boat extends Vehicle {
 **Smell:** Subclass doesn't use most of inherited methods/fields.
 
 **Detection Patterns:**
+
 - Subclass throws "not supported" exceptions
 - Subclass doesn't use parent's methods
 - Inheritance used for code reuse, not "is-a" relationship
 
 **Why It's Bad:**
+
 - Wrong hierarchy
 - Violates Liskov Substitution Principle
 - Confusing design
 
 **Recommended Refactoring:**
+
 - **Replace Inheritance with Delegation**
 - **Create New Sibling Class**
 - **Remove subclass if unnecessary**
@@ -537,16 +547,19 @@ class Boat extends Vehicle {
 **Smell:** Two classes do the same thing but have different method names.
 
 **Detection Patterns:**
+
 - Similar algorithms with different method names
 - Code duplication between classes
 - Switching between classes requires rewriting
 
 **Why It's Bad:**
+
 - Duplication
 - Inconsistency
 - Hard to switch implementations
 
 **Recommended Refactoring:**
+
 - **Rename Method** to make consistent
 - **Extract Superclass**
 - **Extract Interface**
@@ -562,16 +575,19 @@ class Boat extends Vehicle {
 **Smell:** One class is commonly changed in different ways for different reasons.
 
 **Detection Patterns:**
+
 - "Whenever we add a new database, we change these 3 methods"
 - "Whenever we add UI field, we change these 5 methods"
 - One class modified for multiple types of changes
 
 **Why It's Bad:**
+
 - Violates Single Responsibility
 - High change risk
 - Hard to predict impact
 
 **Recommended Refactoring:**
+
 - **Extract Class** for each type of change
 - **Move Method** to appropriate class
 
@@ -582,16 +598,19 @@ class Boat extends Vehicle {
 **Smell:** Every change requires tiny changes in many classes.
 
 **Detection Patterns:**
+
 - Simple change touches 5+ classes
 - Adding feature requires editing scattered methods
 - Changes ripple through system
 
 **Why It's Bad:**
+
 - Error-prone
 - Time-consuming
 - Easy to miss a change
 
 **Recommended Refactoring:**
+
 - **Move Method/Field** to centralize
 - **Inline Class** if too fragmented
 
@@ -602,16 +621,19 @@ class Boat extends Vehicle {
 **Smell:** When you add subclass to one hierarchy, you need to add subclass to another.
 
 **Detection Patterns:**
+
 - Class name prefixes match in two hierarchies
 - Every time you subclass A, you subclass B
 - Two hierarchies grow together
 
 **Why It's Bad:**
+
 - Duplication
 - Hard to maintain
 - Easy to forget
 
 **Recommended Refactoring:**
+
 - **Move Method/Field** to eliminate one hierarchy
 - **Collapse Hierarchy**
 
@@ -626,23 +648,27 @@ class Boat extends Vehicle {
 **Smell:** Comment explaining what code does (not why).
 
 **Detection Patterns:**
+
 - Comment repeats what code says
 - Comment explains complex code
 - TODO comments left for years
 - Commented-out code
 
 **Why It's Bad:**
+
 - Code should be self-explanatory
 - Comments get outdated
 - Indicates unclear code
 
 **Recommended Refactoring:**
+
 - **Extract Method** with descriptive name
 - **Rename Method** to clarify
 - **Introduce Assertion** instead of assumption comment
 - Delete commented-out code (use version control!)
 
 **Example:**
+
 ```javascript
 // ❌ BAD: Comment explaining what code does
 // Check if user is eligible for discount
@@ -658,9 +684,7 @@ if (user.isEligibleForLoyaltyDiscount()) {
 
 class User {
   isEligibleForLoyaltyDiscount() {
-    return this.orders > 10 &&
-           this.totalSpent > 1000 &&
-           this.membershipYears > 2;
+    return this.orders > 10 && this.totalSpent > 1000 && this.membershipYears > 2;
   }
 
   applyLoyaltyDiscount(price) {
@@ -676,16 +700,19 @@ class User {
 **Smell:** Same code structure in multiple places.
 
 **Detection Patterns:**
+
 - Exact code duplication
 - Similar code with slight variations
 - Same algorithm in different methods
 
 **Why It's Bad:**
+
 - Maintenance nightmare
 - Bug appears in multiple places
 - Changes must be replicated
 
 **Recommended Refactoring:**
+
 - **Extract Method**
 - **Pull Up Method** (if in subclasses)
 - **Form Template Method**
@@ -697,17 +724,20 @@ class User {
 **Smell:** Class doesn't do enough to justify existence.
 
 **Detection Patterns:**
+
 - Class with only 1-2 methods
 - Class that just delegates to another
 - Empty or near-empty class
 - Class used in only one place
 
 **Why It's Bad:**
+
 - Unnecessary complexity
 - Hard to navigate codebase
 - Over-engineering
 
 **Recommended Refactoring:**
+
 - **Inline Class**
 - **Collapse Hierarchy** if subclass
 - Delete if truly unused
@@ -719,16 +749,19 @@ class User {
 **Smell:** Class with only fields and getters/setters, no behavior.
 
 **Detection Patterns:**
+
 - Only public fields or getters/setters
 - No logic methods
 - Other classes manipulate its data
 
 **Why It's Bad:**
+
 - Violates encapsulation
 - Behavior scattered in other classes
 - Anemic domain model
 
 **Recommended Refactoring:**
+
 - **Move Method** behavior to data class
 - **Encapsulate Field**
 - **Remove Setting Method** for fields that shouldn't change
@@ -740,17 +773,20 @@ class User {
 **Smell:** Code that's never executed.
 
 **Detection Patterns:**
+
 - Unused functions/methods
 - Unreachable if/else branches
 - Unused parameters
 - Unused variables
 
 **Why It's Bad:**
+
 - Confusing
 - Wastes maintenance effort
 - Can't be refactored safely
 
 **Recommended Refactoring:**
+
 - **Delete it!** (version control remembers)
 
 ---
@@ -760,17 +796,20 @@ class User {
 **Smell:** "We might need this someday" code that's never used.
 
 **Detection Patterns:**
+
 - Abstract classes with one subclass
 - Unused parameters
 - Overly complex "flexible" solutions
 - Features no one asked for
 
 **Why It's Bad:**
+
 - YAGNI violation (You Aren't Gonna Need It)
 - Harder to understand
 - Wastes time
 
 **Recommended Refactoring:**
+
 - **Collapse Hierarchy**
 - **Inline Class**
 - **Remove Parameter**
@@ -787,20 +826,24 @@ class User {
 **Smell:** Method uses data from another class more than its own.
 
 **Detection Patterns:**
+
 - Method calls other class's getters extensively
 - Method logic primarily about another object
 - Method would make more sense in another class
 
 **Why It's Bad:**
+
 - Wrong responsibility
 - High coupling
 - Hard to change
 
 **Recommended Refactoring:**
+
 - **Move Method** to envied class
 - **Extract Method** if only part envies
 
 **Example:**
+
 ```javascript
 // ❌ BAD: Feature envy
 class ShoppingCart {
@@ -842,16 +885,19 @@ class ShoppingCart {
 **Smell:** Classes are too familiar with each other's private parts.
 
 **Detection Patterns:**
+
 - Class accesses private fields of another
 - Classes spend too much time together
 - Bidirectional dependencies
 
 **Why It's Bad:**
+
 - High coupling
 - Hard to change
 - Violates encapsulation
 
 **Recommended Refactoring:**
+
 - **Move Method/Field**
 - **Extract Class** for common interests
 - **Hide Delegate** or **Replace Delegation with Inheritance**
@@ -863,21 +909,25 @@ class ShoppingCart {
 **Smell:** Code like `a.getB().getC().getD().doSomething()` (Law of Demeter violation).
 
 **Detection Patterns:**
+
 - Long chains of method calls
 - Navigating through object structure
 - Client knows too much about implementation
 
 **Why It's Bad:**
+
 - Brittle - change anywhere breaks everything
 - High coupling
 - Hard to test
 
 **Recommended Refactoring:**
+
 - **Hide Delegate**
 - **Extract Method** to hide chain
 - Move method closer to data
 
 **Example:**
+
 ```javascript
 // ❌ BAD: Message chain
 const streetName = person.getAddress().getStreet().getName();
@@ -897,7 +947,9 @@ const streetName = person.getStreetName();
 ## 🎯 Using This Catalog
 
 ### In Code Reviews
+
 Look for these smells systematically:
+
 1. Check file size (Bloater indicator)
 2. Check method/function length
 3. Look for repeated code patterns
@@ -905,28 +957,34 @@ Look for these smells systematically:
 5. Look for type codes and switches
 
 ### Automated Detection
+
 Many tools can detect these:
+
 - **SonarLint** - detects cognitive complexity, code smells
 - **ESLint/TSLint** - configurable rules for many smells
 - **Pylint** - Python code analysis
 - **CodeScene** - AI-powered smell detection
 
 ### Priority
+
 Not all smells are equal:
 
 **Fix Immediately:**
+
 - Duplicate code
 - Long methods (>100 lines)
 - Large classes (>500 lines)
 - Switch statements on type
 
 **Fix Soon:**
+
 - Long parameter lists
 - Feature envy
 - Inappropriate intimacy
 - Data clumps
 
 **Fix When Touching Code:**
+
 - Comments (as you refactor)
 - Speculative generality
 - Dead code
@@ -936,7 +994,7 @@ Not all smells are equal:
 
 ## 📚 Additional Resources
 
-- **Fowler, Martin.** *Refactoring: Improving the Design of Existing Code (2nd Edition)*
+- **Fowler, Martin.** _Refactoring: Improving the Design of Existing Code (2nd Edition)_
 - **Refactoring.guru** - Interactive catalog with examples
 - **Clean Code by Robert Martin** - Related concepts
 

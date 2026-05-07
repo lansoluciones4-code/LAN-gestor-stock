@@ -11,11 +11,13 @@ npm init playwright@latest
 ## Comandos de Ejecución
 
 Correr antes de cada prueba, no todas lo necesitan, pero es mejor prevenir.
+
 ```bash
 npm run db:reset-data-hard
 ```
 
 Tambien se puede correr una version menos agresiva de este comando, que no reinicia la tabla de usuarios para evitar la sesion inválida.
+
 ```bash
 npm run db:reset-data
 ```

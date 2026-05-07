@@ -4,12 +4,13 @@
 
 ```html
 <!-- Custom focus styles that meet WCAG AA -->
-<button class="focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2">
-  Accessible Button
-</button>
+<button class="focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2">Accessible Button</button>
 
 <!-- Skip links for keyboard navigation -->
-<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4">
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4"
+>
   Skip to main content
 </a>
 ```
@@ -18,9 +19,7 @@
 
 ```html
 <!-- Only show focus ring on keyboard navigation -->
-<button class="focus-visible:ring-2 focus-visible:ring-blue-500">
-  Keyboard-only focus indicator
-</button>
+<button class="focus-visible:ring-2 focus-visible:ring-blue-500">Keyboard-only focus indicator</button>
 ```
 
 ---
@@ -29,22 +28,43 @@
 
 ```html
 <!-- Semantic buttons with ARIA labels -->
-<button aria-label="Close dialog" class="p-2">
-  <svg class="w-5 h-5" fill="none" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+<button
+  aria-label="Close dialog"
+  class="p-2"
+>
+  <svg
+    class="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
 </button>
 
 <!-- Descriptive links -->
-<a href="/docs" aria-describedby="docs-description">
+<a
+  href="/docs"
+  aria-describedby="docs-description"
+>
   Documentation
 </a>
-<p id="docs-description" class="sr-only">
+<p
+  id="docs-description"
+  class="sr-only"
+>
   Learn how to use our API and integration guides
 </p>
 
 <!-- Live regions for dynamic content -->
-<div aria-live="polite" class="sr-only">
+<div
+  aria-live="polite"
+  class="sr-only"
+>
   <p>3 new notifications</p>
 </div>
 ```
@@ -61,18 +81,12 @@
 
 ```html
 <!-- Ensure sufficient contrast ratios -->
-<div class="bg-gray-900 text-white">
-  High contrast text (WCAG AAA)
-</div>
+<div class="bg-gray-900 text-white">High contrast text (WCAG AAA)</div>
 
-<div class="bg-blue-500 text-blue-100">
-  Good contrast on colored backgrounds
-</div>
+<div class="bg-blue-500 text-blue-100">Good contrast on colored backgrounds</div>
 
 <!-- Use contrast utilities for testing -->
-<div class="bg-red-500 text-white contrast-more:bg-red-600 contrast-more:text-red-100">
-  Adjusts for high contrast mode
-</div>
+<div class="bg-red-500 text-white contrast-more:bg-red-600 contrast-more:text-red-100">Adjusts for high contrast mode</div>
 ```
 
 ### Contrast Guidelines
@@ -87,14 +101,10 @@
 
 ```html
 <!-- Respect prefers-reduced-motion -->
-<div class="transform transition-transform motion-reduce:transition-none">
-  Doesn't animate when user prefers reduced motion
-</div>
+<div class="transform transition-transform motion-reduce:transition-none">Doesn't animate when user prefers reduced motion</div>
 
 <!-- Conditional animations -->
-<div class="animate-pulse motion-safe:hover:animate-spin">
-  Only animates when motion is preferred
-</div>
+<div class="animate-pulse motion-safe:hover:animate-spin">Only animates when motion is preferred</div>
 ```
 
 ### Reduced Motion Media Query
@@ -139,10 +149,16 @@
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
 >
   <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-6">
-    <h2 id="alert-title" class="text-lg font-bold mb-2">
+    <h2
+      id="alert-title"
+      class="text-lg font-bold mb-2"
+    >
       Are you sure?
     </h2>
-    <p id="alert-description" class="text-gray-600 mb-4">
+    <p
+      id="alert-description"
+      class="text-gray-600 mb-4"
+    >
       This action cannot be undone.
     </p>
     <div class="flex justify-end gap-2">

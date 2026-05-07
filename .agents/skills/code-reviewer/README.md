@@ -63,6 +63,7 @@ code-reviewer/
 ## 🔍 Auto-Invoke Triggers
 
 This skill automatically activates when you mention:
+
 - "review this code"
 - "check for bugs"
 - "security audit"
@@ -77,11 +78,13 @@ This skill automatically activates when you mention:
 ## 🛡️ Research Backing
 
 ### OWASP Standards
+
 - **OWASP Code Review Guide 2025** - Official review methodology
 - **OWASP Top 10 2021** - Current security standard
 - **CWE Top 25 2024** - Most dangerous software weaknesses
 
 ### Industry Research
+
 - **Google Research (2018):** 9M code reviews analyzed
   - Median review latency: < 4 hours
   - 200-400 LOC optimal for catching defects
@@ -93,6 +96,7 @@ This skill automatically activates when you mention:
   - Most missed: Memory errors, resource management
 
 ### Key Finding
+
 Teams with **continuous code review** fix vulnerabilities **92% faster** than batch reviews.
 
 ---
@@ -110,12 +114,14 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 ### Supported Tools
 
 **Always Available:**
+
 - ✅ npm audit (dependency vulnerabilities)
 - ✅ ESLint (code quality)
 - ✅ Prettier (code formatting)
 - ✅ TypeScript type checking
 
 **Advanced (If Installed):**
+
 - ✅ **SonarQube** - Comprehensive quality + security
   - Quality Gates, Code Smells, Duplications
 - ✅ **CodeQL** - Semantic analysis (88% accuracy)
@@ -127,18 +133,19 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 
 ### Tool Accuracy Benchmarks (2025 Research)
 
-| Tool | Accuracy | False Positive Rate | Best Use Case |
-|------|----------|---------------------|---------------|
-| CodeQL | 88% | 5% | Semantic analysis, SQL injection |
-| Snyk | 85% | 8% | Dependencies, real-time IDE feedback |
-| Semgrep | 82% | 12% | Custom rules, policy enforcement |
-| SonarQube | ~80% | 8-10% | Comprehensive quality + security |
+| Tool      | Accuracy | False Positive Rate | Best Use Case                        |
+| --------- | -------- | ------------------- | ------------------------------------ |
+| CodeQL    | 88%      | 5%                  | Semantic analysis, SQL injection     |
+| Snyk      | 85%      | 8%                  | Dependencies, real-time IDE feedback |
+| Semgrep   | 82%      | 12%                 | Custom rules, policy enforcement     |
+| SonarQube | ~80%     | 8-10%               | Comprehensive quality + security     |
 
 ---
 
 ## 📊 Severity Classification
 
 ### 🔴 Critical (Blocks Deployment)
+
 - SQL injection vulnerabilities
 - XSS vulnerabilities
 - Authentication bypass
@@ -148,6 +155,7 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 **Action:** STOP. Must fix immediately.
 
 ### 🟠 High (Fix Within 48 Hours)
+
 - Missing authentication checks
 - Insecure session management
 - CSRF vulnerabilities
@@ -156,6 +164,7 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 **Action:** Create blocker ticket. Fix before next deployment.
 
 ### 🟡 Medium (Fix This Sprint)
+
 - Missing input validation
 - Inefficient algorithms (O(n²) on small datasets)
 - Code duplication
@@ -164,6 +173,7 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 **Action:** Create ticket. Fix within current sprint.
 
 ### 🔵 Low (Backlog)
+
 - Code style violations
 - Minor performance optimizations
 - Refactoring opportunities
@@ -176,6 +186,7 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 ## 📋 Quick Review Checklist (3 Minutes)
 
 **Security (30 seconds):**
+
 - [ ] No hardcoded secrets/API keys
 - [ ] User input sanitized/validated
 - [ ] Authentication on protected routes
@@ -183,12 +194,14 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 - [ ] Passwords hashed (bcrypt/argon2)
 
 **Performance (30 seconds):**
+
 - [ ] No N+1 query patterns
 - [ ] No nested loops over large datasets
 - [ ] Database indexes present
 - [ ] No synchronous file operations
 
 **Code Quality (60 seconds):**
+
 - [ ] TypeScript strict mode (no `any`)
 - [ ] Functions < 50 lines
 - [ ] No commented-out code
@@ -196,12 +209,14 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 - [ ] No console.log statements
 
 **Tests (30 seconds):**
+
 - [ ] Unit tests present
 - [ ] Test coverage > 80%
 - [ ] Edge cases tested
 - [ ] Tests pass locally
 
 **Documentation (30 seconds):**
+
 - [ ] Complex logic has comments
 - [ ] README updated
 - [ ] Public APIs have JSDoc
@@ -213,6 +228,7 @@ Teams with **continuous code review** fix vulnerabilities **92% faster** than ba
 ## 💡 Usage Examples
 
 ### Example 1: Quick PR Review
+
 ```
 User: "Review this PR for security issues"
 
@@ -224,6 +240,7 @@ Skill Output:
 ```
 
 ### Example 2: Pre-Deployment Audit
+
 ```
 User: "Security audit before deployment"
 
@@ -236,6 +253,7 @@ Skill Output:
 ```
 
 ### Example 3: Performance Review
+
 ```
 User: "Check performance of the user list endpoint"
 
@@ -252,18 +270,23 @@ Skill Output:
 ## 🚀 Key Features
 
 ### 1. Research-Backed Standards
+
 Every checklist item backed by OWASP, CWE, or academic research.
 
 ### 2. Progressive Disclosure
+
 Core skill loads fast (4,500 tokens). Detailed references loaded on-demand.
 
 ### 3. Multi-Tool Integration
+
 Works with SonarQube, CodeQL, Snyk, or just npm audit + ESLint.
 
 ### 4. Structured Output
+
 Clear reports with severity classification, code snippets, and specific recommendations.
 
 ### 5. Automation Scripts
+
 Quick-audit scripts run all basic checks in 2 minutes.
 
 ---
@@ -271,6 +294,7 @@ Quick-audit scripts run all basic checks in 2 minutes.
 ## 📖 Documentation
 
 **For detailed information, see:**
+
 - **EXAMPLES.md** - Complete walkthrough examples (start here if new to code review!)
 - **SKILL.md** - Main review workflow and procedures
 - **REFERENCE.md** - Complete OWASP Top 10, CWE Top 25, performance patterns
@@ -279,6 +303,7 @@ Quick-audit scripts run all basic checks in 2 minutes.
 - **resources/examples/** - Real-world good/bad review examples
 
 **Research Citations:**
+
 - OWASP Code Review Guide: https://owasp.org/www-project-code-review-guide/
 - OWASP Top 10 2021: https://owasp.org/Top10/
 - CWE Top 25: https://cwe.mitre.org/top25/
@@ -289,6 +314,7 @@ Quick-audit scripts run all basic checks in 2 minutes.
 ## 🔄 Integration with Other Skills
 
 **Works well with:**
+
 - **qa-testing** - Code review identifies issues, QA testing verifies fixes
 - **feature-orchestrator** - Reviews features during implementation phase
 - **critic-agent** - Code-reviewer for quick checks, critic-agent for deep audits
@@ -335,6 +361,7 @@ Add tool-specific scripts to `scripts/` directory and update quick-audit scripts
 ## 🤝 Contributing
 
 Found a new security pattern? Improved a checklist? Submit updates to:
+
 - GitHub: https://github.com/mgbotoe/claude-code-share/tree/main/claude-code-skills/code-reviewer
 - License: CC BY 4.0 (attribution required)
 

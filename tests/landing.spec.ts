@@ -1,10 +1,8 @@
-/* eslint-disable space-before-function-paren */
 import { test, expect } from '@playwright/test';
 import { ProductosPage } from './pages/ProductosPage';
 import { LandingPage } from './pages/LandingPage';
 
 test.describe.serial('Pruebas de Landing Page', () => {
-
   test('Debería ocultar el producto de la landing cuando se desactiva su visibilidad', async ({ page }) => {
     const productosPage = new ProductosPage(page);
     await productosPage.goto();
@@ -25,5 +23,4 @@ test.describe.serial('Pruebas de Landing Page', () => {
     await landingPage.buscarProducto(producto.equipo);
     await expect(tarjeta).toBeHidden();
   });
-
 });

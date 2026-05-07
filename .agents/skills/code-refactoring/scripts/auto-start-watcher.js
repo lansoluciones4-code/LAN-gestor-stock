@@ -55,15 +55,11 @@ function main() {
   }
 
   // Start the watcher in detached mode
-  const watcher = spawn(
-    'node',
-    [path.join(SCRIPT_DIR, 'file-watcher.js'), WATCH_DIR, '--quiet'],
-    {
-      detached: true,
-      stdio: ['ignore', 'ignore', 'ignore'], // Fully detached
-      cwd: SCRIPT_DIR,
-    }
-  );
+  const watcher = spawn('node', [path.join(SCRIPT_DIR, 'file-watcher.js'), WATCH_DIR, '--quiet'], {
+    detached: true,
+    stdio: ['ignore', 'ignore', 'ignore'], // Fully detached
+    cwd: SCRIPT_DIR,
+  });
 
   // Unref so parent can exit
   watcher.unref();

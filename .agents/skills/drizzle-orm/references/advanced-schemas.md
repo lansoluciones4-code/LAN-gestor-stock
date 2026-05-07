@@ -65,7 +65,10 @@ export const posts = pgTable('posts', {
 // Query array columns
 import { arrayContains, arrayContained } from 'drizzle-orm';
 
-await db.select().from(posts).where(arrayContains(posts.tags, ['typescript', 'drizzle']));
+await db
+  .select()
+  .from(posts)
+  .where(arrayContains(posts.tags, ['typescript', 'drizzle']));
 ```
 
 ## Indexes
@@ -75,16 +78,20 @@ await db.select().from(posts).where(arrayContains(posts.tags, ['typescript', 'dr
 ```typescript
 import { pgTable, serial, text, varchar, index, uniqueIndex } from 'drizzle-orm/pg-core';
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull(),
-  name: text('name'),
-  city: text('city'),
-}, (table) => ({
-  emailIdx: uniqueIndex('email_idx').on(table.email),
-  nameIdx: index('name_idx').on(table.name),
-  cityNameIdx: index('city_name_idx').on(table.city, table.name),
-}));
+export const users = pgTable(
+  'users',
+  {
+    id: serial('id').primaryKey(),
+    email: varchar('email', { length: 255 }).notNull(),
+    name: text('name'),
+    city: text('city'),
+  },
+  (table) => ({
+    emailIdx: uniqueIndex('email_idx').on(table.email),
+    nameIdx: index('name_idx').on(table.name),
+    cityNameIdx: index('city_name_idx').on(table.city, table.name),
+  })
+);
 ```
 
 ### Partial Indexes
@@ -92,15 +99,19 @@ export const users = pgTable('users', {
 ```typescript
 import { sql } from 'drizzle-orm';
 
-export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }),
-  deletedAt: timestamp('deleted_at'),
-}, (table) => ({
-  activeEmailIdx: uniqueIndex('active_email_idx')
-    .on(table.email)
-    .where(sql`${table.deletedAt} IS NULL`),
-}));
+export const users = pgTable(
+  'users',
+  {
+    id: serial('id').primaryKey(),
+    email: varchar('email', { length: 255 }),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => ({
+    activeEmailIdx: uniqueIndex('active_email_idx')
+      .on(table.email)
+      .where(sql`${table.deletedAt} IS NULL`),
+  })
+);
 ```
 
 ### Full-Text Search
@@ -109,21 +120,23 @@ export const users = pgTable('users', {
 import { pgTable, serial, text, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
-export const posts = pgTable('posts', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  content: text('content').notNull(),
-}, (table) => ({
-  searchIdx: index('search_idx').using(
-    'gin',
-    sql`to_tsvector('english', ${table.title} || ' ' || ${table.content})`
-  ),
-}));
+export const posts = pgTable(
+  'posts',
+  {
+    id: serial('id').primaryKey(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+  },
+  (table) => ({
+    searchIdx: index('search_idx').using('gin', sql`to_tsvector('english', ${table.title} || ' ' || ${table.content})`),
+  })
+);
 
 // Full-text search query
-const results = await db.select().from(posts).where(
-  sql`to_tsvector('english', ${posts.title} || ' ' || ${posts.content}) @@ plainto_tsquery('english', 'typescript orm')`
-);
+const results = await db
+  .select()
+  .from(posts)
+  .where(sql`to_tsvector('english', ${posts.title} || ' ' || ${posts.content}) @@ plainto_tsquery('english', 'typescript orm')`);
 ```
 
 ## Composite Keys
@@ -131,13 +144,17 @@ const results = await db.select().from(posts).where(
 ```typescript
 import { pgTable, text, primaryKey } from 'drizzle-orm/pg-core';
 
-export const userPreferences = pgTable('user_preferences', {
-  userId: integer('user_id').notNull(),
-  key: text('key').notNull(),
-  value: text('value').notNull(),
-}, (table) => ({
-  pk: primaryKey({ columns: [table.userId, table.key] }),
-}));
+export const userPreferences = pgTable(
+  'user_preferences',
+  {
+    userId: integer('user_id').notNull(),
+    key: text('key').notNull(),
+    value: text('value').notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.key] }),
+  })
+);
 ```
 
 ## Check Constraints
@@ -146,14 +163,18 @@ export const userPreferences = pgTable('user_preferences', {
 import { pgTable, serial, integer, check } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
-export const products = pgTable('products', {
-  id: serial('id').primaryKey(),
-  price: integer('price').notNull(),
-  discountPrice: integer('discount_price'),
-}, (table) => ({
-  priceCheck: check('price_check', sql`${table.price} > 0`),
-  discountCheck: check('discount_check', sql`${table.discountPrice} < ${table.price}`),
-}));
+export const products = pgTable(
+  'products',
+  {
+    id: serial('id').primaryKey(),
+    price: integer('price').notNull(),
+    discountPrice: integer('discount_price'),
+  },
+  (table) => ({
+    priceCheck: check('price_check', sql`${table.price} > 0`),
+    discountCheck: check('discount_check', sql`${table.discountPrice} < ${table.price}`),
+  })
+);
 ```
 
 ## Generated Columns
@@ -166,10 +187,7 @@ export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
-  fullName: text('full_name').generatedAlwaysAs(
-    (): SQL => sql`${users.firstName} || ' ' || ${users.lastName}`,
-    { mode: 'stored' }
-  ),
+  fullName: text('full_name').generatedAlwaysAs((): SQL => sql`${users.firstName} || ' ' || ${users.lastName}`, { mode: 'stored' }),
 });
 ```
 
@@ -187,7 +205,9 @@ export const tenants = pgTable('tenants', {
 
 export const documents = pgTable('documents', {
   id: serial('id').primaryKey(),
-  tenantId: uuid('tenant_id').notNull().references(() => tenants.id),
+  tenantId: uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id),
   title: text('title').notNull(),
   content: text('content'),
 });
@@ -240,14 +260,16 @@ export const settings = pgTable('settings', {
 });
 
 // JSONB operators
-await db.select().from(settings).where(
-  sql`${settings.config}->>'theme' = 'dark'`
-);
+await db
+  .select()
+  .from(settings)
+  .where(sql`${settings.config}->>'theme' = 'dark'`);
 
 // JSONB path query
-await db.select().from(settings).where(
-  sql`${settings.config} @> '{"notifications": {"email": true}}'::jsonb`
-);
+await db
+  .select()
+  .from(settings)
+  .where(sql`${settings.config} @> '{"notifications": {"email": true}}'::jsonb`);
 ```
 
 ### MySQL: Spatial Types
@@ -262,9 +284,10 @@ export const locations = mysqlTable('locations', {
 });
 
 // Spatial query
-await db.select().from(locations).where(
-  sql`ST_Distance_Sphere(${locations.point}, POINT(${lng}, ${lat})) < 1000`
-);
+await db
+  .select()
+  .from(locations)
+  .where(sql`ST_Distance_Sphere(${locations.point}, POINT(${lng}, ${lat})) < 1000`);
 ```
 
 ### SQLite: FTS5

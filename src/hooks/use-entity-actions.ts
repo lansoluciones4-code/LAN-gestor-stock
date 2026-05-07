@@ -22,17 +22,7 @@ interface UseEntityActionsProps<TDef, TInput, TUpdateInput = Partial<TInput>> {
   showInactive: boolean;
 }
 
-export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput, TUpdateInput = Partial<TInput>>({ 
-  handlers, 
-  setStoreData, 
-  onSuccessMessage, 
-  onErrorMessage, 
-  closeFormModal, 
-  setServerError, 
-  setItemToDelete, 
-  editingItem, 
-  showInactive 
-}: UseEntityActionsProps<TDef, TInput, TUpdateInput>) {
+export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput, TUpdateInput = Partial<TInput>>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive }: UseEntityActionsProps<TDef, TInput, TUpdateInput>) {
   const [isPending, startTransition] = useTransition();
 
   const syncData = async (manual = false) => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useDeferredValue } from 'react';
-import { type ProductDef } from '@/schemas/product.schema';
+import { type ProductDef } from '@/features/product/domain/product.schema';
 import { normalizeForSearch } from '@/lib/utils';
 
 interface UseCatalogFiltersProps {
@@ -43,7 +43,7 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
 
       return matchesSearch && matchesCategory && matchesPrice;
     });
-  }, [products, search, selectedCategory, minPrice, maxPrice]);
+  }, [products, deferredSearch, selectedCategory, minPrice, maxPrice]);
 
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {

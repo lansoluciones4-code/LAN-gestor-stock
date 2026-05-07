@@ -27,12 +27,14 @@ resources/
 **Purpose:** Comprehensive catalog of 21 code smells based on Martin Fowler's "Refactoring" and Refactoring.guru.
 
 **Contents:**
+
 - **5 categories:** Bloaters, OO Abusers, Change Preventers, Dispensables, Couplers
 - **21 code smells** with detection patterns, why they're bad, and recommended refactorings
 - **Before/After examples** in JavaScript/TypeScript and Python
 - **Tool recommendations** for automated detection (SonarLint, ESLint, Pylint)
 
 **Use cases:**
+
 - Systematic code review
 - Understanding what to look for beyond file size
 - Learning authoritative refactoring patterns
@@ -47,6 +49,7 @@ resources/
 **Purpose:** Gap analysis of this skill vs industry standards.
 
 **Contents:**
+
 - Comparison against Martin Fowler's "Refactoring" (2nd Edition)
 - Comparison against Refactoring.guru (66 techniques)
 - Comparison against Kent Beck's TDD methodology
@@ -55,6 +58,7 @@ resources/
 - Recommended enhancements
 
 **Use cases:**
+
 - Validating skill against best practices
 - Understanding how this skill complements Fowler's work
 - Identifying future improvements
@@ -69,6 +73,7 @@ resources/
 **Purpose:** Visual flowcharts and decision trees for quick refactoring decisions.
 
 **Contents:**
+
 - **8 Mermaid diagrams** that render in GitHub, GitLab, and documentation sites:
   1. Main Decision Flowchart (when to refactor workflow)
   2. File Size Decision Tree (thresholds and actions)
@@ -80,6 +85,7 @@ resources/
   8. Success Criteria Checklist (verification flow)
 
 **Use cases:**
+
 - Quick visual reference during code review
 - Teaching refactoring concepts
 - Presentations and training
@@ -94,12 +100,14 @@ resources/
 **Purpose:** Complete, runnable code examples showing real-world refactoring scenarios.
 
 **Planned contents:**
+
 - Full file examples (not just snippets)
 - Both "before" and "after" versions
 - Test files showing unchanged functionality
 - README explaining the refactoring decisions
 
 **Use cases:**
+
 - Learning by example
 - Understanding refactoring patterns in context
 - Template for your own refactorings
@@ -137,12 +145,14 @@ resources/
 ## 📝 Contributing Examples
 
 **Good examples should:**
+
 - Be runnable code (not pseudocode)
 - Show measurable improvement
 - Include test coverage
 - Document the "why" not just the "what"
 
 **Example structure:**
+
 ```
 examples/react-data-extraction/
 ├── before/
@@ -160,12 +170,14 @@ examples/react-data-extraction/
 ## 🔗 Related Documentation
 
 **Core Skill Files:**
+
 - **SKILL.md** - Main skill workflow (auto-invokes, optimized at ~6.5k tokens)
 - **REFERENCE.md** - Detailed patterns, TDD integration, "When NOT to Refactor", execution procedures
 - **FORMS.md** - Templates and checklists (prioritization, roadmaps, verification)
 - **README.md** - User documentation (complete guide)
 
 **Helper Tools:**
+
 - **scripts/check-size.sh** - Quick file size checker
 - **scripts/analyze-codebase.sh** - Full codebase audit
 
@@ -175,10 +187,10 @@ examples/react-data-extraction/
 
 This skill is validated against and references:
 
-1. **Martin Fowler** - *Refactoring: Improving the Design of Existing Code (2nd Edition)*, 2018
+1. **Martin Fowler** - _Refactoring: Improving the Design of Existing Code (2nd Edition)_, 2018
 2. **Refactoring.guru** - Interactive catalog of refactoring techniques
-3. **Kent Beck** - *Test-Driven Development: By Example*
-4. **Robert Martin** - *Clean Code* (related principles)
+3. **Kent Beck** - _Test-Driven Development: By Example_
+4. **Robert Martin** - _Clean Code_ (related principles)
 
 **Coverage:** 100% of core refactoring principles, with unique automated execution features.
 
@@ -187,6 +199,7 @@ This skill is validated against and references:
 ## 📈 Statistics
 
 **Total documentation:** ~5,000+ lines
+
 - SKILL.md: 413 lines (~6,500 tokens)
 - REFERENCE.md: 1,755 lines (TDD, When NOT to refactor, patterns, audit mode)
 - FORMS.md: 1,059 lines (templates)

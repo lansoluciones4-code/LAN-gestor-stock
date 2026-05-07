@@ -1,22 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { type SaleDef } from '@/schemas/sale.schema';
-import { fetchSales } from '@/server/actions/sale.actions';
-import { fetchCustomers } from '@/server/actions/customer.actions';
-import { fetchProducts } from '@/server/actions/product.actions';
+import { type SaleDef } from '@/features/sale/domain/sale.schema';
+import { fetchSales } from '@/features/sale/actions/sale.actions';
+import { fetchCustomers } from '@/features/customer/actions/customer.actions';
+import { fetchProducts } from '@/features/product/actions/product.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
-import { SalesListView } from '@/features/sales/components/sales-list-view';
-import { SalesPOSView } from '@/features/sales/components/sales-pos-view';
-import { SalesPrintView } from '@/features/sales/components/sales-print-view';
-import { useCart } from '@/features/sales/hooks/useCart';
-import { useSalesActions } from '@/features/sales/hooks/useSalesActions';
-import { SalePaymentModal } from '@/features/sales/components/sale-payment-modal';
-import { SaleDiscountModal } from '@/features/sales/components/sale-discount-modal';
+import { SalesListView } from '@/features/sale/ui/components/sales-list-view';
+import { SalesPOSView } from '@/features/sale/ui/components/sales-pos-view';
+import { SalesPrintView } from '@/features/sale/ui/components/sales-print-view';
+import { useCart } from '@/features/sale/ui/hooks/useCart';
+import { useSalesActions } from '@/features/sale/ui/hooks/useSalesActions';
+import { SalePaymentModal } from '@/features/sale/ui/components/sale-payment-modal';
+import { SaleDiscountModal } from '@/features/sale/ui/components/sale-discount-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
-import { useSalesStore } from '@/stores/sales.store';
-import { useProductsStore } from '@/stores/products.store';
-import { useCustomersStore } from '@/stores/customers.store';
+import { useSaleStore } from '@/features/sale/store/sale.store';
+import { useProductStore } from '@/features/product/store/product.store';
+import { useCustomerStore } from '@/features/customer/store/customer.store';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { GlobalMessage } from '@/components/ui/alert';
 import { roundToDecimals } from '@/lib/utils';
@@ -25,9 +25,9 @@ export function SalesPanel() {
   const [view, setView] = useState<'list' | 'new' | 'print'>('list');
   const [initialLoading, setInitialLoading] = useState(true);
 
-  const { sales, setSales, isLoaded: salesLoaded } = useSalesStore();
-  const { products, setProducts, isLoaded: prodsLoaded } = useProductsStore();
-  const { customers, setCustomers, isLoaded: custLoaded } = useCustomersStore();
+  const { sales, setSales, isLoaded: salesLoaded } = useSaleStore();
+  const { products, setProducts, isLoaded: prodsLoaded } = useProductStore();
+  const { customers, setCustomers, isLoaded: custLoaded } = useCustomerStore();
 
   const { itemToDelete, setItemToDelete, globalMessage, showGlobalMessage, search: searchTerm, setSearch: setSearchTerm } = useEntityManager<SaleDef>();
 
@@ -67,9 +67,9 @@ export function SalesPanel() {
 
   useEffect(() => {
     if (view === 'new' && !selectedCustomerId && displayCustomers.length > 0) {
-      const activeCustomers = displayCustomers.filter(c => c.isActive);
+      const activeCustomers = displayCustomers.filter((c) => c.isActive);
       if (activeCustomers.length > 0) {
-        const defaultCust = activeCustomers.find(c => c.name.toLowerCase() === 'mostrador') || activeCustomers[0];
+        const defaultCust = activeCustomers.find((c) => c.name.toLowerCase() === 'mostrador') || activeCustomers[0];
         setSelectedCustomerId(defaultCust.id);
       }
     }
@@ -91,7 +91,7 @@ export function SalesPanel() {
 
   if (initialLoading) {
     return (
-      <div className="mt-8 animate-in fade-in duration-500">
+      <div className='mt-8 animate-in fade-in duration-500'>
         <TableSkeleton />
       </div>
     );
@@ -159,7 +159,10 @@ export function SalesPanel() {
 
   return (
     <>
-      <div className="flex flex-col flex-1 h-full overflow-hidden outline-none" tabIndex={-1}>
+      <div
+        className='flex flex-col flex-1 h-full overflow-hidden outline-none'
+        tabIndex={-1}
+      >
         <SalesListView
           sales={displaySales}
           isPending={isPending}
@@ -187,9 +190,9 @@ export function SalesPanel() {
         isOpen={!!itemToDelete}
         onClose={() => setItemToDelete(null)}
         onConfirm={() => confirmDelete(itemToDelete as string)}
-        title="Anular Venta"
-        description="¿Deseas anular esta venta? El stock de los productos asociados será repuesto automáticamente. Esta acción no se puede deshacer."
-        submitLabel="Confirmar Anulación"
+        title='Anular Venta'
+        description='¿Deseas anular esta venta? El stock de los productos asociados será repuesto automáticamente. Esta acción no se puede deshacer.'
+        submitLabel='Confirmar Anulación'
         isPending={isPending}
       />
     </>

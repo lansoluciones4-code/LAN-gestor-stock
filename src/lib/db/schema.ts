@@ -79,6 +79,19 @@ export const products = pgTable(
   (table) => [index('device_id_idx').on(table.deviceId), index('provider_id_idx').on(table.providerId)]
 );
 
+export const productImages = pgTable(
+  'product_images',
+  {
+    publicId: varchar('public_id', { length: 255 }).primaryKey(),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id),
+    url: varchar('url', { length: 500 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('product_images_product_id_idx').on(table.productId)]
+);
+
 export const sales = pgTable(
   'sales',
   {
@@ -178,6 +191,14 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   losses: many(productLosses),
   logs: many(auditLogs),
+  images: many(productImages),
+}));
+
+export const productImagesRelations = relations(productImages, ({ one }) => ({
+  product: one(products, {
+    fields: [productImages.productId],
+    references: [products.id],
+  }),
 }));
 
 export const salesRelations = relations(sales, ({ one, many }) => ({

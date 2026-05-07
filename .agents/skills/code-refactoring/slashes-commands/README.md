@@ -23,16 +23,19 @@ These slash commands work on **all platforms** (Windows, macOS, Linux). The unde
 ### Important: Global Skill vs Project-Level Slash Commands
 
 **The code-refactoring skill is GLOBAL:**
+
 - ✅ Installed ONCE in `~/.claude/plugins/marketplaces/custom-skills/code-refactoring/` (global)
 - ✅ Works across ALL your projects automatically
 - ❌ Do NOT copy the skill folder to individual projects
 
 **Slash commands are PROJECT-LEVEL:**
+
 - ✅ Copied to individual projects in `.claude/commands/` (per-project)
 - ✅ Each project can choose which commands to install
 - ✅ Commands point to the GLOBAL skill location
 
 **Prerequisites:**
+
 - Skill installed in `~/.claude/plugins/marketplaces/custom-skills/code-refactoring/` (global)
 - Node.js dependencies installed: `cd ~/.claude/plugins/.../scripts && npm install`
 - If skill installed elsewhere, edit the script paths in the command files
@@ -58,6 +61,7 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ```
 
 **Note:** `/check-refactor-alerts` is **optional** because:
+
 - The code-refactoring skill automatically checks alerts when invoked
 - The `/start-watcher` command also checks alerts automatically
 - You only need this if you want to manually check alerts outside the skill workflow
@@ -67,9 +71,11 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ## 📋 Available Commands
 
 ### `/start-watcher`
+
 **Purpose:** Start background file watcher to monitor code file sizes in real-time
 
 **What it does:**
+
 - Auto-detects your `src/` directory
 - Scans all code files and shows initial report
 - Starts background monitoring
@@ -81,9 +87,11 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ---
 
 ### `/stop-watcher`
+
 **Purpose:** Stop the background file watcher
 
 **What it does:**
+
 - Stops the background file watcher process
 - Cross-platform (works on Windows, Mac, Linux)
 
@@ -92,15 +100,18 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ---
 
 ### `/scan-code-size`
+
 **Purpose:** One-time scan for oversized files (no background monitoring)
 
 **What it does:**
+
 - Scans your codebase for files exceeding size thresholds
 - Saves detailed report with timestamp
 - Shows summary of critical/alert/warning files
 - Does NOT start background watcher
 
 **Use when:**
+
 - You want a quick assessment without background monitoring
 - Auditing legacy/inherited codebase
 - Planning a refactoring sprint
@@ -108,14 +119,17 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ---
 
 ### `/check-refactor-alerts` (Optional)
+
 **Purpose:** Manually check file watcher alerts
 
 **What it does:**
+
 - Reads unread alerts from background watcher
 - Shows files that exceeded thresholds since last check
 - Offers refactoring options
 
 **Use when:**
+
 - You want to manually check alerts outside the skill workflow
 - Catching up on alerts before starting work
 
@@ -126,6 +140,7 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ## 🔄 Typical Workflow
 
 ### Option 1: Background Monitoring (Recommended)
+
 ```
 1. /start-watcher          → Start monitoring
 2. [Edit code normally]    → Watcher alerts if files get too large
@@ -134,6 +149,7 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ```
 
 ### Option 2: One-Time Scan
+
 ```
 1. /scan-code-size         → Get report of current state
 2. [Review report]         → See what needs refactoring
@@ -141,6 +157,7 @@ cp slashes-commands/check-refactor-alerts.md .claude/commands/
 ```
 
 ### Option 3: Manual Alert Checking (If installed)
+
 ```
 1. /start-watcher          → Start monitoring
 2. [Edit code for a while] → Watcher runs in background
@@ -166,11 +183,13 @@ slashes-commands/
 ## 🎯 Installation Recommendations
 
 **Install these 3 core commands:**
+
 - ✅ `/start-watcher` - Essential for background monitoring
 - ✅ `/stop-watcher` - Essential to stop monitoring
 - ✅ `/scan-code-size` - Useful for quick audits
 
 **Optionally install:**
+
 - ⚠️ `/check-refactor-alerts` - Only if you want manual alert checking
   - Skill auto-checks alerts, so this is redundant for most workflows
   - Useful if you prefer explicit control over alert checking

@@ -46,3 +46,26 @@ export function roundToDecimals(num: number, decimals: number = 2): number {
   const factor = Math.pow(10, decimals);
   return Math.round((num + Number.EPSILON) * factor) / factor;
 }
+
+/** Keys that browsers inject into number inputs but are invalid for price fields. */
+export const PRICE_BLOCKED_KEYS = ['-', '.', ',', 'e', 'E', '+'];
+
+/**
+ * Keyboard handler for price / integer inputs.
+ * Allows digits, a single comma as decimal separator, and control keys.
+ * Prevents any other character from being typed.
+ */
+export function blockInvalidPriceKey(e: React.KeyboardEvent<HTMLInputElement>): void {
+  const { key, currentTarget, ctrlKey, metaKey } = e;
+  const CONTROL_KEYS = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'];
+
+  // Only one comma allowed
+  if (key === ',' && currentTarget.value.includes(',')) {
+    e.preventDefault();
+    return;
+  }
+
+  if (!/^[0-9]$/.test(key) && key !== ',' && !CONTROL_KEYS.includes(key) && !ctrlKey && !metaKey) {
+    e.preventDefault();
+  }
+}

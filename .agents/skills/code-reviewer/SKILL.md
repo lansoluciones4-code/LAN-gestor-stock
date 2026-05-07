@@ -29,6 +29,7 @@ Comprehensive code review skill implementing **2025 research-backed best practic
 ## Core Philosophy
 
 **Balanced Quality + Security Approach:**
+
 - 50% Security focus (OWASP Top 10, vulnerabilities, authentication)
 - 30% Code quality (maintainability, standards, duplication)
 - 20% Performance (N+1 queries, algorithm complexity, bundle size)
@@ -40,6 +41,7 @@ Comprehensive code review skill implementing **2025 research-backed best practic
 ## When to Use This Skill
 
 **Auto-invoked when user mentions:**
+
 - "review this code"
 - "check for bugs"
 - "security audit"
@@ -51,6 +53,7 @@ Comprehensive code review skill implementing **2025 research-backed best practic
 - "performance check"
 
 **Manual invocation:**
+
 - Before committing critical changes
 - Pre-deployment validation
 - After implementing security-sensitive features
@@ -65,6 +68,7 @@ Comprehensive code review skill implementing **2025 research-backed best practic
 ### Phase 1: Automated Analysis (Run First)
 
 **Step 1: Identify Code to Review**
+
 - If reviewing specific files: Read those files
 - If reviewing PR/changes: Use `git diff` to see changes
 - If reviewing entire feature: Identify affected files via grep/glob
@@ -72,6 +76,7 @@ Comprehensive code review skill implementing **2025 research-backed best practic
 **Step 2: Run Automated SAST Tools (If Available)**
 
 Use the scripts in `scripts/` directory:
+
 ```bash
 # Quick security audit
 bash scripts/quick-audit.sh
@@ -88,6 +93,7 @@ snyk test                   # Snyk security
 ```
 
 **Step 3: Parse SAST Results**
+
 - Categorize findings by severity (Critical/High/Medium/Low)
 - Filter false positives (document reasoning)
 - Cross-reference with manual checks
@@ -128,14 +134,15 @@ snyk test                   # Snyk security
 **Check for Common Performance Issues:**
 
 1. **N+1 Query Problem**
+
    ```typescript
    // 🔴 BAD: N+1 queries
-   users.forEach(user => {
-     db.query("SELECT * FROM posts WHERE user_id = ?", user.id)
-   })
+   users.forEach((user) => {
+     db.query('SELECT * FROM posts WHERE user_id = ?', user.id);
+   });
 
    // ✅ GOOD: Single query with JOIN
-   db.query("SELECT * FROM users LEFT JOIN posts ON users.id = posts.user_id")
+   db.query('SELECT * FROM users LEFT JOIN posts ON users.id = posts.user_id');
    ```
 
 2. **O(n²) or Worse Algorithms**
@@ -163,6 +170,7 @@ snyk test                   # Snyk security
 ### Phase 4: Code Quality Standards
 
 **Check TypeScript/JavaScript Standards:**
+
 - [ ] No `any` types without justification comment
 - [ ] Proper error handling (no empty catch blocks)
 - [ ] No `console.log` statements (use proper logging)
@@ -172,6 +180,7 @@ snyk test                   # Snyk security
 - [ ] Import order follows convention (React → Third-party → Internal → Relative)
 
 **Check Naming Conventions:**
+
 - Files: `kebab-case` (user-service.ts)
 - Components: `PascalCase` (UserProfile.tsx)
 - Functions/Variables: `camelCase` (getUserData)
@@ -182,6 +191,7 @@ snyk test                   # Snyk security
 ### Phase 5: Generate Review Report
 
 Use templates from `resources/templates/` to create structured output:
+
 - **Comprehensive Review:** Use `resources/templates/code-review-report.md`
 - **Security Audit:** Use `resources/templates/security-review-template.md`
 - **Performance Review:** Use `resources/templates/performance-review-template.md`
@@ -197,21 +207,27 @@ Use templates from `resources/templates/` to create structured output:
 **Review Date:** [ISO Date]
 
 ## Critical Issues (Must Fix Before Merge)
+
 [None or list with code snippets]
 
 ## High Priority Issues (Fix Within 48h)
+
 [None or list with recommendations]
 
 ## Medium Priority Issues (Fix This Sprint)
+
 [None or list]
 
 ## Low Priority / Suggestions
+
 [Optional improvements]
 
 ## Strengths & Good Practices
+
 [What was done well]
 
 ## Metrics
+
 - **Lines Changed:** X
 - **Files Modified:** Y
 - **Estimated Risk:** Low/Medium/High
@@ -225,6 +241,7 @@ Use templates from `resources/templates/` to create structured output:
 ### SonarQube Integration
 
 **If SonarQube results available:**
+
 1. Read `sonar-report.json` or access SonarQube API
 2. Focus manual review on issues SonarQube missed:
    - Business logic vulnerabilities
@@ -233,6 +250,7 @@ Use templates from `resources/templates/` to create structured output:
 3. Validate SonarQube findings (check false positives)
 
 **Key SonarQube Metrics to Review:**
+
 - **Security Hotspots:** Require manual validation
 - **Code Smells:** Maintainability issues (threshold: Grade A or B)
 - **Duplications:** Keep < 3%
@@ -241,6 +259,7 @@ Use templates from `resources/templates/` to create structured output:
 ### CodeQL Integration
 
 **If CodeQL scan available:**
+
 1. Review CodeQL alerts in GitHub Security tab
 2. Prioritize alerts by severity:
    - **Critical/High:** Must fix before merge
@@ -253,6 +272,7 @@ Use templates from `resources/templates/` to create structured output:
    - Cryptographic operations
 
 **CodeQL Strengths (88% accuracy):**
+
 - SQL injection detection
 - Path traversal vulnerabilities
 - Command injection
@@ -261,6 +281,7 @@ Use templates from `resources/templates/` to create structured output:
 ### Snyk Integration
 
 **If Snyk results available:**
+
 1. Run `snyk test` for dependency vulnerabilities
 2. Run `snyk code test` for code-level issues
 3. Prioritize by:
@@ -270,6 +291,7 @@ Use templates from `resources/templates/` to create structured output:
 4. Check for available patches: `snyk wizard`
 
 **Snyk Strengths:**
+
 - Dependency vulnerabilities (real-time CVE database)
 - License compliance
 - Container security
@@ -278,6 +300,7 @@ Use templates from `resources/templates/` to create structured output:
 ### ESLint + Prettier + npm audit
 
 **Basic Security Stack (Always Run):**
+
 ```bash
 # Run these three commands ALWAYS
 npm audit --audit-level=high    # Dependency vulnerabilities
@@ -286,6 +309,7 @@ npx prettier --check .          # Code formatting
 ```
 
 **Interpretation:**
+
 - **npm audit:** Fix all high/critical vulnerabilities
 - **ESLint:** Must pass with 0 errors (warnings acceptable if documented)
 - **Prettier:** Auto-fix with `npx prettier --write .`
@@ -297,6 +321,7 @@ npx prettier --check .          # Code formatting
 Use this framework to categorize all findings:
 
 ### 🔴 Critical (Blocks Deployment)
+
 - SQL injection vulnerabilities
 - XSS vulnerabilities (unescaped user input)
 - Authentication bypass
@@ -307,6 +332,7 @@ Use this framework to categorize all findings:
 **Action:** STOP. Must fix immediately before proceeding.
 
 ### 🟠 High (Fix Within 48 Hours)
+
 - Missing authentication checks
 - Insecure session management
 - CSRF vulnerabilities
@@ -318,6 +344,7 @@ Use this framework to categorize all findings:
 **Action:** Create blocker ticket. Fix before next deployment.
 
 ### 🟡 Medium (Fix This Sprint)
+
 - Missing input validation (non-critical fields)
 - Inefficient algorithms (O(n²) on small datasets)
 - Missing database indexes (< 1000 rows)
@@ -328,6 +355,7 @@ Use this framework to categorize all findings:
 **Action:** Create ticket. Fix within current sprint.
 
 ### 🔵 Low (Backlog / Nice-to-Have)
+
 - Code style violations (if not enforced by linter)
 - Missing comments on complex code
 - Minor performance optimizations
@@ -391,6 +419,7 @@ Use this framework to categorize all findings:
 Before approving any code review:
 
 **Security:**
+
 - [ ] No SQL injection vulnerabilities (parameterized queries)
 - [ ] No XSS vulnerabilities (user input escaped)
 - [ ] Authentication checks on protected routes
@@ -399,6 +428,7 @@ Before approving any code review:
 - [ ] CSRF protection on state-changing endpoints
 
 **Performance:**
+
 - [ ] No N+1 query patterns
 - [ ] No O(n²) or worse algorithms on large datasets
 - [ ] Database indexes present for queried columns
@@ -406,6 +436,7 @@ Before approving any code review:
 - [ ] Images optimized and lazy-loaded
 
 **Code Quality:**
+
 - [ ] TypeScript strict mode compliance (no `any` without justification)
 - [ ] Error handling present (no empty catch blocks)
 - [ ] No console.log statements
@@ -414,6 +445,7 @@ Before approving any code review:
 - [ ] No commented-out code
 
 **Documentation:**
+
 - [ ] Complex logic has explanatory comments
 - [ ] Public APIs have JSDoc comments
 - [ ] README updated if behavior changed
@@ -424,16 +456,19 @@ Before approving any code review:
 ## Next Steps After Review
 
 **If APPROVED (✅):**
+
 1. Merge the PR
 2. Monitor deployment for issues
 3. Update test coverage metrics
 
 **If APPROVED WITH RESERVATIONS (⚠️):**
+
 1. Create tickets for medium/low priority issues
 2. Merge if critical/high issues are fixed
 3. Schedule follow-up review
 
 **If REQUIRES REVISION (❌):**
+
 1. Provide detailed feedback with code snippets
 2. Block merge until critical issues resolved
 3. Offer to pair-program on fixes if needed
@@ -443,6 +478,7 @@ Before approving any code review:
 ## Supporting Files
 
 **For detailed information, see:**
+
 - **EXAMPLES.md** - Complete end-to-end code review examples (good, bad, security-focused)
 - **REFERENCE.md** - Complete OWASP Top 10 checklist, performance patterns, CWE references
 - **FORMS.md** - Review report templates overview and guidance
@@ -459,6 +495,7 @@ Before approving any code review:
   - `quick-audit.bat` - Quick security audit (Windows)
 
 **Research Citations:**
+
 - OWASP Code Review Guide: https://owasp.org/www-project-code-review-guide/
 - OWASP Top 10 2021: https://owasp.org/Top10/
 - Empirical Study (2024): https://arxiv.org/html/2311.16396v2

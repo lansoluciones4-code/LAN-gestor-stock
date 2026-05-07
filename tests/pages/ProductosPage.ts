@@ -49,12 +49,12 @@ export class ProductosPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
-    this.inputMinPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMin);
-    this.inputMaxPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMax);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
+    this.inputMinPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMin).filter({ visible: true });
+    this.inputMaxPrecio = page.getByTestId(TEST_IDS.productos.inputBusquedaPrecioMax).filter({ visible: true });
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
-    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos);
+    this.btnVerInactivos = page.getByTestId(TEST_IDS.general.btnVerOcultos).filter({ visible: true });
     this.inputDescripcion = page.getByRole('textbox', { name: 'Ej: Negro, 256GB - Kit Funda' });
     this.inputPrecioCompra = page.locator('input[name="purchasePrice"]');
     this.inputPrecioVenta = page.locator('input[name="salePrice"]');
@@ -84,7 +84,7 @@ export class ProductosPage {
 
   async hacerScrollHastaVisible(nombre: string) {
     const fila = this.page.getByRole('row').filter({
-      has: this.page.getByText(nombre, { exact: true }).or(this.page.getByTitle(nombre, { exact: true }))
+      has: this.page.getByText(nombre, { exact: true }).or(this.page.getByTitle(nombre, { exact: true })),
     });
     if (await fila.isVisible()) return;
 
@@ -93,9 +93,11 @@ export class ProductosPage {
       await this.page.mouse.move(viewport.width / 2, viewport.height / 2);
     }
 
-    const scroller = this.page.getByTestId('virtuoso-scroller');
+    const scroller = this.page.getByTestId('virtuoso-scroller').filter({ visible: true });
     if (await scroller.isVisible()) {
-      await scroller.evaluate(node => { node.scrollTop = node.scrollHeight; });
+      await scroller.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
       await this.page.waitForTimeout(200);
     }
 
@@ -226,9 +228,9 @@ export class ProductosPage {
     const fila = this.obtenerFila(equipo, proveedor, descActual);
     // Asumimos que hay un switch o botón relacionado a la visibilidad en la landing
     await fila.getByRole('button', { name: ProductosPage.UI.BTN_OCULTAR, exact: true }).click();
-    
+
     // Esperar un momento si hay una mutación optimista o un guardado automático
-    await this.page.waitForTimeout(500); 
+    await this.page.waitForTimeout(500);
     await this.borrarBusqueda();
   }
 
@@ -246,7 +248,7 @@ export class ProductosPage {
     await this.btnSincronizar.click();
   }
 
-  async inyectarProductoEfimero(): Promise<{ descripcion: string, equipo: string, proveedor: string, stock: number, purchasePrice: string, salePrice: string }> {
+  async inyectarProductoEfimero(): Promise<{ descripcion: string; equipo: string; proveedor: string; stock: number; purchasePrice: string; salePrice: string }> {
     const hash = Math.random().toString(36).substring(2, 8);
     const equipo = `Eq Efim ${hash}`;
     const proveedor = {
@@ -275,7 +277,12 @@ export class ProductosPage {
 
     await this.sincronizar();
     return {
-      descripcion, equipo, proveedor: proveedor.name, stock, purchasePrice, salePrice
+      descripcion,
+      equipo,
+      proveedor: proveedor.name,
+      stock,
+      purchasePrice,
+      salePrice,
     };
   }
 
@@ -292,19 +299,19 @@ export class ProductosPage {
 
     if (equipo) {
       fila = fila.filter({
-        has: this.page.getByText(equipo, { exact: true }).or(this.page.getByTitle(equipo, { exact: true }))
+        has: this.page.getByText(equipo, { exact: true }).or(this.page.getByTitle(equipo, { exact: true })),
       });
     }
 
     if (proveedor) {
       fila = fila.filter({
-        has: this.page.getByText(proveedor, { exact: true }).or(this.page.getByTitle(proveedor, { exact: true }))
+        has: this.page.getByText(proveedor, { exact: true }).or(this.page.getByTitle(proveedor, { exact: true })),
       });
     }
 
     if (desc) {
       fila = fila.filter({
-        has: this.page.getByText(desc, { exact: true }).or(this.page.getByTitle(desc, { exact: true }))
+        has: this.page.getByText(desc, { exact: true }).or(this.page.getByTitle(desc, { exact: true })),
       });
     }
 

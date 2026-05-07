@@ -31,5 +31,5 @@ export const MESSAGES = {
       SESSION_EXPIRED: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
     },
     GENERIC: 'Ha ocurrido un error inesperado. Por favor, intenta nuevamente.',
-  }
+  },
 } as const;

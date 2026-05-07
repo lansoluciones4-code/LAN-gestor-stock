@@ -9,7 +9,7 @@ export const USER_ROLES = {
   VENDEDOR: 'vendedor',
 } as const;
 
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export class UsuariosPage {
   static readonly ROLES = USER_ROLES;
@@ -55,13 +55,13 @@ export class UsuariosPage {
     this.inputUsername = page.getByRole('textbox', { name: 'Ej: juan.perez' });
     this.inputPassword = page.getByLabel('Escribe una contraseña segura').or(page.getByPlaceholder('Escribe una contraseña segura'));
     this.inputEditPassword = page.getByLabel('******').or(page.getByPlaceholder('******'));
-    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla);
+    this.inputBusqueda = page.getByTestId(TEST_IDS.general.inputBusquedaTabla).filter({ visible: true });
 
     this.btnAgregarNuevo = page.getByTestId(TEST_IDS.general.btnAgregar);
     this.btnRegistrar = page.getByRole('button', { name: 'Confirmar Credencial', exact: true });
     this.btnCancelar = page.getByRole('button', { name: 'Cancelar', exact: true });
     this.btnActualizar = page.getByRole('button', { name: 'Confirmar Credencial', exact: true });
-    this.btnVerInactivos = page.getByRole('checkbox', { name: 'Ver Inactivos', exact: true });
+    this.btnVerInactivos = page.getByRole('checkbox', { name: 'Ver Inactivos', exact: true }).filter({ visible: true });
     this.btnDesvincular = page.getByRole('button', { name: 'Eliminar Acceso', exact: true });
     this.comboRol = page.getByRole('combobox');
     this.btnSincronizar = page.getByTestId(TEST_IDS.general.btnSincronizar);
@@ -98,7 +98,9 @@ export class UsuariosPage {
 
     const scroller = this.page.getByTestId('virtuoso-scroller');
     if (await scroller.isVisible()) {
-      await scroller.evaluate(node => { node.scrollTop = node.scrollHeight; });
+      await scroller.evaluate((node) => {
+        node.scrollTop = node.scrollHeight;
+      });
       await this.page.waitForTimeout(200);
     }
 
@@ -207,7 +209,7 @@ export class UsuariosPage {
    */
   obtenerFilaPorNombre(username: string): Locator {
     return this.page.getByRole('row').filter({
-      has: this.page.getByText(username, { exact: true }).or(this.page.getByTitle(username, { exact: true }))
+      has: this.page.getByText(username, { exact: true }).or(this.page.getByTitle(username, { exact: true })),
     });
   }
 }

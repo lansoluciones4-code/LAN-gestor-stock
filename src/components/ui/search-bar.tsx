@@ -10,9 +10,9 @@ interface SearchBarProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export function SearchBar({ value, onChange, placeholder = 'Buscar...', containerClassName = '', className = '', ...props }: SearchBarProps) {
   return (
     <div className={`relative flex-1 min-w-0 ${containerClassName}`}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+      <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400' />
       <input
-        type="text"
+        type='text'
         placeholder={placeholder}
         value={value}
         onChange={onChange}

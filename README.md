@@ -1,191 +1,218 @@
-# Stock Management Application — Tech Retail POS
+# Phone Center — Stock Management & POS System
 
-> A robust, full-stack web application meticulously engineered to manage inventory, sales, clients, providers, and user credentials for local technology and mobile phone retail businesses. Built with scalability, clean architecture, and modern security patterns in mind.
+> A high-performance, full-stack web application engineered for technology retail and mobile phone businesses. It seamlessly manages inventory, point-of-sale (POS) operations, clients, providers, user credentials, and exhaustive audit logging. Built with strict adherence to Clean Architecture, SOLID principles, and modern Next.js paradigms.
 
-## 📖 Official Documentation
+---
 
-This repository serves as the official source of truth for the system's architecture, technologies, capabilities, and workflows. It is meant to provide seamless onboarding for future maintainers and developers. All architectural decisions strictly honor **Clean Code**, **SOLID principles** (particularly Single Responsibility and Liskov Substitution Principle), and **Separation of Concerns**.
+## 📖 Developer Onboarding & Documentation
+
+Welcome to the Phone Center project. This document is your single source of truth for understanding the system's architecture, business rules, technologies, and local setup. Whether you are adding a new feature or debugging a production issue, this guide will provide the context you need to start coding immediately.
 
 ---
 
 ## 🛠 Technology Stack
 
-The project sits on the absolute bleeding edge of the JavaScript/TypeScript ecosystem, leveraging the highest performance paradigms currently available:
+This project leverages the bleeding edge of the JavaScript/TypeScript ecosystem to deliver uncompromising performance and type safety.
 
 ### Core Frameworks & UI
 
-- **[Next.js 15 (App Router)](https://nextjs.org/)** — Full-stack framework utilizing React Server Components (RSC). We strictly avoid standalone API routes; preferring Next.js **Server Actions** to unify the backend/frontend execution model efficiently.
-- **[React 19](https://react.dev/)** — Employing cutting-edge hooks (`useTransition`, `useActionState`, `useFormStatus`) and concurrent rendering features.
-- **[Tailwind CSS v4](https://tailwindcss.com/)** — A utility-first CSS engine handling layout constraints, dark mode integrations via dynamic system preferences, and complex CSS custom properties natively.
-- **[Lucide React](https://lucide.dev/)** — For consistent, clean, and scalable vector iconography.
+- **[Next.js 16 (App Router)](https://nextjs.org/)**: The backbone of the application. We use React Server Components (RSC) and **Server Actions** to unify the backend and frontend execution models, explicitly avoiding standalone API routes.
+- **[React 19](https://react.dev/)**: Utilizing concurrent rendering features and hooks (`useTransition`, `useActionState`).
+- **[Tailwind CSS v4](https://tailwindcss.com/)**: Utility-first CSS engine handling layout constraints and responsive design.
+- **[Lucide React](https://lucide.dev/)**: Scalable vector iconography.
+- **[Playwright](https://playwright.dev/)**: End-to-End (E2E) testing framework guaranteeing critical business flows.
 
-### State & Forms
+### State Management & Forms
 
-- **[Zustand](https://github.com/pmndrs/zustand)** — A lightweight, un-opinionated global state manager. Solely used to handle Client-Side Authentication state sync across disjointed components avoiding deeply nested Context Providers.
-- **[React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)** — We enforce rigorous end-to-end type safety. Zod schemas guarantee the exact shape of data bridging the client payload into backend Server Actions.
+- **[Zustand](https://github.com/pmndrs/zustand)**: Lightweight global state management. Used primarily for client-side entity synchronization (e.g., `useSaleStore`, `useProductStore`) avoiding deeply nested React Contexts.
+- **[React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)**: End-to-end type safety. Zod schemas bridge the client payload into backend Server Actions with rigorous validation.
 
 ### Back-End Engine & Infrastructure
 
-- **[PostgreSQL](https://www.postgresql.org/)** — Relational database providing transactional integrity and robust querying capability. Orchestrated locally via Docker Compose.
-- **[Drizzle ORM](https://orm.drizzle.team/)** — A high-performance, edge-ready Object Relational Mapper. It bridges our TypeScript schemas with Postgres gracefully utilizing deep relational `with` queries to eliminate N+1 problems.
-- **[jose](https://github.com/panva/jose) & [bcrypt](https://www.npmjs.com/package/bcrypt)** — Used for cryptographically secure hashing of user passwords and minting / verifying Edge-compatible JSON Web Tokens (JWT).
+- **[PostgreSQL](https://www.postgresql.org/)**: Relational database orchestrating transactional integrity.
+- **[Drizzle ORM](https://orm.drizzle.team/)**: High-performance, edge-ready Object Relational Mapper bridging TypeScript schemas with Postgres.
+- **[jose](https://github.com/panva/jose) & [bcrypt](https://www.npmjs.com/package/bcrypt)**: Cryptographically secure password hashing and Edge-compatible JSON Web Tokens (JWT) for authentication.
 
 ---
 
-## 🏗 Architectural Decisions & Patterns
+## 🏗 Architecture & Conventions
 
-### 1. The Repository Pattern
+The project strictly follows a **Feature-Oriented Clean Architecture**. Code is grouped by business capability (feature) rather than technical role.
 
-To maintain the Single Responsibility Principle, database interactions are purely isolated within the `/src/server/repositories/` layer. Server Actions orchestrate business logic but delegate actual DB reads/writes to Repositories. This avoids bleeding ORM logic into UI components or handler orchestration.
+### Directory Structure
 
-### 2. React Server Components (RSC) vs Client Components
+```text
+src/
+  app/              # Next.js App Router (Pages, Layouts, Routing)
+  features/         # Core business logic organized by feature
+    [feature_name]/ # e.g., auth, product, sale, customer, audit
+      actions/      # Server Actions (Application Layer / Use Cases)
+      domain/       # Zod Schemas & Types (Domain Layer)
+      repository/   # Drizzle DB interactions (Infrastructure Layer)
+      store/        # Zustand State (Client State Management)
+      ui/           # Feature-specific React Components
+  components/       # Shared, generic UI components (Buttons, Modals, Tables)
+  lib/              # Shared utilities, DB connection, constants
+```
 
-- **Server Components:** Utilized heavily at `/page.tsx` boundaries to pre-fetch initial data concurrently via `Promise.all()` directly from the DB, shipping zero JavaScript to the browser.
-- **Client Components (`'use client'`):** Confined to specific interactive islands (`*-manager.tsx`), managing local states, modal dialogs, and real-time client-side search filtering arrays without triggering costly network roundtrips per keystroke.
+### Strict Layer Separation
 
-### 3. Rigorous Type-Safety & Data Validation (Zod)
+- **Domain Layer (`domain/`)**: Pure business logic and data shapes (Zod schemas). Zero external dependencies.
+- **Infrastructure Layer (`repository/`)**: Database access via Drizzle. **Repositories never handle HTTP or UI logic.**
+- **Application Layer (`actions/`)**: Thin Server Actions that validate input (via Zod), call the repository, and return a typed `ActionResult`. **Business logic never lives in UI components.**
+- **Presentation Layer (`app/` & `ui/`)**: React components. They consume Server Actions and Zustand stores. They never query the database directly.
 
-We enforce a strict **Fail-Fast** architecture on the server. Data integrity is managed through a dual-schema pattern in the `/src/schemas/` directory:
+### Coding Standards
 
-#### The `DefSchema` Pattern
+1. **SOLID Principles**: Single Responsibility (functions do one thing), Dependency Inversion (depend on abstractions).
+2. **Type-Safety (Zod)**: We use a dual-schema pattern.
+   - `InputSchema` (e.g., `userSchema`): Validates incoming data from forms.
+   - `DefSchema` (e.g., `userDefSchema`): The Source of Truth representing the database record.
+3. **Action Results**: All Server Actions must return a standardized `ActionResult<T>` type instead of throwing raw errors to the client:
+   ```typescript
+   type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string };
+   ```
+4. **Zustand Naming**: Store hooks must use singular naming conventions (e.g., `useCustomerStore` instead of `useCustomersStore`).
+5. **Concurrency**: Assume operations run concurrently. Use `Promise.all` for independent async operations.
 
-To maintain absolute consistency, we separate **Input** from **Output/Definition** schemas:
+---
 
-- **`InputSchema` (e.g., `userSchema`):** Defines the requirements for creating or updating an entity (validation of names, email formats, password lengths). Used by `react-hook-form` and Server Actions for payload verification.
-- **`DefSchema` (e.g., `userDefSchema`):** Defines the **Source of Truth** for an entity as it exists in the system. This includes database-generated fields like `id`, `createdAt`, `updatedAt`, and nested relations (e.g., a product's associated `provider`).
+## 📜 Business Rules
 
-#### Centralized Server Validation
-
-Unlike traditional patterns where the frontend "casts" types blindly, our architecture offloads validation to the **Server Actions**:
-
-1.  **Server-Side Parsing:** Every `fetch` action validates the database output against its `DefSchema` before shipping it to the client.
-2.  **Type Inference:** The frontend receives already-validated, strongly-typed objects. This eliminates the need for `as any` or manual `parse` calls in UI components.
-3.  **Contract Enforcement:** If a database migration adds or changes a field, the Server Action will throw an error immediately, preventing the UI from entering an inconsistent state with missing or malformed data.
-
-This ensures a seamless flow of integrity from the Postgres Schema $\rightarrow$ Drizzle $\rightarrow$ Server Actions $\rightarrow$ Zod $\rightarrow$ UI State.
-
-### 3. Dual-Layer Security Model (RBAC)
+### 1. Dual-Layer Security & RBAC
 
 Security enforces Strict Role-Based Access Control (`admin` vs `vendedor`).
 
-1. **Edge Middleware (`middleware.ts`):** Intercepts requests evaluating HttpOnly Session Cookies. Unauthenticated users are permanently locked out of the `/(main)` route group.
-2. **Server Action Authorization (`verifyAuthOrAdmin`):** Every mutation validates permissions on execution. If a `vendedor` forcibly attempts to mock a backend payload reserved for `admin`, the Server Action aborts instantly.
-3. **Self-Harm Protections:** Administrators contain logical blocks preventing them from accidentally downgrading their own roles or deleting their own active profile.
+- **Edge Middleware (`middleware.ts`)**: Evaluates HttpOnly Session Cookies. Unauthenticated users are redirected to `/login`.
+- **Action Authorization**: Every mutation validates permissions (`verifyAuthOrAdmin`). `vendedor` roles cannot mock backend payloads to execute admin-only actions.
+
+### 2. Relational Integrity & Soft Deletes
+
+To preserve Foreign Key (FK) integrity and historical audit data, the system relies on **Conditional Soft Deletes**.
+If an entity (Provider, Device, Customer) has been part of a transaction, it is restricted to a Soft Delete (`isActive: false`). It is removed from operational views but kept intact for the database.
+
+### 3. Point of Sale (POS) & Stock Automation
+
+When a sale is confirmed via the POS interface, the system processes a database transaction that:
+
+1. Records the sale and associates it with the vendor and customer.
+2. Automatically decrements `stock` for all purchased products.
+3. Registers the sale revenue in the dashboard analytics.
+
+### 4. High-Fidelity Audit Logging
+
+Every critical operation (`CREAR`, `ACTUALIZAR`, `ELIMINAR`, `LOGIN`, `PÉRDIDA`) is recorded in the Audit Log.
+
+- The log captures the User ID, Entity ID, timestamp, and a JSON payload of the affected data.
+- **Filtered Search Mechanism**: 
+  - **Frontend Normalization**: The UI is designed to be user-friendly. Users can search using natural language terms to filter specific entities or actions.
+    - **Actions**: `creación`, `edición`, `borrado`, `baja`, `pérdida`
+    - **Entities**: `usuario`, `proveedor`, `producto`, `cliente`, `equipo`, `venta`
+  - **Backend Unaccent**: The backend queries the database using the Postgres `unaccent` extension paired with `ILIKE`. This ensures that searches are completely accent-insensitive (e.g., searching for "pérdida", "perdida", or "PERDIDA" all match the same logs).
+  - **IMPORTANT**: The `unaccent` extension is **not activated by default** in standard Postgres installations. To guarantee this search mechanism functions properly, you **must** manually activate the `unaccent` extension in your database (e.g. running `CREATE EXTENSION IF NOT EXISTS unaccent;`).
+
+### 5. Product Image Management
+
+To ensure a consistent and premium visual experience across the application (especially on the landing page and product details), the frontend displays product images in a strict `1:1` (square) container to maintain layout uniformity.
+- **Client Recommendation:** Always take and upload product photos in a **1:1 aspect ratio** (e.g., using the "Square" mode on a smartphone camera).
+- **Fallback Behavior:** If non-square (rectangular) images are uploaded, the system utilizes an intelligent "zoom-to-fill" strategy (via CSS `object-cover` and Cloudinary's AI-driven `crop: 'fill'`). This guarantees that there are no empty gaps/letterboxing in the UI, but it may result in the edges of the image being cropped.
 
 ---
 
-## 📦 System Modules & Workflows
+## 📦 System Modules
 
-### 💻 1. Authentication Module (`/login`)
-
-A pristine, fully-responsive login interface evaluating credentials against the hashed PostgreSQL records. Successful logins mint an HttpOnly token shielding against XSS payload extractions.
-
-### 📊 2. Dashboard (`/`)
-
-The analytical focal point. Aggregates metrics (active stock value, monthly revenue margins, top sellers) pulling statistical slices concurrently.
-
-### 📱 3. Devices & Categories (`/equipos`)
-
-An administrative classification ledger. Defines models, brands, or device variations (e.g., iPhone 15 Pro, Samsung S24).
-
-- **Admin Privilege:** Full CRUD.
-
-### 📦 4. Stock & Inventory Management (`/productos`)
-
-The core beating heart of the system. Represents actual physical units tied to a `device` and a `provider`.
-
-- **Pricing:** Manages specific `purchasePrice` vs `salePrice`.
-- **In-Memory Search Architecture:** Instantaneous client-side memory search against Device Names and Descriptions. By avoiding debounced API calls for filtering, we achieve sub-millisecond responsiveness for the user.
-- **Conditional Soft Deletes:** To preserve FK integrity, the system implements a strict "Relationship Check" before any hard deletion. If an entity (Provider, Device, Customer) has ever been part of a transaction or record, it is restricted to a **Soft Delete** (`isActive: false`). This keeps historical data intact for future audits while removing the item from active operational views.
-
-### 🛒 5. Point of Sale (POS) - _Current Development Phase_
-
-The upcoming engine for generating revenue. It will allow vendors to:
-
-- **Select Products:** Add multiple items to a synchronized cart.
-- **Client Association:** Link sales to existing customers or fast-track a guest checkout.
-- **Stock Automation:** Automatic decrement of `products.stock` upon checkout completion.
-- **Revenue Tracking:** Integrated with the Dashboard for real-time sales metrics.
-
-### 👥 5. Client Portfolio (`/clientes`)
-
-A CRM directory preserving final purchaser identities required for warranties or invoice association.
-
-- **Vendor Privilege:** Can register new clients and edit contact information (Phone/Email/DNI).
-- **Admin Privilege:** Exclusive rights to perform deletions.
-
-### 🏢 6. Provider Registry (`/proveedores`)
-
-A B2B directory managing wholesalers and external suppliers from whom hardware is sourced.
-
-- **Admin Privilege:** Exclusive rights to create, modify, and delete supplier relationships.
-
-### 🛡 7. User Profiles & Credentials (`/usuarios`)
-
-A strict internal Administrative panel designed to onboard new employees, assigning them access bounds (`vendedor` / `admin`). Capable of password overrides or complete access revocation.
-
-### 📜 8. Audit Logging & Tracing (`/logs`) — _Newly Implemented_
-
-To ensure absolute accountability, the system maintains a **High-Fidelity Audit Log** of all critical operations:
-
-- **Event Capture:** Every `CREATE`, `UPDATE`, `DELETE`, and `LOGIN` event is recorded with the specific User ID, Entity ID, and a JSON payload of the affected data.
-- **Data Integrity (Soft Deletes):** Entites are now protected by an `isActive` flag. The system prohibits the permanent deletion of any record that has historical relationships (Foreign Keys) to preserve data consistency.
-- **Administrative Inspector:** Admins can filter logs and view a deep-dive JSON comparison of data states, ensuring complete visibility over who changed what and when.
-
-### ⚡ UI/UX Philosophy: Performance over Decoration
-
-We have explicitly removed transition animations (`Framer Motion`) from the main layouts. The application is tuned to feel like a high-performance native cockpit: **instant interaction, zero latency.** Every click and search result is immediate, prioritizing professional efficiency over decorative effects.
+- 💻 **Authentication (`/login`)**: Secure access using bcrypt and HttpOnly JWTs.
+- 📊 **Dashboard (`/`)**: Business intelligence aggregating revenue, stock value, and top sellers.
+- 📱 **Devices (`/categorias`)**: Administrative ledger defining hardware models (e.g., iPhone 15 Pro).
+- 📦 **Products/Inventory (`/productos`)**: Core inventory management tying devices to physical stock and providers.
+- 🛒 **Point of Sale (`/ventas`)**: Synchronized cart checkout, customer association, and automated stock decrement.
+- 👥 **Customers (`/clientes`)**: CRM directory preserving purchaser identities.
+- 🏢 **Providers (`/proveedores`)**: B2B directory of external hardware suppliers.
+- 🛡 **Users (`/usuarios`)**: Internal administrative panel for employee credentials.
+- 📜 **Audit Logs (`/logs`)**: High-fidelity tracing of all system mutations.
 
 ---
 
-## 🚀 Running the Project Locally
+## 🚀 Local Development Setup
 
-Assuming you have `Node.js >= 18` and `Docker Compose` installed.
+### Prerequisites
 
-### 1. Spawn Infrastructure
+- Node.js >= 18
+- Docker & Docker Compose (for PostgreSQL)
 
-Start the PostgreSQL container. It binds externally to port `5433` (as designated in `docker-compose.yml`) to prevent clashes with native Postgres installations.
+### 1. Clone & Install
+
+```bash
+git clone <repository-url>
+cd StockManagementApp
+npm install
+```
+
+### 2. Environment Configuration
+
+Create a `.env` file at the root of the project:
+
+```env
+# Connects to the local Docker Postgres instance on port 5433
+DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
+JWT_SECRET=super_secret_dev_key_change_me_later
+```
+
+### 3. Spawn Database Infrastructure
+
+Start the PostgreSQL container (binds to port `5433` to prevent clashes with local DBs):
 
 ```bash
 docker compose up -d
 ```
 
-### 2. Install Dependencies
+### 4. Database Setup & Seeding
+
+Generate the schema, apply migrations, enable the unaccent extension, and seed the initial data:
 
 ```bash
-npm install
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env` file at the root:
-
-```env
-DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
-JWT_SECRET=super_secret_dev_key_change_me_later
-```
-
-### 4. Database Sync & Seeding
-
-Execute Drizzle to generate SQL structures, push migrations, and seed out the foundational Administrative User.
-
-```bash
+# Push SQL schemas to the database
 npm run db:generate
 npm run db:migrate
+
+# Enable 'unaccent' extension for flexible search queries
+npx tsx src/scripts/enable-unaccent.ts
+
+# Seed the foundation (creates the initial admin user)
 npm run db:seed
 ```
 
-### 5. Ignite the Server
+### 5. Start the Development Server
 
 ```bash
 npm run dev
 ```
 
 Navigate to `http://localhost:3000`.
+
 **Default Administrative Credentials:**
 
 - **User:** `admin`
 - **Pass:** `admin`
+
+---
+
+## 🛠 Useful Scripts & Commands
+
+The `package.json` includes several utility scripts to streamline your workflow:
+
+| Command                  | Description                                                           |
+| ------------------------ | --------------------------------------------------------------------- |
+| `npm run dev`            | Starts the Next.js development server with Turbopack.                 |
+| `npm run build`          | Creates an optimized production build.                                |
+| `npm run lint`           | Runs ESLint to verify code quality.                                   |
+| `npm run db:generate`    | Generates Drizzle SQL migration files based on schema changes.        |
+| `npm run db:migrate`     | Applies pending Drizzle migrations to the database.                   |
+| `npm run db:seed`        | Injects foundational data (like the master admin account).            |
+| `npm run db:reset-data`  | Clears and resets standard operational data (useful for dev testing). |
+| `npm run db:reset-full`  | Wipes the entire database completely (Warning: Destructive).          |
+| `npm run db:stress-test` | Runs a script to flood the DB with mock data for performance testing. |
+| `npx playwright test`    | Executes the End-to-End (E2E) test suite via Playwright.              |
 
 ---
 

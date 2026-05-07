@@ -13,6 +13,7 @@ Use this for rapid reviews of small changes or pre-commit checks.
 - [ ] **Passwords hashed** - bcrypt/argon2 used (not MD5/SHA1)
 
 **Quick command:**
+
 ```bash
 git diff --staged | grep -i "api_key\|password\|secret"
 ```
@@ -28,6 +29,7 @@ git diff --staged | grep -i "api_key\|password\|secret"
 
 **Quick check:**
 Look for:
+
 - `forEach` or `map` containing `await db.query`
 - Nested `for` loops
 - `fs.readFileSync` in Node.js
@@ -43,6 +45,7 @@ Look for:
 - [ ] **No console.log statements** - Use proper logging library
 
 **Quick command:**
+
 ```bash
 # Find console.logs
 git diff --staged | grep "console.log"
@@ -61,6 +64,7 @@ git diff --staged | grep ": any"
 - [ ] **Tests pass locally** - Run test suite before review
 
 **Quick command:**
+
 ```bash
 npm test
 npm run test:coverage
@@ -75,6 +79,7 @@ npm run test:coverage
 - [ ] **Public APIs have JSDoc** - Functions exported have documentation
 
 **Quick check:**
+
 - Are there functions > 20 lines without any comments?
 - Did public API change? Is it documented?
 
@@ -89,6 +94,7 @@ npm run test:coverage
 ### ❌ Immediate Fail (Stop Review)
 
 If you find ANY of these:
+
 - Hardcoded API keys or passwords
 - SQL injection vulnerability (string concatenation in queries)
 - XSS vulnerability (unescaped user input in HTML)
@@ -102,6 +108,7 @@ If you find ANY of these:
 ### ⚠️ Conditional Pass (Requires Fixes)
 
 If you find:
+
 - Missing tests for new code
 - console.log statements
 - `any` types
@@ -115,6 +122,7 @@ If you find:
 ### ✅ Pass
 
 If:
+
 - All checklist items pass
 - No security vulnerabilities
 - Tests present and passing
@@ -136,6 +144,7 @@ Use the **full code review process** (15-30 minutes) instead of this quick check
 - Pre-deployment security audit
 
 For these cases, see:
+
 - `code-review-report.md` for comprehensive reviews
 - `security-review-template.md` for security audits
 - `performance-review-template.md` for performance reviews

@@ -22,6 +22,7 @@ This file contains detailed checklists, vulnerability patterns, and tool-specifi
 ### A01:2021 – Broken Access Control
 
 **What to Check:**
+
 - [ ] Authentication checks on ALL protected routes/endpoints
 - [ ] Authorization checks verify user has permission for specific resource
 - [ ] Direct object references are validated (prevent IDOR attacks)
@@ -31,10 +32,11 @@ This file contains detailed checklists, vulnerability patterns, and tool-specifi
 - [ ] Session invalidation on logout works
 
 **Common Vulnerabilities:**
+
 ```typescript
 // 🔴 VULNERABLE: Missing authorization check
 app.get('/api/user/:id', (req, res) => {
-  const user = db.getUser(req.params.id);  // Any user can access any profile!
+  const user = db.getUser(req.params.id); // Any user can access any profile!
   res.json(user);
 });
 
@@ -55,6 +57,7 @@ app.get('/api/user/:id', authenticateUser, (req, res) => {
 ### A02:2021 – Cryptographic Failures
 
 **What to Check:**
+
 - [ ] Sensitive data encrypted at rest (database encryption)
 - [ ] HTTPS enforced for all external communication (no HTTP)
 - [ ] Passwords hashed with bcrypt, argon2, or scrypt (NOT MD5/SHA1)
@@ -64,6 +67,7 @@ app.get('/api/user/:id', authenticateUser, (req, res) => {
 - [ ] Proper key rotation strategy in place
 
 **Common Vulnerabilities:**
+
 ```typescript
 // 🔴 VULNERABLE: Weak hashing
 import crypto from 'crypto';
@@ -88,6 +92,7 @@ if (!JWT_SECRET) throw new Error('JWT_SECRET not configured');
 ### A03:2021 – Injection
 
 **What to Check:**
+
 - [ ] Parameterized queries used (no string concatenation)
 - [ ] ORM used correctly (no raw queries with user input)
 - [ ] User input sanitized before database operations
@@ -97,6 +102,7 @@ if (!JWT_SECRET) throw new Error('JWT_SECRET not configured');
 - [ ] XML injection prevented (XXE attacks)
 
 **SQL Injection Examples:**
+
 ```typescript
 // 🔴 VULNERABLE: SQL injection
 const query = `SELECT * FROM users WHERE email = '${userInput}'`;
@@ -108,7 +114,7 @@ db.query(query, [userInput]);
 
 // 🔴 VULNERABLE: Command injection
 const fileName = req.body.file;
-exec(`cat ${fileName}`, callback);  // Attacker: "; rm -rf /"
+exec(`cat ${fileName}`, callback); // Attacker: "; rm -rf /"
 
 // ✅ SECURE: Avoid shell execution, use libraries
 const fs = require('fs');
@@ -122,6 +128,7 @@ fs.readFile(fileName, 'utf8', callback);
 ### A03:2021 – Cross-Site Scripting (XSS)
 
 **What to Check:**
+
 - [ ] User input escaped before rendering in HTML
 - [ ] Content Security Policy (CSP) headers configured
 - [ ] `dangerouslySetInnerHTML` avoided or properly sanitized
@@ -131,6 +138,7 @@ fs.readFile(fileName, 'utf8', callback);
 - [ ] JSON responses have proper Content-Type
 
 **XSS Examples:**
+
 ```typescript
 // 🔴 VULNERABLE: Unescaped user input
 <div>{userInput}</div>  // If React, this is actually safe
@@ -155,6 +163,7 @@ const clean = DOMPurify.sanitize(userInput);
 ### A04:2021 – Insecure Design
 
 **What to Check:**
+
 - [ ] Threat modeling performed for sensitive features
 - [ ] Security requirements defined early (not retrofitted)
 - [ ] Rate limiting implemented on sensitive endpoints
@@ -164,6 +173,7 @@ const clean = DOMPurify.sanitize(userInput);
 - [ ] Separation of duties for critical operations
 
 **Design Flaws:**
+
 - No rate limiting on login → Brute force attacks
 - No CAPTCHA on public forms → Bot abuse
 - No email verification → Fake account creation
@@ -176,6 +186,7 @@ const clean = DOMPurify.sanitize(userInput);
 ### A05:2021 – Security Misconfiguration
 
 **What to Check:**
+
 - [ ] Default credentials changed
 - [ ] Unnecessary features disabled (debug mode OFF in production)
 - [ ] Error messages don't leak stack traces to users
@@ -185,6 +196,7 @@ const clean = DOMPurify.sanitize(userInput);
 - [ ] Cloud storage buckets not publicly accessible
 
 **Configuration Checks:**
+
 ```typescript
 // 🔴 VULNERABLE: Debug mode in production
 if (process.env.NODE_ENV === 'development') {
@@ -203,10 +215,12 @@ if (process.env.NODE_ENV === 'production') {
 app.use(cors({ origin: '*', credentials: true }));
 
 // ✅ SECURE: Restrictive CORS
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(','),
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(','),
+    credentials: true,
+  })
+);
 ```
 
 **CWE References:** CWE-16 (Configuration), CWE-11 (ASP.NET Misconfiguration)
@@ -216,6 +230,7 @@ app.use(cors({
 ### A06:2021 – Vulnerable and Outdated Components
 
 **What to Check:**
+
 - [ ] Dependencies updated regularly (`npm audit`)
 - [ ] No known CVEs in production dependencies
 - [ ] Dependency versions pinned (not `^` or `~` in production)
@@ -225,6 +240,7 @@ app.use(cors({
 - [ ] License compliance verified
 
 **Tools to Use:**
+
 ```bash
 # Check for vulnerabilities
 npm audit
@@ -243,6 +259,7 @@ npx depcheck  # Find unused dependencies
 ### A07:2021 – Identification and Authentication Failures
 
 **What to Check:**
+
 - [ ] Passwords hashed with salt (bcrypt, argon2)
 - [ ] Session tokens cryptographically random (not predictable)
 - [ ] Session expiration implemented (timeout after inactivity)
@@ -252,6 +269,7 @@ npx depcheck  # Find unused dependencies
 - [ ] Session invalidation on password change
 
 **Authentication Examples:**
+
 ```typescript
 // 🔴 VULNERABLE: Weak session token
 const sessionId = Math.random().toString();
@@ -269,8 +287,8 @@ app.post('/login', async (req, res) => {
 // ✅ SECURE: Rate limiting
 import rateLimit from 'express-rate-limit';
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 minutes
-  max: 5  // Max 5 attempts
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Max 5 attempts
 });
 app.post('/login', loginLimiter, async (req, res) => {
   // ...
@@ -284,6 +302,7 @@ app.post('/login', loginLimiter, async (req, res) => {
 ### A08:2021 – Software and Data Integrity Failures
 
 **What to Check:**
+
 - [ ] Dependencies verified (integrity hashes, signatures)
 - [ ] CI/CD pipeline secured (no unauthorized deployments)
 - [ ] Code signing implemented for releases
@@ -292,10 +311,11 @@ app.post('/login', loginLimiter, async (req, res) => {
 - [ ] Git commits signed (GPG)
 
 **Deserialization Vulnerabilities:**
+
 ```typescript
 // 🔴 VULNERABLE: Unsafe deserialization
 const userData = JSON.parse(untrustedInput);
-eval(userData.callback);  // EXTREMELY DANGEROUS
+eval(userData.callback); // EXTREMELY DANGEROUS
 
 // ✅ SECURE: Validate structure before use
 import Ajv from 'ajv';
@@ -313,6 +333,7 @@ if (validate(userData)) {
 ### A09:2021 – Security Logging and Monitoring Failures
 
 **What to Check:**
+
 - [ ] Security events logged (login, logout, access denied)
 - [ ] Logs include timestamp, user ID, IP, action
 - [ ] Sensitive data NOT logged (passwords, tokens, PII)
@@ -322,6 +343,7 @@ if (validate(userData)) {
 - [ ] Logs integrity protected (tamper-proof)
 
 **Logging Best Practices:**
+
 ```typescript
 // 🔴 VULNERABLE: Logging sensitive data
 logger.info(`User logged in with password: ${password}`);
@@ -341,6 +363,7 @@ logger.error(`Access denied: User ${userId} attempted to access resource ${resou
 ### A10:2021 – Server-Side Request Forgery (SSRF)
 
 **What to Check:**
+
 - [ ] User-controlled URLs validated before fetching
 - [ ] Internal IP addresses blocked (127.0.0.1, 10.0.0.0/8, etc.)
 - [ ] URL allowlist implemented (not blocklist)
@@ -349,10 +372,11 @@ logger.error(`Access denied: User ${userId} attempted to access resource ${resou
 - [ ] HTTP redirects limited or disabled
 
 **SSRF Examples:**
+
 ```typescript
 // 🔴 VULNERABLE: SSRF
 app.get('/fetch', async (req, res) => {
-  const url = req.query.url;  // Attacker: http://localhost:8080/admin
+  const url = req.query.url; // Attacker: http://localhost:8080/admin
   const data = await fetch(url);
   res.send(data);
 });
@@ -365,10 +389,7 @@ app.get('/fetch', async (req, res) => {
   const url = new URL(req.query.url);
 
   // Block internal IPs
-  if (url.hostname === 'localhost' ||
-      url.hostname.startsWith('127.') ||
-      url.hostname.startsWith('10.') ||
-      url.hostname.startsWith('192.168.')) {
+  if (url.hostname === 'localhost' || url.hostname.startsWith('127.') || url.hostname.startsWith('10.') || url.hostname.startsWith('192.168.')) {
     return res.status(400).json({ error: 'Invalid URL' });
   }
 
@@ -404,6 +425,7 @@ app.get('/fetch', async (req, res) => {
 10. **CWE-434:** Unrestricted Upload of File with Dangerous Type
 
 **For JavaScript/TypeScript, most relevant:**
+
 - CWE-79 (XSS)
 - CWE-89 (SQL Injection)
 - CWE-78 (Command Injection)
@@ -421,6 +443,7 @@ app.get('/fetch', async (req, res) => {
 ### N+1 Query Problem
 
 **Detection:**
+
 ```typescript
 // 🔴 RED FLAG: Loop with database query inside
 users.forEach(async (user) => {
@@ -430,6 +453,7 @@ users.forEach(async (user) => {
 ```
 
 **Solutions:**
+
 ```typescript
 // ✅ SOLUTION 1: JOIN query
 const usersWithPosts = await db.query(`
@@ -451,19 +475,24 @@ const postLoader = new DataLoader(async (userIds) => {
 ### O(n²) Algorithm Detection
 
 **Common Patterns:**
+
 ```typescript
 // 🔴 O(n²): Nested loops
 for (const item1 of array1) {
   for (const item2 of array2) {
-    if (item1.id === item2.id) { /* ... */ }
+    if (item1.id === item2.id) {
+      /* ... */
+    }
   }
 }
 
 // ✅ O(n): Use Map/Set
-const map = new Map(array2.map(item => [item.id, item]));
+const map = new Map(array2.map((item) => [item.id, item]));
 for (const item1 of array1) {
   const match = map.get(item1.id);
-  if (match) { /* ... */ }
+  if (match) {
+    /* ... */
+  }
 }
 ```
 
@@ -472,7 +501,9 @@ for (const item1 of array1) {
 ### Memory Leaks
 
 **Common Causes:**
+
 1. **Event listeners not removed**
+
 ```typescript
 // 🔴 LEAK
 useEffect(() => {
@@ -488,11 +519,12 @@ useEffect(() => {
 ```
 
 2. **Closures holding references**
+
 ```typescript
 // 🔴 LEAK
 let largeData = fetchLargeData();
 setInterval(() => {
-  console.log(largeData.length);  // Keeps largeData in memory forever
+  console.log(largeData.length); // Keeps largeData in memory forever
 }, 1000);
 
 // ✅ CORRECT
@@ -507,6 +539,7 @@ setInterval(() => {
 ### Bundle Size Optimization
 
 **Check for:**
+
 - [ ] Tree-shaking enabled (ES modules, not CommonJS)
 - [ ] Code splitting implemented (React.lazy, dynamic imports)
 - [ ] Large libraries imported selectively (lodash → lodash/specific-function)
@@ -515,6 +548,7 @@ setInterval(() => {
 - [ ] Gzip/Brotli compression enabled
 
 **Examples:**
+
 ```typescript
 // 🔴 BAD: Import entire library
 import _ from 'lodash';
@@ -538,6 +572,7 @@ const HeavyComponent = React.lazy(() => import('./HeavyComponent'));
 ### SonarQube
 
 **Quality Gates:**
+
 - **Bugs:** 0 (A rating)
 - **Vulnerabilities:** 0 (A rating)
 - **Security Hotspots:** Reviewed 100%
@@ -546,13 +581,14 @@ const HeavyComponent = React.lazy(() => import('./HeavyComponent'));
 - **Duplications:** < 3%
 
 **Reading SonarQube Output:**
+
 ```json
 {
   "issues": [
     {
-      "severity": "BLOCKER",  // Must fix before merge
+      "severity": "BLOCKER", // Must fix before merge
       "type": "VULNERABILITY",
-      "rule": "java:S2076",  // SQL Injection
+      "rule": "java:S2076", // SQL Injection
       "message": "Ensure that the query is not vulnerable to SQL injection",
       "line": 45
     }
@@ -561,6 +597,7 @@ const HeavyComponent = React.lazy(() => import('./HeavyComponent'));
 ```
 
 **Integration Script:**
+
 ```bash
 # Run SonarQube scan
 sonar-scanner \
@@ -579,6 +616,7 @@ curl -u $SONAR_TOKEN: \
 ### CodeQL
 
 **High-Value Queries:**
+
 - `js/sql-injection` - SQL injection detection
 - `js/command-line-injection` - Command injection
 - `js/path-injection` - Path traversal
@@ -586,11 +624,12 @@ curl -u $SONAR_TOKEN: \
 - `js/hardcoded-credentials` - Hardcoded secrets
 
 **Reading CodeQL Alerts:**
+
 ```yaml
 alerts:
   - rule: js/sql-injection
     severity: error
-    message: "This SQL query is vulnerable to injection"
+    message: 'This SQL query is vulnerable to injection'
     location: src/api/users.ts:45:12
     paths:
       - source: req.body.username
@@ -598,6 +637,7 @@ alerts:
 ```
 
 **Integration:**
+
 ```bash
 # Create CodeQL database
 codeql database create mydb --language=javascript
@@ -617,12 +657,14 @@ codeql github upload-results \
 ### Snyk
 
 **Vulnerability Priorities:**
+
 - **Critical (9.0-10.0 CVSS):** Fix immediately
 - **High (7.0-8.9):** Fix within 7 days
 - **Medium (4.0-6.9):** Fix within 30 days
 - **Low (0.1-3.9):** Backlog
 
 **Reading Snyk Output:**
+
 ```json
 {
   "vulnerabilities": [
@@ -640,6 +682,7 @@ codeql github upload-results \
 ```
 
 **Integration:**
+
 ```bash
 # Test for vulnerabilities
 snyk test
@@ -661,26 +704,29 @@ snyk monitor
 ### TypeScript/JavaScript
 
 **Common Issues:**
+
 1. **Unsafe type assertions**
+
 ```typescript
 // 🔴 DANGEROUS
-const data = response as UserData;  // No runtime validation!
+const data = response as UserData; // No runtime validation!
 
 // ✅ SAFE
 import { z } from 'zod';
 const UserSchema = z.object({ id: z.string(), name: z.string() });
-const data = UserSchema.parse(response);  // Validates at runtime
+const data = UserSchema.parse(response); // Validates at runtime
 ```
 
 2. **Promise rejection handling**
+
 ```typescript
 // 🔴 UNHANDLED
-fetchData().then(data => processData(data));
+fetchData().then((data) => processData(data));
 
 // ✅ HANDLED
 fetchData()
-  .then(data => processData(data))
-  .catch(error => logger.error('Fetch failed:', error));
+  .then((data) => processData(data))
+  .catch((error) => logger.error('Fetch failed:', error));
 ```
 
 ---
@@ -688,20 +734,23 @@ fetchData()
 ### React
 
 **Common Issues:**
+
 1. **Missing dependency arrays**
+
 ```typescript
 // 🔴 INFINITE LOOP RISK
 useEffect(() => {
   fetchData();
-});  // Missing dependency array
+}); // Missing dependency array
 
 // ✅ CORRECT
 useEffect(() => {
   fetchData();
-}, []);  // Empty array = run once
+}, []); // Empty array = run once
 ```
 
 2. **Unnecessary re-renders**
+
 ```typescript
 // 🔴 RE-RENDERS ON EVERY PARENT RENDER
 <ExpensiveComponent data={data} />
@@ -716,16 +765,19 @@ const MemoizedComponent = React.memo(ExpensiveComponent);
 ### Node.js
 
 **Common Issues:**
+
 1. **Blocking the event loop**
+
 ```typescript
 // 🔴 BLOCKS EVENT LOOP
-const data = fs.readFileSync('large-file.txt');  // Synchronous
+const data = fs.readFileSync('large-file.txt'); // Synchronous
 
 // ✅ NON-BLOCKING
-const data = await fs.promises.readFile('large-file.txt');  // Async
+const data = await fs.promises.readFile('large-file.txt'); // Async
 ```
 
 2. **Memory leaks in streams**
+
 ```typescript
 // 🔴 LEAK
 const stream = fs.createReadStream('file.txt');
@@ -744,6 +796,7 @@ stream.on('close', () => cleanup());
 ### Manual Testing Checklist
 
 **Authentication Testing:**
+
 - [ ] Try accessing protected routes without authentication
 - [ ] Try using expired tokens
 - [ ] Try using tokens from different users
@@ -751,12 +804,14 @@ stream.on('close', () => cleanup());
 - [ ] Test password reset flow for vulnerabilities
 
 **Authorization Testing:**
+
 - [ ] Try accessing resources belonging to other users
 - [ ] Try privilege escalation (regular user → admin)
 - [ ] Test horizontal privilege escalation (user A → user B)
 - [ ] Test direct object reference manipulation (change IDs in URLs)
 
 **Input Validation Testing:**
+
 - [ ] Test with extremely long inputs (> 10,000 chars)
 - [ ] Test with special characters: `< > " ' ; / \ ` `
 - [ ] Test with SQL metacharacters: `' OR '1'='1`
@@ -770,17 +825,20 @@ stream.on('close', () => cleanup());
 ### OWASP Standards (Primary Sources)
 
 **OWASP Code Review Guide 2025**
+
 - URL: https://owasp.org/www-project-code-review-guide/
 - Purpose: Official methodology for secure code review
 - Key Contributions: Security-focused review procedures, vulnerability patterns
 
 **OWASP Top 10 2021** (Current Standard)
+
 - URL: https://owasp.org/Top10/
 - Purpose: Most critical web application security risks
 - Updated: 2021 (next update expected 2025)
 - Key Changes from 2017: New categories for insecure design, software integrity failures, SSRF
 
 **OWASP ASVS (Application Security Verification Standard)**
+
 - URL: https://owasp.org/www-project-application-security-verification-standard/
 - Purpose: Testing requirements for web app security
 - Levels: 1 (Opportunistic), 2 (Standard), 3 (Advanced)
@@ -790,6 +848,7 @@ stream.on('close', () => cleanup());
 ### CWE (Common Weakness Enumeration)
 
 **CWE Top 25 Most Dangerous Software Weaknesses (2024)**
+
 - URL: https://cwe.mitre.org/top25/
 - Updated: Annually based on CVE data
 - Key Weaknesses Referenced in This Skill:
@@ -805,6 +864,7 @@ stream.on('close', () => cleanup());
 ### Academic Research & Empirical Studies
 
 **1. Google Research: Code Review at Google (2018)**
+
 - **Study:** "Modern Code Review: A Case Study at Google"
 - **Sample Size:** 9 million code reviews analyzed
 - **Key Findings:**
@@ -816,6 +876,7 @@ stream.on('close', () => cleanup());
 - **Relevance:** Informed our recommendation for incremental reviews and review size limits
 
 **2. Microsoft Research: Code Reviews (2013)**
+
 - **Study:** "Expectations, Outcomes, and Challenges of Modern Code Review"
 - **Sample Size:** 900+ developers surveyed, 17 teams
 - **Key Findings:**
@@ -827,6 +888,7 @@ stream.on('close', () => cleanup());
 - **Relevance:** Established evidence base for code review effectiveness
 
 **3. Empirical Study: Security in Code Reviews (2024)**
+
 - **Study:** "An Empirical Study of Security Vulnerabilities in Code Reviews"
 - **URL:** https://arxiv.org/html/2311.16396v2
 - **Sample Size:** 135,560 code review comments analyzed
@@ -839,6 +901,7 @@ stream.on('close', () => cleanup());
 - **Relevance:** Our 50% security focus and OWASP checklist address most-missed categories
 
 **4. IEEE: Automated SAST Tool Accuracy (2023)**
+
 - **Study:** "Comparative Analysis of Static Application Security Testing Tools"
 - **Sample Size:** 1,200+ known vulnerabilities tested across 6 SAST tools
 - **Key Findings:**
@@ -850,6 +913,7 @@ stream.on('close', () => cleanup());
 - **Relevance:** Our tool accuracy benchmarks and recommendation to combine automated + manual review
 
 **5. NIST Secure Software Development Framework (SSDF)**
+
 - **Document:** NIST SP 800-218
 - **URL:** https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf
 - **Purpose:** Software development security practices
@@ -864,16 +928,19 @@ stream.on('close', () => cleanup());
 ### Industry Best Practices
 
 **DevSecOps Automation Research**
+
 - **Finding:** Teams with continuous security review (integrated in CI/CD) fix vulnerabilities 92% faster
 - **Source:** DevSecOps Community Survey 2024
 - **Implementation:** Our quick-audit scripts for CI/CD integration
 
 **PCI-DSS Requirements** (Payment Card Industry)
+
 - **Requirement 6.3.2:** Code review before release to production
 - **Requirement 6.5:** Address common coding vulnerabilities (references OWASP Top 10)
 - **Relevance:** Security review template includes PCI-DSS considerations
 
 **SOC 2 Type II Requirements**
+
 - **CC7.1:** Change management includes review before deployment
 - **CC7.2:** System security involves secure development practices
 - **Relevance:** Review reports support compliance documentation
@@ -883,6 +950,7 @@ stream.on('close', () => cleanup());
 ### SAST Tool Integration Research
 
 **Tool Selection Criteria (Based on 2023 Forrester Research)**
+
 1. **Accuracy:** Detection rate vs false positive rate
 2. **Speed:** Time to scan (critical for CI/CD)
 3. **Coverage:** Languages and frameworks supported
@@ -890,6 +958,7 @@ stream.on('close', () => cleanup());
 5. **Remediation:** Actionable fix guidance
 
 **Recommended Tool Stack:**
+
 - **CodeQL** (GitHub) - Best for semantic analysis, SQL injection
 - **Snyk** - Best for dependencies, real-time IDE feedback
 - **SonarQube** - Best for comprehensive quality + security
@@ -901,12 +970,14 @@ stream.on('close', () => cleanup());
 ### Performance Pattern Research
 
 **N+1 Query Problem**
+
 - **Study:** "Database Performance Anti-Patterns" (2020)
 - **Impact:** 10-100x slowdown depending on dataset size
 - **Detection:** ORM query logs, APM tools
 - **Fix:** Eager loading, batch queries
 
 **Algorithm Complexity**
+
 - **Source:** "Introduction to Algorithms" (CLRS, 4th Ed)
 - **Big-O Benchmarks:**
   - O(1): < 1ms for any dataset
@@ -917,6 +988,7 @@ stream.on('close', () => cleanup());
   - O(2ⁿ): Never acceptable in production
 
 **Memory Leak Patterns**
+
 - **Study:** "Memory Leak Detection in JavaScript" (2019)
 - **Common Causes:**
   - Event listeners not removed: 45% of leaks
@@ -929,15 +1001,18 @@ stream.on('close', () => cleanup());
 ### Key Metrics to Track (Research-Based)
 
 **Mean Time to Remediate (MTTR)**
+
 - **Industry Benchmark:** < 7 days for high severity (Veracode State of Software Security 2024)
 - **Our Target:** < 24 hours for critical, < 7 days for high
 
 **Defect Density**
+
 - **Industry Average:** 1-25 defects per 1000 LOC (varies by language)
 - **High-Quality Code:** < 1.0 defects per 1000 LOC
 - **Our Target:** < 1.0 defects per 1000 LOC
 
 **Review Coverage**
+
 - **Google Standard:** 100% of changed lines reviewed before merge
 - **Microsoft Standard:** 95%+ code coverage with reviews
 - **Our Target:** 100% of changed lines, 100% manual review for critical paths
@@ -947,16 +1022,19 @@ stream.on('close', () => cleanup());
 ## Further Reading
 
 ### Books
+
 - "The Art of Software Security Assessment" by Dowd, McDonald, Schuh
 - "Secure Programming with Static Analysis" by Chess & West
 - "Code Complete" by Steve McConnell (Chapter on code reviews)
 
 ### Standards
+
 - ISO/IEC 27034 - Application Security
 - ISO/IEC 25010 - Software Quality Model
 - NIST SP 800-53 - Security Controls
 
 ### Online Resources
+
 - OWASP Cheat Sheet Series: https://cheatsheetseries.owasp.org/
 - CWE/SANS Top 25: https://cwe.mitre.org/top25/
 - Google's Engineering Practices: https://google.github.io/eng-practices/review/
@@ -969,6 +1047,7 @@ stream.on('close', () => cleanup());
 **Version:** 1.0
 
 **Research Sources:**
+
 - OWASP Code Review Guide 2025
 - OWASP Top 10 2021
 - CWE Top 25 (2024)

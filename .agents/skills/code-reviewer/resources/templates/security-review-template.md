@@ -29,6 +29,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Authentication required on protected routes
 - [ ] Authorization validates user permissions
 - [ ] Direct object references protected (IDOR prevention)
@@ -45,6 +46,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Sensitive data encrypted at rest
 - [ ] Sensitive data encrypted in transit (HTTPS)
 - [ ] Passwords hashed with bcrypt/argon2
@@ -61,6 +63,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Parameterized queries used (no string concatenation)
 - [ ] Input validation on all user inputs
 - [ ] ORM used correctly (no raw queries with user input)
@@ -77,6 +80,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Threat modeling performed
 - [ ] Secure by default
 - [ ] Defense in depth
@@ -93,6 +97,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Security headers configured (CSP, HSTS, X-Frame-Options)
 - [ ] Error messages don't leak information
 - [ ] Default credentials changed
@@ -109,6 +114,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] npm audit shows no critical/high vulnerabilities
 - [ ] Dependencies up to date
 - [ ] Known vulnerable components not used
@@ -124,6 +130,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Multi-factor authentication available
 - [ ] Password requirements enforced
 - [ ] Session management secure
@@ -140,6 +147,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Code signature verification
 - [ ] Dependency integrity checks
 - [ ] No unsigned/unverified plugins
@@ -155,6 +163,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] Authentication failures logged
 - [ ] Authorization failures logged
 - [ ] High-value transactions logged
@@ -171,6 +180,7 @@
 **Status:** ✅ Pass | ⚠️ Minor Issues | ❌ Vulnerabilities Found
 
 **Checks Performed:**
+
 - [ ] URL validation on user-supplied URLs
 - [ ] Network segmentation
 - [ ] Whitelist of allowed domains
@@ -186,12 +196,15 @@
 ### Attack Surface Analysis
 
 **External Endpoints:**
+
 - [List public-facing endpoints]
 
 **Authentication Methods:**
+
 - [List auth methods used]
 
 **Sensitive Data Handled:**
+
 - [List types of sensitive data]
 
 ### Potential Attack Vectors
@@ -206,10 +219,12 @@
 ## Security Test Results
 
 ### Automated Testing
+
 - **SAST Tool:** [Tool name and version]
 - **Results:** [Summary]
 
 ### Manual Testing
+
 - **Penetration Testing:** [If performed]
 - **Code Review:** [Findings]
 
@@ -218,6 +233,7 @@
 ## Compliance Checklist
 
 **Applicable Standards:**
+
 - [ ] PCI-DSS (if handling payments)
 - [ ] HIPAA (if handling health data)
 - [ ] GDPR (if handling EU citizen data)
@@ -233,25 +249,31 @@
 ### Risk Summary
 
 **Critical Risks:** X
+
 - [List critical vulnerabilities]
 
 **High Risks:** Y
+
 - [List high priority issues]
 
 **Medium Risks:** Z
+
 - [List medium issues]
 
 ### Recommendations
 
 **Immediate Actions (Critical):**
+
 1. [Action with timeline]
 2. [Action with timeline]
 
 **Short-term (Within 7 days):**
+
 1. [Action]
 2. [Action]
 
 **Long-term (Within 30 days):**
+
 1. [Action]
 2. [Action]
 
@@ -262,6 +284,7 @@
 **Security Status:** [✅ APPROVED | ⚠️ CONDITIONAL APPROVAL | ❌ REJECTED]
 
 **Conditions (if conditional):**
+
 - [List conditions that must be met]
 
 **Next Security Review:** [Date or trigger]

@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, children, width = '2xl' }: ModalProps) => {
   }[width];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/60 backdrop-blur-sm p-4 overflow-y-auto'>
       <div className={`bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full ${maxWidthClass} overflow-hidden border border-zinc-200 dark:border-zinc-800 m-auto animate-in fade-in zoom-in-95 duration-200`}>{children}</div>
     </div>
   );
@@ -52,15 +52,15 @@ const ModalHeader = ({ title, icon, onClose, className = '', titleClassName = ''
     </h3>
     <button
       onClick={onClose}
-      className="text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md transition-colors"
+      className='text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md transition-colors'
     >
-      <X className="w-5 h-5" />
+      <X className='w-5 h-5' />
     </button>
   </div>
 );
 
 const ModalContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => <div className={`p-6 sm:p-8 space-y-6 ${className}`}>{children}</div>;
 
-const ModalFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => <div className={`flex justify-end px-6 sm:px-8 py-5 gap-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 ${className}`}>{children}</div>;
+const ModalFooter = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => <div className={`flex justify-center sm:justify-end px-6 sm:px-8 py-5 gap-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 ${className}`}>{children}</div>;
 
 export { Modal, ModalHeader, ModalContent, ModalFooter };
