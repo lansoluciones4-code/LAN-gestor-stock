@@ -99,7 +99,7 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
     });
   } catch (error) {
     console.error('Error during login action:', error);
-    return { success: false, message: 'An internal error occurred.' };
+    return { success: false, message: 'Ocurrió un error interno. Intente nuevamente.' };
   }
 }
 
