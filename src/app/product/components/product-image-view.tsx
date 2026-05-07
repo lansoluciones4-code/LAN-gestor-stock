@@ -84,7 +84,7 @@ export function ProductImageView({ images = [], deviceName, isOutOfStock }: Prod
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={1}
               onDragEnd={handleDragEnd}
-              className='object-contain w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
+              className='object-cover w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
             />
           </AnimatePresence>
 
