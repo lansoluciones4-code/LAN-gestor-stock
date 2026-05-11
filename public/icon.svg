@@ -1,0 +1,44 @@
+<svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="boxLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="boxRight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6ee7b7"/>
+      <stop offset="50%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#10b981" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <g transform="translate(0, 40)">
+    <!-- Inner Back Walls (Open Box) -->
+    <path d="M120 160 L256 80 L256 240 Z" fill="#047857" />
+    <path d="M392 160 L256 80 L256 240 Z" fill="#022c22" />
+    
+    <!-- Glowing Arrow / Chart popping out -->
+    <path d="M200 240 L200 120 L270 160 L360 40" stroke="url(#arrowGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" fill="none" />
+    <path d="M290 40 L360 40 L360 110" stroke="url(#arrowGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glow)" />
+
+    <!-- Front Left Wall -->
+    <path d="M120 160 L120 320 L256 400 L256 240 Z" fill="url(#boxLeft)" />
+    
+    <!-- Front Right Wall -->
+    <path d="M392 160 L392 320 L256 400 L256 240 Z" fill="url(#boxRight)" />
+    
+    <!-- Tech / Server Lines on Left Wall -->
+    <path d="M150 210 L226 254" stroke="#6ee7b7" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+    <path d="M150 250 L226 294" stroke="#6ee7b7" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+    <path d="M150 290 L226 334" stroke="#6ee7b7" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+    
+    <!-- Checkmark on Right Wall -->
+    <path d="M290 280 L320 310 L360 240" stroke="#6ee7b7" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  </g>
+</svg>

@@ -1,4 +1,4 @@
-# Phone Center — Stock Management & POS System
+# ArgenStock — Stock Management & POS System
 
 > A high-performance, full-stack web application engineered for technology retail and mobile phone businesses. It seamlessly manages inventory, point-of-sale (POS) operations, clients, providers, user credentials, and exhaustive audit logging. Built with strict adherence to Clean Architecture, SOLID principles, and modern Next.js paradigms.
 
@@ -6,7 +6,7 @@
 
 ## 📖 Developer Onboarding & Documentation
 
-Welcome to the Phone Center project. This document is your single source of truth for understanding the system's architecture, business rules, technologies, and local setup. Whether you are adding a new feature or debugging a production issue, this guide will provide the context you need to start coding immediately.
+Welcome to the ArgenStock project. This document is your single source of truth for understanding the system's architecture, business rules, technologies, and local setup. Whether you are adding a new feature or debugging a production issue, this guide will provide the context you need to start coding immediately.
 
 ---
 
@@ -204,7 +204,7 @@ npm run db:migrate
 npx tsx src/scripts/enable-unaccent.ts
 
 # Seed the foundation (creates the initial admin user)
-npm run db:seed
+npm run db:seed-users
 ```
 
 ### 5. Start the Development Server

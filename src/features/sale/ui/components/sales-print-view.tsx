@@ -43,7 +43,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
         >
           <div className='flex justify-between items-start mb-12 border-b-2 border-indigo-50 pb-8'>
             <div>
-              <h2 className='text-3xl font-black text-indigo-600'>PHONE CENTER</h2>
+              <h2 className='text-3xl font-black text-indigo-600'>ARGENSTOCK</h2>
               <p className='text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1'>Registro Comercial</p>
             </div>
             <div className='text-right'>
