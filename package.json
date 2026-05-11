@@ -12,7 +12,8 @@
     "db:seed": "tsx src/lib/db/scripts/setup-initial-data.ts",
     "db:reset-data": "tsx src/lib/db/scripts/setup-initial-data.ts",
     "db:reset-full": "tsx src/lib/db/scripts/reset-full.ts",
-    "db:stress-test": "tsx src/lib/db/scripts/seed-stress-test.ts"
+    "db:stress-test": "tsx src/lib/db/scripts/seed-stress-test.ts",
+    "db:backfill-cost": "tsx src/lib/db/scripts/backfill-sale-item-cost.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

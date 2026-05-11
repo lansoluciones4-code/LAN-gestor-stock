@@ -124,6 +124,7 @@ export const saleItems = pgTable(
       .references(() => products.id),
     quantity: integer('quantity').notNull(),
     unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
+    unitCost: numeric('unit_cost', { precision: 10, scale: 2 }).notNull().default('0'),
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
   (table) => [index('sale_items_sale_id_idx').on(table.saleId), index('sale_items_product_id_idx').on(table.productId)]

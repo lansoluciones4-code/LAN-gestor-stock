@@ -6,6 +6,7 @@ export interface CartItem {
   productId: string;
   quantity: number;
   unitPrice: number;
+  unitCost: number;
   subtotal: number;
   name: string;
   desc: string;
@@ -29,6 +30,7 @@ export function useCart() {
           productId: product.id,
           quantity: 1,
           unitPrice: product.salePrice,
+          unitCost: product.purchasePrice,
           subtotal: product.salePrice,
           name: `${product.device?.name || 'Equipo'}`,
           desc: product.description || '',

@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { db } from '..';
-import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses, users, salePayments } from '../schema';
+import { providers, customers, devices, products, sales, saleItems, auditLogs, productLosses, users, salePayments, productImages } from '../schema';
 
 async function setup() {
   console.log('--- Database Reset & Initial Data Setup ---');
-  console.log('Cleaning existing data (Audit logs, sales, products, devices, providers, customers)...');
+  console.log('Cleaning existing data (Audit logs, sales, product images, products, devices, providers, customers)...');
 
   try {
     // Order matters for deletion due to foreign keys
@@ -13,6 +13,7 @@ async function setup() {
     await db.delete(salePayments);
     await db.delete(sales);
     await db.delete(productLosses);
+    await db.delete(productImages);
     await db.delete(products);
     await db.delete(devices);
     await db.delete(providers);

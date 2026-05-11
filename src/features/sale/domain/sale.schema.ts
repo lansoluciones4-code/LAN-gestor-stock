@@ -18,11 +18,15 @@ export const saleItemInputSchema = createInsertSchema(saleItems, {
     .number()
     .min(0)
     .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
+  unitCost: z
+    .number()
+    .min(0)
+    .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
   subtotal: z
     .number()
     .min(0)
     .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
-}).pick({ productId: true, quantity: true, unitPrice: true, subtotal: true });
+}).pick({ productId: true, quantity: true, unitPrice: true, unitCost: true, subtotal: true });
 
 export type SaleItemInput = z.infer<typeof saleItemInputSchema>;
 
@@ -80,6 +84,7 @@ export const saleRowSchema = createSelectSchema(sales).extend({
         id: z.string(),
         quantity: z.number(),
         unitPrice: z.preprocess((val) => parseFloat(val as string), z.number()),
+        unitCost: z.preprocess((val) => parseFloat(val as string), z.number()),
         subtotal: z.preprocess((val) => parseFloat(val as string), z.number()),
         product: z
           .object({
