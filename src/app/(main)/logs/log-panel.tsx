@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { History, X, RefreshCcw } from 'lucide-react';
+import { History, X, RefreshCcw, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
@@ -15,6 +15,7 @@ import { useEntityManager } from '@/hooks/use-entity-manager';
 import { getAuditColumns } from '@/config/tables/audit-columns';
 import { TEST_IDS } from '@/constants/test-ids';
 import { renderAuditCard } from '@/config/cards/audit-card';
+import { AuditDetailRenderer } from '@/features/audit/ui/audit-detail-renderer';
 
 const ENTITY_LABELS: Record<string, string> = {
   USER: 'USUARIO', PROVIDER: 'PROVEEDOR', PRODUCT: 'PRODUCTO',
@@ -23,7 +24,23 @@ const ENTITY_LABELS: Record<string, string> = {
 
 const PAGE_SIZE = 50;
 
+function MetaField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className='space-y-0.5'>
+      <span className='block text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>{label}</span>
+      <div className='font-bold text-zinc-700 dark:text-zinc-300'>{children}</div>
+    </div>
+  );
+}
+
 function AuditDetailModal({ log, onClose }: { log: AuditLogDef; onClose: () => void }) {
+  const entityName = log.product?.device?.name
+    ?? log.customer?.name
+    ?? log.provider?.name
+    ?? log.device?.name
+    ?? log.targetUser?.username
+    ?? (log.sale ? `Venta $${log.sale.total}` : null);
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200'>
       <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 flex flex-col max-h-[90vh]'>
@@ -36,35 +53,40 @@ function AuditDetailModal({ log, onClose }: { log: AuditLogDef; onClose: () => v
             <X className='w-5 h-5' />
           </button>
         </div>
+
         <div className='p-6 overflow-y-auto custom-scrollbar space-y-6'>
+          {/* Metadata grid */}
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm'>
-            <div className='space-y-0.5'>
-              <span className='block text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>Fecha y Hora Exacta</span>
-              <span className='font-bold text-zinc-700 dark:text-zinc-300'>{new Date(log.createdAt).toLocaleString('es-AR')}</span>
-            </div>
-            <div className='space-y-0.5'>
-              <span className='block text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>ID de Auditoría</span>
-              <span className='text-xs opacity-90 font-mono'>{log.id}</span>
-            </div>
-            <div className='space-y-0.5'>
-              <span className='block text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>Entidad Afectada</span>
-              <span className='font-bold text-zinc-700 dark:text-zinc-300'>{ENTITY_LABELS[log.entity] || log.entity}</span>
-            </div>
-            <div className='space-y-0.5'>
-              <span className='block text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>Entidad Específica</span>
-              <span className='font-bold text-indigo-600 dark:text-indigo-400'>
-                {log.product?.device?.name || log.customer?.name || log.provider?.name || log.device?.name || (log.sale ? `VENTA $${log.sale.total}` : '--')}
+            <MetaField label='Fecha y Hora Exacta'>
+              {new Date(log.createdAt).toLocaleString('es-AR')}
+            </MetaField>
+            <MetaField label='Realizado por'>
+              <span className='flex items-center gap-1.5'>
+                <User className='w-3.5 h-3.5 text-indigo-400' />
+                {log.user?.username ?? <span className='text-zinc-400 font-normal italic'>Sistema</span>}
               </span>
-            </div>
-            <div className='space-y-0.5'>
-              <span className='block text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>ID de Referencia</span>
-              <span className='text-[12px] font-mono text-zinc-500 break-all'>{log.entityId || '--'}</span>
-            </div>
+            </MetaField>
+            <MetaField label='Entidad Afectada'>
+              {ENTITY_LABELS[log.entity] ?? log.entity}
+            </MetaField>
+            <MetaField label='Entidad Específica'>
+              <span className='text-indigo-600 dark:text-indigo-400'>
+                {entityName ?? <span className='text-zinc-400 font-normal italic'>—</span>}
+              </span>
+            </MetaField>
+            <MetaField label='ID de Referencia'>
+              <span className='text-[12px] font-mono text-zinc-500 font-normal break-all'>{log.entityId ?? '—'}</span>
+            </MetaField>
+            <MetaField label='ID de Auditoría'>
+              <span className='text-xs opacity-90 font-mono font-normal'>{log.id}</span>
+            </MetaField>
           </div>
-          <div className='space-y-4'>
-            <h4 className='text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>Estructura de Datos</h4>
-            <div className='bg-zinc-900 dark:bg-zinc-950 p-4 rounded-lg border border-zinc-800 font-mono text-[11px] text-indigo-300 overflow-x-auto whitespace-pre custom-scrollbar'>
-              {JSON.stringify(log.detail, null, 2)}
+
+          {/* Detail section */}
+          <div className='space-y-3'>
+            <h4 className='text-[10px] font-bold text-zinc-400 uppercase tracking-widest'>Detalles de la Acción</h4>
+            <div className='bg-zinc-50 dark:bg-zinc-800/40 rounded-xl border border-zinc-200 dark:border-zinc-700/50 p-4'>
+              <AuditDetailRenderer detail={log.detail as Record<string, unknown> | null | undefined} />
             </div>
           </div>
         </div>
@@ -73,6 +95,7 @@ function AuditDetailModal({ log, onClose }: { log: AuditLogDef; onClose: () => v
   );
 }
 AuditDetailModal.displayName = 'AuditDetailModal';
+
 
 export function LogPanel() {
   const { logs, setLogs, appendLogs, isLoaded } = useAuditStore();

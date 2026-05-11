@@ -28,8 +28,13 @@ export async function toggleProviderActiveAction(id: string, isActive: boolean):
     const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
+      const provider = await tx.query.providers.findFirst({ where: (p: any, { eq }: any) => eq(p.id, id) });
       await providerRepository.updateActiveStatus(id, isActive, tx);
-      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'PROVIDER', id, { active: isActive }, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'PROVIDER', id, {
+        name: provider?.name ?? 'Desconocido',
+        active: isActive,
+        action: isActive ? 'Reactivado' : 'Desactivado',
+      }, tx);
       return {
         success: true,
         message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Proveedor') : MESSAGES.SUCCESS.DEACTIVATED('Proveedor'),
@@ -81,7 +86,11 @@ export async function updateProviderAction(id: string, input: ProviderUpdateInpu
 
     return await db.transaction(async (tx) => {
       const updated = await providerRepository.updateProvider(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PROVIDER', id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PROVIDER', id, {
+        name: updated.name,
+        phone: updated.phone,
+        email: updated.email,
+      }, tx);
       return {
         success: true,
         message: MESSAGES.SUCCESS.UPDATED('Proveedor'),
@@ -104,8 +113,14 @@ export async function deleteProviderAction(id: string): Promise<ActionResult> {
         return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
+      const provider = await tx.query.providers.findFirst({ where: (p: any, { eq }: any) => eq(p.id, id) });
       await providerRepository.deleteProvider(id, tx);
-      await recordAuditLog(caller.id, 'ELIMINAR', 'PROVIDER', id, { note: 'Eliminación permanente' }, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'PROVIDER', id, {
+        name: provider?.name ?? 'Desconocido',
+        phone: provider?.phone ?? '',
+        email: provider?.email ?? '',
+        note: 'Eliminación permanente',
+      }, tx);
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Proveedor') };
     });
   } catch (error: any) {

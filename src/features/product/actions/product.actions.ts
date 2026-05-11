@@ -50,16 +50,24 @@ export async function createProductAction(input: ProductInput): Promise<ActionRe
     return await db.transaction(async (tx) => {
       const newProduct = await productRepository.createProduct(parsed.data, tx);
 
+      const [device, provider] = await Promise.all([
+        tx.query.devices.findFirst({ where: (d: any, { eq }: any) => eq(d.id, parsed.data.deviceId) }),
+        tx.query.providers.findFirst({ where: (p: any, { eq }: any) => eq(p.id, parsed.data.providerId) }),
+      ]);
+
       await recordAuditLog(
         caller.id,
         'CREAR',
         'PRODUCT',
         newProduct.id,
         {
-          deviceId: parsed.data.deviceId,
+          deviceName: device?.name ?? 'Desconocido',
+          providerName: provider?.name ?? 'Desconocido',
+          description: parsed.data.description,
           stock: parsed.data.stock,
-          purchasePrice: parsed.data.purchasePrice,
-          salePrice: parsed.data.salePrice,
+          purchasePrice: String(parsed.data.purchasePrice),
+          salePrice: String(parsed.data.salePrice),
+          note: 'Producto creado',
         },
         tx
       );
@@ -84,7 +92,19 @@ export async function updateProductAction(id: string, input: ProductUpdateInput)
     return await db.transaction(async (tx) => {
       const updated = await productRepository.updateProduct(id, parsed.data, tx);
 
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, parsed.data, tx);
+      const [device, provider] = await Promise.all([
+        updated.deviceId ? tx.query.devices.findFirst({ where: (d: any, { eq }: any) => eq(d.id, updated.deviceId) }) : Promise.resolve(null),
+        updated.providerId ? tx.query.providers.findFirst({ where: (p: any, { eq }: any) => eq(p.id, updated.providerId) }) : Promise.resolve(null),
+      ]);
+
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'PRODUCT', id, {
+        deviceName: device?.name ?? 'Desconocido',
+        providerName: provider?.name ?? 'Desconocido',
+        description: updated.description,
+        stock: updated.stock,
+        purchasePrice: String(updated.purchasePrice),
+        salePrice: String(updated.salePrice),
+      }, tx);
 
       return {
         success: true,
@@ -108,8 +128,16 @@ export async function deleteProductAction(id: string): Promise<ActionResult> {
         return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
+      const product = await productRepository.getProductById(id);
+
       await productRepository.deleteProduct(id, tx);
-      await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id, undefined, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id, {
+        deviceName: product?.device?.name ?? 'Desconocido',
+        description: product?.description ?? '',
+        stockAlMomento: product?.stock ?? 0,
+        salePrice: String(product?.salePrice ?? 0),
+        note: 'Eliminación permanente',
+      }, tx);
 
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Producto') };
     });
@@ -126,9 +154,19 @@ export async function registerProductLossAction(productId: string, quantity: num
     if (!reason.trim()) return { success: false, error: 'Debe especificar un motivo' };
 
     return await db.transaction(async (tx) => {
+      const product = await productRepository.getProductById(productId);
+      const stockBefore = product?.stock ?? 0;
+
       await productRepository.registerLoss(productId, caller.id, quantity, reason, tx);
 
-      await recordAuditLog(caller.id, 'PÉRDIDA', 'PRODUCT', productId, { quantity, reason }, tx);
+      await recordAuditLog(caller.id, 'PÉRDIDA', 'PRODUCT', productId, {
+        productName: product?.device?.name ?? 'Desconocido',
+        description: product?.description ?? '',
+        quantity,
+        reason,
+        stockBefore,
+        stockAfter: stockBefore - quantity,
+      }, tx);
 
       return { success: true, message: 'Pérdida registrada exitosamente' };
     });
@@ -155,7 +193,13 @@ export async function toggleProductVisibilityAction(id: string, isVisible: boole
     return await db.transaction(async (tx) => {
       await productRepository.toggleVisibility(id, isVisible, tx);
 
-      await recordAuditLog(caller.id, 'ACTUALIZAR_VISIBILIDAD_LANDING', 'PRODUCT', id, { showOnLanding: isVisible }, tx);
+      const product = await productRepository.getProductById(id);
+
+      await recordAuditLog(caller.id, 'ACTUALIZAR_VISIBILIDAD_LANDING', 'PRODUCT', id, {
+        productName: product?.device?.name ?? 'Desconocido',
+        description: product?.description ?? '',
+        showOnLanding: isVisible,
+      }, tx);
 
       return {
         success: true,

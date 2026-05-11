@@ -32,8 +32,14 @@ export async function toggleUserActiveAction(id: string, isActive: boolean): Pro
     }
 
     return await db.transaction(async (tx) => {
+      const target = await userRepository.getUserById(id, tx);
       await userRepository.updateActiveStatus(id, isActive, tx);
-      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, { active: isActive }, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'USER', id, {
+        username: target?.username ?? 'Desconocido',
+        role: target?.role ?? 'Desconocido',
+        active: isActive,
+        action: isActive ? 'Reactivado' : 'Desactivado',
+      }, tx);
       return {
         success: true,
         message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Usuario') : MESSAGES.SUCCESS.DEACTIVATED('Usuario'),
@@ -91,7 +97,13 @@ export async function updateUserAction(id: string, input: UserUpdateInput): Prom
 
     return await db.transaction(async (tx) => {
       const updated = await userRepository.updateUser(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, {
+        username: updated.username,
+        role: updated.role,
+        changes: Object.keys(parsed.data)
+          .filter((k) => k !== 'passwordHash' && k !== 'version')
+          .reduce<Record<string, unknown>>((acc, k) => { acc[k] = (parsed.data as any)[k]; return acc; }, {}),
+      }, tx);
       return {
         success: true,
         message: MESSAGES.SUCCESS.UPDATED('Usuario'),
@@ -126,7 +138,11 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
       }
 
       await userRepository.deleteUser(id, tx);
-      await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, { note: 'Usuario eliminado permanentemente (sin historial previo).' }, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'USER', id, {
+        username: user.username,
+        role: user.role,
+        note: 'Eliminado permanentemente (sin historial previo)',
+      }, tx);
 
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Usuario') };
     });
