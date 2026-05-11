@@ -28,8 +28,14 @@ export async function toggleCustomerActiveAction(id: string, isActive: boolean):
     const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
+      const customer = await tx.query.customers.findFirst({ where: (c: any, { eq }: any) => eq(c.id, id) });
       await customerRepository.updateActiveStatus(id, isActive, tx);
-      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'CUSTOMER', id, { active: isActive }, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'CUSTOMER', id, {
+        name: customer?.name ?? 'Desconocido',
+        documentNumber: customer?.documentNumber ?? '',
+        active: isActive,
+        action: isActive ? 'Reactivado' : 'Desactivado',
+      }, tx);
       return {
         success: true,
         message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Cliente') : MESSAGES.SUCCESS.DEACTIVATED('Cliente'),
@@ -81,7 +87,12 @@ export async function updateCustomerAction(id: string, input: CustomerUpdateInpu
 
     return await db.transaction(async (tx) => {
       const updated = await customerRepository.updateCustomer(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'CUSTOMER', id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'CUSTOMER', id, {
+        name: updated.name,
+        phone: updated.phone,
+        email: updated.email,
+        documentNumber: updated.documentNumber,
+      }, tx);
       return {
         success: true,
         message: MESSAGES.SUCCESS.UPDATED('Cliente'),
@@ -104,8 +115,15 @@ export async function deleteCustomerAction(id: string): Promise<ActionResult> {
         return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
+      const customer = await tx.query.customers.findFirst({ where: (c: any, { eq }: any) => eq(c.id, id) });
       await customerRepository.deleteCustomer(id, tx);
-      await recordAuditLog(caller.id, 'ELIMINAR', 'CUSTOMER', id, { note: 'Eliminación permanente' }, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'CUSTOMER', id, {
+        name: customer?.name ?? 'Desconocido',
+        phone: customer?.phone ?? '',
+        email: customer?.email ?? '',
+        documentNumber: customer?.documentNumber ?? '',
+        note: 'Eliminación permanente',
+      }, tx);
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Cliente') };
     });
   } catch (error: any) {

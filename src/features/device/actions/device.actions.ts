@@ -28,8 +28,13 @@ export async function toggleDeviceActiveAction(id: string, isActive: boolean): P
     const caller = await verifyAuthOrAdmin(true);
 
     return await db.transaction(async (tx) => {
+      const device = await deviceRepository.getDeviceById(id);
       await deviceRepository.updateActiveStatus(id, isActive, tx);
-      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'DEVICE', id, { active: isActive }, tx);
+      await recordAuditLog(caller.id, isActive ? 'ACTUALIZAR' : 'ELIMINAR', 'DEVICE', id, {
+        name: device?.name ?? 'Desconocido',
+        active: isActive,
+        action: isActive ? 'Reactivado' : 'Desactivado',
+      }, tx);
       return {
         success: true,
         message: isActive ? MESSAGES.SUCCESS.ACTIVATED('Equipo') : MESSAGES.SUCCESS.DEACTIVATED('Equipo'),
@@ -81,7 +86,9 @@ export async function updateDeviceAction(id: string, input: DeviceUpdateInput): 
 
     return await db.transaction(async (tx) => {
       const updated = await deviceRepository.updateDevice(id, parsed.data, tx);
-      await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, parsed.data, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'DEVICE', id, {
+        name: updated.name,
+      }, tx);
       return {
         success: true,
         message: MESSAGES.SUCCESS.UPDATED('Equipo'),
@@ -104,8 +111,12 @@ export async function deleteDeviceAction(id: string): Promise<ActionResult> {
         return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
 
+      const device = await deviceRepository.getDeviceById(id);
       await deviceRepository.deleteDevice(id, tx);
-      await recordAuditLog(caller.id, 'ELIMINAR', 'DEVICE', id, { note: 'Eliminación permanente' }, tx);
+      await recordAuditLog(caller.id, 'ELIMINAR', 'DEVICE', id, {
+        name: device?.name ?? 'Desconocido',
+        note: 'Eliminación permanente',
+      }, tx);
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Equipo') };
     });
   } catch (error: any) {
