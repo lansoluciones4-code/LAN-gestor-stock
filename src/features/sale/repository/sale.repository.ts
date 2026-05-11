@@ -89,6 +89,7 @@ export class SaleRepository {
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: item.unitPrice.toString(),
+        unitCost: item.unitCost.toString(),
         subtotal: item.subtotal.toString(),
       });
 

@@ -1,0 +1,1 @@
+ALTER TABLE "sale_items" ADD COLUMN "unit_cost" numeric(10, 2) DEFAULT '0' NOT NULL;

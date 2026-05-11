@@ -53,10 +53,10 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       salesWithItems.forEach((s: any) => {
         totalRevenue += Number(s.total);
 
-        // COGS
+        // COGS — uses the cost snapshot stored at time of sale (immutable)
         s.items.forEach((item: any) => {
-          const purchasePrice = Number(item.product?.purchasePrice || 0);
-          totalCostOfGoodsSold += purchasePrice * item.quantity;
+          const unitCost = Number(item.unitCost || 0);
+          totalCostOfGoodsSold += unitCost * item.quantity;
         });
 
         // Payments Breakdown
