@@ -204,7 +204,7 @@ npm run db:migrate
 npx tsx src/scripts/enable-unaccent.ts
 
 # Seed the foundation (creates the initial admin user)
-npm run db:seed
+npm run db:seed-users
 ```
 
 ### 5. Start the Development Server
