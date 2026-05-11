@@ -58,12 +58,12 @@ export default function MainLayout({ children }: { children: ReactNode }) {
         <div className='flex items-center'>
           <div className='w-12 h-12 bg-white border border-zinc-200 shadow-sm rounded-lg flex items-center justify-center mr-3 overflow-hidden'>
             <img
-              src='/icon.ico'
-              alt='PhoneCenter'
+              src='/icon.svg'
+              alt='ArgenStock'
               className='w-10 h-10 object-contain'
             />
           </div>
-          <span className='font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100'>PhoneCenter</span>
+          <span className='font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100'>ArgenStock</span>
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(false)}

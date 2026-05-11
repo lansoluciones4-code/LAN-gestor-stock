@@ -9,7 +9,7 @@ export type ProductMessageData = {
 };
 
 export function generateWhatsAppMessage(product: ProductMessageData): string {
-  const baseMessage = '¡Hola Phone Center!';
+  const baseMessage = '¡Hola ArgenStock!';
   const interestMessage = `Me interesa el *${product.name}*`;
   const descriptionPart = product.description ? ` (${product.description})` : '';
   const closing = '¿Lo tienen disponible? ¡Muchas gracias!';

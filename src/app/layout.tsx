@@ -9,8 +9,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'PhoneCenterAPP',
+  title: 'ArgenStock',
   description: 'Manage technology store stock effectively',
+  icons: {
+    icon: '/icon.svg',
+  },
   robots: {
     index: false,
     follow: false,

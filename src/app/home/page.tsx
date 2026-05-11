@@ -6,9 +6,12 @@ import { CatalogClient } from './components/catalog-client';
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: 'Phone Center - Catalogo',
+  title: 'ArgenStock - Catálogo',
   description: 'Descubre nuestra colección exclusiva de fundas, cargadores, cables y accesorios premium diseñados para tus dispositivos Apple. Calidad superior, envío rápido y la mejor protección.',
   keywords: 'accesorios apple, fundas iphone, cargador magsafe, cables premium, apple watch, airpods, tienda de accesorios, fundas premium',
+  icons: {
+    icon: '/icon.svg',
+  },
   robots: {
     index: true,
     follow: true,
@@ -33,7 +36,7 @@ export default async function HomePage() {
           <ThemeToggle />
         </div>
         <div className='max-w-6xl mx-auto text-center space-y-4 md:space-y-6'>
-          <h1 className='text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white'>Phone Center</h1>
+          <h1 className='text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white'>ArgenStock</h1>
         </div>
       </section>
 
@@ -47,7 +50,7 @@ export default async function HomePage() {
 
       {/* Footer - Minimal on desktop to save space */}
       <footer className='shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 text-center text-[14px] text-zinc-500 dark:text-zinc-400 px-6'>
-        <p>© {new Date().getFullYear()} Phone Center. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} ArgenStock. Todos los derechos reservados.</p>
       </footer>
     </div>
   );
