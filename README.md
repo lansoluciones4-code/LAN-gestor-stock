@@ -140,47 +140,57 @@ To ensure a consistent and premium visual experience across the application (esp
 - Node.js >= 18
 - Docker & Docker Compose (for PostgreSQL)
 
-### 1. Clone & Install
+### 1. Clone & Setup from Template
+
+If you are using this as a template, follow these steps to initialize your new project:
 
 ```bash
-git clone <repository-url>
-cd StockManagementApp
+# 1. Copy the template content to your new project directory
+cp -r . your-new-project-name
+cd your-new-project-name
+
+# 2. Clean up template artifacts
+rm -rf node_modules package-lock.json .next
+
+# 3. Install dependencies
 npm install
+
+# 4. Install Playwright browsers (required for E2E tests)
+npx playwright install
 ```
 
-### 2. Environment Configuration & Deployment Environments
+### 2. Environment Configuration
 
-The project relies on a strict `.env` hierarchy to prevent accidental modifications to production data. Thanks to the `.gitignore` configuration (`.env*`), **all environment files are safely ignored by Git**.
+The project uses a standard `.env` hierarchy. The environment is determined by the `NODE_ENV` variable:
+
+- **Local Development**: Run commands without prefixes (defaults to `.env.local`).
+- **Production**: Prefix commands with `NODE_ENV=production` to use `.env.prod`.
 
 #### A. Local Development (`.env.local`)
-Create a `.env.local` file at the root of the project. Next.js and Drizzle automatically prioritize this file when running standard commands (like `npm run dev`). Use this strictly for your local/development database and services.
+Create a `.env.local` file at the root.
 
 ```env
-# Connects to the local Docker Postgres instance on port 5433
 LOCAL_DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
-JWT_SECRET=super_secret_dev_key_change_me_later
+JWT_SECRET=super_secret_dev_key
 CLOUDINARY_URL=cloudinary://your_dev_key...
 ```
 
-#### B. Production Scripts (`.env.prod`)
-Vercel handles the actual production environment variables securely via its dashboard. However, if you need to run local CLI commands against the production database (e.g., pushing schema migrations), create a `.env.prod` file:
+#### B. Production (`.env.prod`)
+Create a `.env.prod` file for production-specific settings or when running scripts against the production DB.
 
 ```env
-# Production Database Connection
-LOCAL_DATABASE_URL=postgresql://postgres:password@localhost:5433/
 DATABASE_URL=postgresql://postgres.your_project:password@aws-0-sa-east-1.pooler.supabase.com:6543/postgres
+JWT_SECRET=your_production_secret
 CLOUDINARY_URL=cloudinary://your_prod_key...
 ```
 
-**How to run scripts against production:**
-By default, all terminal commands use `.env.local`. To explicitly target production and avoid disastrous mistakes, use the installed `dotenv-cli` package to inject the production variables:
-
+**How to run scripts:**
 ```bash
-# Example: Migrate production database
-npx dotenv -e .env.prod -- npm run db:migrate
+# Local (uses .env.local)
+npm run db:migrate
 
-# Example: Seed production database
-npx dotenv -e .env.prod -- npm run db:seed
+# Production (uses .env.prod)
+NODE_ENV=production npm run db:migrate
 ```
 
 ### 3. Spawn Database Infrastructure
@@ -193,19 +203,21 @@ docker compose up -d
 
 ### 4. Database Setup & Seeding
 
-Generate the schema, apply migrations, enable the unaccent extension, and seed the initial data:
+Generate the schema, apply migrations, enable the unaccent extension, and seed the initial data. Remember to run these for **both local and production** environments.
 
 ```bash
-# Push SQL schemas to the database
+# 1. Push SQL schemas to the database
 npm run db:generate
 npm run db:migrate
 
-# Enable 'unaccent' extension for flexible search queries
-npx tsx src/scripts/enable-unaccent.ts
+# 2. Enable 'unaccent' extension (CRITICAL for search functionality)
+npm run db:enable-unaccent
 
-# Seed the foundation (creates the initial admin user)
+# 3. Seed the foundation (creates the initial admin user)
 npm run db:seed-users
 ```
+
+*Note: For production, prefix these with `NODE_ENV=production`.*
 
 ### 5. Start the Development Server
 
@@ -235,9 +247,10 @@ The `package.json` includes several utility scripts to streamline your workflow:
 | `npm run db:migrate`     | Applies pending Drizzle migrations to the database.                   |
 | `npm run db:seed`        | Injects foundational data (like the master admin account).            |
 | `npm run db:reset-data`  | Clears and resets standard operational data (useful for dev testing). |
-| `npm run db:reset-full`  | Wipes the entire database completely (Warning: Destructive).          |
-| `npm run db:stress-test` | Runs a script to flood the DB with mock data for performance testing. |
-| `npx playwright test`    | Executes the End-to-End (E2E) test suite via Playwright.              |
+| `npm run db:reset-full`     | Wipes the entire database completely (Warning: Destructive).          |
+| `npm run db:stress-test`    | Runs a script to flood the DB with mock data for performance testing. |
+| `npm run db:enable-unaccent`| Enables the unaccent extension in the database (Required for search). |
+| `npx playwright test`       | Executes the End-to-End (E2E) test suite via Playwright.              |
 
 ---
 
