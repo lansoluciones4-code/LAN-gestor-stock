@@ -124,8 +124,7 @@ export function ProductFormModal({
           />
           {errors.deviceId && <p className='text-red-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
         </div>
-        {role === 'admin' && (
-          <div className='col-span-1 md:col-span-2'>
+        <div className='col-span-1 md:col-span-2'>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Proveedor Entrante</label>
             <Combobox
               options={suppliers.filter((s) => s.isActive || s.id === editingItem?.providerId).map((s) => ({ id: s.id, name: s.name }))}
@@ -135,7 +134,6 @@ export function ProductFormModal({
             />
             {errors.providerId && <p className='text-red-500 text-xs mt-1.5'>{errors.providerId.message}</p>}
           </div>
-        )}
         <div className='col-span-1 md:col-span-2'>
           <label className='block text-sm font-medium mb-1.5'>Descripción Física (Color, Memoria)</label>
           <input
