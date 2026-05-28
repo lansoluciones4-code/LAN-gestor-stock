@@ -304,10 +304,11 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
             size='lg'
             fullWidth
             onClick={handleConfirm}
-            disabled={isPending || isAdding}
+            isLoading={isPending}
+            disabled={isAdding}
             data-testid={TEST_IDS.ventas.payment.btnFinalizarYFacturar}
           >
-            {isPending ? 'Confirmando...' : 'Finalizar y Facturar'}
+            Finalizar y Facturar
           </Button>
           {!isAdding && (
             <button

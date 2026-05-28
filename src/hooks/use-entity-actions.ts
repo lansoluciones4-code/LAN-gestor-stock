@@ -30,7 +30,6 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
       if (manual) {
         invalidateAllCaches();
       }
-      // Usamos el valor directamente para evitar cierres de función (closures) antiguos
       const resp = await handlers.fetchData(showInactive);
       setStoreData(resp);
 
@@ -40,50 +39,59 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     });
   };
 
-  const handleEditSubmit = async (data: TInput | TUpdateInput) => {
+  const handleEditSubmit = (data: TInput | TUpdateInput) => {
     setServerError(null);
-    let result;
-    if (editingItem) {
-      if (!handlers.updateAction) return setServerError('Operación no soportada');
-      result = await handlers.updateAction(editingItem.id!, data as TUpdateInput);
-    } else {
-      if (!handlers.createAction) return setServerError('Operación no soportada');
-      result = await handlers.createAction(data as TInput);
-    }
+    startTransition(async () => {
+      let result;
+      if (editingItem) {
+        if (!handlers.updateAction) { setServerError('Operación no soportada'); return; }
+        result = await handlers.updateAction(editingItem.id!, data as TUpdateInput);
+      } else {
+        if (!handlers.createAction) { setServerError('Operación no soportada'); return; }
+        result = await handlers.createAction(data as TInput);
+      }
 
-    if (!result.success) return setServerError(result.error);
+      if (!result.success) { setServerError(result.error); return; }
 
-    closeFormModal();
-    onSuccessMessage(result.message || 'Operación exitosa');
-    invalidateAllCaches();
-    syncData();
-  };
-
-  const handleDelete = async (id: string) => {
-    setItemToDelete(null);
-    if (!handlers.deleteAction) return onErrorMessage('Operación no soportada');
-
-    const result = await handlers.deleteAction(id);
-
-    if (!result.success) return onErrorMessage(result.error);
-
-    onSuccessMessage(result.message || 'Operación exitosa');
-    invalidateAllCaches();
-    syncData();
-  };
-
-  const handleToggleActive = async (item: TDef) => {
-    if (!handlers.toggleActiveAction) return onErrorMessage('Operación no soportada');
-
-    const nextStatus = !item.isActive;
-    const result = await handlers.toggleActiveAction(item.id!, nextStatus);
-    if (!result.success) {
-      onErrorMessage(result.error);
-    } else {
+      closeFormModal();
       onSuccessMessage(result.message || 'Operación exitosa');
       invalidateAllCaches();
-      syncData();
-    }
+      const resp = await handlers.fetchData(showInactive);
+      setStoreData(resp);
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    setItemToDelete(null);
+    startTransition(async () => {
+      if (!handlers.deleteAction) { onErrorMessage('Operación no soportada'); return; }
+
+      const result = await handlers.deleteAction(id);
+
+      if (!result.success) { onErrorMessage(result.error); return; }
+
+      onSuccessMessage(result.message || 'Operación exitosa');
+      invalidateAllCaches();
+      const resp = await handlers.fetchData(showInactive);
+      setStoreData(resp);
+    });
+  };
+
+  const handleToggleActive = (item: TDef) => {
+    startTransition(async () => {
+      if (!handlers.toggleActiveAction) { onErrorMessage('Operación no soportada'); return; }
+
+      const nextStatus = !item.isActive;
+      const result = await handlers.toggleActiveAction(item.id!, nextStatus);
+      if (!result.success) {
+        onErrorMessage(result.error);
+      } else {
+        onSuccessMessage(result.message || 'Operación exitosa');
+        invalidateAllCaches();
+        const resp = await handlers.fetchData(showInactive);
+        setStoreData(resp);
+      }
+    });
   };
 
   return {
