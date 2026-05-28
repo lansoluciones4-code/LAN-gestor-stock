@@ -112,7 +112,6 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       return;
     }
 
-    // Prohibido el punto
     if (val.includes('.')) return;
 
     // Solo números y una coma, máximo 2 decimales
