@@ -161,41 +161,25 @@ npx playwright install
 
 ### 2. Environment Configuration
 
-The project uses a standard `.env` hierarchy. The environment is determined by the `NODE_ENV` variable:
-
-- **Local Development**: Run commands without prefixes (defaults to `.env.local`).
-- **Production**: Prefix commands with `NODE_ENV=production` to use `.env.prod`.
-
-#### A. Local Development (`.env.local`)
-Create a `.env.local` file at the root.
+**Since the LAN migration, this app only ever talks to its own local Postgres.** There is no more "production = Supabase" mode — Supabase is only touched by the separate "Publicar cambios" push (see below). Copy [.env.example](.env.example) to `.env.local` and fill in real values:
 
 ```env
-LOCAL_DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
+DATABASE_URL=postgresql://postgres:password@localhost:5433/stock_db
 JWT_SECRET=super_secret_dev_key
 CLOUDINARY_URL=cloudinary://your_dev_key...
-```
 
-#### B. Production (`.env.prod`)
-Create a `.env.prod` file for production-specific settings or when running scripts against the production DB.
-
-```env
-DATABASE_URL=postgresql://postgres.your_project:password@aws-0-sa-east-1.pooler.supabase.com:6543/postgres
-JWT_SECRET=your_production_secret
-CLOUDINARY_URL=cloudinary://your_prod_key...
+# Solo necesario si vas a probar el botón "Publicar cambios al sitio web":
+SUPABASE_DB_URL=postgresql://postgres:password@aws-0-sa-east-1.pooler.supabase.com:6543/postgres
 ```
 
 **How to run scripts:**
 ```bash
-# Local (uses .env.local)
 npm run db:migrate
-
-# Production (uses .env.prod)
-NODE_ENV=production npm run db:migrate
 ```
 
 ### 3. Spawn Database Infrastructure
 
-Start the PostgreSQL container (binds to port `5433` to prevent clashes with local DBs):
+Start the PostgreSQL + app containers:
 
 ```bash
 docker compose up -d
@@ -203,21 +187,21 @@ docker compose up -d
 
 ### 4. Database Setup & Seeding
 
-Generate the schema, apply migrations, enable the unaccent extension, and seed the initial data. Remember to run these for **both local and production** environments.
+Generate the schema, apply migrations, enable the unaccent extension, and seed the initial data. Use `npm run <script>` directly if you have Node installed locally (against the port Docker exposes), or `docker compose run --rm migrator <script>` to run them from inside a container without installing Node at all (this is the path for the client's LAN server, which only needs Docker installed):
 
 ```bash
 # 1. Push SQL schemas to the database
-npm run db:generate
-npm run db:migrate
+docker compose run --rm migrator db:generate
+docker compose run --rm migrator db:migrate
 
 # 2. Enable 'unaccent' extension (CRITICAL for search functionality)
-npm run db:enable-unaccent
+docker compose run --rm migrator db:enable-unaccent
 
-# 3. Seed the foundation (creates the initial admin user)
-npm run db:seed-users
+# 3. Seed the foundation (creates the initial admin/vendedor accounts — see below)
+docker compose run --rm migrator db:seed-users
 ```
 
-*Note: For production, prefix these with `NODE_ENV=production`.*
+`db:seed-users` creates two demo accounts (`admin/admin`, `vendedor/vendedor`) for the first login. Once inside the app, create the real store credentials from **`/usuarios`** (choosing role admin/vendedor there) and deactivate the demo accounts — see the panel's "Crear Credencial" / active-toggle actions.
 
 ### 5. Start the Development Server
 

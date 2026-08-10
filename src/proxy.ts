@@ -13,6 +13,13 @@ export async function proxy(request: NextRequest) {
   }
 
   const isPublicPath = publicPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
+
+  // Deploy público en Vercel (ver scripts/prepare-vercel-build.js): las rutas de gestión
+  // ni siquiera existen en ese build, pero por las dudas cualquier cosa que no sea
+  // catálogo público redirige a /home en vez de mostrar un 404 crudo.
+  if (process.env.DEPLOYMENT_MODE === 'public' && !isPublicPath) {
+    return NextResponse.redirect(new URL('/home', request.url));
+  }
   const token = request.cookies.get('session')?.value;
 
   let isAuthenticated = false;

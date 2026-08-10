@@ -176,16 +176,6 @@ export async function registerProductLossAction(productId: string, quantity: num
   }
 }
 
-export async function fetchLandingProducts(): Promise<ProductDef[]> {
-  try {
-    const products = await productRepository.getLandingProducts();
-    return z.array(productRowSchema).parse(products);
-  } catch (error) {
-    console.error('fetchLandingProducts error:', error);
-    return [];
-  }
-}
-
 export async function toggleProductVisibilityAction(id: string, isVisible: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
@@ -210,16 +200,4 @@ export async function toggleProductVisibilityAction(id: string, isVisible: boole
     return { success: false, error: handleDatabaseError(error, 'producto') };
   }
 }
-
-export async function fetchProductById(id: string): Promise<ProductDef | null> {
-  try {
-    const product = await productRepository.getProductById(id);
-    if (!product) return null;
-    return productRowSchema.parse(product);
-  } catch (error) {
-    console.error('fetchProductById error:', error);
-    return null;
-  }
-}
-
 

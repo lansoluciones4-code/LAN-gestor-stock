@@ -1,17 +1,32 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, CreditCard, Banknote } from 'lucide-react';
+import { TrendingUp, TrendingDown, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, CreditCard, Banknote, UploadCloud } from 'lucide-react';
 import { fetchDashboardStats } from '@/features/stats/actions/stats.actions';
+import { publicarStock, getLastSyncInfo, type LastSyncInfo } from '@/features/sync/actions/publish-stock.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { invalidateAllCaches } from '@/stores';
 import { useStatsStore } from '@/features/stats/store/stats.store';
 import { RefreshCcw } from 'lucide-react';
 
+function formatTimeAgo(date: Date | string): string {
+  const target = typeof date === 'string' ? new Date(date) : date;
+  const diffMin = Math.floor((Date.now() - target.getTime()) / 60000);
+  if (diffMin < 1) return 'hace instantes';
+  if (diffMin < 60) return `hace ${diffMin} min`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `hace ${diffHours} h`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `hace ${diffDays} d`;
+}
+
 export default function DashboardPage() {
   const [isPending, startTransition] = useTransition();
+  const [isPublishing, startPublishTransition] = useTransition();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [lastSync, setLastSync] = useState<LastSyncInfo | null>(null);
+  const [publishError, setPublishError] = useState<string | null>(null);
   const { stats, setStats, isLoaded } = useStatsStore();
 
   const loadStats = (start?: string, end?: string) => {
@@ -30,9 +45,26 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded]);
 
+  useEffect(() => {
+    getLastSyncInfo().then(setLastSync);
+  }, []);
+
   const handleSync = () => {
     invalidateAllCaches();
     loadStats();
+  };
+
+  const handlePublish = () => {
+    setPublishError(null);
+    startPublishTransition(async () => {
+      const res = await publicarStock();
+      if (res.success) {
+        const info = await getLastSyncInfo();
+        setLastSync(info);
+      } else {
+        setPublishError(res.error);
+      }
+    });
   };
 
   return (
@@ -81,6 +113,28 @@ export default function DashboardPage() {
               </>
             )}
           </button>
+          <button
+            onClick={handlePublish}
+            disabled={isPublishing}
+            className='px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-base transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2'
+          >
+            {isPublishing ? (
+              'Publicando...'
+            ) : (
+              <>
+                <UploadCloud className='w-4 h-4' />
+                Publicar cambios al sitio web
+              </>
+            )}
+          </button>
+        </div>
+        <div className='w-full xl:w-auto flex flex-col items-end gap-1'>
+          {lastSync && (
+            <p className='text-xs font-medium text-zinc-400'>
+              Última sincronización: {formatTimeAgo(lastSync.at)} por {lastSync.username}
+            </p>
+          )}
+          {publishError && <p className='text-xs font-bold text-rose-500'>{publishError}</p>}
         </div>
       </div>
 

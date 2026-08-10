@@ -1,15 +1,43 @@
 services:
   db:
-    image: postgres:15
+    image: postgres:16
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: stock_db
+      POSTGRES_USER: ${DB_USER:-stock_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-stock_db}
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432' # solo accesible desde esta misma PC
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      target: runner
     restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-stock_admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-stock_db}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
+    ports:
+      - '0.0.0.0:3000:3000' # accesible desde el resto de la LAN
+
+  # Servicio auxiliar para migraciones/seed (npm run db:migrate, db:seed-users, etc.)
+  # No se levanta con "docker compose up". Uso: docker compose run --rm migrator db:migrate
+  migrator:
+    build:
+      context: .
+      target: builder
+    profiles: ['tools']
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-stock_admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-stock_db}
+    entrypoint: ['npm', 'run']
 
 volumes:
   pgdata:

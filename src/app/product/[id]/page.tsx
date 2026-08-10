@@ -1,4 +1,4 @@
-import { fetchProductById } from '@/features/product/actions/product.actions';
+import { fetchProductById } from '@/features/product/actions/public-product.actions';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/utils';
 import { BackButton } from '../components/back-button';
