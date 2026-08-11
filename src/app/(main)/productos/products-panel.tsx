@@ -13,7 +13,7 @@ import { useEntityActions } from '@/hooks/use-entity-actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
-import { registerProductLossAction, fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/features/product/actions/product.actions';
+import { fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/features/product/actions/product.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,6 @@ import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 import { renderProductCard } from '@/config/cards/product-card';
 import { ProductFormModal } from '@/features/product/ui/components/product-form-modal';
-import { ProductLossModal } from '@/features/product/ui/components/product-loss-modal';
 import { ProductPhotosManager } from '@/features/product/ui/components/product-photos-manager';
 
 
@@ -35,7 +34,6 @@ export function ProductsPanel() {
   const [showOnlyLanding, setShowOnlyLanding] = useState(false);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [lossProduct, setLossProduct] = useState<ProductDef | null>(null);
   const [photoManageProduct, setPhotoManageProduct] = useState<ProductDef | null>(null);
   const [isPendingLocal, startTransition] = useTransition();
 
@@ -87,8 +85,6 @@ export function ProductsPanel() {
     openFormModal(item);
   };
 
-  const handleLossOpen = (p: ProductDef) => { setLossProduct(p); setServerError(null); };
-  
   const handleManagePhotosOpen = (p: ProductDef) => { setPhotoManageProduct(p); };
 
   const handleToggleVisibility = (p: ProductDef) => {
@@ -100,20 +96,7 @@ export function ProductsPanel() {
     });
   };
 
-  const handleLossSubmit = (qty: number, reason: string) => {
-    if (!qty || qty <= 0) return setServerError('La cantidad debe ser al menos 1');
-    if (qty > (lossProduct?.stock || 0)) return setServerError('Excede el stock disponible');
-    setServerError(null);
-    startTransition(async () => {
-      const result = await registerProductLossAction(lossProduct!.id, qty, reason);
-      if (!result.success) return setServerError(result.error);
-      setLossProduct(null);
-      showGlobalMessage('success', result.message || 'Pérdida registrada');
-      invalidateAllCaches(); syncData();
-    });
-  };
-
-  const columns = getProductColumns({ role, onLoss: handleLossOpen, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen });
+  const columns = getProductColumns({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen });
 
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
@@ -169,7 +152,7 @@ export function ProductsPanel() {
         data={filteredProducts}
         isLoading={isPending}
         emptyMessage='No se han encontrado productos coincidentes.'
-        renderCard={renderProductCard({ role, onLoss: handleLossOpen, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen })}
+        renderCard={renderProductCard({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen })}
       />
 
       <ProductFormModal
@@ -187,15 +170,6 @@ export function ProductsPanel() {
       <ConfirmModal isOpen={!!itemToDelete} onClose={() => setItemToDelete(null)} onConfirm={() => handleDelete(itemToDelete as string)}
         title='Borrar Inventario' description='¿Deseas eliminar físicamente este lote del inventario? Toda la trazabilidad de esta ID se perderá.'
         submitLabel='Purgar Stock' isPending={isPending} />
-
-      <ProductLossModal
-        isOpen={!!lossProduct}
-        onClose={() => setLossProduct(null)}
-        onSubmit={handleLossSubmit}
-        product={lossProduct}
-        serverError={serverError}
-        isPending={isPending}
-      />
 
       <ProductPhotosManager
         isOpen={!!photoManageProduct}

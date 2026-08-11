@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, CreditCard, Banknote, UploadCloud } from 'lucide-react';
+import { TrendingUp, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, CreditCard, Banknote, UploadCloud, AlertTriangle } from 'lucide-react';
 import { fetchDashboardStats } from '@/features/stats/actions/stats.actions';
 import { publicarStock, getLastSyncInfo, type LastSyncInfo } from '@/features/sync/actions/publish-stock.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
@@ -188,16 +188,13 @@ export default function DashboardPage() {
 
         <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
           <div className='flex justify-between items-start mb-4'>
-            <div className='p-2 bg-rose-50 dark:bg-rose-500/10 rounded-lg'>
-              <TrendingDown className='w-5 h-5 text-rose-600' />
+            <div className='p-2 bg-amber-50 dark:bg-amber-500/10 rounded-lg'>
+              <AlertTriangle className='w-5 h-5 text-amber-600' />
             </div>
-            <span className='text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full'>COSTO</span>
+            <span className='text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded-full'>ALERTA</span>
           </div>
-          <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Pérdidas Totales</span>
-          <span className='text-xl font-black text-rose-600 dark:text-rose-400 mt-1'>
-            -$
-            {stats?.totalLossCost?.toLocaleString('es-AR') || '0'}
-          </span>
+          <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Stock Bajo</span>
+          <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>{stats?.lowStockCount ?? 0} productos</span>
         </div>
 
         <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
@@ -308,13 +305,13 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className='bg-zinc-50/50 dark:bg-zinc-900/10 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-900/30 transition-all hover:border-zinc-200 dark:hover:border-zinc-900/50'>
+          <div className='bg-amber-50/50 dark:bg-amber-900/10 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/30 transition-all hover:border-amber-200 dark:hover:border-amber-900/50'>
             <div className='flex items-center gap-3 mb-4'>
-              <TrendingDown className='w-5 h-5 text-zinc-500' />
-              <h4 className='font-bold text-sm text-zinc-800 dark:text-zinc-400'>Impacto de Pérdidas</h4>
+              <AlertTriangle className='w-5 h-5 text-amber-500' />
+              <h4 className='font-bold text-sm text-amber-800 dark:text-amber-400'>Alerta de Stock</h4>
             </div>
-            <p className='text-xs text-zinc-600/80 dark:text-zinc-400/80 leading-relaxed font-medium'>
-              Se han registrado mermas por un valor acumulado de <strong>${stats?.totalLossCost?.toLocaleString('es-AR')}</strong>, afectando el margen neto final.
+            <p className='text-xs text-amber-700/80 dark:text-amber-400/80 leading-relaxed font-medium'>
+              Hay <strong>{stats?.lowStockCount ?? 0}</strong> productos con pocas unidades — revisá la reposición para no quedarte sin stock.
             </p>
           </div>
 

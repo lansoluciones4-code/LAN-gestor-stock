@@ -12,14 +12,14 @@ import { logoutAction } from '@/features/auth/actions/auth.actions';
 
 const navigation = [
   { name: 'Estadísticas', href: '/', icon: LayoutDashboard, roles: ['admin'] },
-  { name: 'Productos', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
+  { name: 'Buscador de productos', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
   { name: 'Ventas', href: '/ventas', icon: Briefcase, roles: ['admin', 'vendedor'] },
   { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
   { name: 'Proveedores', href: '/proveedores', icon: Users, roles: ['admin'] },
 ];
 
 const adminNavigation = [
-  { name: 'Categorias', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
+  { name: 'Stock', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
   { name: 'Usuarios', href: '/usuarios', icon: UserCog, roles: ['admin'] },
   { name: 'Auditoría', href: '/logs', icon: ShieldAlert, roles: ['admin'] },
 ];

@@ -1,11 +1,10 @@
 /* eslint-disable react/display-name */
-import { PackageX, Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 
 interface ProductCardActionsProps {
   role?: string;
-  onLoss: (p: ProductDef) => void;
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (p: ProductDef) => void;
@@ -72,14 +71,6 @@ export function renderProductCard(actions: ProductCardActionsProps) {
                 label={product.showOnLanding ? 'Ocultar en Landing' : 'Mostrar en Landing'}
                 onClick={() => actions.onToggleVisibility(product)}
                 variant={product.showOnLanding ? 'success' : 'default'}
-              />
-            )}
-            {actions.role === 'admin' && (
-              <CardAction
-                icon={<PackageX className='w-4 h-4' />}
-                label='Registrar Pérdida'
-                onClick={() => actions.onLoss(product)}
-                variant='warning'
               />
             )}
             {actions.role === 'admin' && (

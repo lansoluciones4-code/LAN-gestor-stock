@@ -1,17 +1,16 @@
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
-import { PackageX, Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
 
 interface ColumnActions {
   role?: string;
-  onLoss: (p: ProductDef) => void;
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (p: ProductDef) => void;
   onManagePhotos: (p: ProductDef) => void;
 }
 
-export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisibility, onManagePhotos }: ColumnActions): ColumnDef<ProductDef>[] {
+export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, onManagePhotos }: ColumnActions): ColumnDef<ProductDef>[] {
   return [
     {
       header: 'Equipo y Detalle',
@@ -85,15 +84,6 @@ export function getProductColumns({ role, onLoss, onEdit, onDelete, onToggleVisi
               title={p.showOnLanding ? 'Ocultar en Landing' : 'Mostrar en Landing'}
             >
               {p.showOnLanding ? <Eye className='w-4 h-4' /> : <EyeOff className='w-4 h-4' />}
-            </button>
-          )}
-          {role === 'admin' && (
-            <button
-              onClick={() => onLoss(p)}
-              className='p-1.5 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
-              title='Registrar Pérdida'
-            >
-              <PackageX className='w-4 h-4' />
             </button>
           )}
           {role === 'admin' ? (

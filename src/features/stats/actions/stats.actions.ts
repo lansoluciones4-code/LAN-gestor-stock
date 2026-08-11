@@ -37,10 +37,13 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       let totalEquipos = 0;
       let totalModels = allProducts.length;
       let currentInventoryCost = 0;
+      let lowStockCount = 0;
 
       allProducts.forEach((p) => {
-        totalEquipos += Number(p.stock || 0);
-        currentInventoryCost += Number(p.purchasePrice || 0) * Number(p.stock || 0);
+        const stock = Number(p.stock || 0);
+        totalEquipos += stock;
+        currentInventoryCost += Number(p.purchasePrice || 0) * stock;
+        if (stock > 0 && stock <= 5) lowStockCount += 1;
       });
 
       // 3. Process Sales (Revenue, COGS, Seller Stats)
@@ -95,6 +98,7 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         totalModels,
         totalRevenue,
         currentInventoryCost,
+        lowStockCount,
         netProfit,
         totalLossCost,
         topSellers,
