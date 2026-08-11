@@ -17,12 +17,12 @@ const ENTITY_LABELS: Record<string, string> = {
 };
 
 const ACTION_COLORS: Record<string, string> = {
-  CREAR: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-  ACTUALIZAR: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-  EDITAR: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-  ELIMINAR: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400',
-  'PÉRDIDA': 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
-  LOGIN: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
+  CREAR: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
+  ACTUALIZAR: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
+  EDITAR: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
+  ELIMINAR: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
+  'PÉRDIDA': 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
+  LOGIN: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
 };
 
 function getReference(log: AuditLogDef): string {
@@ -51,7 +51,7 @@ export function renderAuditCard(actions: AuditCardActionsProps) {
         title={
           <span>
             {dateStr}{' '}
-            <span className='text-indigo-600 dark:text-indigo-400 font-bold'>{timeStr}</span>
+            <span className='text-zinc-600 dark:text-zinc-400 font-bold'>{timeStr}</span>
           </span>
         }
         subtitle={`Por: ${log.user?.username ?? 'SISTEMA'}`}

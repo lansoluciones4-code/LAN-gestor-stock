@@ -48,7 +48,7 @@ export function PanelToolbar({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholderMobile ?? searchPlaceholder}
-          className='w-full h-11 pl-9 pr-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm sm:hidden'
+          className='w-full h-11 pl-9 pr-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-zinc-500 transition-colors shadow-sm sm:hidden'
           data-testid={testId}
         />
         <input
@@ -56,7 +56,7 @@ export function PanelToolbar({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
-          className='w-full h-11 pl-9 pr-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm hidden sm:block'
+          className='w-full h-11 pl-9 pr-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-zinc-500 transition-colors shadow-sm hidden sm:block'
           data-testid={testId}
         />
       </div>
@@ -72,7 +72,7 @@ export function PanelToolbar({
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={searchPlaceholder}
-              className='w-full h-11 pl-9 pr-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm'
+              className='w-full h-11 pl-9 pr-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-zinc-500 transition-colors shadow-sm'
               data-testid={testId}
             />
           </div>
@@ -84,7 +84,7 @@ export function PanelToolbar({
                 onClick={() => setShowFilters(!showFilters)}
                 className={`xl:hidden flex items-center justify-center gap-2 px-4 h-11 border rounded-lg text-sm font-bold transition-colors flex-1 sm:flex-none ${
                   showFilters 
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-300' 
+                    ? 'bg-zinc-50 border-zinc-200 text-zinc-700 dark:bg-zinc-500/20 dark:border-zinc-500/30 dark:text-zinc-300' 
                     : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
                 }`}
               >
@@ -123,12 +123,12 @@ export function PanelToolbar({
           <div className='xl:hidden fixed inset-x-0 bottom-0 z-50 p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 rounded-t-3xl shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] animate-in slide-in-from-bottom duration-300 ease-out'>
             <div className='flex items-center justify-between mb-4 px-2'>
               <div className='flex items-center gap-2'>
-                <Filter className='w-4 h-4 text-indigo-500' />
+                <Filter className='w-4 h-4 text-zinc-500' />
                 <span className='text-sm font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider'>Filtros</span>
               </div>
               <button
                 onClick={() => setShowFilters(false)}
-                className='px-4 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded-full transition-colors'
+                className='px-4 py-1 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 text-sm font-bold rounded-full transition-colors'
               >
                 Hecho
               </button>

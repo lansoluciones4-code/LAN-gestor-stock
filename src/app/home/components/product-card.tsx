@@ -71,7 +71,7 @@ export function ProductCard({ product }: ProductCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 ${isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''}`}
+      className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-zinc-500/10 transition-all duration-500 ${isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''}`}
     >
       <Link
         href={`/product/${product.id}`}

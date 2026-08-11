@@ -128,26 +128,6 @@ button:focus,
     z-index: 9999;
   }
 
-  /* Ensure text colors are preserved */
-  .text-indigo-600 {
-    color: #4f46e5 !important;
-  }
-
-  .text-indigo-700 {
-    color: #4338ca !important;
-  }
-
-  .text-emerald-600 {
-    color: #059669 !important;
-  }
-
-  .bg-indigo-50 {
-    background-color: #eef2ff !important;
-  }
-
-  .border-indigo-50 {
-    border-color: #eef2ff !important;
-  }
 }
 
 

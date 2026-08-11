@@ -19,7 +19,7 @@ export function ToggleFilter({ id, checked, onChange, label, ...props }: ToggleF
         id={id}
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className='w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700'
+        className='w-4 h-4 rounded text-zinc-600 focus:ring-zinc-500 border-zinc-300 dark:border-zinc-700'
       />
       <label
         htmlFor={id}

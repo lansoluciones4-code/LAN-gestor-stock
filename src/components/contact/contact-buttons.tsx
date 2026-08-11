@@ -74,7 +74,7 @@ export function ContactButtons({ product, size = 'md', showLabels = true }: Cont
         target='_blank'
         rel='noopener noreferrer'
         onClick={stopProp}
-        className={`${baseButtonStyles} ${sizeStyles} border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-emerald-50 dark:hover:bg-emerald-500/5`}
+        className={`${baseButtonStyles} ${sizeStyles} border-zinc-100 dark:border-zinc-900/30 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-500/5`}
       >
         <span className='mr-2'>
           <WhatsAppIcon />
@@ -86,7 +86,7 @@ export function ContactButtons({ product, size = 'md', showLabels = true }: Cont
         target='_blank'
         rel='noopener noreferrer'
         onClick={stopProp}
-        className={`${baseButtonStyles} ${sizeStyles} border-pink-100 dark:border-pink-900/30 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-pink-50 dark:hover:bg-pink-500/5`}
+        className={`${baseButtonStyles} ${sizeStyles} border-zinc-100 dark:border-zinc-900/30 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-500/5`}
       >
         <span className='mr-2'>
           <InstagramIcon />

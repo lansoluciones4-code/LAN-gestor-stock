@@ -41,7 +41,7 @@ export function ResponsiveModal({ isOpen, onClose, title, icon, children, width 
             <button
               type='button'
               onClick={onClose}
-              className='px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium shadow-sm'
+              className='px-5 py-2.5 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition font-medium shadow-sm'
               data-testid={cancelTestId}
             >
               {cancelLabel}
@@ -49,7 +49,7 @@ export function ResponsiveModal({ isOpen, onClose, title, icon, children, width 
             <button
               type='submit'
               disabled={isPending}
-              className='px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm flex items-center gap-2'
+              className='px-5 py-2.5 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition disabled:opacity-70 font-medium shadow-sm flex items-center gap-2'
               data-testid={submitTestId}
             >
               {isPending && <Spinner />}
@@ -85,8 +85,8 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
       width='sm'
     >
       <ModalContent className='p-6'>
-        <div className='flex items-center text-red-500 mb-4'>
-          <div className='p-2 bg-red-100 dark:bg-red-500/10 rounded-full mr-3'>
+        <div className='flex items-center text-zinc-500 mb-4'>
+          <div className='p-2 bg-zinc-100 dark:bg-zinc-500/10 rounded-full mr-3'>
             <Trash2 className='w-6 h-6' />
           </div>
           <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>{title}</h3>
@@ -96,7 +96,7 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
           <button
             onClick={onClose}
             disabled={isPending}
-            className='px-4 py-2 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors font-medium shadow-sm'
+            className='px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-900/30 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/10 rounded-lg transition-colors font-medium shadow-sm'
             data-testid={cancelTestId}
           >
             {cancelLabel}
@@ -104,7 +104,7 @@ export function ConfirmModal({ isOpen, onClose, onConfirm, title, description, s
           <button
             onClick={onConfirm}
             disabled={isPending}
-            className='px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-70 flex items-center gap-2'
+            className='px-4 py-2 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-70 flex items-center gap-2'
             data-testid={submitTestId}
           >
             {isPending && <Spinner />}

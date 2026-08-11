@@ -87,7 +87,10 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
       const cookieStore = await cookies();
       cookieStore.set('session', token, {
         httpOnly: true,
-        secure: true,
+        // El sistema local corre siempre sobre HTTP plano dentro de la LAN (sin TLS
+        // por diseño). Con "secure: true" el navegador descarta la cookie en cualquier
+        // acceso que no sea HTTPS/localhost, dejando el login roto vía IP de LAN.
+        secure: false,
         sameSite: 'lax',
         path: '/',
         maxAge: 60 * 60 * 24, // 24 hours

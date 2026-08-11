@@ -13,9 +13,9 @@ interface ProductCardActionsProps {
 }
 
 function stockLabel(stock: number) {
-  if (stock > 5) return { text: `${stock} Uds`, cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' };
-  if (stock > 0) return { text: `${stock} Uds`, cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' };
-  return { text: 'Sin stock', cls: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' };
+  if (stock > 5) return { text: `${stock} Uds`, cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' };
+  if (stock > 0) return { text: `${stock} Uds`, cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' };
+  return { text: 'Sin stock', cls: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' };
 }
 
 export function renderProductCard(actions: ProductCardActionsProps) {
@@ -30,7 +30,7 @@ export function renderProductCard(actions: ProductCardActionsProps) {
           <>
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${stock.cls}`}>{stock.text}</span>
             {actions.role === 'admin' && product.showOnLanding && (
-              <span className='px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400'>
+              <span className='px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-500/20 dark:text-zinc-400'>
                 En landing
               </span>
             )}
@@ -40,7 +40,7 @@ export function renderProductCard(actions: ProductCardActionsProps) {
           <div className='flex flex-col gap-1 mt-1'>
             <div className='flex justify-between items-center'>
               <span className='text-xs text-zinc-400'>Precio público</span>
-              <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
+              <span className='font-semibold text-zinc-600 dark:text-zinc-400'>
                 ${product.salePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
               </span>
             </div>

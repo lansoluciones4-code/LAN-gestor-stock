@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PackageOpen, DollarSign } from 'lucide-react';
@@ -40,6 +40,7 @@ export function ProductFormModal({
     handleSubmit,
     reset,
     setValue,
+    getValues,
     watch,
     formState: { errors, dirtyFields },
   } = useForm<ProductInput>({
@@ -48,6 +49,18 @@ export function ProductFormModal({
 
   const selectedDeviceId = watch('deviceId');
   const selectedProviderId = watch('providerId');
+
+  const [marginPercent, setMarginPercent] = useState('');
+
+  // Markup sobre el costo: venta = costo * (1 + %/100). El % es solo una comodidad
+  // de carga del lado del cliente, no se valida ni se envía al server.
+  const recalcSalePrice = (costStr: string, pctStr: string) => {
+    const cost = Number((costStr || '').replace(',', '.'));
+    const pct = Number((pctStr || '').replace(',', '.'));
+    if (!pctStr || isNaN(cost) || isNaN(pct) || cost <= 0) return;
+    const sale = cost * (1 + pct / 100);
+    setValue('salePrice', sale.toFixed(2).replace('.', ',') as any, { shouldValidate: true, shouldDirty: true });
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -60,6 +73,8 @@ export function ProductFormModal({
           salePrice: editingItem.salePrice.toFixed(2).replace('.', ','),
           stock: editingItem.stock,
         } as any);
+        const impliedMargin = editingItem.purchasePrice > 0 ? ((editingItem.salePrice - editingItem.purchasePrice) / editingItem.purchasePrice) * 100 : 0;
+        setMarginPercent(impliedMargin > 0 ? impliedMargin.toFixed(2).replace('.', ',') : '');
       } else {
         reset({
           deviceId: '',
@@ -69,6 +84,7 @@ export function ProductFormModal({
           salePrice: '0,00',
           stock: 1,
         } as any);
+        setMarginPercent('');
       }
     }
   }, [isOpen, editingItem, reset]);
@@ -106,7 +122,7 @@ export function ProductFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title={editingItem ? 'Editar Producto / Stock' : 'Añadir Nuevo Lote'}
-      icon={<PackageOpen className='w-6 h-6 text-indigo-500' />}
+      icon={<PackageOpen className='w-6 h-6 text-zinc-500' />}
       width='2xl'
       onSubmit={handleSubmit(handleFormSubmit)}
       submitLabel='Confirmar Inventario'
@@ -122,7 +138,7 @@ export function ProductFormModal({
             onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
             placeholder='Seleccionar Equipo'
           />
-          {errors.deviceId && <p className='text-red-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
+          {errors.deviceId && <p className='text-zinc-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
         </div>
         <div className='col-span-1 md:col-span-2'>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Proveedor Entrante</label>
@@ -132,7 +148,7 @@ export function ProductFormModal({
               onChange={(val) => setValue('providerId', val, { shouldValidate: true })}
               placeholder='Seleccionar Proveedor'
             />
-            {errors.providerId && <p className='text-red-500 text-xs mt-1.5'>{errors.providerId.message}</p>}
+            {errors.providerId && <p className='text-zinc-500 text-xs mt-1.5'>{errors.providerId.message}</p>}
           </div>
         <div className='col-span-1 md:col-span-2'>
           <label className='block text-sm font-medium mb-1.5'>Descripción Física (Color, Memoria)</label>
@@ -143,35 +159,63 @@ export function ProductFormModal({
             className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700'
           />
         </div>
-        <div>
-          <label className='block text-sm font-medium mb-1.5'>Precio de Costo ($)</label>
-          <div className='relative'>
-            <DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-            <input
-              type='text'
-              inputMode='decimal'
-              {...register('purchasePrice', { onChange: (e) => setValue('purchasePrice', e.target.value.replace(/\./g, '')) })}
-              onKeyDown={blockInvalidPriceKey}
-              placeholder='0,00'
-              className={`w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500 ${errors.purchasePrice ? 'border-red-500' : ''}`}
-            />
+        <div className='col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6'>
+          <div>
+            <label className='block text-sm font-medium mb-1.5'>Precio de Costo ($)</label>
+            <div className='relative'>
+              <DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
+              <input
+                type='text'
+                inputMode='decimal'
+                {...register('purchasePrice', {
+                  onChange: (e) => {
+                    const cleaned = e.target.value.replace(/\./g, '');
+                    setValue('purchasePrice', cleaned as any);
+                    recalcSalePrice(cleaned, marginPercent);
+                  },
+                })}
+                onKeyDown={blockInvalidPriceKey}
+                placeholder='0,00'
+                className={`w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500 ${errors.purchasePrice ? 'border-zinc-500' : ''}`}
+              />
+            </div>
+            {errors.purchasePrice && <p className='text-zinc-500 text-xs mt-1'>{errors.purchasePrice.message}</p>}
           </div>
-          {errors.purchasePrice && <p className='text-red-500 text-xs mt-1'>{errors.purchasePrice.message}</p>}
-        </div>
-        <div>
-          <label className='block text-sm font-medium mb-1.5'>Precio de Venta ($)</label>
-          <div className='relative'>
-            <DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-emerald-500' />
-            <input
-              type='text'
-              inputMode='decimal'
-              {...register('salePrice', { onChange: (e) => setValue('salePrice', e.target.value.replace(/\./g, '')) })}
-              onKeyDown={blockInvalidPriceKey}
-              placeholder='0,00'
-              className={`w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500 ${errors.salePrice ? 'border-red-500' : ''}`}
-            />
+          <div>
+            <label className='block text-sm font-medium mb-1.5'>% Ganancia</label>
+            <div className='relative'>
+              <span className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400 text-sm font-bold'>%</span>
+              <input
+                type='text'
+                inputMode='decimal'
+                value={marginPercent}
+                onChange={(e) => {
+                  const cleaned = e.target.value.replace(/\./g, '');
+                  setMarginPercent(cleaned);
+                  recalcSalePrice(getValues('purchasePrice') as unknown as string, cleaned);
+                }}
+                onKeyDown={blockInvalidPriceKey}
+                placeholder='Ej: 30'
+                className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+              />
+            </div>
+            <p className='text-zinc-400 text-xs mt-1'>Opcional: calcula el precio de venta solo</p>
           </div>
-          {errors.salePrice && <p className='text-red-500 text-xs mt-1'>{errors.salePrice.message}</p>}
+          <div>
+            <label className='block text-sm font-medium mb-1.5'>Precio de Venta ($)</label>
+            <div className='relative'>
+              <DollarSign className='absolute left-3 top-2.5 h-4 w-4 text-zinc-500' />
+              <input
+                type='text'
+                inputMode='decimal'
+                {...register('salePrice', { onChange: (e) => setValue('salePrice', e.target.value.replace(/\./g, '') as any) })}
+                onKeyDown={blockInvalidPriceKey}
+                placeholder='0,00'
+                className={`w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500 ${errors.salePrice ? 'border-zinc-500' : ''}`}
+              />
+            </div>
+            {errors.salePrice && <p className='text-zinc-500 text-xs mt-1'>{errors.salePrice.message}</p>}
+          </div>
         </div>
         <div>
           <label className='block text-sm font-medium mb-1.5'>Stock Inicial Lote</label>
@@ -184,9 +228,9 @@ export function ProductFormModal({
             min='0'
             step='1'
             placeholder='1'
-            className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500'
+            className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
           />
-          {errors.stock && <p className='text-red-500 text-xs mt-1'>{errors.stock.message}</p>}
+          {errors.stock && <p className='text-zinc-500 text-xs mt-1'>{errors.stock.message}</p>}
         </div>
       </div>
     </ResponsiveModal>

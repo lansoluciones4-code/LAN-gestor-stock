@@ -31,7 +31,7 @@ export function DateRangePicker({ startDate, endDate, onStartChange, onEndChange
         {(startDate || endDate) && onClear && (
           <button
             onClick={onClear}
-            className='ml-2 p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-red-500 transition-all'
+            className='ml-2 p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-500 transition-all'
             title='Limpiar Filtro'
           >
             <X className='w-4 h-4' />

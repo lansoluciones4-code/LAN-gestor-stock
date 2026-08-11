@@ -23,7 +23,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
             {dateString}
             <span
               title={timeString}
-              className='text-indigo-600 dark:text-indigo-400 ml-1 font-bold'
+              className='text-zinc-600 dark:text-zinc-400 ml-1 font-bold'
             >
               {timeString}
             </span>
@@ -56,7 +56,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
           {s.payments?.map((p, i) => (
             <span
               key={i}
-              className={`px-1.5 py-0.5 text-[15px] font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400'}`}
+              className={`px-1.5 py-0.5 text-[15px] font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}
             >
               {p.type === 'efectivo' ? 'EF' : 'TR'}
             </span>
@@ -71,8 +71,8 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
       cellClassName: 'text-right whitespace-nowrap',
       cell: (s) => (
         <div className='flex flex-col items-end gap-0.5 text-[14px] font-bold'>
-          {s.discountPercentage > 0 && <span className='text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded'>-{s.discountPercentage}%</span>}
-          {s.discountAmount > 0 && <span className='text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded'>-${s.discountAmount.toLocaleString('es-AR')}</span>}
+          {s.discountPercentage > 0 && <span className='text-zinc-600 bg-zinc-50 dark:bg-zinc-500/10 px-1 rounded'>-{s.discountPercentage}%</span>}
+          {s.discountAmount > 0 && <span className='text-zinc-600 bg-zinc-50 dark:bg-zinc-500/10 px-1 rounded'>-${s.discountAmount.toLocaleString('es-AR')}</span>}
           {s.discountPercentage === 0 && s.discountAmount === 0 && <span className='text-zinc-300 dark:text-zinc-700'>--</span>}
         </div>
       ),
@@ -91,7 +91,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
         <>
           <button
             onClick={() => onPrint(s)}
-            className='p-1.5 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors'
+            className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10 rounded-lg transition-colors'
             title='Imprimir Factura'
           >
             <FileText className='w-4 h-4' />
@@ -99,7 +99,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
           {role === 'admin' && (
             <button
               onClick={() => onDelete(s.id!)}
-              className='p-1.5 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors'
+              className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10 rounded-lg transition-colors'
               title='Anular Venta'
             >
               <Trash2 className='w-4 h-4' />

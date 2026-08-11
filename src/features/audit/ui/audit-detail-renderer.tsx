@@ -56,7 +56,7 @@ function formatPrice(val: string | number): string {
 
 function BooleanBadge({ value }: { value: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${value ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'}`}>
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${value ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
       <ToggleLeft className='w-3 h-3' />
       {value ? 'Sí' : 'No'}
     </span>
@@ -66,7 +66,7 @@ function BooleanBadge({ value }: { value: boolean }) {
 function PaymentBadge({ type }: { type: string }) {
   const colors: Record<string, string> = {
     efectivo: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-    transferencia: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+    transferencia: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${colors[type] ?? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'}`}>
@@ -141,13 +141,13 @@ function renderValue(key: string, value: DetailValue): React.ReactNode {
 
   if (PRICE_KEYS.has(key)) {
     const n = parseFloat(String(value));
-    if (!isNaN(n) && n > 0) return <span className='font-semibold text-emerald-600 dark:text-emerald-400'>{formatPrice(n)}</span>;
+    if (!isNaN(n) && n > 0) return <span className='font-semibold text-zinc-600 dark:text-zinc-400'>{formatPrice(n)}</span>;
   }
 
   if (key === 'role') {
     const colors: Record<string, string> = {
-      admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      vendedor: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+      admin: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900/30 dark:text-zinc-400',
+      vendedor: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900/30 dark:text-zinc-400',
     };
     return <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold capitalize ${colors[String(value)] ?? 'bg-zinc-100 text-zinc-600'}`}>{String(value)}</span>;
   }

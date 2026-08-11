@@ -139,15 +139,15 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       width='md'
     >
       <div className='space-y-6'>
-        <div className='bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/30'>
+        <div className='bg-zinc-50 dark:bg-zinc-900/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-900/30'>
           <div className='flex justify-between items-center'>
-            <span className='text-xs font-black uppercase text-indigo-400 tracking-widest'>Total a Cobrar</span>
-            <span className='text-2xl font-black text-indigo-700 dark:text-indigo-300'>${totalFormatted}</span>
+            <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Total a Cobrar</span>
+            <span className='text-2xl font-black text-zinc-700 dark:text-zinc-300'>${totalFormatted}</span>
           </div>
           {remaining > 0 && (
-            <div className='flex justify-between items-center mt-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/30'>
-              <span className='text-[10px] font-black uppercase text-amber-500 tracking-widest'>Saldo Restante</span>
-              <span className='text-lg font-black text-amber-600'>${remainingFormatted}</span>
+            <div className='flex justify-between items-center mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-900/30'>
+              <span className='text-[10px] font-black uppercase text-zinc-500 tracking-widest'>Saldo Restante</span>
+              <span className='text-lg font-black text-zinc-600'>${remainingFormatted}</span>
             </div>
           )}
         </div>
@@ -180,22 +180,22 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                 className='flex items-center justify-between p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg group'
               >
                 <div className='flex items-center gap-3'>
-                  <div className={`p-2 rounded-full ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10' : 'bg-blue-100 text-blue-600 dark:bg-blue-500/10'}`}>{p.type === 'efectivo' ? <Banknote className='w-4 h-4' /> : <CreditCard className='w-4 h-4' />}</div>
+                  <div className={`p-2 rounded-full ${p.type === 'efectivo' ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-500/10' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-500/10'}`}>{p.type === 'efectivo' ? <Banknote className='w-4 h-4' /> : <CreditCard className='w-4 h-4' />}</div>
                   <div>
                     <p className='text-xs font-bold uppercase text-zinc-900 dark:text-zinc-100 tracking-tight'>{p.type}</p>
-                    <p className='text-sm font-black text-indigo-600'>${p.amount.toLocaleString('es-AR')}</p>
+                    <p className='text-sm font-black text-zinc-600'>${p.amount.toLocaleString('es-AR')}</p>
                   </div>
                 </div>
                 <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
                   <button
                     onClick={() => startEdit(i)}
-                    className='p-1.5 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors'
+                    className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-900/20 rounded-md transition-colors'
                   >
                     <Edit2 className='w-4 h-4' />
                   </button>
                   <button
                     onClick={() => removePayment(i)}
-                    className='p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors'
+                    className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-900/20 rounded-md transition-colors'
                   >
                     <Trash2 className='w-4 h-4' />
                   </button>
@@ -204,12 +204,12 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
             ))}
 
             {isAdding && (
-              <div className='p-4 bg-zinc-50 dark:bg-zinc-950 border-2 border-dashed border-indigo-200 dark:border-indigo-900/30 rounded-xl space-y-4 animate-in fade-in zoom-in-95 duration-200'>
+              <div className='p-4 bg-zinc-50 dark:bg-zinc-950 border-2 border-dashed border-zinc-200 dark:border-zinc-900/30 rounded-xl space-y-4 animate-in fade-in zoom-in-95 duration-200'>
                 <div className='grid grid-cols-2 gap-3'>
                   <button
                     type='button'
                     onClick={() => setType('efectivo')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'efectivo' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'efectivo' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
                     data-testid={TEST_IDS.ventas.payment.btnEfectivo}
                   >
                     <Banknote className='w-6 h-6 mb-1' />
@@ -218,7 +218,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                   <button
                     type='button'
                     onClick={() => setType('transferencia')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'transferencia' ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'transferencia' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
                     data-testid={TEST_IDS.ventas.payment.btnTranserencia}
                   >
                     <CreditCard className='w-6 h-6 mb-1' />
@@ -234,7 +234,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                       autoFocus
                       type='text'
                       inputMode='decimal'
-                      className='w-full pl-7 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 font-bold'
+                      className='w-full pl-7 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500 font-bold'
                       value={amount}
                       onChange={(e) => handleAmountChange(e.target.value)}
                       onKeyDown={(e) => {
@@ -253,7 +253,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                 </div>
 
                 {error && (
-                  <div className='flex items-center gap-2 p-2 bg-red-50 dark:bg-red-500/10 text-red-600 rounded-lg border border-red-100 dark:border-red-900/30'>
+                  <div className='flex items-center gap-2 p-2 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-600 rounded-lg border border-zinc-100 dark:border-zinc-900/30'>
                     <AlertCircle className='w-4 h-4 shrink-0' />
                     <span className='text-[10px] font-bold'>{error}</span>
                   </div>
@@ -292,7 +292,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
         </div>
 
         {error && !isAdding && (
-          <div className='flex items-center gap-2 p-2 bg-red-50 dark:bg-red-500/10 text-red-600 rounded-lg border border-red-100 dark:border-red-900/30'>
+          <div className='flex items-center gap-2 p-2 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-600 rounded-lg border border-zinc-100 dark:border-zinc-900/30'>
             <AlertCircle className='w-4 h-4 shrink-0' />
             <span className='text-[10px] font-bold'>{error}</span>
           </div>

@@ -11,7 +11,7 @@ import { useAuthStore } from '@/features/auth/store/auth.store';
 import { logoutAction } from '@/features/auth/actions/auth.actions';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['admin'] },
+  { name: 'Estadísticas', href: '/', icon: LayoutDashboard, roles: ['admin'] },
   { name: 'Productos', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
   { name: 'Ventas', href: '/ventas', icon: Briefcase, roles: ['admin', 'vendedor'] },
   { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
@@ -56,11 +56,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     <div className='flex h-full w-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors relative'>
       <div className='p-6 flex items-center justify-between shrink-0'>
         <div className='flex items-center'>
-          <div className='w-12 h-12 bg-white border border-zinc-200 shadow-sm rounded-lg flex items-center justify-center mr-3 overflow-hidden'>
+          <div className='w-12 h-12 bg-black border border-zinc-200 dark:border-zinc-700 shadow-sm rounded-full flex items-center justify-center mr-3 overflow-hidden'>
             <img
-              src='/icon.svg'
-              alt='ArgenStock'
-              className='w-10 h-10 object-contain'
+              src='/LAN_icono.jpg'
+              alt='LAN Soluciones'
+              className='w-full h-full object-cover'
             />
           </div>
           <span className='font-bold text-xl tracking-tight text-zinc-900 dark:text-zinc-100'>ArgenStock</span>
@@ -81,9 +81,9 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               key={item.name}
               href={item.href}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center px-3 py-2.5 text-md font-medium rounded-lg transition-all focus:outline-none ${isActive ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200'}`}
+              className={`flex items-center px-3 py-2.5 text-md font-medium rounded-lg transition-all focus:outline-none ${isActive ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200'}`}
             >
-              <item.icon className={`shrink-0 w-5 h-5 mr-3 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
+              <item.icon className={`shrink-0 w-5 h-5 mr-3 ${isActive ? 'text-white dark:text-black' : 'text-zinc-400 dark:text-zinc-500'}`} />
               {item.name}
             </Link>
           );
@@ -93,10 +93,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       <div className='p-4 border-t border-zinc-200 dark:border-zinc-800 shrink-0'>
         <button
           onClick={() => setShowLogoutModal(true)}
-          className='w-full flex items-center justify-between px-3 py-2 text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:text-zinc-400 dark:hover:bg-red-500/10 transition-colors rounded-lg group'
+          className='w-full flex items-center justify-between px-3 py-2 border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors rounded-lg group'
         >
           <div className='flex flex-col text-left'>
-            <span className='text-md font-medium group-hover:text-red-600 dark:group-hover:text-red-400'>Cerrar sesión</span>
+            <span className='text-md font-medium'>Cerrar sesión</span>
             <span className='text-sm opacity-70'>
               {user?.username} ({user?.role})
             </span>
@@ -184,8 +184,8 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               exit={{ opacity: 0, scale: 0.95 }}
               className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden border border-zinc-200 dark:border-zinc-800 p-6'
             >
-              <div className='flex items-center text-amber-500 mb-4'>
-                <div className='p-2 bg-amber-100 dark:bg-amber-500/10 rounded-full mr-3'>
+              <div className='flex items-center text-red-500 mb-4'>
+                <div className='p-2 bg-red-100 dark:bg-red-500/10 rounded-full mr-3'>
                   <ShieldAlert className='w-6 h-6' />
                 </div>
                 <h3 className='text-lg font-bold text-zinc-900 dark:text-zinc-100'>Cerrar sesión</h3>

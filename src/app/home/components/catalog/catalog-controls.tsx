@@ -56,7 +56,7 @@ export function CatalogControls({ search, onSearchChange, onOpenFilters, selecte
           />
         </div>
         <div className='flex flex-wrap sm:flex-nowrap gap-2 items-center'>
-          <div className='flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 h-12 flex-1 sm:flex-none sm:w-32 group focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all outline-none'>
+          <div className='flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 h-12 flex-1 sm:flex-none sm:w-32 group focus-within:ring-2 focus-within:ring-zinc-500/20 focus-within:border-zinc-500 transition-all outline-none'>
             <span className='text-[10px] font-bold text-zinc-400 uppercase select-none'>Mín</span>
             <input
               type='text'
@@ -71,7 +71,7 @@ export function CatalogControls({ search, onSearchChange, onOpenFilters, selecte
             />
           </div>
 
-          <div className='flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 h-12 flex-1 sm:flex-none sm:w-32 group focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all outline-none'>
+          <div className='flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 h-12 flex-1 sm:flex-none sm:w-32 group focus-within:ring-2 focus-within:ring-zinc-500/20 focus-within:border-zinc-500 transition-all outline-none'>
             <span className='text-[10px] font-bold text-zinc-400 uppercase select-none'>Máx</span>
             <input
               type='text'
@@ -97,12 +97,12 @@ export function CatalogControls({ search, onSearchChange, onOpenFilters, selecte
       </div>
 
       {selectedCategory && (
-        <div className='flex lg:hidden items-center gap-2 px-3 py-1.5 w-fit bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-full text-xs font-medium text-indigo-600 dark:text-indigo-400'>
+        <div className='flex lg:hidden items-center gap-2 px-3 py-1.5 w-fit bg-zinc-50 dark:bg-zinc-500/10 border border-zinc-100 dark:border-zinc-500/20 rounded-full text-xs font-medium text-zinc-600 dark:text-zinc-400'>
           <Tag className='w-3.5 h-3.5' />
           {toSentenceCase(selectedCategoryName)}
           <button
             onClick={onClearCategory}
-            className='ml-1 p-0.5 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-full transition-colors'
+            className='ml-1 p-0.5 hover:bg-zinc-100 dark:hover:bg-zinc-500/20 rounded-full transition-colors'
           >
             <X className='w-3 h-3' />
           </button>

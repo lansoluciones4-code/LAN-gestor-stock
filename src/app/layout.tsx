@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'ArgenStock',
   description: 'Manage technology store stock effectively',
   icons: {
-    icon: '/icon.svg',
+    icon: '/LAN_icono.jpg',
   },
   robots: {
     index: false,

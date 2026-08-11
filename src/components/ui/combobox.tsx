@@ -50,7 +50,7 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
       <button
         type='button'
         onClick={() => setOpen(!open)}
-        className='flex h-10 w-full items-center justify-between rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors'
+        className='flex h-10 w-full items-center justify-between rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-colors'
       >
         <span className='truncate'>{selectedOption ? selectedOption.name : placeholder}</span>
         <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -78,7 +78,7 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
             {addNewLabel && (
               <button
                 type='button'
-                className='flex w-full items-center py-2.5 px-3 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors shrink-0 border-b border-zinc-50 dark:border-zinc-800/50'
+                className='flex w-full items-center py-2.5 px-3 text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/20 transition-colors shrink-0 border-b border-zinc-50 dark:border-zinc-800/50'
                 onClick={() => {
                   onAddNew?.();
                   setOpen(false);
@@ -101,7 +101,7 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
                   setSearch('');
                 }}
               >
-                <Check className={`mr-2 h-4 w-4 ${value === opt.id ? 'opacity-100' : 'opacity-0'} text-indigo-500`} />
+                <Check className={`mr-2 h-4 w-4 ${value === opt.id ? 'opacity-100' : 'opacity-0'} text-zinc-500`} />
                 <span className='truncate'>{opt.name}</span>
               </button>
             ))}

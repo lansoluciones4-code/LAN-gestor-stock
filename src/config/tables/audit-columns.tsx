@@ -10,16 +10,16 @@ const getActionColor = (action: string) => {
   const a = action.toUpperCase();
   switch (a) {
     case 'CREAR':
-      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20';
+      return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-900/40';
     case 'ACTUALIZAR':
     case 'EDITAR':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20';
+      return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/40';
     case 'ELIMINAR':
-      return 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200 dark:border-rose-500/20';
+      return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/40 font-black';
     case 'PÉRDIDA':
-      return 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200 dark:border-orange-500/20';
+      return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-900/40';
     case 'LOGIN':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
+      return 'bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-transparent dark:text-zinc-500 dark:border-zinc-800';
     default:
       return 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800';
   }
@@ -39,7 +39,7 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
             {dateString}
             <span
               title={timeString}
-              className='text-indigo-600 dark:text-indigo-400 ml-1'
+              className='text-zinc-600 dark:text-zinc-400 ml-1'
             >
               {timeString}
             </span>
@@ -103,7 +103,7 @@ export function getAuditColumns({ onView }: ColumnActions): ColumnDef<AuditLogDe
             e.stopPropagation();
             onView(log);
           }}
-          className='p-1.5 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg transition-colors shadow-sm'
+          className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10 rounded-lg transition-colors shadow-sm'
           title='Ver Detalle'
         >
           <Eye className='w-4 h-4' />

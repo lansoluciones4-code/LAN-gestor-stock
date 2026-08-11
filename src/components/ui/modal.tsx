@@ -52,7 +52,7 @@ const ModalHeader = ({ title, icon, onClose, className = '', titleClassName = ''
     </h3>
     <button
       onClick={onClose}
-      className='text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md transition-colors'
+      className='text-zinc-400 hover:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 p-1.5 rounded-md transition-colors'
     >
       <X className='w-5 h-5' />
     </button>

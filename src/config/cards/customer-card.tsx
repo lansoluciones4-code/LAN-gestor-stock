@@ -15,7 +15,7 @@ export function renderCustomerCard(actions: CustomerCardActionsProps) {
       title={customer.name}
       subtitle={customer.email}
       badges={
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${customer.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${customer.isActive ? 'bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
           {customer.isActive ? 'Activo' : 'Inactivo'}
         </span>
       }

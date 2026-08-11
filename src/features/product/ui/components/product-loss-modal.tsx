@@ -47,15 +47,15 @@ export function ProductLossModal({
       isOpen={isOpen}
       onClose={onClose}
       title='Registrar Pérdida'
-      icon={<PackageX className='w-5 h-5 text-amber-500' />}
+      icon={<PackageX className='w-5 h-5 text-zinc-500' />}
       width='md'
       onSubmit={handleSubmit}
       submitLabel='Confirmar Pérdida'
       isPending={isPending}
     >
       <ErrorAlert error={serverError} />
-      <div className='p-3 mb-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg'>
-        <p className='text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-1'>Producto</p>
+      <div className='p-3 mb-4 bg-zinc-50 dark:bg-zinc-900/10 border border-zinc-200 dark:border-zinc-900/30 rounded-lg'>
+        <p className='text-xs font-bold text-zinc-800 dark:text-zinc-400 uppercase tracking-wider mb-1'>Producto</p>
         <p
           className='text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate'
           title={`${product.device?.name} - ${product.description}`}
@@ -77,7 +77,7 @@ export function ProductLossModal({
             min='1'
             step='1'
             placeholder='Ej: 1'
-            className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500'
+            className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-zinc-500'
           />
         </div>
         <div>
@@ -86,7 +86,7 @@ export function ProductLossModal({
             value={lossReason}
             onChange={(e) => setLossReason(e.target.value)}
             placeholder='Ej: Pantalla rota al desembalar'
-            className='w-full px-4 py-2 sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-indigo-500 min-h-[100px] text-sm'
+            className='w-full px-4 py-2 sm:text-base placeholder:text-xs sm:placeholder:text-sm border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 focus:outline-none focus:border-zinc-500 min-h-[100px] text-sm'
           />
         </div>
       </div>

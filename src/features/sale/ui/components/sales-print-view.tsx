@@ -20,7 +20,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
           size='sm'
           onClick={onClose}
           leftIcon={<ArrowLeft className='w-4 h-4' />}
-          className='font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md'
+          className='font-bold border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-900/30 dark:text-zinc-400 dark:hover:bg-zinc-900/20 shadow-md'
         >
           Volver
         </Button>
@@ -41,9 +41,9 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
           id='print-area-wrapper'
           className='bg-white text-zinc-900 p-4 sm:p-12 border border-zinc-200 rounded-xl shadow-lg max-w-2xl mx-auto'
         >
-          <div className='flex justify-between items-start mb-12 border-b-2 border-indigo-50 pb-8'>
+          <div className='flex justify-between items-start mb-12 border-b-2 border-zinc-50 pb-8'>
             <div>
-              <h2 className='text-3xl font-black text-indigo-600'>ARGENSTOCK</h2>
+              <h2 className='text-3xl font-black text-zinc-600'>ARGENSTOCK</h2>
               <p className='text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1'>Registro Comercial</p>
             </div>
             <div className='text-right'>
@@ -117,13 +117,13 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     <span>${(sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   {sale.discountPercentage! > 0 && (
-                    <div className='flex justify-between w-full text-[11px] font-bold text-emerald-600 mt-1'>
+                    <div className='flex justify-between w-full text-[11px] font-bold text-zinc-600 mt-1'>
                       <span className='uppercase'>Descuento ({sale.discountPercentage}%)</span>
                       <span>-${((sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0) * (sale.discountPercentage! / 100)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
                   {sale.discountAmount! > 0 && (
-                    <div className='flex justify-between w-full text-[11px] font-bold text-emerald-600'>
+                    <div className='flex justify-between w-full text-[11px] font-bold text-zinc-600'>
                       <span className='uppercase'>Descuento en Monto</span>
                       <span>-${sale.discountAmount?.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
@@ -132,7 +132,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
               )}
               <div className='flex justify-between w-full items-center mt-2'>
                 <span className='text-xl font-black uppercase text-zinc-900 pt-2'>Total</span>
-                <span className='text-3xl font-black text-indigo-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300'>${sale.total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className='text-3xl font-black text-zinc-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300'>${sale.total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>

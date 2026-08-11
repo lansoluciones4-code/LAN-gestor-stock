@@ -15,7 +15,7 @@ export function renderDeviceCard(actions: DeviceCardActionsProps) {
       key={device.id}
       title={device.name}
       badges={
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${device.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${device.isActive ? 'bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
           {device.isActive ? 'Activo' : 'Inactivo'}
         </span>
       }

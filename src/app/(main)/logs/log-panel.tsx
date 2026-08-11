@@ -46,10 +46,10 @@ function AuditDetailModal({ log, onClose }: { log: AuditLogDef; onClose: () => v
       <div className='bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 flex flex-col max-h-[90vh]'>
         <div className='flex justify-between items-center p-5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50'>
           <h3 className='text-lg font-bold flex items-center gap-2 text-zinc-900 dark:text-zinc-100'>
-            <History className='w-5 h-5 text-indigo-500' />
+            <History className='w-5 h-5 text-zinc-500' />
             Resumen de Transacción
           </h3>
-          <button onClick={onClose} className='p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors'>
+          <button onClick={onClose} className='p-1.5 text-zinc-500 hover:text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition-colors'>
             <X className='w-5 h-5' />
           </button>
         </div>
@@ -62,7 +62,7 @@ function AuditDetailModal({ log, onClose }: { log: AuditLogDef; onClose: () => v
             </MetaField>
             <MetaField label='Realizado por'>
               <span className='flex items-center gap-1.5'>
-                <User className='w-3.5 h-3.5 text-indigo-400' />
+                <User className='w-3.5 h-3.5 text-zinc-400' />
                 {log.user?.username ?? <span className='text-zinc-400 font-normal italic'>Sistema</span>}
               </span>
             </MetaField>
@@ -70,7 +70,7 @@ function AuditDetailModal({ log, onClose }: { log: AuditLogDef; onClose: () => v
               {ENTITY_LABELS[log.entity] ?? log.entity}
             </MetaField>
             <MetaField label='Entidad Específica'>
-              <span className='text-indigo-600 dark:text-indigo-400'>
+              <span className='text-zinc-600 dark:text-zinc-400'>
                 {entityName ?? <span className='text-zinc-400 font-normal italic'>—</span>}
               </span>
             </MetaField>
@@ -191,7 +191,7 @@ export function LogPanel() {
       />
 
       {globalMessage && (
-        <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30' : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/10 dark:text-green-400 dark:border-green-900/30'}`}>
+        <div className={`shrink-0 mb-4 p-4 rounded-lg flex items-center shadow-sm text-sm border ${globalMessage.type === 'error' ? 'bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-900/10 dark:text-zinc-400 dark:border-zinc-900/30' : 'bg-zinc-50 text-zinc-700 border-zinc-200 dark:bg-zinc-900/10 dark:text-zinc-400 dark:border-zinc-900/30'}`}>
           {globalMessage.text}
         </div>
       )}

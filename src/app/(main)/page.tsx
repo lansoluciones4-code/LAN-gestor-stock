@@ -76,7 +76,7 @@ export default function DashboardPage() {
       <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 shrink-0'>
         <div>
           <h1 className='text-3xl font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-3'>
-            <Activity className='text-indigo-600' /> Resumen de Actividad
+            <Activity className='text-zinc-600' /> Resumen de Actividad
           </h1>
           <p className='text-zinc-500 text-sm font-medium mt-1'>Panel de Control e Inteligencia de Negocio.</p>
         </div>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
           <button
             onClick={handleSync}
             disabled={isPending}
-            className='px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-base transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
+            className='px-6 py-2 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg text-base transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 group'
           >
             {isPending ? (
               'Recalculando...'
@@ -116,7 +116,7 @@ export default function DashboardPage() {
           <button
             onClick={handlePublish}
             disabled={isPublishing}
-            className='px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-base transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2'
+            className='px-6 py-2 bg-white hover:bg-zinc-100 text-zinc-900 border border-zinc-300 dark:bg-zinc-200 dark:hover:bg-zinc-300 dark:text-zinc-900 dark:border-zinc-300 rounded-lg text-base transition-all disabled:opacity-50 shadow-sm flex items-center justify-center gap-2'
           >
             {isPublishing ? (
               'Publicando...'
@@ -134,7 +134,7 @@ export default function DashboardPage() {
               Última sincronización: {formatTimeAgo(lastSync.at)} por {lastSync.username}
             </p>
           )}
-          {publishError && <p className='text-xs font-bold text-rose-500'>{publishError}</p>}
+          {publishError && <p className='text-xs font-bold text-zinc-500'>{publishError}</p>}
         </div>
       </div>
 
@@ -213,7 +213,7 @@ export default function DashboardPage() {
         <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
           <div className='flex justify-between items-start mb-4'>
             <div className='p-2 bg-zinc-50 dark:bg-zinc-500/10 rounded-lg'>
-              <Activity className='w-5 h-5 text-amber-500' />
+              <Activity className='w-5 h-5 text-zinc-500' />
             </div>
           </div>
           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Unidades Físicas</span>
@@ -236,7 +236,7 @@ export default function DashboardPage() {
         <div className='lg:col-span-12 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col'>
           <div className='p-6 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-between'>
             <h3 className='font-black flex items-center gap-2 text-zinc-900 dark:text-zinc-100'>
-              <Users className='w-5 h-5 text-indigo-500' /> Vendedores con Mayor Rendimiento
+              <Users className='w-5 h-5 text-zinc-500' /> Vendedores con Mayor Rendimiento
             </h3>
             <span className='text-xs font-bold text-zinc-400 uppercase tracking-widest'>Últimos Datos</span>
           </div>
@@ -256,7 +256,7 @@ export default function DashboardPage() {
                     className='hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors'
                   >
                     <td className='px-8 py-5 flex items-center gap-4'>
-                      <div className='w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 font-bold'>{seller.username[0].toUpperCase()}</div>
+                      <div className='w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-500/20 flex items-center justify-center text-zinc-600 font-bold'>{seller.username[0].toUpperCase()}</div>
                       <div className='min-w-0'>
                         <p
                           className='font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px]'
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                       </div>
                     </td>
                     <td className='px-8 py-5 text-center font-black text-[17px] text-zinc-700 dark:text-zinc-300'>{seller.count}</td>
-                    <td className='px-8 py-5 text-right font-black text-emerald-600 text-[18px] pr-12'>${seller.total.toLocaleString('es-AR')}</td>
+                    <td className='px-8 py-5 text-right font-black text-zinc-600 text-[18px] pr-12'>${seller.total.toLocaleString('es-AR')}</td>
                   </tr>
                 ))}
                 {(!stats?.topSellers || stats.topSellers.length === 0) && (
@@ -290,7 +290,7 @@ export default function DashboardPage() {
         <div className='lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 px-2 pb-6'>
           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
             <div className='flex items-center gap-3 mb-4'>
-              <Clock className='w-5 h-5 text-indigo-500' />
+              <Clock className='w-5 h-5 text-zinc-500' />
               <h4 className='font-bold text-sm'>Actividad Reciente</h4>
             </div>
             <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
@@ -300,7 +300,7 @@ export default function DashboardPage() {
 
           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
             <div className='flex items-center gap-3 mb-4'>
-              <ArrowUpRight className='w-5 h-5 text-emerald-500' />
+              <ArrowUpRight className='w-5 h-5 text-zinc-500' />
               <h4 className='font-bold text-sm'>Rendimiento Operativo</h4>
             </div>
             <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
@@ -308,19 +308,19 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className='bg-rose-50/50 dark:bg-rose-900/10 p-6 rounded-2xl border border-rose-100 dark:border-rose-900/30 transition-all hover:border-rose-200 dark:hover:border-rose-900/50'>
+          <div className='bg-zinc-50/50 dark:bg-zinc-900/10 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-900/30 transition-all hover:border-zinc-200 dark:hover:border-zinc-900/50'>
             <div className='flex items-center gap-3 mb-4'>
-              <TrendingDown className='w-5 h-5 text-rose-500' />
-              <h4 className='font-bold text-sm text-rose-800 dark:text-rose-400'>Impacto de Pérdidas</h4>
+              <TrendingDown className='w-5 h-5 text-zinc-500' />
+              <h4 className='font-bold text-sm text-zinc-800 dark:text-zinc-400'>Impacto de Pérdidas</h4>
             </div>
-            <p className='text-xs text-rose-600/80 dark:text-rose-400/80 leading-relaxed font-medium'>
+            <p className='text-xs text-zinc-600/80 dark:text-zinc-400/80 leading-relaxed font-medium'>
               Se han registrado mermas por un valor acumulado de <strong>${stats?.totalLossCost?.toLocaleString('es-AR')}</strong>, afectando el margen neto final.
             </p>
           </div>
 
           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
             <div className='flex items-center gap-3 mb-4'>
-              <Briefcase className='w-5 h-5 text-amber-500' />
+              <Briefcase className='w-5 h-5 text-zinc-500' />
               <h4 className='font-bold text-sm'>Inversión en Activos</h4>
             </div>
             <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
@@ -330,7 +330,7 @@ export default function DashboardPage() {
 
           <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
             <div className='flex items-center gap-3 mb-4'>
-              <DollarSign className='w-5 h-5 text-emerald-500' />
+              <DollarSign className='w-5 h-5 text-zinc-500' />
               <h4 className='font-bold text-sm'>Flujo de Caja</h4>
             </div>
             <p className='text-xs text-zinc-500 leading-relaxed font-medium'>

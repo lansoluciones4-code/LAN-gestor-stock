@@ -36,7 +36,7 @@ export function ProductInfo({ deviceName, salePrice, description, isOutOfStock }
 
         <div className='flex items-center gap-4'>
           <span className='text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100'>${salePrice.toLocaleString('es-AR')}</span>
-          {!isOutOfStock && <span className='text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full uppercase tracking-wider'>En Stock</span>}
+          {!isOutOfStock && <span className='text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-500/10 px-3 py-1 rounded-full uppercase tracking-wider'>En Stock</span>}
         </div>
 
         <div className='pt-6 border-t border-zinc-100 dark:border-zinc-800'>
@@ -56,12 +56,12 @@ export function ProductInfo({ deviceName, salePrice, description, isOutOfStock }
 
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 pt-8 border-t border-zinc-100 dark:border-zinc-800'>
         <FeatureItem
-          icon={<ShieldCheck className='w-6 h-6 text-indigo-600 dark:text-indigo-400' />}
+          icon={<ShieldCheck className='w-6 h-6 text-zinc-600 dark:text-zinc-400' />}
           title='Calidad Garantizada'
           description='6 meses de garantía directa con nosotros.'
         />
         <FeatureItem
-          icon={<Clock className='w-6 h-6 text-indigo-600 dark:text-indigo-400' />}
+          icon={<Clock className='w-6 h-6 text-zinc-600 dark:text-zinc-400' />}
           title='Protección Inmediata'
           description='Recibí tu accesorio y protegé tu equipo hoy mismo.'
         />

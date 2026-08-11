@@ -16,7 +16,7 @@ export function SearchBar({ value, onChange, placeholder = 'Buscar...', containe
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`w-full pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm text:xs md:text-[12px] lg:text-[16px] placeholder:text-xs md:placeholder:text-[12px] lg:placeholder:text-[16px] ${className}`}
+        className={`w-full pl-9 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500 dark:text-zinc-100 transition-colors shadow-sm text:xs md:text-[12px] lg:text-[16px] placeholder:text-xs md:placeholder:text-[12px] lg:placeholder:text-[16px] ${className}`}
         {...props}
       />
     </div>

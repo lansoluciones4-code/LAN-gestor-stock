@@ -152,7 +152,7 @@ export function ProductPhotosManager({ product, isOpen, onClose }: ProductPhotos
                     <button
                       onClick={() => handleDelete(photo.publicId)}
                       disabled={isPending}
-                      className='absolute top-2 right-2 p-2 bg-red-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-sm disabled:opacity-50'
+                      className='absolute top-2 right-2 p-2 bg-zinc-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-600 shadow-sm disabled:opacity-50'
                       title='Eliminar foto'
                     >
                       <Trash2 className='w-4 h-4' />

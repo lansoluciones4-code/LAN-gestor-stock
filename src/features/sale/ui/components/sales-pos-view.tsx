@@ -69,14 +69,14 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
           size='sm'
           onClick={onCancel}
           leftIcon={<ArrowLeft className='w-4 h-4' />}
-          className='w-full sm:w-auto font-bold border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/20 shadow-md h-10'
+          className='w-full sm:w-auto font-bold border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-900/30 dark:text-zinc-400 dark:hover:bg-zinc-900/20 shadow-md h-10'
           data-testid={TEST_IDS.ventas.pos.btnCancelarCarrito}
         >
           <span className='hidden sm:inline'>Volver Al Listado</span>
           <span className='sm:hidden'>Volver</span>
         </Button>
         <div className='flex items-center justify-center sm:justify-end gap-2 min-w-0 bg-white dark:bg-transparent border border-zinc-200 dark:border-transparent rounded-lg py-2 sm:py-0 shadow-sm sm:shadow-none'>
-          <ShoppingCart className='w-5 h-5 text-indigo-600 shrink-0' />
+          <ShoppingCart className='w-5 h-5 text-zinc-600 shrink-0' />
           <h2 className='text-base sm:text-lg font-bold truncate'>Facturar Venta</h2>
         </div>
       </div>
@@ -90,7 +90,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
               <input
                 type='text'
                 placeholder='Buscar productos...'
-                className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-indigo-500 dark:text-zinc-100 transition-colors shadow-sm h-10'
+                className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500 dark:text-zinc-100 transition-colors shadow-sm h-10'
                 value={saleSearch}
                 onChange={(e) => setSaleSearch(e.target.value)}
                 data-testid={TEST_IDS.ventas.pos.inputBusquedaProducto}
@@ -121,7 +121,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 key={`pos-prod-${p.id}`}
                 disabled={p.stock <= 0}
                 onClick={() => addToCart(p)}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-indigo-500 hover:shadow-md'}`}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-zinc-500 hover:shadow-md'}`}
                 data-testid={TEST_IDS.ventas.pos.btnAgregarProductoLista}
               >
                 <div className='text-left min-w-0 flex-1 mr-4'>
@@ -137,13 +137,13 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                   >
                     {p.description || '--'}
                   </p>
-                  <span className={`text-[10px] font-bold ${p.stock < 5 ? 'text-amber-500' : 'text-zinc-500'}`}>
+                  <span className={`text-[10px] font-bold ${p.stock < 5 ? 'text-zinc-500' : 'text-zinc-500'}`}>
                     Disp:
                     {p.stock}
                   </span>
                 </div>
                 <div className='text-right'>
-                  <div className='text-lg font-black leading-none text-indigo-600'>${p.salePrice.toLocaleString('es-AR')}</div>
+                  <div className='text-lg font-black leading-none text-zinc-600'>${p.salePrice.toLocaleString('es-AR')}</div>
                   <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>Agregar</div>
                 </div>
               </button>
@@ -155,7 +155,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
         <div className='hidden lg:flex lg:col-span-5 flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shrink-0 shadow-sm'>
           <div className='p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center shrink-0'>
             <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Items en Carrito</span>
-            <span className='bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded'>{cart.length}</span>
+            <span className='bg-zinc-600 text-white text-[10px] font-bold px-2 py-0.5 rounded'>{cart.length}</span>
           </div>
           <div className='flex-1 min-h-0 overflow-y-auto p-4 space-y-2 custom-scrollbar'>
             {cart.map((item) => (
@@ -172,7 +172,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                   </span>
                   <button
                     onClick={() => removeFromCart(item.productId)}
-                    className='text-zinc-300 hover:text-red-500 transition-colors p-1'
+                    className='text-zinc-300 hover:text-zinc-500 transition-colors p-1'
                   >
                     <Trash2 className='w-4 h-4' />
                   </button>
@@ -207,7 +207,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
           <div className='p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl shrink-0'>
             <div className='flex justify-between items-center pt-2'>
               <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
-              <span className='text-3xl text-emerald-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
+              <span className='text-3xl text-zinc-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
             </div>
             <Button
               fullWidth
@@ -226,11 +226,11 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
       {cart.length > 0 && !showMobileCart && (
         <button
           onClick={() => setShowMobileCart(true)}
-          className='lg:hidden fixed bottom-6 right-6 p-4 bg-indigo-600 text-white rounded-full shadow-2xl z-40'
+          className='lg:hidden fixed bottom-6 right-6 p-4 bg-zinc-600 text-white rounded-full shadow-2xl z-40'
         >
           <div className='relative'>
             <ShoppingCart className='w-6 h-6' />
-            <span className='absolute -top-2 -right-2 bg-red-500 text-[10px] font-bold px-1.5 rounded-full border-2 border-white'>{cart.length}</span>
+            <span className='absolute -top-2 -right-2 bg-zinc-500 text-[10px] font-bold px-1.5 rounded-full border-2 border-white'>{cart.length}</span>
           </div>
         </button>
       )}
@@ -264,7 +264,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                     </span>
                     <button
                       onClick={() => removeFromCart(item.productId)}
-                      className='text-red-500 p-1'
+                      className='text-zinc-500 p-1'
                     >
                       <Trash2 className='w-4 h-4' />
                     </button>
@@ -293,7 +293,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
             <div className='p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 space-y-4 pb-12 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] shrink-0'>
               <div className='flex justify-between items-center pt-2'>
                 <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
-                <span className='text-emerald-600 text-3xl font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
+                <span className='text-zinc-600 text-3xl font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
               </div>
               <Button
                 fullWidth

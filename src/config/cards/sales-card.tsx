@@ -27,7 +27,7 @@ export function renderSaleCard(actions: SaleCardActionsProps) {
         title={
           <span>
             {date}{' '}
-            <span className='text-indigo-600 dark:text-indigo-400 font-bold'>{time}</span>
+            <span className='text-zinc-600 dark:text-zinc-400 font-bold'>{time}</span>
           </span>
         }
         subtitle={sale.customer?.name ?? 'Consumidor Final'}
@@ -36,7 +36,7 @@ export function renderSaleCard(actions: SaleCardActionsProps) {
             {sale.payments?.map((p, i) => (
               <span
                 key={i}
-                className={`px-2 py-0.5 text-xs font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400'}`}
+                className={`px-2 py-0.5 text-xs font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/20 dark:text-zinc-400' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/20 dark:text-zinc-400'}`}
               >
                 {p.type === 'efectivo' ? 'Efectivo' : 'Transferencia'}
               </span>
@@ -54,7 +54,7 @@ export function renderSaleCard(actions: SaleCardActionsProps) {
             {(sale.discountPercentage > 0 || sale.discountAmount > 0) && (
               <div className='flex justify-between items-center'>
                 <span className='text-xs text-zinc-400'>Descuento</span>
-                <span className='text-emerald-600 dark:text-emerald-400 font-bold text-sm'>
+                <span className='text-zinc-600 dark:text-zinc-400 font-bold text-sm'>
                   {sale.discountPercentage > 0 ? `-${sale.discountPercentage}%` : `-$${sale.discountAmount.toLocaleString('es-AR')}`}
                 </span>
               </div>

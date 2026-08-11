@@ -96,8 +96,8 @@ export function VirtualizedDataTable<T extends { id: string | number }>({ column
           className='text-center py-6'
         >
           <div className='flex flex-col items-center gap-2'>
-            <div className='w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin'></div>
-            <div className='text-[10px] font-black text-indigo-500 uppercase tracking-widest animate-pulse'>Sincronizando Historial...</div>
+            <div className='w-5 h-5 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin'></div>
+            <div className='text-[10px] font-black text-zinc-500 uppercase tracking-widest animate-pulse'>Sincronizando Historial...</div>
           </div>
         </TableCell>
       </tr>

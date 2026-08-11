@@ -46,7 +46,7 @@ export function CatalogPagination({ currentPage, totalPages, onPageChange }: Cat
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none'
+        className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none'
         data-testid={TEST_IDS.landing.btnAnteriorPag}
       >
         <ChevronLeft className='w-4 h-4 sm:w-5 sm:h-5' />
@@ -73,7 +73,7 @@ export function CatalogPagination({ currentPage, totalPages, onPageChange }: Cat
               onClick={() => onPageChange(page as number)}
               className={`
                 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-xs sm:text-sm font-bold transition-all duration-200 border
-                ${isActive ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 border-zinc-200 dark:border-zinc-700 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 border-transparent hover:bg-white/50 dark:hover:bg-zinc-800/50 hover:text-indigo-600 dark:hover:text-indigo-400'}
+                ${isActive ? 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 border-transparent hover:bg-white/50 dark:hover:bg-zinc-800/50 hover:text-zinc-600 dark:hover:text-zinc-400'}
               `}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -87,7 +87,7 @@ export function CatalogPagination({ currentPage, totalPages, onPageChange }: Cat
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none'
+        className='w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400 hover:bg-white/50 dark:hover:bg-zinc-800/50 transition-all duration-200 disabled:opacity-0 disabled:pointer-events-none'
         data-testid={TEST_IDS.landing.btnSiguientePag}
       >
         <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5' />

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Descubre nuestra colección exclusiva de fundas, cargadores, cables y accesorios premium diseñados para tus dispositivos Apple. Calidad superior, envío rápido y la mejor protección.',
   keywords: 'accesorios apple, fundas iphone, cargador magsafe, cables premium, apple watch, airpods, tienda de accesorios, fundas premium',
   icons: {
-    icon: '/icon.svg',
+    icon: '/LAN_icono.jpg',
   },
   robots: {
     index: true,
@@ -29,13 +29,20 @@ export default async function HomePage() {
   const [products, categories] = await Promise.all([fetchLandingProducts(), fetchLandingCategories()]);
 
   return (
-    <div className='lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-indigo-500/30 flex flex-col'>
+    <div className='lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-zinc-500/30 flex flex-col'>
       {/* Hero Section */}
       <section className='relative pb-4 md:pb-10 pt-16 md:pt-12 overflow-hidden px-4 sm:px-8 shrink-0'>
         <div className='absolute top-4 right-4 z-50'>
           <ThemeToggle />
         </div>
         <div className='max-w-6xl mx-auto text-center space-y-4 md:space-y-6'>
+          <div className='w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 shadow-sm'>
+            <img
+              src='/LAN_icono.jpg'
+              alt='LAN Soluciones'
+              className='w-full h-full object-cover'
+            />
+          </div>
           <h1 className='text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white'>ArgenStock</h1>
         </div>
       </section>
