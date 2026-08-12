@@ -15,10 +15,8 @@ export function ProductInfo({ deviceName, category, brand, salePrice, descriptio
     <div className='flex flex-col justify-center max-w-xl'>
       <div className='space-y-6 mb-12'>
         <div className='space-y-2'>
-          {(category || brand) && (
-            <p className='text-sm font-bold uppercase tracking-widest text-zinc-400'>{[category, brand].filter(Boolean).join(' · ')}</p>
-          )}
-          <h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-zinc-900 dark:text-white'>{deviceName}</h1>
+          {category && <p className='text-xl sm:text-2xl font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400'>{category}</p>}
+          <h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-zinc-900 dark:text-white'>{[brand, deviceName].filter(Boolean).join(' - ')}</h1>
         </div>
 
         <div className='flex items-center gap-4'>
