@@ -2,6 +2,7 @@
 import { FileText, Trash2 } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type SaleDef } from '@/features/sale/domain/sale.schema';
+import { getPaymentTypeMeta } from '@/lib/payment-types';
 
 interface SaleCardActionsProps {
   role?: string;
@@ -36,9 +37,10 @@ export function renderSaleCard(actions: SaleCardActionsProps) {
             {sale.payments?.map((p, i) => (
               <span
                 key={i}
-                className={`px-2 py-0.5 text-xs font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/20 dark:text-zinc-400' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/20 dark:text-zinc-400'}`}
+                className={`px-2 py-0.5 text-xs font-black uppercase rounded ${getPaymentTypeMeta(p.type).badge}`}
               >
-                {p.type === 'efectivo' ? 'Efectivo' : 'Transferencia'}
+                {getPaymentTypeMeta(p.type).label}
+                {p.installments > 1 ? ` · ${p.installments} cuotas` : ''}
               </span>
             ))}
           </div>

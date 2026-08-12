@@ -24,7 +24,8 @@ export async function fetchLandingProducts(): Promise<ProductDef[]> {
 export async function fetchProductById(id: string): Promise<ProductDef | null> {
   try {
     const product = await productRepository.getProductById(id);
-    if (!product) return null;
+    // Un producto oculto del catálogo (showOnLanding=false) tampoco debe ser accesible por URL directa.
+    if (!product || !product.showOnLanding) return null;
     return productRowSchema.parse(product);
   } catch (error) {
     console.error('fetchProductById error:', error);

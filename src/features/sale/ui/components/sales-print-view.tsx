@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { Button } from '@/components/ui/button';
+import { getPaymentTypeMeta } from '@/lib/payment-types';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
   const itemsSubtotal = sale.businessSection === 'impresiones' ? sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0 : sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0;
@@ -128,10 +129,17 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 {sale.payments?.map((p: any, i: number) => (
                   <div
                     key={i}
-                    className='flex justify-between items-center text-[11px] font-bold text-zinc-700 max-w-[200px]'
+                    className='flex flex-col text-[11px] font-bold text-zinc-700 max-w-[220px]'
                   >
-                    <span className='uppercase'>{p.type}</span>
-                    <span>${p.amount.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <div className='flex justify-between items-center'>
+                      <span className='uppercase'>{getPaymentTypeMeta(p.type).label}</span>
+                      <span>${p.amount.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    {p.installments > 1 && (
+                      <span className='text-[9px] font-medium text-zinc-500 normal-case'>
+                        {p.installments} cuotas de ${(p.amount / p.installments).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} c/u
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -147,7 +155,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                   {sale.discountPercentage! > 0 && (
                     <div className='flex justify-between w-full text-[11px] font-bold text-zinc-600 mt-1'>
                       <span className='uppercase'>Descuento ({sale.discountPercentage}%)</span>
-                      <span>-${(itemsSubtotal * (sale.discountPercentage! / 100)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                      <span>-${(itemsSubtotal * (sale.discountPercentage! / 100)).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   )}
                   {sale.discountAmount! > 0 && (

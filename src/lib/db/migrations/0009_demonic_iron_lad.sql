@@ -1,0 +1,1 @@
+ALTER TABLE "sale_payments" ADD COLUMN "installments" integer DEFAULT 1 NOT NULL;

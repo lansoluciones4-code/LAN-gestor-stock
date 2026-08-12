@@ -32,8 +32,9 @@ export type SaleItemInput = z.infer<typeof saleItemInputSchema>;
 
 /** Input schema for a single payment method entry. */
 export const salePaymentInputSchema = z.object({
-  type: z.enum(['efectivo', 'transferencia']),
+  type: z.enum(['efectivo', 'transferencia', 'debito', 'credito']),
   amount: moneyField,
+  installments: z.union([z.literal(1), z.literal(3), z.literal(6), z.literal(12)]).default(1),
 });
 
 export type SalePaymentInput = z.infer<typeof salePaymentInputSchema>;
@@ -164,6 +165,7 @@ export const saleRowSchema = createSelectSchema(sales).extend({
         id: z.string(),
         type: z.string(),
         amount: z.preprocess((val) => parseFloat(val as string), z.number()),
+        installments: z.number(),
       })
     )
     .optional(),

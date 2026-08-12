@@ -57,6 +57,20 @@
       "when": 1786544833332,
       "tag": "0007_organic_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786563123115,
+      "tag": "0008_workable_albert_cleary",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786567174781,
+      "tag": "0009_demonic_iron_lad",
+      "breakpoints": true
     }
   ]
 }

@@ -40,7 +40,7 @@ export async function createSaleAction(input: SaleInput): Promise<ActionResult<{
       const result = await saleRepository.createSale(caller.id, parsed.data, tx);
 
       const saleDetail = {
-        total: String(parsed.data.total),
+        total: String(result.total),
         itemCount: parsed.data.items.length,
         discountAmount: String(parsed.data.discountAmount ?? 0),
         discountPercentage: String(parsed.data.discountPercentage ?? 0),
@@ -73,7 +73,7 @@ export async function createPrintSaleAction(input: PrintSaleInput): Promise<Acti
       const result = await saleRepository.createPrintSale(caller.id, parsed.data, tx);
 
       const saleDetail = {
-        total: String(parsed.data.total),
+        total: String(result.total),
         itemCount: parsed.data.items.length,
         discountAmount: String(parsed.data.discountAmount ?? 0),
         discountPercentage: String(parsed.data.discountPercentage ?? 0),

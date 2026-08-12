@@ -1,13 +1,21 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { TrendingUp, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, CreditCard, Banknote, UploadCloud, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Package, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, UploadCloud, AlertTriangle } from 'lucide-react';
 import { fetchDashboardStats } from '@/features/stats/actions/stats.actions';
 import { publicarStock, getLastSyncInfo, type LastSyncInfo } from '@/features/sync/actions/publish-stock.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { invalidateAllCaches } from '@/stores';
 import { useStatsStore } from '@/features/stats/store/stats.store';
 import { RefreshCcw } from 'lucide-react';
+import { PAYMENT_TYPES, getPaymentTypeMeta } from '@/lib/payment-types';
+
+const PAYMENT_REVENUE_KEY: Record<string, string> = {
+  transferencia: 'transferRevenue',
+  efectivo: 'cashRevenue',
+  debito: 'debitoRevenue',
+  credito: 'creditoRevenue',
+};
 
 function formatTimeAgo(date: Date | string): string {
   const target = typeof date === 'string' ? new Date(date) : date;
@@ -164,28 +172,6 @@ export default function DashboardPage() {
           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.netProfit?.toLocaleString('es-AR') || '0'}</span>
         </div>
 
-        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col hover:border-emerald-500/50 transition-colors'>
-          <div className='flex justify-between items-start mb-4'>
-            <div className='p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg'>
-              <Banknote className='w-5 h-5 text-emerald-600' />
-            </div>
-            <span className='text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter'>EFECTIVO</span>
-          </div>
-          <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none'>Pagos Recibidos</span>
-          <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.cashRevenue?.toLocaleString('es-AR') || '0'}</span>
-        </div>
-
-        <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col hover:border-blue-500/50 transition-colors'>
-          <div className='flex justify-between items-start mb-4'>
-            <div className='p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg'>
-              <CreditCard className='w-5 h-5 text-blue-600' />
-            </div>
-            <span className='text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter'>TRANSFERENCIA</span>
-          </div>
-          <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none'>Pagos Recibidos</span>
-          <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>${stats?.transferRevenue?.toLocaleString('es-AR') || '0'}</span>
-        </div>
-
         <div className='bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col'>
           <div className='flex justify-between items-start mb-4'>
             <div className='p-2 bg-amber-50 dark:bg-amber-500/10 rounded-lg'>
@@ -226,6 +212,35 @@ export default function DashboardPage() {
           <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Órdenes Procesadas</span>
           <span className='text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1'>{stats?.salesCount || '0'}</span>
         </div>
+
+        {/* Pagos Recibidos por Medio: apilados de a 2 para ocupar el mismo alto de fila que las tarjetas de arriba */}
+        {[
+          [PAYMENT_TYPES[0], PAYMENT_TYPES[2]],
+          [PAYMENT_TYPES[1], PAYMENT_TYPES[3]],
+        ].map((pair, col) => (
+          <div
+            key={col}
+            className='flex flex-col gap-3'
+          >
+            {pair.map((t) => {
+              const meta = getPaymentTypeMeta(t);
+              const Icon = meta.icon;
+              const revenue = stats?.[PAYMENT_REVENUE_KEY[t]] ?? 0;
+              return (
+                <div
+                  key={t}
+                  className={`flex-1 p-3 rounded-2xl border flex flex-col justify-center gap-1 transition-colors ${meta.resting} ${meta.hover}`}
+                >
+                  <div className='flex justify-between items-center'>
+                    <Icon className='w-4 h-4' />
+                    <span className='text-[9px] font-bold uppercase tracking-tighter'>{meta.label}</span>
+                  </div>
+                  <span className='text-base font-black text-zinc-900 dark:text-zinc-100'>${revenue.toLocaleString('es-AR')}</span>
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
@@ -331,7 +346,7 @@ export default function DashboardPage() {
               <h4 className='font-bold text-sm'>Flujo de Caja</h4>
             </div>
             <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-              Segmentación de cobros: <strong>${stats?.cashRevenue?.toLocaleString('es-AR')}</strong> en efectivo y <strong>${stats?.transferRevenue?.toLocaleString('es-AR')}</strong> vía transferencia.
+              Segmentación de cobros: <strong>${stats?.cashRevenue?.toLocaleString('es-AR')}</strong> en efectivo, <strong>${stats?.transferRevenue?.toLocaleString('es-AR')}</strong> por transferencia, <strong>${stats?.debitoRevenue?.toLocaleString('es-AR')}</strong> con débito y <strong>${stats?.creditoRevenue?.toLocaleString('es-AR')}</strong> con crédito.
             </p>
           </div>
         </div>

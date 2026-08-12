@@ -44,6 +44,8 @@ export const TEST_IDS = {
       btnCancelarMetodoDePago: 'btnCancelarMetodoDePago',
       btnEfectivo: 'btnEfectivo',
       btnTranserencia: 'btnTranserencia',
+      btnDebito: 'btnDebito',
+      btnCredito: 'btnCredito',
       btnAddAnotherMetodoDePago: 'btnAddAnotherMetodoDePago',
       btnFinalizarYFacturar: 'btnFinalizarYFacturar',
       btnVolverCarrito: 'btnVolverCarrito',

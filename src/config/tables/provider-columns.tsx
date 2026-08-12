@@ -44,21 +44,21 @@ export function getProviderColumns({ role, onEdit, onToggleActive, onDelete }: C
               <>
                 <button
                   onClick={() => onToggleActive(p)}
-                  className={`p-1.5 rounded-lg transition ${p.isActive ? 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10' : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10'}`}
+                  className='p-1.5 rounded-lg transition-colors text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400'
                   title={p.isActive ? 'Desactivar' : 'Activar'}
                 >
                   <Plus className={`w-4 h-4 ${p.isActive ? 'rotate-45' : ''}`} />
                 </button>
                 <button
                   onClick={() => onEdit(p)}
-                  className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
+                  className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10 dark:hover:text-orange-400 rounded-lg transition-colors'
                   title='Editar'
                 >
                   <Edit className='w-4 h-4' />
                 </button>
                 <button
                   onClick={() => onDelete(p.id!)}
-                  className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
+                  className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-lg transition-colors'
                   title='Eliminar'
                 >
                   <Trash2 className='w-4 h-4' />

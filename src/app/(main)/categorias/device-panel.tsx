@@ -87,8 +87,8 @@ export function DevicePanel() {
         )}
         actions={role === 'admin' && (
           <Button onClick={() => handleEditClick()} variant='primary' leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnAgregar}>
-            <span className='hidden sm:inline'>Agregar Categoría</span>
-            <span className='sm:hidden'>Agregar</span>
+            <span className='hidden sm:inline'>Nuevo Stock</span>
+            <span className='sm:hidden'>Nuevo</span>
           </Button>
         )}
       />

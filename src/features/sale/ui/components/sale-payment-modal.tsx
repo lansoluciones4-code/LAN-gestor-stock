@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Banknote, Plus, Trash2, Edit2, AlertCircle } from 'lucide-react';
+import { CreditCard, Plus, Trash2, Edit2, AlertCircle } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { type SalePaymentInput } from '@/features/sale/domain/sale.schema';
 import { isValidDecimal } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
+import { PAYMENT_TYPES, getPaymentTypeMeta, type PaymentType } from '@/lib/payment-types';
+
+const PAYMENT_TYPE_TESTIDS: Record<PaymentType, string> = {
+  transferencia: TEST_IDS.ventas.payment.btnTranserencia,
+  efectivo: TEST_IDS.ventas.payment.btnEfectivo,
+  debito: TEST_IDS.ventas.payment.btnDebito,
+  credito: TEST_IDS.ventas.payment.btnCredito,
+};
 
 interface SalePaymentModalProps {
   isOpen: boolean;
@@ -20,8 +28,9 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   // Internal form state
-  const [type, setType] = useState<'efectivo' | 'transferencia'>('efectivo');
+  const [type, setType] = useState<PaymentType>('efectivo');
   const [amount, setAmount] = useState<string>('');
+  const [installments, setInstallments] = useState<1 | 3 | 6 | 12>(1);
   const [error, setError] = useState<string | null>(null);
 
   const currentCovered = payments.reduce((acc, p) => acc + p.amount, 0);
@@ -36,6 +45,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       // Auto-start adding if empty
       setIsAdding(true);
       setType('efectivo');
+      setInstallments(1);
       setAmount(total.toFixed(2).replace('.', ','));
     }
   }, [isOpen, total]);
@@ -51,21 +61,27 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       setError('El monto no puede tener más de 2 decimales');
       return;
     }
+    // En cuotas, se permite exceder el total (recargo por interés); en pago único, no.
+    const allowExceed = type === 'credito' && installments > 1;
+    if (allowExceed && numAmount < total - 0.001) {
+      setError(`En ${installments} cuotas, el monto no puede ser menor al total de la venta ($${total.toLocaleString('es-AR')})`);
+      return;
+    }
 
     if (editingIndex !== null) {
       const otherPaymentsTotal = payments.filter((_, i) => i !== editingIndex).reduce((acc, p) => acc + p.amount, 0);
-      if (otherPaymentsTotal + numAmount > total + 0.001) {
+      if (!allowExceed && otherPaymentsTotal + numAmount > total + 0.001) {
         // small epsilon
         setError(`El total excede los $${total.toLocaleString('es-AR')}`);
         return;
       }
 
       const newPayments = [...payments];
-      newPayments[editingIndex] = { type, amount: numAmount };
+      newPayments[editingIndex] = { type, amount: numAmount, installments: type === 'credito' ? installments : 1 };
       setPayments(newPayments);
       setEditingIndex(null);
     } else {
-      if (currentCovered + numAmount > total + 0.001) {
+      if (!allowExceed && currentCovered + numAmount > total + 0.001) {
         setError(`El total excede los $${total.toLocaleString('es-AR')}`);
         return;
       }
@@ -73,11 +89,11 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       // Check if type already exists (max 2 rule but different types)
       const exists = payments.some((p) => p.type === type);
       if (exists) {
-        setError(`Ya existe un pago en ${type}`);
+        setError(`Ya existe un pago en ${getPaymentTypeMeta(type).label}`);
         return;
       }
 
-      setPayments([...payments, { type, amount: numAmount }]);
+      setPayments([...payments, { type, amount: numAmount, installments: type === 'credito' ? installments : 1 }]);
     }
 
     setIsAdding(false);
@@ -92,13 +108,16 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
     const p = payments[index];
     setType(p.type);
     setAmount(p.amount.toFixed(2).replace('.', ','));
+    setInstallments((p.installments as 1 | 3 | 6 | 12) || 1);
     setEditingIndex(index);
     setIsAdding(true);
   };
 
   const handleConfirm = () => {
-    if (Math.abs(total - currentCovered) > 0.001) {
-      setError('El total de los pagos debe coincidir exactamente con el total de la venta');
+    // El total cubierto no puede quedar por debajo del total de la venta. Sí puede superarlo
+    // (recargo por interés en cuotas de Crédito), ya validado al cargar ese pago.
+    if (currentCovered < total - 0.001) {
+      setError('El total de los pagos debe cubrir el total de la venta');
       return;
     }
     onConfirm(payments);
@@ -162,8 +181,10 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                 onClick={() => {
                   setIsAdding(true);
                   setEditingIndex(null);
-                  setType(payments.length > 0 && payments[0].type === 'efectivo' ? 'transferencia' : 'efectivo');
-                  setAmount(remaining.toFixed(2).replace('.', ','));
+                  const usedTypes = payments.map((p) => p.type);
+                  setType(PAYMENT_TYPES.find((t) => !usedTypes.includes(t)) ?? PAYMENT_TYPES[0]);
+                  setInstallments(1);
+                  setAmount(Math.max(remaining, 0).toFixed(2).replace('.', ','));
                 }}
                 leftIcon={<Plus className='w-3 h-3' />}
                 data-testid={TEST_IDS.ventas.payment.btnAddAnotherMetodoDePago}
@@ -174,15 +195,21 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
           </div>
 
           <div className='space-y-2'>
-            {payments.map((p, i) => (
+            {payments.map((p, i) => {
+              const meta = getPaymentTypeMeta(p.type);
+              const Icon = meta.icon;
+              return (
               <div
                 key={i}
                 className='flex items-center justify-between p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg group'
               >
                 <div className='flex items-center gap-3'>
-                  <div className={`p-2 rounded-full ${p.type === 'efectivo' ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-500/10' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-500/10'}`}>{p.type === 'efectivo' ? <Banknote className='w-4 h-4' /> : <CreditCard className='w-4 h-4' />}</div>
+                  <div className={`p-2 rounded-full ${meta.badge}`}><Icon className='w-4 h-4' /></div>
                   <div>
-                    <p className='text-xs font-bold uppercase text-zinc-900 dark:text-zinc-100 tracking-tight'>{p.type}</p>
+                    <p className='text-xs font-bold uppercase text-zinc-900 dark:text-zinc-100 tracking-tight'>
+                      {meta.label}
+                      {p.installments > 1 && <span className='text-zinc-400 font-medium normal-case'> · {p.installments} cuotas</span>}
+                    </p>
                     <p className='text-sm font-black text-zinc-600'>${p.amount.toLocaleString('es-AR')}</p>
                   </div>
                 </div>
@@ -201,30 +228,51 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
 
             {isAdding && (
               <div className='p-4 bg-zinc-50 dark:bg-zinc-950 border-2 border-dashed border-zinc-200 dark:border-zinc-900/30 rounded-xl space-y-4 animate-in fade-in zoom-in-95 duration-200'>
                 <div className='grid grid-cols-2 gap-3'>
-                  <button
-                    type='button'
-                    onClick={() => setType('efectivo')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'efectivo' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
-                    data-testid={TEST_IDS.ventas.payment.btnEfectivo}
-                  >
-                    <Banknote className='w-6 h-6 mb-1' />
-                    <span className='text-[10px] font-black uppercase'>Efectivo</span>
-                  </button>
-                  <button
-                    type='button'
-                    onClick={() => setType('transferencia')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${type === 'transferencia' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400'}`}
-                    data-testid={TEST_IDS.ventas.payment.btnTranserencia}
-                  >
-                    <CreditCard className='w-6 h-6 mb-1' />
-                    <span className='text-[10px] font-black uppercase'>Transferencia</span>
-                  </button>
+                  {PAYMENT_TYPES.map((t) => {
+                    const meta = getPaymentTypeMeta(t);
+                    const Icon = meta.icon;
+                    const isSelected = type === t;
+                    return (
+                      <button
+                        key={t}
+                        type='button'
+                        onClick={() => {
+                          setType(t);
+                          if (t !== 'credito') setInstallments(1);
+                        }}
+                        className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-colors duration-100 ease-out ${isSelected ? meta.selected : `border-transparent ${meta.resting}`} ${meta.hover}`}
+                        data-testid={PAYMENT_TYPE_TESTIDS[t]}
+                      >
+                        <Icon className='w-6 h-6 mb-1' />
+                        <span className='text-[10px] font-black uppercase'>{meta.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {type === 'credito' && (
+                  <div>
+                    <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1.5'>Cuotas</label>
+                    <div className='grid grid-cols-4 gap-2'>
+                      {([1, 3, 6, 12] as const).map((n) => (
+                        <button
+                          key={n}
+                          type='button'
+                          onClick={() => setInstallments(n)}
+                          className={`py-2 rounded-lg border-2 text-xs font-black transition-colors duration-100 ease-out ${installments === n ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-300' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'}`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1.5'>Monto del Pago</label>
@@ -249,6 +297,11 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                       data-testid={TEST_IDS.ventas.payment.inputMonto}
                     />
                   </div>
+                  {type === 'credito' && installments > 1 && (Number(amount.replace(',', '.')) || 0) > 0 && (
+                    <p className='text-[10px] text-zinc-500 mt-1.5 font-bold'>
+                      {installments} cuotas de ${(Number(amount.replace(',', '.')) / installments).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} c/u
+                    </p>
+                  )}
                 </div>
 
                 {error && (

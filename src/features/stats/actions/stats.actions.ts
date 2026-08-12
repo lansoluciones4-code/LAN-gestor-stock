@@ -51,6 +51,8 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       let totalCostOfGoodsSold = 0;
       let cashRevenue = 0;
       let transferRevenue = 0;
+      let debitoRevenue = 0;
+      let creditoRevenue = 0;
       const sellerMap: Record<string, { username: string; total: number; count: number }> = {};
 
       salesWithItems.forEach((s: any) => {
@@ -67,6 +69,8 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
           (s.payments as any[]).forEach((p) => {
             if (p.type === 'efectivo') cashRevenue += Number(p.amount);
             if (p.type === 'transferencia') transferRevenue += Number(p.amount);
+            if (p.type === 'debito') debitoRevenue += Number(p.amount);
+            if (p.type === 'credito') creditoRevenue += Number(p.amount);
           });
         }
 
@@ -105,6 +109,8 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         salesCount: salesWithItems.length,
         cashRevenue,
         transferRevenue,
+        debitoRevenue,
+        creditoRevenue,
       };
     });
 

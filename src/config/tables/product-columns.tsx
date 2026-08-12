@@ -55,7 +55,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
                 : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
           }`}
         >
-          {p.stock > 0 ? `${p.stock} Unidades` : 'Sin stock'}
+          {p.stock > 0 ? `${p.stock} ${p.stock === 1 ? 'Unidad' : 'Unidades'}` : 'Sin stock'}
         </span>
       ),
     },
@@ -91,7 +91,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
           {role === 'admin' && (
             <button
               onClick={() => onToggleVisibility(p)}
-              className={`p-1.5 rounded-lg transition ${p.showOnLanding ? 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10' : 'text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10'}`}
+              className={`p-1.5 rounded-lg transition-colors hover:bg-zinc-900 hover:text-white dark:hover:bg-zinc-700 dark:hover:text-white ${p.showOnLanding ? 'text-zinc-600 dark:text-zinc-400' : 'text-zinc-400'}`}
               title={p.showOnLanding ? 'Ocultar en Landing' : 'Mostrar en Landing'}
             >
               {p.showOnLanding ? <Eye className='w-4 h-4' /> : <EyeOff className='w-4 h-4' />}
@@ -100,7 +100,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
           {role === 'admin' ? (
             <button
               onClick={() => onEdit(p)}
-              className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
+              className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10 dark:hover:text-orange-400 rounded-lg transition-colors'
               title='Editar'
             >
               <Edit className='w-4 h-4' />
@@ -109,7 +109,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
           {role === 'admin' ? (
             <button
               onClick={() => onManagePhotos(p)}
-              className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
+              className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-lg transition-colors'
               title='Gestionar Fotos'
             >
               <Camera className='w-4 h-4' />
@@ -117,7 +117,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
           ) : null}
           <button
             onClick={() => onDelete(p.id!)}
-            className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
+            className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-lg transition-colors'
             title='Eliminar'
           >
             <Trash2 className='w-4 h-4' />

@@ -166,7 +166,10 @@ export function SalesPanel() {
           total={roundToDecimals(currentSubtotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount)}
           isPending={isPending}
           onConfirm={(payments) => {
-            const finalTotal = roundToDecimals(currentSubtotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount);
+            const baseTotal = roundToDecimals(currentSubtotal * (1 - currentDiscounts.percentage / 100) - currentDiscounts.amount);
+            const paymentsSum = roundToDecimals(payments.reduce((acc, p) => acc + p.amount, 0));
+            // El total cobrado puede superar al de la venta por el recargo de cuotas con interés en Crédito.
+            const finalTotal = Math.max(baseTotal, paymentsSum);
             if (activeSection === 'impresiones') {
               handleCreatePrintSale(customerSelection, printCartProps.items, finalTotal, payments, currentDiscounts, printCartProps.clearItems);
             } else {

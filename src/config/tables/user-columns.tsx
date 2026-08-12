@@ -45,7 +45,7 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
           <button
             disabled={currentUserId === u.id}
             onClick={() => onToggleActive(u)}
-            className={`p-1.5 rounded-lg transition ${currentUserId === u.id ? 'opacity-20 cursor-not-allowed' : u.isActive ? 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10' : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10'}`}
+            className={`p-1.5 rounded-lg transition-colors ${currentUserId === u.id ? 'opacity-20 cursor-not-allowed text-zinc-600 dark:text-zinc-400' : 'text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400'}`}
             title={u.isActive ? 'Desactivar' : 'Activar'}
           >
             <Plus className={`w-4 h-4 ${u.isActive ? 'rotate-45' : ''}`} />
@@ -53,7 +53,7 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
 
           <button
             onClick={() => onEdit(u)}
-            className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10 rounded-lg transition'
+            className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10 dark:hover:text-orange-400 rounded-lg transition-colors'
             title='Editar Seguridad'
           >
             <Edit className='w-4 h-4' />
@@ -63,7 +63,7 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
             <button
               onClick={() => onDelete(u.id)}
               disabled={currentUserId === u.id}
-              className={`p-1.5 rounded-lg transition ${currentUserId === u.id ? 'opacity-30 cursor-not-allowed text-zinc-500' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-500/10'}`}
+              className={`p-1.5 rounded-lg transition-colors ${currentUserId === u.id ? 'opacity-30 cursor-not-allowed text-zinc-500' : 'text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400'}`}
               title='Retirar Acceso'
             >
               <Trash2 className='w-4 h-4' />

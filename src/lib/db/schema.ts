@@ -2,7 +2,7 @@ import { pgTable, uuid, varchar, timestamp, pgEnum, numeric, integer, jsonb, ind
 import { sql, relations } from 'drizzle-orm';
 
 export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
-export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia']);
+export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia', 'debito', 'credito']);
 export const businessSectionEnum = pgEnum('business_section', ['tech', 'impresiones', 'libreria']);
 export const colorModeEnum = pgEnum('color_mode', ['color', 'blanco_y_negro']);
 
@@ -208,6 +208,7 @@ export const salePayments = pgTable(
       .references(() => sales.id),
     type: paymentTypeEnum('type').notNull(),
     amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+    installments: integer('installments').default(1).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [index('sale_payments_sale_id_idx').on(table.saleId)]

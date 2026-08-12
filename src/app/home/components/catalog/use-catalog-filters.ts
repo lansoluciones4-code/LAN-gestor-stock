@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useDeferredValue } from 'react';
 import { type ProductDef } from '@/features/product/domain/product.schema';
+import { type LandingSection } from '@/features/device/actions/public-device.actions';
 import { normalizeForSearch } from '@/lib/utils';
 
 interface UseCatalogFiltersProps {
@@ -10,6 +11,7 @@ interface UseCatalogFiltersProps {
 }
 
 export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersProps) {
+  const [section, setSectionState] = useState<LandingSection>('tech');
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [minPrice, setMinPrice] = useState<string>('');
@@ -19,31 +21,40 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
   // Use deferred value for search to keep the input snappy
   const deferredSearch = useDeferredValue(search);
 
+  // Changing section resets the category filter — categories belong to a single section.
+  const setSection = (s: LandingSection) => {
+    setSectionState(s);
+    setSelectedCategory(null);
+  };
+
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [deferredSearch, selectedCategory, minPrice, maxPrice]);
+  }, [deferredSearch, selectedCategory, minPrice, maxPrice, section]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      // 1. Search filter (Fuzzy)
+      // 1. Section filter (Tecnología / Librería)
+      const matchesSection = p.device?.section === section;
+
+      // 2. Search filter (Fuzzy)
       const searchTerms = normalizeForSearch(deferredSearch).split(/\s+/).filter(Boolean);
 
       const combinedText = normalizeForSearch(`${p.device?.name || ''} ${p.device?.brand || ''} ${p.description || ''}`);
       const matchesSearch = searchTerms.every((term) => combinedText.includes(term));
 
-      // 2. Category filter
+      // 3. Category filter
       const matchesCategory = selectedCategory ? p.device?.category === selectedCategory : true;
 
-      // 3. Price range filter
+      // 4. Price range filter
       const price = p.salePrice;
       const min = minPrice ? parseFloat(minPrice) : 0;
       const max = maxPrice ? parseFloat(maxPrice) : Infinity;
       const matchesPrice = price >= min && price <= max;
 
-      return matchesSearch && matchesCategory && matchesPrice;
+      return matchesSection && matchesSearch && matchesCategory && matchesPrice;
     });
-  }, [products, deferredSearch, selectedCategory, minPrice, maxPrice]);
+  }, [products, section, deferredSearch, selectedCategory, minPrice, maxPrice]);
 
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {
@@ -64,6 +75,8 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
   };
 
   return {
+    section,
+    setSection,
     search,
     setSearch,
     selectedCategory,

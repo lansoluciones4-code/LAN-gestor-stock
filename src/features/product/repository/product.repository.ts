@@ -87,8 +87,12 @@ export class ProductRepository {
     if (input.purchasePrice !== undefined) updateData.purchasePrice = input.purchasePrice?.toString();
     if (input.salePrice !== undefined) updateData.salePrice = input.salePrice?.toString();
 
+    const whereConditions = [eq(products.id, id), eq(products.version, input.version)];
+
     if (input.stockDelta !== undefined) {
       updateData.stock = sql`${products.stock} + ${input.stockDelta}`;
+      // El stock resultante nunca puede quedar negativo, sin importar lo que mande el cliente.
+      whereConditions.push(gte(sql`${products.stock} + ${input.stockDelta}`, 0));
     } else if (input.stock !== undefined) {
       updateData.stock = input.stock;
     }
@@ -96,10 +100,16 @@ export class ProductRepository {
     const result = await dbtx
       .update(products)
       .set(updateData)
-      .where(and(eq(products.id, id), eq(products.version, input.version)))
+      .where(and(...whereConditions))
       .returning();
 
     if (result.length === 0) {
+      if (input.stockDelta !== undefined && input.stockDelta < 0) {
+        const current = await dbtx.query.products.findFirst({ where: eq(products.id, id), columns: { stock: true } });
+        if (current && current.stock + input.stockDelta < 0) {
+          throw new Error(`Stock insuficiente: el ajuste dejaría el stock en negativo. Disponible actualmente: ${current.stock}.`);
+        }
+      }
       throw new ConcurrencyError();
     }
     return result[0];

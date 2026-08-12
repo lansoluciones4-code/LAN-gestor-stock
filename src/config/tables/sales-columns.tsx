@@ -1,6 +1,7 @@
 import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
 import { FileText, Trash2 } from 'lucide-react';
+import { getPaymentTypeMeta } from '@/lib/payment-types';
 
 interface ColumnActions {
   role?: string;
@@ -56,9 +57,10 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
           {s.payments?.map((p, i) => (
             <span
               key={i}
-              className={`px-1.5 py-0.5 text-[15px] font-black uppercase rounded ${p.type === 'efectivo' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'}`}
+              className={`px-1.5 py-0.5 text-[15px] font-black uppercase rounded ${getPaymentTypeMeta(p.type).badge}`}
             >
-              {p.type === 'efectivo' ? 'EF' : 'TR'}
+              {getPaymentTypeMeta(p.type).short}
+              {p.installments > 1 ? ` x${p.installments}` : ''}
             </span>
           ))}
           {(!s.payments || s.payments.length === 0) && <span className='text-[10px] text-zinc-400 font-bold italic'>--</span>}
@@ -91,7 +93,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
         <>
           <button
             onClick={() => onPrint(s)}
-            className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10 rounded-lg transition-colors'
+            className='p-1.5 text-zinc-600 hover:bg-blue-50 hover:text-blue-600 dark:text-zinc-400 dark:hover:bg-blue-500/10 dark:hover:text-blue-400 rounded-lg transition-colors'
             title='Imprimir Factura'
           >
             <FileText className='w-4 h-4' />
@@ -99,7 +101,7 @@ export function getSalesColumns({ role, onPrint, onDelete }: ColumnActions): Col
           {role === 'admin' && (
             <button
               onClick={() => onDelete(s.id!)}
-              className='p-1.5 text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-500/10 rounded-lg transition-colors'
+              className='p-1.5 text-zinc-600 hover:bg-red-50 hover:text-red-600 dark:text-zinc-400 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-lg transition-colors'
               title='Anular Venta'
             >
               <Trash2 className='w-4 h-4' />
