@@ -2,9 +2,11 @@ import { useTransition } from 'react';
 import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { type CustomerDef } from '@/features/customer/domain/customer.schema';
 import { type ProductDef } from '@/features/product/domain/product.schema';
-import { createSaleAction, deleteSaleAction, fetchSales } from '@/features/sale/actions/sale.actions';
+import { createSaleAction, createPrintSaleAction, deleteSaleAction, fetchSales } from '@/features/sale/actions/sale.actions';
 import { fetchProducts } from '@/features/product/actions/product.actions';
-import { fetchCustomers } from '@/features/customer/actions/customer.actions';
+import { fetchCustomers, createCustomerAction } from '@/features/customer/actions/customer.actions';
+import { type SaleCustomerSelection } from '@/features/sale/ui/components/sale-customer-picker';
+import { type PrintCartItem } from '@/features/sale/ui/hooks/usePrintCart';
 import { invalidateAllCaches } from '@/stores';
 
 interface UseSalesActionsProps {
@@ -38,12 +40,29 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     });
   };
 
-  const handleCreateSale = async (selectedCustomerId: string, cart: any[], cartTotal: number, payments: any[], discounts: { amount: number; percentage: number }) => {
-    if (cart.length === 0 || !selectedCustomerId || payments.length === 0) return;
+  /** Resolves a customer selection to an id: creates the customer inline first when mode is 'new'. */
+  const resolveCustomerId = async (selection: SaleCustomerSelection): Promise<{ id?: string; error?: string }> => {
+    if (selection.mode === 'final') return {};
+    if (selection.mode === 'existing') return { id: selection.customerId };
+
+    const result = await createCustomerAction(selection.data);
+    if (!result.success) return { error: result.error };
+    return { id: result.data!.id };
+  };
+
+  const handleCreateSale = async (customerSelection: SaleCustomerSelection, section: 'tech' | 'libreria', cart: any[], cartTotal: number, payments: any[], discounts: { amount: number; percentage: number }) => {
+    if (cart.length === 0 || payments.length === 0) return;
 
     startTransition(async () => {
+      const { id: customerId, error: customerError } = await resolveCustomerId(customerSelection);
+      if (customerError) {
+        onErrorMessage(customerError);
+        return;
+      }
+
       const result = await createSaleAction({
-        customerId: selectedCustomerId || undefined,
+        customerId,
+        businessSection: section,
         items: cart.map(({ name, desc, max, ...rest }) => ({
           ...rest,
           unitPrice: rest.unitPrice,
@@ -61,6 +80,37 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       if (result.success) {
         onSuccessMessage(result.message || 'Venta realizada con éxito');
         clearCart();
+        closeMobileCart();
+        navigateToList();
+        loadData();
+      } else {
+        onErrorMessage(result.error);
+      }
+    });
+  };
+
+  const handleCreatePrintSale = async (customerSelection: SaleCustomerSelection, items: PrintCartItem[], total: number, payments: any[], discounts: { amount: number; percentage: number }, onDone: () => void) => {
+    if (items.length === 0 || payments.length === 0) return;
+
+    startTransition(async () => {
+      const { id: customerId, error: customerError } = await resolveCustomerId(customerSelection);
+      if (customerError) {
+        onErrorMessage(customerError);
+        return;
+      }
+
+      const result = await createPrintSaleAction({
+        customerId,
+        items: items.map(({ id, ...rest }) => rest),
+        total,
+        discountAmount: discounts.amount,
+        discountPercentage: discounts.percentage,
+        payments: payments.map((p) => ({ ...p, amount: p.amount })),
+      });
+
+      if (result.success) {
+        onSuccessMessage(result.message || 'Venta realizada con éxito');
+        onDone();
         closeMobileCart();
         navigateToList();
         loadData();
@@ -88,6 +138,7 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     isPending,
     loadData,
     handleCreateSale,
+    handleCreatePrintSale,
     confirmDelete,
   };
 }

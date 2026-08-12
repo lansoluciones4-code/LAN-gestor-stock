@@ -7,6 +7,11 @@ export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { r
 
   return [
     {
+      header: 'Sección',
+      cellClassName: 'text-zinc-700 dark:text-zinc-300 max-w-[100px] truncate',
+      cell: (row: DeviceDef) => (row.section === 'libreria' ? 'Librería' : 'Tech'),
+    },
+    {
       header: 'Categoría',
       cellClassName: 'text-zinc-700 dark:text-zinc-300 max-w-[180px] truncate',
       cell: (row: DeviceDef) => row.category || '—',

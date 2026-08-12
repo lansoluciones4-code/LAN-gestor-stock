@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { saleRepository } from '@/features/sale/repository/sale.repository';
-import { saleCreateSchema, saleRowSchema, type SaleInput, type SaleDef } from '@/features/sale/domain/sale.schema';
+import { saleCreateSchema, printSaleCreateSchema, saleRowSchema, type SaleInput, type PrintSaleInput, type SaleDef } from '@/features/sale/domain/sale.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
@@ -61,6 +61,39 @@ export async function createSaleAction(input: SaleInput): Promise<ActionResult<{
 }
 
 /**
+ * Create a new Impresiones sale. No stock/product involved.
+ */
+export async function createPrintSaleAction(input: PrintSaleInput): Promise<ActionResult<{ id: string }>> {
+  try {
+    const caller = await verifyAuthOrAdmin(false);
+    const parsed = printSaleCreateSchema.safeParse(input);
+    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
+
+    return await db.transaction(async (tx) => {
+      const result = await saleRepository.createPrintSale(caller.id, parsed.data, tx);
+
+      const saleDetail = {
+        total: String(parsed.data.total),
+        itemCount: parsed.data.items.length,
+        discountAmount: String(parsed.data.discountAmount ?? 0),
+        discountPercentage: String(parsed.data.discountPercentage ?? 0),
+        paymentTypes: parsed.data.payments?.map((p) => p.type) ?? [],
+      };
+
+      await recordAuditLog(caller.id, 'CREAR', 'SALE', result.id, saleDetail, tx);
+
+      return {
+        success: true,
+        message: 'Venta realizada con éxito',
+        data: { id: result.id },
+      };
+    });
+  } catch (error: any) {
+    return { success: false, error: handleDatabaseError(error, 'Venta') };
+  }
+}
+
+/**
  * Delete a sale. Admin ONLY.
  */
 export async function deleteSaleAction(id: string): Promise<ActionResult> {
@@ -75,6 +108,7 @@ export async function deleteSaleAction(id: string): Promise<ActionResult> {
         snapshotTotal: String(sale.total),
         customerName: sale.customer?.name ?? 'Sin cliente',
         vendorUsername: sale.vendor?.username ?? 'Desconocido',
+        businessSection: sale.businessSection,
         itemCount: sale.items.length,
         items: sale.items.map((item) => ({
           productName: item.product?.device?.name ?? 'Producto',
@@ -82,8 +116,13 @@ export async function deleteSaleAction(id: string): Promise<ActionResult> {
           quantity: item.quantity,
           unitPrice: String(item.unitPrice),
         })),
+        printItems: sale.printItems?.map((item) => ({
+          pages: item.pages,
+          colorMode: item.colorMode,
+          unitPrice: String(item.unitPrice),
+        })),
         paymentTypes: sale.payments.map((p) => p.type),
-        note: 'Venta anulada. Stock restablecido.',
+        note: sale.items.length > 0 ? 'Venta anulada. Stock restablecido.' : 'Venta anulada.',
       };
 
       await saleRepository.deleteSale(id, tx);

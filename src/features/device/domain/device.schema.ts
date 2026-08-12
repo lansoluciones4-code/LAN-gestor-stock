@@ -7,7 +7,8 @@ export const deviceCreateSchema = createInsertSchema(devices, {
   name: z.string().trim().min(1, 'El modelo es obligatorio').max(100, 'El modelo no puede exceder los 100 caracteres'),
   category: z.string().trim().min(1, 'La categoría es obligatoria').max(100, 'La categoría no puede exceder los 100 caracteres'),
   brand: z.string().trim().max(100, 'La marca no puede exceder los 100 caracteres').optional().or(z.literal('')),
-}).pick({ name: true, category: true, brand: true });
+  section: z.enum(['tech', 'libreria'], { message: 'Debes seleccionar una sección' }),
+}).pick({ name: true, category: true, brand: true, section: true });
 
 export type DeviceInput = z.infer<typeof deviceCreateSchema>;
 

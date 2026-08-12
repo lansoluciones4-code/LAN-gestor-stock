@@ -1,45 +1,35 @@
 import { useState, useEffect } from 'react';
 import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search } from 'lucide-react';
-import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { type ProductDef } from '@/features/product/domain/product.schema';
-import { type CustomerDef } from '@/features/customer/domain/customer.schema';
 import { type CartItem } from '../hooks/useCart';
-import { CustomerModal } from '@/features/customer/ui/components/customer-modal';
+import { SaleCustomerPicker, isCustomerSelectionValid, type SaleCustomerSelection } from './sale-customer-picker';
 import { TEST_IDS } from '@/constants/test-ids';
 
 interface SalesPOSViewProps {
   products: ProductDef[];
-  customers: CustomerDef[];
-  setCustomers: (items: CustomerDef[]) => void;
   cart: CartItem[];
   addToCart: (p: ProductDef) => void;
   removeFromCart: (id: string) => void;
   updateCartQty: (id: string, delta: number) => void;
   cartTotal: number;
-  selectedCustomerId: string;
-  setSelectedCustomerId: (id: string) => void;
+  setCustomerSelection: (selection: SaleCustomerSelection) => void;
   isPending: boolean;
   onConfirmSale: () => void;
   onCancel: () => void;
   showMobileCart: boolean;
   setShowMobileCart: (v: boolean) => void;
-  setGlobalMessage: (msg: any) => void;
   isPaymentModalOpen: boolean;
   setIsPaymentModalOpen: (v: boolean) => void;
 }
 
-export function SalesPOSView({ products, customers, setCustomers, cart, addToCart, removeFromCart, updateCartQty, cartTotal, selectedCustomerId, setSelectedCustomerId, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, setGlobalMessage, isPaymentModalOpen, setIsPaymentModalOpen }: SalesPOSViewProps) {
+export function SalesPOSView({ products, cart, addToCart, removeFromCart, updateCartQty, cartTotal, setCustomerSelection, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, isPaymentModalOpen, setIsPaymentModalOpen }: SalesPOSViewProps) {
   const [saleSearch, setSaleSearch] = useState('');
-  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [customerSelectionState, setCustomerSelectionState] = useState<SaleCustomerSelection>({ mode: 'final' });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isCustomerModalOpen) {
-          setIsCustomerModalOpen(false);
-          return;
-        }
         if (isPaymentModalOpen) {
           setIsPaymentModalOpen(false);
           return;
@@ -49,7 +39,12 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onCancel, isPaymentModalOpen, setIsPaymentModalOpen, isCustomerModalOpen]);
+  }, [onCancel, isPaymentModalOpen, setIsPaymentModalOpen]);
+
+  const handleCustomerChange = (selection: SaleCustomerSelection) => {
+    setCustomerSelectionState(selection);
+    setCustomerSelection(selection);
+  };
 
   const filteredProducts = products.filter((p) => {
     if (p.stock <= 0) return false;
@@ -97,21 +92,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
               />
             </div>
             <div className='w-full'>
-              <Combobox
-                options={customers
-                  .filter((c) => c.isActive)
-                  .map((c) => ({
-                    id: c.id,
-                    name: c.name,
-                  }))}
-                value={selectedCustomerId}
-                onChange={setSelectedCustomerId}
-                placeholder='Cliente de la operación...'
-                addNewLabel='+ Nuevo Cliente'
-                onAddNew={() => setIsCustomerModalOpen(true)}
-                data-testid={TEST_IDS.ventas.pos.comboClienteVenta}
-                searchTestId={TEST_IDS.ventas.pos.inputBusquedaCliente}
-              />
+              <SaleCustomerPicker onChange={handleCustomerChange} />
             </div>
           </div>
 
@@ -213,7 +194,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
               fullWidth
               onClick={onConfirmSale}
               size='lg'
-              disabled={cart.length === 0 || !selectedCustomerId || isPending}
+              disabled={cart.length === 0 || !isCustomerSelectionValid(customerSelectionState) || isPending}
               data-testid={TEST_IDS.ventas.pos.btnConfirmarCarrito}
             >
               {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
@@ -299,7 +280,7 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
                 fullWidth
                 onClick={onConfirmSale}
                 size='lg'
-                disabled={cart.length === 0 || !selectedCustomerId || isPending}
+                disabled={cart.length === 0 || !isCustomerSelectionValid(customerSelectionState) || isPending}
               >
                 {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
               </Button>
@@ -307,21 +288,6 @@ export function SalesPOSView({ products, customers, setCustomers, cart, addToCar
           </div>
         </div>
       )}
-
-      <CustomerModal
-        isOpen={isCustomerModalOpen}
-        onClose={() => setIsCustomerModalOpen(false)}
-        onSuccess={(newC: CustomerDef, message?: string) => {
-          // Robust update: If id exists (reactivation case), replace it. Otherwise append.
-          const exists = customers.some((c) => c.id === newC.id);
-          const updatedList = exists ? customers.map((c) => (c.id === newC.id ? newC : c)) : [...customers, newC];
-
-          setCustomers(updatedList);
-          setSelectedCustomerId(newC.id);
-          setGlobalMessage({ type: 'success', text: message || 'Cliente registrado y seleccionado.' });
-          setTimeout(() => setGlobalMessage(null), 4000);
-        }}
-      />
     </div>
   );
 }

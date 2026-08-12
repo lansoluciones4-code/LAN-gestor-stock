@@ -1,23 +1,4 @@
-import { ShieldCheck, Truck, Clock } from 'lucide-react';
 import { ContactButtons } from '@/components/contact/contact-buttons';
-
-interface FeatureItemProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function FeatureItem({ icon, title, description }: FeatureItemProps) {
-  return (
-    <div className='flex items-start gap-4'>
-      <div className='w-12 h-12 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800'>{icon}</div>
-      <div>
-        <h4 className='text-sm font-bold text-zinc-900 dark:text-white'>{title}</h4>
-        <p className='text-xs text-zinc-500 mt-1'>{description}</p>
-      </div>
-    </div>
-  );
-}
 
 interface ProductInfoProps {
   deviceName: string;
@@ -34,6 +15,9 @@ export function ProductInfo({ deviceName, category, brand, salePrice, descriptio
     <div className='flex flex-col justify-center max-w-xl'>
       <div className='space-y-6 mb-12'>
         <div className='space-y-2'>
+          {(category || brand) && (
+            <p className='text-sm font-bold uppercase tracking-widest text-zinc-400'>{[category, brand].filter(Boolean).join(' · ')}</p>
+          )}
           <h1 className='text-4xl sm:text-6xl font-bold tracking-tight text-zinc-900 dark:text-white'>{deviceName}</h1>
         </div>
 
@@ -57,19 +41,6 @@ export function ProductInfo({ deviceName, category, brand, salePrice, descriptio
             />
           </div>
         </div>
-      </div>
-
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 pt-8 border-t border-zinc-100 dark:border-zinc-800'>
-        <FeatureItem
-          icon={<ShieldCheck className='w-6 h-6 text-zinc-600 dark:text-zinc-400' />}
-          title='Calidad Garantizada'
-          description='6 meses de garantía directa con nosotros.'
-        />
-        <FeatureItem
-          icon={<Clock className='w-6 h-6 text-zinc-600 dark:text-zinc-400' />}
-          title='Protección Inmediata'
-          description='Recibí tu accesorio y protegé tu equipo hoy mismo.'
-        />
       </div>
     </div>
   );

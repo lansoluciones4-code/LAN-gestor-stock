@@ -36,34 +36,45 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
   const [brandOptions, setBrandOptions] = useState<DeviceFieldOption[]>([]);
   const category = watch('category');
   const brand = watch('brand');
+  const section = watch('section');
 
-  const loadOptions = () => {
-    fetchDeviceFieldOptions('category').then(setCategoryOptions);
-    fetchDeviceFieldOptions('brand').then(setBrandOptions);
+  const loadOptions = (forSection: 'tech' | 'libreria') => {
+    fetchDeviceFieldOptions('category', forSection).then(setCategoryOptions);
+    fetchDeviceFieldOptions('brand', forSection).then(setBrandOptions);
   };
 
   useEffect(() => {
     if (isOpen) {
-      loadOptions();
       if (editingItem) {
         reset({
           name: editingItem.name,
           category: editingItem.category || '',
           brand: editingItem.brand || '',
+          section: (editingItem.section as 'tech' | 'libreria') || 'tech',
         });
+        loadOptions((editingItem.section as 'tech' | 'libreria') || 'tech');
       } else {
         reset({
           name: '',
           category: '',
           brand: '',
+          section: 'tech',
         });
+        loadOptions('tech');
       }
     }
   }, [isOpen, editingItem, reset]);
 
+  const handleSectionChange = (val: 'tech' | 'libreria') => {
+    setValue('section', val, { shouldValidate: true, shouldDirty: true });
+    setValue('category', '', { shouldValidate: true });
+    setValue('brand', '', { shouldValidate: true });
+    loadOptions(val);
+  };
+
   const handleDeleteOption = async (field: 'category' | 'brand', value: string) => {
-    const res = await deleteDeviceFieldOptionAction(field, value);
-    if (res.success) loadOptions();
+    const res = await deleteDeviceFieldOptionAction(field, value, section || 'tech');
+    if (res.success) loadOptions(section || 'tech');
   };
 
   const handleFormSubmit = (data: DeviceInput) => {
@@ -98,6 +109,26 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
     >
       <ErrorAlert error={serverError} />
       <div className='max-h-[60vh] overflow-y-auto px-1 space-y-4'>
+        <div>
+          <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Sección</label>
+          <div className='flex rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1'>
+            <button
+              type='button'
+              onClick={() => handleSectionChange('tech')}
+              className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${section === 'tech' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+            >
+              Tech
+            </button>
+            <button
+              type='button'
+              onClick={() => handleSectionChange('libreria')}
+              className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${section === 'libreria' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+            >
+              Librería
+            </button>
+          </div>
+          {errors.section && <p className='text-zinc-500 text-xs mt-1.5'>{errors.section.message}</p>}
+        </div>
         <div>
           <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Categoría</label>
           <Combobox

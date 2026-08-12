@@ -51,7 +51,7 @@ export const productRowSchema = createSelectSchema(products).extend({
   showOnLanding: z.boolean(),
   version: z.number(),
   device: z
-    .object({ id: z.string(), name: z.string(), version: z.number(), category: z.string().nullable().optional(), brand: z.string().nullable().optional() })
+    .object({ id: z.string(), name: z.string(), version: z.number(), category: z.string().nullable().optional(), brand: z.string().nullable().optional(), section: z.string().optional() })
     .optional()
     .nullable(),
   provider: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),

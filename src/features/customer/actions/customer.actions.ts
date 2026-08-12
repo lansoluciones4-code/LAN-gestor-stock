@@ -23,6 +23,22 @@ export async function fetchCustomers(): Promise<CustomerDef[]> {
   }
 }
 
+/** Read-only lookup used by the sale flow to autofill an existing customer's data by DNI. */
+export async function fetchCustomerByDocumentNumberAction(documentNumber: string): Promise<CustomerDef | null> {
+  try {
+    await verifyAuthOrAdmin(false);
+    const normalized = documentNumber.replace(/[.\-]/g, '').trim();
+    if (normalized.length < 4) return null;
+
+    const result = await customerRepository.findByDocumentNumber(documentNumber);
+    if (!result) return null;
+    return customerRowSchema.parse(result);
+  } catch (error) {
+    console.error('fetchCustomerByDocumentNumberAction error:', error);
+    return null;
+  }
+}
+
 export async function toggleCustomerActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);

@@ -4,6 +4,8 @@ import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { Button } from '@/components/ui/button';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
+  const itemsSubtotal = sale.businessSection === 'impresiones' ? sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0 : sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0;
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -66,32 +68,58 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
             </div>
           </div>
 
-          <table className='w-full mb-16'>
-            <thead>
-              <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
-                <th className='py-5'>Producto</th>
-                <th className='py-5 text-center'>Cant</th>
-                <th className='py-5 text-right'>Precio</th>
-                <th className='py-5 text-right'>Subtotal</th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-zinc-100'>
-              {sale.items?.map((item: any) => (
-                <tr
-                  key={item.id}
-                  className='text-[13px] text-zinc-900'
-                >
-                  <td className='py-5 font-bold text-zinc-900'>
-                    {item.product?.device?.name}
-                    <span className='block text-[10px] font-normal text-zinc-500 uppercase mt-0.5'>{item.product?.description}</span>
-                  </td>
-                  <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
-                  <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          {sale.businessSection === 'impresiones' ? (
+            <table className='w-full mb-16'>
+              <thead>
+                <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
+                  <th className='py-5'>Hojas</th>
+                  <th className='py-5 text-center'>Modo</th>
+                  <th className='py-5 text-right'>Precio</th>
+                  <th className='py-5 text-right'>Subtotal</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className='divide-y divide-zinc-100'>
+                {sale.printItems?.map((item: any) => (
+                  <tr
+                    key={item.id}
+                    className='text-[13px] text-zinc-900'
+                  >
+                    <td className='py-5 font-bold text-zinc-900'>{item.pages}</td>
+                    <td className='py-5 text-center font-bold text-zinc-900 uppercase'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</td>
+                    <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table className='w-full mb-16'>
+              <thead>
+                <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
+                  <th className='py-5'>Producto</th>
+                  <th className='py-5 text-center'>Cant</th>
+                  <th className='py-5 text-right'>Precio</th>
+                  <th className='py-5 text-right'>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-zinc-100'>
+                {sale.items?.map((item: any) => (
+                  <tr
+                    key={item.id}
+                    className='text-[13px] text-zinc-900'
+                  >
+                    <td className='py-5 font-bold text-zinc-900'>
+                      {item.product?.device?.name}
+                      <span className='block text-[10px] font-normal text-zinc-500 uppercase mt-0.5'>{item.product?.description}</span>
+                    </td>
+                    <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
+                    <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
           <div className='flex justify-between items-start pt-8 border-t-2 border-zinc-900 mt-8 gap-8'>
             <div className='flex flex-col gap-2 flex-1'>
@@ -114,12 +142,12 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 <>
                   <div className='flex justify-between w-full text-xs font-bold text-zinc-500 border-b border-zinc-100 pb-2'>
                     <span className='uppercase tracking-widest'>Subtotal</span>
-                    <span>${(sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span>${itemsSubtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   {sale.discountPercentage! > 0 && (
                     <div className='flex justify-between w-full text-[11px] font-bold text-zinc-600 mt-1'>
                       <span className='uppercase'>Descuento ({sale.discountPercentage}%)</span>
-                      <span>-${((sale.items?.reduce((acc: number, item: any) => acc + item.subtotal, 0) || 0) * (sale.discountPercentage! / 100)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                      <span>-${(itemsSubtotal * (sale.discountPercentage! / 100)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
                   {sale.discountAmount! > 0 && (

@@ -3,6 +3,8 @@ import { sql, relations } from 'drizzle-orm';
 
 export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
 export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia']);
+export const businessSectionEnum = pgEnum('business_section', ['tech', 'impresiones', 'libreria']);
+export const colorModeEnum = pgEnum('color_mode', ['color', 'blanco_y_negro']);
 
 /** Fila única con configuración global del catálogo público (ej. mostrar precios o no). */
 export const appSettings = pgTable('app_settings', {
@@ -33,6 +35,7 @@ export const devices = pgTable('devices', {
   name: varchar('name', { length: 100 }).notNull().unique(),
   category: varchar('category', { length: 100 }),
   brand: varchar('brand', { length: 100 }),
+  section: businessSectionEnum('section').notNull().default('tech'),
   isActive: boolean('is_active').default(true).notNull(),
   version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -113,6 +116,7 @@ export const sales = pgTable(
     vendorId: uuid('vendor_id')
       .notNull()
       .references(() => users.id),
+    businessSection: businessSectionEnum('business_section').notNull().default('tech'),
     total: numeric('total', { precision: 10, scale: 2 }).notNull(),
     discountAmount: numeric('discount_amount', { precision: 10, scale: 2 }).default('0').notNull(),
     discountPercentage: numeric('discount_percentage', { precision: 5, scale: 2 }).default('0').notNull(),
@@ -139,6 +143,23 @@ export const saleItems = pgTable(
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
   (table) => [index('sale_items_sale_id_idx').on(table.saleId), index('sale_items_product_id_idx').on(table.productId)]
+);
+
+export const salePrintItems = pgTable(
+  'sale_print_items',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    saleId: uuid('sale_id')
+      .notNull()
+      .references(() => sales.id),
+    pages: integer('pages').notNull(),
+    colorMode: colorModeEnum('color_mode').notNull(),
+    unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
+    subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
+  },
+  (table) => [index('sale_print_items_sale_id_idx').on(table.saleId)]
 );
 
 export const auditLogs = pgTable(
@@ -223,7 +244,15 @@ export const salesRelations = relations(sales, ({ one, many }) => ({
     references: [users.id],
   }),
   items: many(saleItems),
+  printItems: many(salePrintItems),
   payments: many(salePayments),
+}));
+
+export const salePrintItemsRelations = relations(salePrintItems, ({ one }) => ({
+  sale: one(sales, {
+    fields: [salePrintItems.saleId],
+    references: [sales.id],
+  }),
 }));
 
 export const productLossesRelations = relations(productLosses, ({ one }) => ({

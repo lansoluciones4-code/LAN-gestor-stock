@@ -39,7 +39,7 @@ export function ProductsPanel() {
   const [maxPrice, setMaxPrice] = useState('');
   const [photoManageProduct, setPhotoManageProduct] = useState<ProductDef | null>(null);
   const [isPendingLocal, startTransition] = useTransition();
-  const pendingPhotosRef = useRef<string[]>([]);
+  const pendingPhotosRef = useRef<File[]>([]);
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   const { products, setProducts, isLoaded: prodsLoaded } = useProductStore();
@@ -67,8 +67,8 @@ export function ProductsPanel() {
       startTransition(async () => {
         setIsUploadingPhotos(true);
         let failed = 0;
-        for (const base64 of photos) {
-          const res = await uploadProductPhoto(created.id!, base64);
+        for (const file of photos) {
+          const res = await uploadProductPhoto(created.id!, file);
           if (!res.success) failed += 1;
         }
         setIsUploadingPhotos(false);

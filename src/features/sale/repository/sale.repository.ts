@@ -1,7 +1,7 @@
 import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { sales, saleItems, products, customers, salePayments } from '@/lib/db/schema';
-import type { SaleInput } from '@/features/sale/domain/sale.schema';
+import { sales, saleItems, salePrintItems, products, customers, salePayments } from '@/lib/db/schema';
+import type { SaleInput, PrintSaleInput } from '@/features/sale/domain/sale.schema';
 import { ConcurrencyError } from '@/lib/errors';
 
 export class SaleRepository {
@@ -26,6 +26,7 @@ export class SaleRepository {
             },
           },
         },
+        printItems: true,
         payments: true,
       },
     });
@@ -46,6 +47,7 @@ export class SaleRepository {
             },
           },
         },
+        printItems: true,
         payments: true,
       },
     });
@@ -71,6 +73,7 @@ export class SaleRepository {
       .values({
         customerId: input.customerId,
         vendorId,
+        businessSection: input.businessSection,
         total: input.total.toString(),
         discountAmount: input.discountAmount ? input.discountAmount.toString() : '0',
         discountPercentage: input.discountPercentage ? input.discountPercentage.toString() : '0',
@@ -123,6 +126,47 @@ export class SaleRepository {
     return sale;
   }
 
+  /** Impresiones sale: no stock/product involved, just print lines (pages + color mode + manual price). */
+  async createPrintSale(vendorId: string, input: PrintSaleInput, dbtx: any = db) {
+    const [sale] = await dbtx
+      .insert(sales)
+      .values({
+        customerId: input.customerId,
+        vendorId,
+        businessSection: 'impresiones',
+        total: input.total.toString(),
+        discountAmount: input.discountAmount ? input.discountAmount.toString() : '0',
+        discountPercentage: input.discountPercentage ? input.discountPercentage.toString() : '0',
+      })
+      .returning();
+
+    if (input.customerId) {
+      await dbtx.update(customers).set({ isActive: true }).where(eq(customers.id, input.customerId));
+    }
+
+    for (const item of input.items) {
+      await dbtx.insert(salePrintItems).values({
+        saleId: sale.id,
+        pages: item.pages,
+        colorMode: item.colorMode,
+        unitPrice: item.unitPrice.toString(),
+        subtotal: item.subtotal.toString(),
+      });
+    }
+
+    if (input.payments && input.payments.length > 0) {
+      for (const p of input.payments) {
+        await dbtx.insert(salePayments).values({
+          saleId: sale.id,
+          type: p.type as any,
+          amount: p.amount.toString(),
+        });
+      }
+    }
+
+    return sale;
+  }
+
   async deleteSale(id: string, dbtx: any = db) {
     // 1. Lock the sale to prevent double-deletion and race conditions
     // Using FOR UPDATE ensures no other transaction can delete or modify this sale concurrently.
@@ -147,8 +191,9 @@ export class SaleRepository {
     }
 
     await dbtx.delete(saleItems).where(eq(saleItems.saleId, id));
+    await dbtx.delete(salePrintItems).where(eq(salePrintItems.saleId, id));
     await dbtx.delete(salePayments).where(eq(salePayments.saleId, id));
-    
+
     // Final delete of the locked sale record
     await dbtx.delete(sales).where(eq(sales.id, id));
   }

@@ -17,6 +17,7 @@ export function renderDeviceCard(actions: DeviceCardActionsProps) {
       subtitle={device.brand || undefined}
       badges={
         <>
+          <span className='px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'>{device.section === 'libreria' ? 'Librería' : 'Tech'}</span>
           {device.category && <span className='px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'>{device.category}</span>}
           <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${device.isActive ? 'bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}`}>
             {device.isActive ? 'Activo' : 'Inactivo'}

@@ -16,6 +16,16 @@ export class CustomerRepository {
     return !!sale;
   }
 
+  /** Finds a customer by document number, ignoring `.`/`-` formatting and case. Matches regardless of active status. */
+  async findByDocumentNumber(documentNumber: string, dbtx: any = db) {
+    const normalized = documentNumber.replace(/[.\-]/g, '');
+    if (!normalized) return null;
+    const existing = await dbtx.query.customers.findFirst({
+      where: sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalized}`,
+    });
+    return existing ?? null;
+  }
+
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(customers)
@@ -32,10 +42,7 @@ export class CustomerRepository {
 
   async createCustomer(input: CustomerInput, dbtx: any = db) {
     if (input.documentNumber) {
-      const normalizedInput = input.documentNumber.replace(/[.\-]/g, '');
-      const existing = await dbtx.query.customers.findFirst({
-        where: sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`,
-      });
+      const existing = await this.findByDocumentNumber(input.documentNumber, dbtx);
 
       if (existing) {
         if (!existing.isActive) {
@@ -84,12 +91,9 @@ export class CustomerRepository {
     if (input.email !== undefined) updateData.email = input.email || '';
 
     if (input.documentNumber !== undefined) {
-      const normalizedInput = (input.documentNumber || '').replace(/[.\-]/g, '');
-      const existing = await dbtx.query.customers.findFirst({
-        where: and(sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalizedInput}`, sql`${customers.id} != ${id}`),
-      });
+      const existing = await this.findByDocumentNumber(input.documentNumber || '', dbtx);
 
-      if (existing) {
+      if (existing && existing.id !== id) {
         throw new DuplicateEntityError();
       }
 

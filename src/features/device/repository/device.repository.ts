@@ -56,6 +56,7 @@ export class DeviceRepository {
             name: input.name,
             category: input.category,
             brand: input.brand || null,
+            section: input.section,
             isActive: true,
             updatedAt: sql`NOW()`,
             version: sql`${devices.version} + 1`,
@@ -74,6 +75,7 @@ export class DeviceRepository {
         name: input.name,
         category: input.category,
         brand: input.brand || null,
+        section: input.section,
         isActive: true,
         version: 1,
       })
@@ -95,6 +97,7 @@ export class DeviceRepository {
     }
     if (input.category !== undefined) updateData.category = input.category;
     if (input.brand !== undefined) updateData.brand = input.brand || null;
+    if (input.section !== undefined) updateData.section = input.section;
 
     const result = await dbtx
       .update(devices)
@@ -114,36 +117,36 @@ export class DeviceRepository {
   }
 
   /**
-   * Distinct values already used for `category`/`brand`, with a flag indicating whether
-   * any product currently depends on a device carrying that value (used to gate deletion).
+   * Distinct values already used for `category`/`brand` within a given `section`, with a flag
+   * indicating whether any product currently depends on a device carrying that value (used to gate deletion).
    */
-  async getFieldOptions(field: DeviceTextField) {
+  async getFieldOptions(field: DeviceTextField, section: 'tech' | 'libreria') {
     const column = devices[field];
     const rows = await db
       .select({ value: column, productCount: sql<number>`count(${products.id})`.mapWith(Number) })
       .from(devices)
       .leftJoin(products, eq(products.deviceId, devices.id))
-      .where(and(isNotNull(column), ne(column, '')))
+      .where(and(isNotNull(column), ne(column, ''), eq(devices.section, section)))
       .groupBy(column);
 
     return rows.map((r) => ({ value: r.value as string, hasProducts: r.productCount > 0 }));
   }
 
-  /** Clears `field` on every device using `value`, only if none of them has products yet. */
-  async clearFieldOption(field: DeviceTextField, value: string) {
+  /** Clears `field` on every device using `value` within `section`, only if none of them has products yet. */
+  async clearFieldOption(field: DeviceTextField, value: string, section: 'tech' | 'libreria') {
     const column = devices[field];
     const inUse = await db
       .select({ id: products.id })
       .from(products)
       .innerJoin(devices, eq(products.deviceId, devices.id))
-      .where(eq(column, value))
+      .where(and(eq(column, value), eq(devices.section, section)))
       .limit(1);
 
     if (inUse.length > 0) {
       throw new Error('No se puede eliminar: hay productos que dependen de ese valor.');
     }
 
-    await db.update(devices).set({ [field]: null }).where(eq(column, value));
+    await db.update(devices).set({ [field]: null }).where(and(eq(column, value), eq(devices.section, section)));
   }
 }
 

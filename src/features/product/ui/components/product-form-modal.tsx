@@ -22,8 +22,8 @@ interface ProductFormModalProps {
   devices: DeviceDef[];
   suppliers: ProviderDef[];
   role?: string;
-  /** Fotos elegidas (base64) para el producto que se está por crear, justo antes de enviarlas. */
-  onPhotosReady?: (photosBase64: string[]) => void;
+  /** Fotos elegidas para el producto que se está por crear, justo antes de enviarlas. */
+  onPhotosReady?: (files: File[]) => void;
 }
 
 export function ProductFormModal({
@@ -54,6 +54,7 @@ export function ProductFormModal({
   const selectedProviderId = watch('providerId');
 
   const NO_BRAND = '__sin_marca__';
+  const [selectedSection, setSelectedSection] = useState<'tech' | 'libreria'>('tech');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
 
@@ -61,11 +62,14 @@ export function ProductFormModal({
 
   const categoryOptions = useMemo(() => {
     const set = new Set<string>();
-    devices.filter(activeDevices).forEach((d) => d.category && set.add(d.category));
+    devices
+      .filter(activeDevices)
+      .filter((d) => d.section === selectedSection)
+      .forEach((d) => d.category && set.add(d.category));
     return Array.from(set)
       .sort((a, b) => a.localeCompare(b))
       .map((c) => ({ id: c, name: c }));
-  }, [devices, editingItem]);
+  }, [devices, selectedSection, editingItem]);
 
   const brandOptions = useMemo(() => {
     if (!selectedCategory) return [];
@@ -73,43 +77,33 @@ export function ProductFormModal({
     let hasNoBrand = false;
     devices
       .filter(activeDevices)
-      .filter((d) => d.category === selectedCategory)
+      .filter((d) => d.section === selectedSection && d.category === selectedCategory)
       .forEach((d) => (d.brand ? set.add(d.brand) : (hasNoBrand = true)));
     const options = Array.from(set)
       .sort((a, b) => a.localeCompare(b))
       .map((b) => ({ id: b, name: b }));
     return hasNoBrand ? [...options, { id: NO_BRAND, name: 'Sin marca' }] : options;
-  }, [devices, selectedCategory, editingItem]);
+  }, [devices, selectedSection, selectedCategory, editingItem]);
 
   const modelOptions = useMemo(() => {
     if (!selectedCategory || !selectedBrand) return [];
     return devices
       .filter(activeDevices)
-      .filter((d) => d.category === selectedCategory && (selectedBrand === NO_BRAND ? !d.brand : d.brand === selectedBrand))
+      .filter((d) => d.section === selectedSection && d.category === selectedCategory && (selectedBrand === NO_BRAND ? !d.brand : d.brand === selectedBrand))
       .map((d) => ({ id: d.id, name: d.name }));
-  }, [devices, selectedCategory, selectedBrand, editingItem]);
+  }, [devices, selectedSection, selectedCategory, selectedBrand, editingItem]);
 
   const [marginPercent, setMarginPercent] = useState('');
 
-  const [pendingPhotos, setPendingPhotos] = useState<{ base64: string; previewUrl: string }[]>([]);
+  const [pendingPhotos, setPendingPhotos] = useState<{ file: File; previewUrl: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const readFileAsBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     e.target.value = '';
     if (files.length === 0) return;
-    const added = await Promise.all(
-      files.map(async (file) => ({ base64: await readFileAsBase64(file), previewUrl: URL.createObjectURL(file) }))
-    );
+    const added = files.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }));
     setPendingPhotos((prev) => [...prev, ...added]);
   };
 
@@ -140,6 +134,7 @@ export function ProductFormModal({
         } as any);
         const impliedMargin = editingItem.purchasePrice > 0 ? ((editingItem.salePrice - editingItem.purchasePrice) / editingItem.purchasePrice) * 100 : 0;
         setMarginPercent(impliedMargin > 0 ? impliedMargin.toFixed(2).replace('.', ',') : '');
+        setSelectedSection((editingItem.device?.section as 'tech' | 'libreria') || 'tech');
         setSelectedCategory(editingItem.device?.category || '');
         setSelectedBrand(editingItem.device?.brand || NO_BRAND);
       } else {
@@ -152,6 +147,7 @@ export function ProductFormModal({
           stock: 1,
         } as any);
         setMarginPercent('');
+        setSelectedSection('tech');
         setSelectedCategory('');
         setSelectedBrand('');
       }
@@ -183,7 +179,7 @@ export function ProductFormModal({
       }
       onSubmit(changedData as ProductUpdateInput);
     } else {
-      onPhotosReady?.(pendingPhotos.map((p) => p.base64));
+      onPhotosReady?.(pendingPhotos.map((p) => p.file));
       onSubmit(data);
     }
   };
@@ -201,6 +197,35 @@ export function ProductFormModal({
     >
       <ErrorAlert error={serverError} />
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div className='col-span-1 md:col-span-2'>
+          <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Sección</label>
+          <div className='flex rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1'>
+            <button
+              type='button'
+              onClick={() => {
+                setSelectedSection('tech');
+                setSelectedCategory('');
+                setSelectedBrand('');
+                setValue('deviceId', '', { shouldValidate: true });
+              }}
+              className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${selectedSection === 'tech' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+            >
+              Tech
+            </button>
+            <button
+              type='button'
+              onClick={() => {
+                setSelectedSection('libreria');
+                setSelectedCategory('');
+                setSelectedBrand('');
+                setValue('deviceId', '', { shouldValidate: true });
+              }}
+              className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${selectedSection === 'libreria' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+            >
+              Librería
+            </button>
+          </div>
+        </div>
         <div className='col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6'>
           <div>
             <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Categoría</label>

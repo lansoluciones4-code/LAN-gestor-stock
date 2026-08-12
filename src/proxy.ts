@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth/jwt';
 
 const publicPaths = ['/login', '/favicon.ico', '/icon.svg', '/api/public', '/home', '/product'];
-const allowedVendedorPaths = ['/productos', '/ventas', '/clientes'];
+const allowedVendedorPaths = ['/productos', '/ventas', '/clientes', '/api/product-photos'];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

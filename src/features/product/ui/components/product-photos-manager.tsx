@@ -65,29 +65,18 @@ export function ProductPhotosManager({ product, isOpen, onClose }: ProductPhotos
     });
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file || !product?.id) return;
 
-    // Convert file to base64
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const base64String = reader.result as string;
-      uploadPhoto(product.id!, base64String);
-    };
-    reader.onerror = () => {
-      setError('Error al leer el archivo.');
-    };
-    
-    // Reset input
-    e.target.value = '';
+    uploadPhoto(product.id, file);
   };
 
-  const uploadPhoto = (productId: string, base64: string) => {
+  const uploadPhoto = (productId: string, file: File) => {
     startTransition(async () => {
       setError(null);
-      const res = await uploadProductPhoto(productId, base64);
+      const res = await uploadProductPhoto(productId, file);
       if (res.success) {
         // Add new photo to list and switch to view tab
         setPhotos((prev) => [res.data as any, ...prev]);

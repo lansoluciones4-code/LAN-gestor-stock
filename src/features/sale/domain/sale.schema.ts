@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { sales, saleItems } from '@/lib/db/schema';
+import { sales, saleItems, salePrintItems } from '@/lib/db/schema';
 import { isValidDecimal } from '@/lib/utils';
 import { toNumber } from '@/lib/zod-helpers';
 
@@ -38,10 +38,28 @@ export const salePaymentInputSchema = z.object({
 
 export type SalePaymentInput = z.infer<typeof salePaymentInputSchema>;
 
-/** Input schema for creating a sale (form → server). */
+/** Input schema for a single print (Impresiones) line item. */
+export const salePrintItemInputSchema = createInsertSchema(salePrintItems, {
+  pages: z.number().int().min(1, 'La cantidad de hojas debe ser al menos 1'),
+  unitPrice: z
+    .number()
+    .min(0)
+    .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
+  subtotal: z
+    .number()
+    .min(0)
+    .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
+}).pick({ pages: true, colorMode: true, unitPrice: true, subtotal: true });
+
+export type SalePrintItemInput = z.infer<typeof salePrintItemInputSchema>;
+
+const customerIdField = createInsertSchema(sales).pick({ customerId: true }).shape.customerId;
+
+/** Input schema for creating a sale of stock products (Tech / Librería) (form → server). */
 export const saleCreateSchema = createInsertSchema(sales)
   .pick({ customerId: true, total: true, discountAmount: true, discountPercentage: true })
   .extend({
+    businessSection: z.enum(['tech', 'libreria']),
     total: toNumber().pipe(
       z
         .number()
@@ -70,8 +88,40 @@ export const saleCreateSchema = createInsertSchema(sales)
 
 export type SaleInput = z.infer<typeof saleCreateSchema>;
 
+/** Input schema for creating an Impresiones sale (form → server). No stock/product involved. */
+export const printSaleCreateSchema = z.object({
+  customerId: customerIdField.optional(),
+  total: toNumber().pipe(
+    z
+      .number()
+      .min(0, 'El total es requerido')
+      .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+  ),
+  discountAmount: toNumber().pipe(
+    z
+      .number()
+      .min(0)
+      .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+  ),
+  discountPercentage: toNumber().pipe(
+    z
+      .number()
+      .min(0)
+      .max(100)
+      .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+  ),
+  items: z.array(salePrintItemInputSchema).min(1, 'La venta debe tener al menos una impresión cargada'),
+  payments: z
+    .array(salePaymentInputSchema)
+    .min(1, 'Debe especificar al menos un método de pago')
+    .max(2, 'Solo se permiten hasta dos métodos de pago'),
+});
+
+export type PrintSaleInput = z.infer<typeof printSaleCreateSchema>;
+
 /** Row schema for reading a sale from the DB (with relations). */
 export const saleRowSchema = createSelectSchema(sales).extend({
+  businessSection: z.enum(['tech', 'impresiones', 'libreria']),
   total: z.preprocess((val) => parseFloat(val as string), z.number()),
   discountAmount: z.preprocess((val) => parseFloat((val as string) || '0'), z.number()),
   discountPercentage: z.preprocess((val) => parseFloat((val as string) || '0'), z.number()),
@@ -94,6 +144,17 @@ export const saleRowSchema = createSelectSchema(sales).extend({
           })
           .optional()
           .nullable(),
+      })
+    )
+    .optional(),
+  printItems: z
+    .array(
+      z.object({
+        id: z.string(),
+        pages: z.number(),
+        colorMode: z.string(),
+        unitPrice: z.preprocess((val) => parseFloat(val as string), z.number()),
+        subtotal: z.preprocess((val) => parseFloat(val as string), z.number()),
       })
     )
     .optional(),

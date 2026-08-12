@@ -25,21 +25,21 @@ export async function fetchDevices(): Promise<DeviceDef[]> {
 
 export type DeviceFieldOption = { value: string; hasProducts: boolean };
 
-export async function fetchDeviceFieldOptions(field: 'category' | 'brand'): Promise<DeviceFieldOption[]> {
+export async function fetchDeviceFieldOptions(field: 'category' | 'brand', section: 'tech' | 'libreria'): Promise<DeviceFieldOption[]> {
   try {
     await verifyAuthOrAdmin(false);
-    return await deviceRepository.getFieldOptions(field);
+    return await deviceRepository.getFieldOptions(field, section);
   } catch (error) {
     console.error('fetchDeviceFieldOptions error:', error);
     return [];
   }
 }
 
-export async function deleteDeviceFieldOptionAction(field: 'category' | 'brand', value: string): Promise<ActionResult> {
+export async function deleteDeviceFieldOptionAction(field: 'category' | 'brand', value: string, section: 'tech' | 'libreria'): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
-    await deviceRepository.clearFieldOption(field, value);
-    await recordAuditLog(caller.id, 'ELIMINAR', field === 'category' ? 'DEVICE_CATEGORY' : 'DEVICE_BRAND', undefined, { value });
+    await deviceRepository.clearFieldOption(field, value, section);
+    await recordAuditLog(caller.id, 'ELIMINAR', field === 'category' ? 'DEVICE_CATEGORY' : 'DEVICE_BRAND', undefined, { value, section });
     return { success: true, message: `"${value}" eliminado de las sugerencias.` };
   } catch (error: any) {
     return { success: false, error: error?.message || 'No se pudo eliminar.' };
@@ -87,6 +87,7 @@ export async function createDeviceAction(input: DeviceInput): Promise<ActionResu
           name: result.name,
           category: result.category,
           brand: result.brand,
+          section: result.section,
           note: wasReactivated ? 'Equipo reactivado' : 'Nuevo registro',
         },
         tx
