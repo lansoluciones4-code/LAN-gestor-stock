@@ -29,11 +29,11 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
       // 1. Search filter (Fuzzy)
       const searchTerms = normalizeForSearch(deferredSearch).split(/\s+/).filter(Boolean);
 
-      const combinedText = normalizeForSearch(`${p.device?.name || ''} ${p.description || ''}`);
+      const combinedText = normalizeForSearch(`${p.device?.name || ''} ${p.device?.brand || ''} ${p.description || ''}`);
       const matchesSearch = searchTerms.every((term) => combinedText.includes(term));
 
       // 2. Category filter
-      const matchesCategory = selectedCategory ? p.deviceId === selectedCategory : true;
+      const matchesCategory = selectedCategory ? p.device?.category === selectedCategory : true;
 
       // 3. Price range filter
       const price = p.salePrice;

@@ -15,22 +15,33 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
     {
       header: 'Equipo y Detalle',
       cellClassName: 'max-w-[250px]',
-      cell: (p) => (
-        <div className='flex flex-col min-w-0'>
-          <div
-            className='font-bold text-zinc-900 dark:text-zinc-100 truncate'
-            title={p.device?.name || '---'}
-          >
-            {p.device?.name || '---'}
+      cell: (p) => {
+        const categoryBrand = [p.device?.category, p.device?.brand].filter(Boolean).join(' · ');
+        return (
+          <div className='flex flex-col min-w-0'>
+            {categoryBrand && (
+              <div
+                className='text-[10px] font-bold uppercase tracking-wide text-zinc-400 truncate'
+                title={categoryBrand}
+              >
+                {categoryBrand}
+              </div>
+            )}
+            <div
+              className='font-bold text-zinc-900 dark:text-zinc-100 truncate'
+              title={p.device?.name || '---'}
+            >
+              {p.device?.name || '---'}
+            </div>
+            <div
+              className='text-xs text-zinc-500 mt-0.5 truncate'
+              title={p.description || ''}
+            >
+              {p.description || 'Sin detalle'}
+            </div>
           </div>
-          <div
-            className='text-xs text-zinc-500 mt-0.5 truncate'
-            title={p.description || ''}
-          >
-            {p.description || 'Sin detalle'}
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       header: 'Stock',

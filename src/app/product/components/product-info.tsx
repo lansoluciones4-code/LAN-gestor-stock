@@ -24,9 +24,10 @@ interface ProductInfoProps {
   salePrice: number;
   description?: string | null;
   isOutOfStock: boolean;
+  showPrice: boolean;
 }
 
-export function ProductInfo({ deviceName, salePrice, description, isOutOfStock }: ProductInfoProps) {
+export function ProductInfo({ deviceName, salePrice, description, isOutOfStock, showPrice }: ProductInfoProps) {
   return (
     <div className='flex flex-col justify-center max-w-xl'>
       <div className='space-y-6 mb-12'>
@@ -35,7 +36,11 @@ export function ProductInfo({ deviceName, salePrice, description, isOutOfStock }
         </div>
 
         <div className='flex items-center gap-4'>
-          <span className='text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100'>${salePrice.toLocaleString('es-AR')}</span>
+          {showPrice ? (
+            <span className='text-3xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100'>${salePrice.toLocaleString('es-AR')}</span>
+          ) : (
+            <span className='text-xl font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400'>Consultar precio</span>
+          )}
           {!isOutOfStock && <span className='text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-500/10 px-3 py-1 rounded-full uppercase tracking-wider'>En Stock</span>}
         </div>
 

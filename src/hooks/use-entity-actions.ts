@@ -20,9 +20,11 @@ interface UseEntityActionsProps<TDef, TInput, TUpdateInput = Partial<TInput>> {
   setItemToDelete: (val: string | null) => void;
   editingItem: TDef | (TDef & { id: string }) | null;
   showInactive: boolean;
+  /** Called with the freshly created row right after a successful (non-edit) create. */
+  onCreateSuccess?: (created: TDef) => void;
 }
 
-export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput, TUpdateInput = Partial<TInput>>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive }: UseEntityActionsProps<TDef, TInput, TUpdateInput>) {
+export function useEntityActions<TDef extends { id?: string; isActive?: boolean }, TInput, TUpdateInput = Partial<TInput>>({ handlers, setStoreData, onSuccessMessage, onErrorMessage, closeFormModal, setServerError, setItemToDelete, editingItem, showInactive, onCreateSuccess }: UseEntityActionsProps<TDef, TInput, TUpdateInput>) {
   const [isPending, startTransition] = useTransition();
 
   const syncData = async (manual = false) => {
@@ -43,6 +45,7 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
     setServerError(null);
     startTransition(async () => {
       let result;
+      const isCreate = !editingItem;
       if (editingItem) {
         if (!handlers.updateAction) { setServerError('Operación no soportada'); return; }
         result = await handlers.updateAction(editingItem.id!, data as TUpdateInput);
@@ -58,6 +61,7 @@ export function useEntityActions<TDef extends { id?: string; isActive?: boolean 
       invalidateAllCaches();
       const resp = await handlers.fetchData(showInactive);
       setStoreData(resp);
+      if (isCreate && result.data) onCreateSuccess?.(result.data as TDef);
     });
   };
 

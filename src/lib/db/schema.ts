@@ -4,6 +4,15 @@ import { sql, relations } from 'drizzle-orm';
 export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
 export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia']);
 
+/** Fila única con configuración global del catálogo público (ej. mostrar precios o no). */
+export const appSettings = pgTable('app_settings', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  showPrices: boolean('show_prices').default(true).notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const users = pgTable('users', {
   id: uuid('id')
     .primaryKey()
@@ -22,6 +31,8 @@ export const devices = pgTable('devices', {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: varchar('name', { length: 100 }).notNull().unique(),
+  category: varchar('category', { length: 100 }),
+  brand: varchar('brand', { length: 100 }),
   isActive: boolean('is_active').default(true).notNull(),
   version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

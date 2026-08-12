@@ -50,7 +50,10 @@ export const productRowSchema = createSelectSchema(products).extend({
   salePrice: z.preprocess((val) => parseFloat(val as string), z.number()),
   showOnLanding: z.boolean(),
   version: z.number(),
-  device: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
+  device: z
+    .object({ id: z.string(), name: z.string(), version: z.number(), category: z.string().nullable().optional(), brand: z.string().nullable().optional() })
+    .optional()
+    .nullable(),
   provider: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
   images: z.array(z.object({ publicId: z.string(), url: z.string() })).optional(),
   createdAt: z.union([z.date(), z.string()]),

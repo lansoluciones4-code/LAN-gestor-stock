@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PackageOpen, DollarSign } from 'lucide-react';
+import { PackageOpen, DollarSign, Upload, Camera, X, ImageIcon } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { productCreateSchema, type ProductInput, type ProductDef, type ProductUpdateInput } from '@/features/product/domain/product.schema';
 import { type DeviceDef } from '@/features/device/domain/device.schema';
@@ -22,6 +22,8 @@ interface ProductFormModalProps {
   devices: DeviceDef[];
   suppliers: ProviderDef[];
   role?: string;
+  /** Fotos elegidas (base64) para el producto que se está por crear, justo antes de enviarlas. */
+  onPhotosReady?: (photosBase64: string[]) => void;
 }
 
 export function ProductFormModal({
@@ -34,6 +36,7 @@ export function ProductFormModal({
   devices,
   suppliers,
   role,
+  onPhotosReady,
 }: ProductFormModalProps) {
   const {
     register,
@@ -50,7 +53,69 @@ export function ProductFormModal({
   const selectedDeviceId = watch('deviceId');
   const selectedProviderId = watch('providerId');
 
+  const NO_BRAND = '__sin_marca__';
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
+
+  const activeDevices = (d: DeviceDef) => d.isActive || d.id === editingItem?.deviceId;
+
+  const categoryOptions = useMemo(() => {
+    const set = new Set<string>();
+    devices.filter(activeDevices).forEach((d) => d.category && set.add(d.category));
+    return Array.from(set)
+      .sort((a, b) => a.localeCompare(b))
+      .map((c) => ({ id: c, name: c }));
+  }, [devices, editingItem]);
+
+  const brandOptions = useMemo(() => {
+    if (!selectedCategory) return [];
+    const set = new Set<string>();
+    let hasNoBrand = false;
+    devices
+      .filter(activeDevices)
+      .filter((d) => d.category === selectedCategory)
+      .forEach((d) => (d.brand ? set.add(d.brand) : (hasNoBrand = true)));
+    const options = Array.from(set)
+      .sort((a, b) => a.localeCompare(b))
+      .map((b) => ({ id: b, name: b }));
+    return hasNoBrand ? [...options, { id: NO_BRAND, name: 'Sin marca' }] : options;
+  }, [devices, selectedCategory, editingItem]);
+
+  const modelOptions = useMemo(() => {
+    if (!selectedCategory || !selectedBrand) return [];
+    return devices
+      .filter(activeDevices)
+      .filter((d) => d.category === selectedCategory && (selectedBrand === NO_BRAND ? !d.brand : d.brand === selectedBrand))
+      .map((d) => ({ id: d.id, name: d.name }));
+  }, [devices, selectedCategory, selectedBrand, editingItem]);
+
   const [marginPercent, setMarginPercent] = useState('');
+
+  const [pendingPhotos, setPendingPhotos] = useState<{ base64: string; previewUrl: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const readFileAsBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (files.length === 0) return;
+    const added = await Promise.all(
+      files.map(async (file) => ({ base64: await readFileAsBase64(file), previewUrl: URL.createObjectURL(file) }))
+    );
+    setPendingPhotos((prev) => [...prev, ...added]);
+  };
+
+  const removePendingPhoto = (index: number) => {
+    setPendingPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // Markup sobre el costo: venta = costo * (1 + %/100). El % es solo una comodidad
   // de carga del lado del cliente, no se valida ni se envía al server.
@@ -75,6 +140,8 @@ export function ProductFormModal({
         } as any);
         const impliedMargin = editingItem.purchasePrice > 0 ? ((editingItem.salePrice - editingItem.purchasePrice) / editingItem.purchasePrice) * 100 : 0;
         setMarginPercent(impliedMargin > 0 ? impliedMargin.toFixed(2).replace('.', ',') : '');
+        setSelectedCategory(editingItem.device?.category || '');
+        setSelectedBrand(editingItem.device?.brand || NO_BRAND);
       } else {
         reset({
           deviceId: '',
@@ -85,7 +152,10 @@ export function ProductFormModal({
           stock: 1,
         } as any);
         setMarginPercent('');
+        setSelectedCategory('');
+        setSelectedBrand('');
       }
+      setPendingPhotos([]);
     }
   }, [isOpen, editingItem, reset]);
 
@@ -113,6 +183,7 @@ export function ProductFormModal({
       }
       onSubmit(changedData as ProductUpdateInput);
     } else {
+      onPhotosReady?.(pendingPhotos.map((p) => p.base64));
       onSubmit(data);
     }
   };
@@ -130,15 +201,45 @@ export function ProductFormModal({
     >
       <ErrorAlert error={serverError} />
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        <div className='col-span-1 md:col-span-2'>
-          <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Modelo / Equipo</label>
-          <Combobox
-            options={devices.filter((d) => d.isActive || d.id === editingItem?.deviceId).map((d) => ({ id: d.id, name: d.name }))}
-            value={selectedDeviceId}
-            onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
-            placeholder='Seleccionar Equipo'
-          />
-          {errors.deviceId && <p className='text-zinc-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
+        <div className='col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6'>
+          <div>
+            <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Categoría</label>
+            <Combobox
+              options={categoryOptions}
+              value={selectedCategory}
+              onChange={(val) => {
+                setSelectedCategory(val);
+                setSelectedBrand('');
+                setValue('deviceId', '', { shouldValidate: true });
+              }}
+              placeholder='Elegir categoría'
+              emptyMessage='No hay categorías cargadas todavía (agregalas en "Stock").'
+            />
+          </div>
+          <div>
+            <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Marca</label>
+            <Combobox
+              options={brandOptions}
+              value={selectedBrand}
+              onChange={(val) => {
+                setSelectedBrand(val);
+                setValue('deviceId', '', { shouldValidate: true });
+              }}
+              placeholder={selectedCategory ? 'Elegir marca' : 'Elegí una categoría primero'}
+              emptyMessage='No hay marcas para esta categoría.'
+            />
+          </div>
+          <div>
+            <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Modelo</label>
+            <Combobox
+              options={modelOptions}
+              value={selectedDeviceId}
+              onChange={(val) => setValue('deviceId', val, { shouldValidate: true })}
+              placeholder={selectedBrand ? 'Elegir modelo' : 'Elegí una marca primero'}
+              emptyMessage='No hay modelos para esa categoría/marca.'
+            />
+            {errors.deviceId && <p className='text-zinc-500 text-xs mt-1.5'>{errors.deviceId.message}</p>}
+          </div>
         </div>
         <div className='col-span-1 md:col-span-2'>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Proveedor Entrante</label>
@@ -217,6 +318,57 @@ export function ProductFormModal({
             {errors.salePrice && <p className='text-zinc-500 text-xs mt-1'>{errors.salePrice.message}</p>}
           </div>
         </div>
+
+        {!editingItem && (
+          <div className='col-span-1 md:col-span-2'>
+            <label className='block text-sm font-medium mb-1.5'>Fotos del producto (opcional)</label>
+            <input type='file' accept='image/*' multiple ref={fileInputRef} className='hidden' onChange={handleFilesSelected} />
+            <input type='file' accept='image/*' capture='environment' ref={cameraInputRef} className='hidden' onChange={handleFilesSelected} />
+
+            <div className='flex flex-wrap gap-2 mb-3'>
+              <button
+                type='button'
+                onClick={() => fileInputRef.current?.click()}
+                className='flex items-center gap-2 px-4 py-2 text-sm font-medium border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors'
+              >
+                <Upload className='w-4 h-4' /> Seleccionar Archivos
+              </button>
+              <button
+                type='button'
+                onClick={() => cameraInputRef.current?.click()}
+                className='flex items-center gap-2 px-4 py-2 text-sm font-medium border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors'
+              >
+                <Camera className='w-4 h-4' /> Tomar Foto
+              </button>
+            </div>
+
+            {pendingPhotos.length > 0 ? (
+              <div className='grid grid-cols-3 sm:grid-cols-4 gap-3'>
+                {pendingPhotos.map((photo, index) => (
+                  <div
+                    key={index}
+                    className='relative group aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800'
+                  >
+                    <img src={photo.previewUrl} alt='' className='w-full h-full object-contain p-1' />
+                    <button
+                      type='button'
+                      onClick={() => removePendingPhoto(index)}
+                      className='absolute top-1 right-1 p-1.5 bg-zinc-900/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600'
+                      title='Quitar'
+                    >
+                      <X className='w-3.5 h-3.5' />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className='flex items-center gap-2 text-xs text-zinc-400 py-2'>
+                <ImageIcon className='w-4 h-4' /> Podés elegir varias a la vez, o sacarlas con la cámara del celular. Se suben al confirmar.
+              </div>
+            )}
+          </div>
+        )}
+
         <div>
           <label className='block text-sm font-medium mb-1.5'>Stock Inicial Lote</label>
           <input

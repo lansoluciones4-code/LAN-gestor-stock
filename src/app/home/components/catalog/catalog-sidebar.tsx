@@ -1,11 +1,11 @@
 'use client';
 
-import { type DeviceDef } from '@/features/device/domain/device.schema';
+import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 import { Tag, ChevronRight } from 'lucide-react';
 import { toSentenceCase } from '@/lib/utils';
 
 interface CatalogSidebarProps {
-  categories: DeviceDef[];
+  categories: LandingCategory[];
   selectedCategory: string | null;
   onSelectCategory: (id: string | null) => void;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useTransition } from 'react';
+import { useState, useEffect, useMemo, useRef, useTransition } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { type ProductInput, type ProductDef, type ProductUpdateInput } from '@/features/product/domain/product.schema';
 import { useAuthStore } from '@/features/auth/store/auth.store';
@@ -14,6 +14,8 @@ import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
 import { fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/features/product/actions/product.actions';
+import { uploadProductPhoto } from '@/features/product/actions/upload-product-photo';
+import { fetchShowPrices, updateShowPricesAction } from '@/features/settings/actions/settings.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Button } from '@/components/ui/button';
@@ -32,10 +34,13 @@ export function ProductsPanel() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [showZeroStock, setShowZeroStock] = useState(false);
   const [showOnlyLanding, setShowOnlyLanding] = useState(false);
+  const [showPricesOnCatalog, setShowPricesOnCatalog] = useState(true);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [photoManageProduct, setPhotoManageProduct] = useState<ProductDef | null>(null);
   const [isPendingLocal, startTransition] = useTransition();
+  const pendingPhotosRef = useRef<string[]>([]);
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
 
   const { products, setProducts, isLoaded: prodsLoaded } = useProductStore();
   const { devices, setDevices, isLoaded: devicesLoaded } = useDeviceStore();
@@ -54,9 +59,29 @@ export function ProductsPanel() {
     setItemToDelete,
     editingItem,
     showInactive: false,
+    onCreateSuccess: (created) => {
+      const photos = pendingPhotosRef.current;
+      pendingPhotosRef.current = [];
+      if (photos.length === 0 || !created.id) return;
+
+      startTransition(async () => {
+        setIsUploadingPhotos(true);
+        let failed = 0;
+        for (const base64 of photos) {
+          const res = await uploadProductPhoto(created.id!, base64);
+          if (!res.success) failed += 1;
+        }
+        setIsUploadingPhotos(false);
+        if (failed > 0) {
+          showGlobalMessage('error', `Se creó el producto, pero ${failed} de ${photos.length} foto(s) no se pudieron subir. Podés reintentar desde "Gestionar Fotos".`);
+        }
+        invalidateAllCaches();
+        syncData();
+      });
+    },
   });
 
-  const isPending = isPendingAction || isPendingLocal;
+  const isPending = isPendingAction || isPendingLocal || isUploadingPhotos;
 
   useEffect(() => {
     if (prodsLoaded && devicesLoaded && supsLoaded) { setInitialLoading(false); return; }
@@ -67,13 +92,30 @@ export function ProductsPanel() {
     Promise.all(promises).finally(() => setInitialLoading(false));
   }, [prodsLoaded, devicesLoaded, supsLoaded, setProducts, setDevices, setSuppliers]);
 
+  useEffect(() => {
+    if (role === 'admin') fetchShowPrices().then(setShowPricesOnCatalog);
+  }, [role]);
+
+  const handleToggleShowPrices = (checked: boolean) => {
+    setShowPricesOnCatalog(checked);
+    startTransition(async () => {
+      const result = await updateShowPricesAction(checked);
+      if (!result.success) {
+        setShowPricesOnCatalog(!checked);
+        showGlobalMessage('error', result.error);
+      } else {
+        showGlobalMessage('success', result.message || 'Configuración actualizada.');
+      }
+    });
+  };
+
 
 
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        const text = [normalizeForSearch(p.device?.name), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
+        const text = [normalizeForSearch(p.device?.name), normalizeForSearch(p.device?.brand), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
         return terms.every((w) => text.includes(w)) && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0) && (!showOnlyLanding || p.showOnLanding);
@@ -128,6 +170,7 @@ export function ProductsPanel() {
               <>
                 <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' data-testid={TEST_IDS.general.btnVerOcultos} />
                 <ToggleFilter id='showOnlyLanding' checked={showOnlyLanding} onChange={setShowOnlyLanding} label='Solo Landing' />
+                <ToggleFilter id='showPricesOnCatalog' checked={showPricesOnCatalog} onChange={handleToggleShowPrices} label='Mostrar Precios' />
               </>
             )}
           </>
@@ -165,6 +208,7 @@ export function ProductsPanel() {
         devices={devices}
         suppliers={suppliers}
         role={role}
+        onPhotosReady={(photos) => { pendingPhotosRef.current = photos; }}
       />
 
       <ConfirmModal isOpen={!!itemToDelete} onClose={() => setItemToDelete(null)} onConfirm={() => handleDelete(itemToDelete as string)}

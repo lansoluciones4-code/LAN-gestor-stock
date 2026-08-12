@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { type ProductDef } from '@/features/product/domain/product.schema';
-import { type DeviceDef } from '@/features/device/domain/device.schema';
+import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 
 import { useCatalogFilters } from './catalog/use-catalog-filters';
 import { CatalogSidebar } from './catalog/catalog-sidebar';
@@ -13,10 +13,11 @@ import { MobileFilterDrawer } from './catalog/mobile-filter-drawer';
 
 interface CatalogClientProps {
   products: ProductDef[];
-  categories: DeviceDef[];
+  categories: LandingCategory[];
+  showPrices: boolean;
 }
 
-export function CatalogClient({ products, categories }: CatalogClientProps) {
+export function CatalogClient({ products, categories, showPrices }: CatalogClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const itemsPerPage = 16;
 
@@ -55,6 +56,7 @@ export function CatalogClient({ products, categories }: CatalogClientProps) {
             <CatalogGrid
               products={paginatedProducts}
               onResetFilters={clearFilters}
+              showPrices={showPrices}
             />
           </div>
 

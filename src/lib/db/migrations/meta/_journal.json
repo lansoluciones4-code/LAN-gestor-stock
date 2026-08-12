@@ -36,6 +36,20 @@
       "when": 1778520771950,
       "tag": "0004_fearless_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786489781193,
+      "tag": "0005_handy_blade",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786500169130,
+      "tag": "0006_aromatic_power_man",
+      "breakpoints": true
     }
   ]
 }

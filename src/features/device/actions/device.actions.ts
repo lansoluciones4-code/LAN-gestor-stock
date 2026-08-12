@@ -23,6 +23,29 @@ export async function fetchDevices(): Promise<DeviceDef[]> {
   }
 }
 
+export type DeviceFieldOption = { value: string; hasProducts: boolean };
+
+export async function fetchDeviceFieldOptions(field: 'category' | 'brand'): Promise<DeviceFieldOption[]> {
+  try {
+    await verifyAuthOrAdmin(false);
+    return await deviceRepository.getFieldOptions(field);
+  } catch (error) {
+    console.error('fetchDeviceFieldOptions error:', error);
+    return [];
+  }
+}
+
+export async function deleteDeviceFieldOptionAction(field: 'category' | 'brand', value: string): Promise<ActionResult> {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+    await deviceRepository.clearFieldOption(field, value);
+    await recordAuditLog(caller.id, 'ELIMINAR', field === 'category' ? 'DEVICE_CATEGORY' : 'DEVICE_BRAND', undefined, { value });
+    return { success: true, message: `"${value}" eliminado de las sugerencias.` };
+  } catch (error: any) {
+    return { success: false, error: error?.message || 'No se pudo eliminar.' };
+  }
+}
+
 export async function toggleDeviceActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
@@ -62,6 +85,8 @@ export async function createDeviceAction(input: DeviceInput): Promise<ActionResu
         result.id,
         {
           name: result.name,
+          category: result.category,
+          brand: result.brand,
           note: wasReactivated ? 'Equipo reactivado' : 'Nuevo registro',
         },
         tx

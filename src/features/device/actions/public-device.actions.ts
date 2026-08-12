@@ -1,19 +1,24 @@
 'use server';
 
-import { z } from 'zod';
 import { deviceRepository } from '@/features/device/repository/device.repository';
-import { deviceRowSchema, type DeviceDef } from '@/features/device/domain/device.schema';
 
 /**
  * Única Server Action de "device" que el catálogo público (Vercel) necesita.
  * Ver nota en public-product.actions.ts sobre por qué vive separada de device.actions.ts.
  */
-export async function fetchLandingCategories(): Promise<DeviceDef[]> {
+export type LandingCategory = { id: string; name: string };
+
+export async function fetchLandingCategories(): Promise<LandingCategory[]> {
   try {
     const devicesList = await deviceRepository.getAllDevices();
-    // Only return active categories for the landing page
-    const active = devicesList.filter((d) => d.isActive);
-    return z.array(deviceRowSchema).parse(active);
+    // Categorías distintas entre los equipos activos (no un filtro por modelo puntual).
+    const categories = new Set<string>();
+    devicesList.forEach((d) => {
+      if (d.isActive && d.category) categories.add(d.category);
+    });
+    return Array.from(categories)
+      .sort((a, b) => a.localeCompare(b))
+      .map((c) => ({ id: c, name: c }));
   } catch (error) {
     console.error('fetchLandingCategories error:', error);
     return [];

@@ -7,8 +7,18 @@ export function getDeviceColumns({ role, onEdit, onToggleActive, onDelete }: { r
 
   return [
     {
-      header: 'Modelo y Categoría',
-      cellClassName: 'max-w-[300px]',
+      header: 'Categoría',
+      cellClassName: 'text-zinc-700 dark:text-zinc-300 max-w-[180px] truncate',
+      cell: (row: DeviceDef) => row.category || '—',
+    },
+    {
+      header: 'Marca',
+      cellClassName: 'text-zinc-700 dark:text-zinc-300 max-w-[150px] truncate',
+      cell: (row: DeviceDef) => row.brand || '—',
+    },
+    {
+      header: 'Modelo',
+      cellClassName: 'max-w-[250px]',
       cell: (row: DeviceDef) => (
         <div
           className='flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0'

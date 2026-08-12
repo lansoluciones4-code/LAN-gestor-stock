@@ -8,9 +8,10 @@ import { ProductCard } from '../product-card';
 interface CatalogGridProps {
   products: ProductDef[];
   onResetFilters: () => void;
+  showPrices: boolean;
 }
 
-export function CatalogGrid({ products, onResetFilters }: CatalogGridProps) {
+export function CatalogGrid({ products, onResetFilters, showPrices }: CatalogGridProps) {
   if (products.length === 0) {
     return (
       <motion.div
@@ -46,7 +47,7 @@ export function CatalogGrid({ products, onResetFilters }: CatalogGridProps) {
             transition={{ duration: 0.2 }}
             className='h-full'
           >
-            <ProductCard product={product} />
+            <ProductCard product={product} showPrice={showPrices} />
           </motion.div>
         ))}
       </AnimatePresence>

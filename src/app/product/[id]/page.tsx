@@ -1,4 +1,5 @@
 import { fetchProductById } from '@/features/product/actions/public-product.actions';
+import { fetchPublicShowPrices } from '@/features/settings/actions/public-settings.actions';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/utils';
 import { BackButton } from '../components/back-button';
@@ -11,7 +12,7 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-  const product = await fetchProductById(id);
+  const [product, showPrices] = await Promise.all([fetchProductById(id), fetchPublicShowPrices()]);
 
   if (!product) {
     notFound();
@@ -42,6 +43,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               salePrice={product.salePrice}
               description={product.description}
               isOutOfStock={isOutOfStock}
+              showPrice={showPrices}
             />
           </div>
         </div>

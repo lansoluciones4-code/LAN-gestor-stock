@@ -9,9 +9,10 @@ import { ContactButtons } from '@/components/contact/contact-buttons';
 
 interface ProductCardProps {
   product: ProductDef & { images?: { publicId: string; url: string }[] };
+  showPrice: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, showPrice }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const deviceName = product.device?.name || 'Accesorio Apple';
@@ -143,7 +144,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className='text-xs sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1 sm:mb-1.5 line-clamp-1'>{deviceName}</h3>
           <p className='text-[11px] sm:text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-2 sm:mb-3 leading-relaxed flex-1'>{product.description || 'Diseñado con precisión para ofrecer la mejor experiencia y protección.'}</p>
           <div className='mb-3'>
-            <span className='text-sm sm:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100'>${product.salePrice.toLocaleString('es-AR')}</span>
+            {showPrice ? (
+              <span className='text-sm sm:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100'>${product.salePrice.toLocaleString('es-AR')}</span>
+            ) : (
+              <span className='text-xs sm:text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400'>Consultar precio</span>
+            )}
           </div>
         </div>
       </Link>

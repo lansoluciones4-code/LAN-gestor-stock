@@ -54,7 +54,8 @@ export function DevicePanel() {
     devices
       .filter((d) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        return terms.every((w) => normalizeForSearch(d.name).includes(w)) && (showInactive || d.isActive);
+        const text = normalizeForSearch(`${d.name} ${d.category || ''} ${d.brand || ''}`);
+        return terms.every((w) => text.includes(w)) && (showInactive || d.isActive);
       })
       .sort((a, b) => (a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1)),
     [devices, search, showInactive]

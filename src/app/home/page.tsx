@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { fetchLandingProducts } from '@/features/product/actions/public-product.actions';
 import { fetchLandingCategories } from '@/features/device/actions/public-device.actions';
+import { fetchPublicShowPrices } from '@/features/settings/actions/public-settings.actions';
 import { CatalogClient } from './components/catalog-client';
 
 export const revalidate = 30;
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default async function HomePage() {
-  const [products, categories] = await Promise.all([fetchLandingProducts(), fetchLandingCategories()]);
+  const [products, categories, showPrices] = await Promise.all([fetchLandingProducts(), fetchLandingCategories(), fetchPublicShowPrices()]);
 
   return (
     <div className='lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-zinc-500/30 flex flex-col'>
@@ -52,6 +53,7 @@ export default async function HomePage() {
         <CatalogClient
           products={products}
           categories={categories}
+          showPrices={showPrices}
         />
       </div>
 
