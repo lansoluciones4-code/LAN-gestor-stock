@@ -153,15 +153,13 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
         </div>
       </Link>
 
-      {!isOutOfStock && (
-        <div className='px-3 pb-4 pt-0 mt-auto'>
-          <ContactButtons
-            product={{ name: deviceName, description: product.description }}
-            size='sm'
-            showLabels={false}
-          />
-        </div>
-      )}
+      <div className='px-3 pb-4 pt-0 mt-auto'>
+        <ContactButtons
+          product={{ category: product.device?.category, brand: product.device?.brand, model: deviceName, inStock: !isOutOfStock }}
+          size='sm'
+          showLabels={false}
+        />
+      </div>
     </motion.div>
   );
 }

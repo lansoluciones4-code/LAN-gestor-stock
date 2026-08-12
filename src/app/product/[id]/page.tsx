@@ -40,6 +40,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className='flex flex-col justify-center 2xl:overflow-y-auto custom-scrollbar pr-0 2xl:pr-6 pb-8 lg:pb-0'>
             <ProductInfo
               deviceName={deviceName}
+              category={product.device?.category}
+              brand={product.device?.brand}
               salePrice={product.salePrice}
               description={product.description}
               isOutOfStock={isOutOfStock}

@@ -4,17 +4,18 @@ export type ContactInfo = {
 };
 
 export type ProductMessageData = {
-  name: string;
-  description?: string | null;
+  category?: string | null;
+  brand?: string | null;
+  model: string;
+  inStock: boolean;
 };
 
 export function generateWhatsAppMessage(product: ProductMessageData): string {
-  const baseMessage = '¡Hola ArgenStock!';
-  const interestMessage = `Me interesa el *${product.name}*`;
-  const descriptionPart = product.description ? ` (${product.description})` : '';
-  const closing = '¿Lo tienen disponible? ¡Muchas gracias!';
+  const label = [product.category, product.brand, product.model].filter(Boolean).join(' - ');
 
-  return `${baseMessage} ${interestMessage}${descriptionPart}. ${closing}`;
+  return product.inStock
+    ? `Buenas, quería saber el precio de ${label}, muchas gracias!`
+    : `Buenas, quería saber si iban a traer ${label} ya que no hay stock en la tienda web, muchas gracias!`;
 }
 
 export function generateWhatsAppLink(phoneNumber: string, message: string): string {
