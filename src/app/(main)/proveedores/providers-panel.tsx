@@ -132,7 +132,7 @@ export function ProvidersPanel() {
         <div className='space-y-4'>
           <div>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Razón Social / Identificador</label>
-            <input type='text' {...register('name')} placeholder='Ej: Accesorios del Sur SRL'
+            <input type='text' {...register('name')}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
             {errors.name && <p className='text-zinc-500 text-xs mt-1.5'>{errors.name.message}</p>}
           </div>
@@ -140,13 +140,12 @@ export function ProvidersPanel() {
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Línea Telefónica Directa</label>
             <input type='text' {...register('phone')}
               onChange={(e) => { e.target.value = e.target.value.replace(/[^0-9+\s]/g, ''); register('phone').onChange(e); }}
-              placeholder='+54 9 11 1234-5678'
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.phone ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
             {errors.phone && <p className='text-zinc-500 text-xs mt-1.5'>{errors.phone.message}</p>}
           </div>
           <div>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Correo Electrónico Comercial</label>
-            <input type='email' {...register('email')} placeholder='ventas@distribuidora.com'
+            <input type='email' {...register('email')}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.email ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`} />
             {errors.email && <p className='text-zinc-500 text-xs mt-1.5'>{errors.email.message}</p>}
           </div>

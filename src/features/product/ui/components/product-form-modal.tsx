@@ -142,8 +142,8 @@ export function ProductFormModal({
           deviceId: '',
           providerId: '',
           description: '',
-          purchasePrice: '0,00',
-          salePrice: '0,00',
+          purchasePrice: '',
+          salePrice: '',
           stock: 1,
         } as any);
         setMarginPercent('');
@@ -281,7 +281,6 @@ export function ProductFormModal({
           <input
             type='text'
             {...register('description')}
-            placeholder='Ej: Negro, 256GB - Kit Funda'
             className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700'
           />
         </div>
@@ -301,7 +300,6 @@ export function ProductFormModal({
                   },
                 })}
                 onKeyDown={blockInvalidPriceKey}
-                placeholder='0,00'
                 className={`w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500 ${errors.purchasePrice ? 'border-zinc-500' : ''}`}
               />
             </div>
@@ -321,7 +319,6 @@ export function ProductFormModal({
                   recalcSalePrice(getValues('purchasePrice') as unknown as string, cleaned);
                 }}
                 onKeyDown={blockInvalidPriceKey}
-                placeholder='Ej: 30'
                 className='w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
               />
             </div>
@@ -336,7 +333,6 @@ export function ProductFormModal({
                 inputMode='decimal'
                 {...register('salePrice', { onChange: (e) => setValue('salePrice', e.target.value.replace(/\./g, '') as any) })}
                 onKeyDown={blockInvalidPriceKey}
-                placeholder='0,00'
                 className={`w-full pl-9 pr-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500 ${errors.salePrice ? 'border-zinc-500' : ''}`}
               />
             </div>
@@ -404,7 +400,6 @@ export function ProductFormModal({
             }}
             min='0'
             step='1'
-            placeholder='1'
             className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
           />
           {errors.stock && <p className='text-zinc-500 text-xs mt-1'>{errors.stock.message}</p>}

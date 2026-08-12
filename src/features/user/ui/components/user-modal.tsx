@@ -79,7 +79,6 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
           <input
             type='text'
             {...register('username')}
-            placeholder='Ej: juan.perez'
             className={`w-full px-4 py-2 text-sm sm:text-base placeholder:text-[11px] sm:placeholder:text-sm border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.username ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.username && <p className='text-zinc-500 text-xs mt-1.5'>{errors.username.message}</p>}
@@ -93,7 +92,6 @@ export function UserModal({ isOpen, onClose, editingItem, onSubmit, isPending, s
           <input
             type='password'
             {...register('password')}
-            placeholder={editingItem ? '******' : 'Escribe una contraseña segura'}
             className={`w-full px-4 py-2 text-sm sm:text-base placeholder:text-[11px] sm:placeholder:text-sm border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.password ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.password && <p className='text-zinc-500 text-xs mt-1.5'>{errors.password.message}</p>}

@@ -11,6 +11,7 @@ import { deviceRowSchema, type DeviceDef } from '@/features/device/domain/device
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 import { ConcurrencyError } from '@/lib/errors';
+import { cloudinaryService } from '@/lib/cloudinary';
 
 import { MESSAGES } from '@/config/messages';
 import { handleDatabaseError } from '@/lib/db-errors';
@@ -120,15 +121,14 @@ export async function updateProductAction(id: string, input: ProductUpdateInput)
 export async function deleteProductAction(id: string): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
+    const product = await productRepository.getProductById(id);
 
-    return await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx): Promise<ActionResult> => {
       // Rule: Cannot delete if has sales or losses (Business check before DB constraint)
       const hasRelations = await productRepository.checkHasRelations(id, tx);
       if (hasRelations) {
         return { success: false, error: MESSAGES.ERROR.DATABASE.FOREIGN_KEY_VIOLATION };
       }
-
-      const product = await productRepository.getProductById(id);
 
       await productRepository.deleteProduct(id, tx);
       await recordAuditLog(caller.id, 'ELIMINAR', 'PRODUCT', id, {
@@ -136,11 +136,22 @@ export async function deleteProductAction(id: string): Promise<ActionResult> {
         description: product?.description ?? '',
         stockAlMomento: product?.stock ?? 0,
         salePrice: String(product?.salePrice ?? 0),
+        photosEliminadas: product?.images?.length ?? 0,
         note: 'Eliminación permanente',
       }, tx);
 
       return { success: true, message: MESSAGES.SUCCESS.DELETED('Producto') };
     });
+
+    // Limpieza best-effort en Cloudinary: si falla, el producto ya quedó eliminado en la base
+    // (que es la fuente de verdad), así que no se hace fallar la operación por esto.
+    if (result.success && product?.images?.length) {
+      await Promise.all(
+        product.images.map((img) => cloudinaryService.deleteImage(img.publicId).catch((err) => console.error(`No se pudo borrar la foto ${img.publicId} de Cloudinary:`, err)))
+      );
+    }
+
+    return result;
   } catch (error: any) {
     return { success: false, error: handleDatabaseError(error, 'producto') };
   }

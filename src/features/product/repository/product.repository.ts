@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { products, productLosses } from '@/lib/db/schema';
+import { products, productLosses, productImages } from '@/lib/db/schema';
 import type { ProductInput, ProductUpdateInput } from '@/features/product/domain/product.schema';
 import { ConcurrencyError } from '@/lib/errors';
 
@@ -106,6 +106,10 @@ export class ProductRepository {
   }
 
   async deleteProduct(id: string, dbtx: any = db) {
+    // Las fotos no tienen valor propio sin el producto (a diferencia de ventas/pérdidas, que sí
+    // se preservan por trazabilidad) — se borran en cascada para no bloquear la eliminación.
+    await dbtx.delete(productImages).where(eq(productImages.productId, id));
+
     const result = await dbtx.delete(products).where(eq(products.id, id)).returning();
     if (result.length === 0) throw new ConcurrencyError();
   }

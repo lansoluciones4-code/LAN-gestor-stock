@@ -167,7 +167,6 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                     e.preventDefault();
                   }
                 }}
-                placeholder='0'
               />
               <span className='absolute right-3 top-1/2 -translate-y-1/2 font-bold text-zinc-400'>%</span>
             </div>
@@ -196,7 +195,6 @@ export function SaleDiscountModal({ isOpen, onClose, subtotal, onConfirm, isPend
                     e.preventDefault();
                   }
                 }}
-                placeholder='0,00'
               />
             </div>
           </div>

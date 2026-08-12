@@ -137,7 +137,7 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
             onChange={(val) => setValue('category', val, { shouldValidate: true, shouldDirty: true })}
             onDeleteOption={(val) => handleDeleteOption('category', val)}
             freeText
-            placeholder='Ej: Celulares'
+            placeholder='Elegir categoría'
             searchPlaceholder='Buscar o escribir una categoría nueva...'
             emptyMessage='Escribí para crear una categoría nueva.'
           />
@@ -151,7 +151,7 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
             onChange={(val) => setValue('brand', val, { shouldValidate: true, shouldDirty: true })}
             onDeleteOption={(val) => handleDeleteOption('brand', val)}
             freeText
-            placeholder='Ej: Apple (opcional)'
+            placeholder='Elegir marca (opcional)'
             searchPlaceholder='Buscar o escribir una marca nueva...'
             emptyMessage='Escribí para crear una marca nueva.'
           />
@@ -163,7 +163,6 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
             type='text'
             {...register('name')}
             autoFocus
-            placeholder='Ej: iPhone 15 Pro Max'
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.name && <p className='text-zinc-500 text-xs mt-1.5'>{errors.name.message}</p>}

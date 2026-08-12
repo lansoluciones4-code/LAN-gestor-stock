@@ -107,7 +107,6 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
             type='text'
             {...register('name')}
             autoFocus
-            placeholder='Ej: Carlos Pérez Martínez'
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.name ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.name && <p className='text-zinc-500 text-xs mt-1.5'>{errors.name.message}</p>}
@@ -124,7 +123,6 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
               // Llamamos al onChange de register manualmente para que react-hook-form se entere del cambio
               register('documentNumber').onChange(e);
             }}
-            placeholder='Ej: 35.123.456 o 20-35123456-9'
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.documentNumber ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
           />
           {errors.documentNumber && <p className='text-zinc-500 text-xs mt-1.5'>{errors.documentNumber.message}</p>}
@@ -136,7 +134,6 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
             <input
               type='text'
               {...register('phone')}
-              placeholder='+54 9 11 9876-5432'
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.phone ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
             />
             {errors.phone && <p className='text-zinc-500 text-xs mt-1.5'>{errors.phone.message}</p>}
@@ -146,7 +143,6 @@ export function CustomerModal({ isOpen, onClose, onSuccess, editingItem }: Custo
             <input
               type='email'
               {...register('email')}
-              placeholder='cliente@correo.com'
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors text-sm ${errors.email ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
             />
             {errors.email && <p className='text-zinc-500 text-xs mt-1.5'>{errors.email.message}</p>}

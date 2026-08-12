@@ -85,13 +85,13 @@ export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
 
       {tab === 'data' && (
         <div className='space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg'>
+          <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest'>DNI / CUIT</label>
           <div className='relative'>
             <IdCard className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
             <input
               type='text'
               value={documentNumber}
               onChange={(e) => setDocumentNumber(e.target.value.replace(/[^0-9.\-]/g, ''))}
-              placeholder='DNI / CUIT del cliente'
               className='w-full pl-9 pr-9 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
             />
             {lookupStatus === 'loading' && <Loader2 className='absolute right-3 top-2.5 h-4 w-4 text-zinc-400 animate-spin' />}
@@ -121,35 +121,41 @@ export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
 
           {lookupStatus === 'not_found' && (
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
-              <div className='relative sm:col-span-2'>
-                <User className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-                <input
-                  type='text'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder='Nombre completo'
-                  className='w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
-                />
+              <div className='sm:col-span-2'>
+                <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1'>Nombre completo</label>
+                <div className='relative'>
+                  <User className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
+                  <input
+                    type='text'
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className='w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
+                  />
+                </div>
               </div>
-              <div className='relative'>
-                <Phone className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-                <input
-                  type='text'
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder='Teléfono'
-                  className='w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
-                />
+              <div>
+                <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1'>Teléfono</label>
+                <div className='relative'>
+                  <Phone className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
+                  <input
+                    type='text'
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className='w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
+                  />
+                </div>
               </div>
-              <div className='relative'>
-                <Mail className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
-                <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder='Email'
-                  className='w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
-                />
+              <div>
+                <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1'>Email</label>
+                <div className='relative'>
+                  <Mail className='absolute left-3 top-2.5 h-4 w-4 text-zinc-400' />
+                  <input
+                    type='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className='w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500'
+                  />
+                </div>
               </div>
             </div>
           )}

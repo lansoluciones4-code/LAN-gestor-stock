@@ -246,7 +246,6 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                           e.preventDefault();
                         }
                       }}
-                      placeholder='0,00'
                       data-testid={TEST_IDS.ventas.payment.inputMonto}
                     />
                   </div>
