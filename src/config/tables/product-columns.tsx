@@ -48,7 +48,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
       cell: (p) => (
         <span
           className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-            p.stock > 5
+            p.stock > p.lowStockThreshold
               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
               : p.stock > 0
                 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'

@@ -156,7 +156,10 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     className='flex flex-col text-[11px] font-bold text-zinc-700 max-w-[220px]'
                   >
                     <div className='flex justify-between items-center'>
-                      <span className='uppercase'>{getPaymentTypeMeta(p.type).label}</span>
+                      <span className='uppercase'>
+                        {getPaymentTypeMeta(p.type).label}
+                        {p.card?.name && ` · ${p.card.name}`}
+                      </span>
                       <span>${p.amount.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     {p.installments > 1 && (

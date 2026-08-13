@@ -68,6 +68,32 @@ export const technicalServices = pgTable('technical_services', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const cards = pgTable('cards', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+  isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const cardInstallments = pgTable(
+  'card_installments',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    cardId: uuid('card_id')
+      .notNull()
+      .references(() => cards.id, { onDelete: 'cascade' }),
+    installments: integer('installments').notNull(),
+    interestPercentage: numeric('interest_percentage', { precision: 5, scale: 2 }).notNull(),
+  },
+  (table) => [index('card_installments_card_id_idx').on(table.cardId)]
+);
+
 export const customers = pgTable('customers', {
   id: uuid('id')
     .primaryKey()
@@ -98,6 +124,7 @@ export const products = pgTable(
     purchasePrice: numeric('purchase_price', { precision: 10, scale: 2 }).notNull(),
     salePrice: numeric('sale_price', { precision: 10, scale: 2 }).notNull(),
     stock: integer('stock').default(1).notNull(),
+    lowStockThreshold: integer('low_stock_threshold').default(5).notNull(),
     showOnLanding: boolean('show_on_landing').default(true).notNull(),
     version: integer('version').default(1).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -235,6 +262,7 @@ export const salePayments = pgTable(
     saleId: uuid('sale_id')
       .notNull()
       .references(() => sales.id),
+    cardId: uuid('card_id').references(() => cards.id),
     type: paymentTypeEnum('type').notNull(),
     amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
     installments: integer('installments').default(1).notNull(),
@@ -340,6 +368,19 @@ export const technicalServicesRelations = relations(technicalServices, ({ many }
   logs: many(auditLogs),
 }));
 
+export const cardsRelations = relations(cards, ({ many }) => ({
+  installments: many(cardInstallments),
+  payments: many(salePayments),
+  logs: many(auditLogs),
+}));
+
+export const cardInstallmentsRelations = relations(cardInstallments, ({ one }) => ({
+  card: one(cards, {
+    fields: [cardInstallments.cardId],
+    references: [cards.id],
+  }),
+}));
+
 export const customersRelations = relations(customers, ({ many }) => ({
   sales: many(sales),
   logs: many(auditLogs),
@@ -366,6 +407,10 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
     fields: [auditLogs.entityId],
     references: [technicalServices.id],
   }),
+  card: one(cards, {
+    fields: [auditLogs.entityId],
+    references: [cards.id],
+  }),
   device: one(devices, {
     fields: [auditLogs.entityId],
     references: [devices.id],
@@ -384,5 +429,9 @@ export const salePaymentsRelations = relations(salePayments, ({ one }) => ({
   sale: one(sales, {
     fields: [salePayments.saleId],
     references: [sales.id],
+  }),
+  card: one(cards, {
+    fields: [salePayments.cardId],
+    references: [cards.id],
   }),
 }));

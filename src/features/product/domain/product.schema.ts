@@ -14,7 +14,7 @@ const priceField = (label: string) =>
 
 /** Input schema for creating a product batch (form → server). */
 export const productCreateSchema = createInsertSchema(products)
-  .pick({ deviceId: true, providerId: true, description: true, purchasePrice: true, salePrice: true, stock: true })
+  .pick({ deviceId: true, providerId: true, description: true, purchasePrice: true, salePrice: true, stock: true, lowStockThreshold: true })
   .extend({
     deviceId: z.string().trim().min(1, 'Debes seleccionar un equipo válido'),
     providerId: z.string().trim().min(1, 'Debes seleccionar un proveedor válido'),
@@ -33,6 +33,17 @@ export const productCreateSchema = createInsertSchema(products)
         return Math.floor(parsed);
       })
       .pipe(z.number().min(0, 'El stock no puede ser negativo')),
+    lowStockThreshold: z
+      .any()
+      .transform((v: any, ctx) => {
+        const parsed = Number(v);
+        if (v === '' || v === null || v === undefined || Number.isNaN(parsed)) {
+          ctx.addIssue({ code: 'custom', message: 'Debe ingresar un límite válido' });
+          return z.NEVER;
+        }
+        return Math.floor(parsed);
+      })
+      .pipe(z.number().min(0, 'El límite no puede ser negativo')),
   });
 
 export type ProductInput = z.infer<typeof productCreateSchema>;

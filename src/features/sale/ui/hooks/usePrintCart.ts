@@ -15,6 +15,10 @@ const computeItem = (listAmount: number, discountPercentage: number) => ({
   subtotal: roundToDecimals(listAmount * (1 - discountPercentage / 100)),
 });
 
+// crypto.randomUUID() requiere contexto seguro (HTTPS o localhost) y falla al
+// entrar por la IP de la LAN en HTTP plano — este id es solo de estado local.
+const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
 export function usePrintCart() {
   const [items, setItems] = useState<PrintCartItem[]>([]);
 
@@ -23,7 +27,7 @@ export function usePrintCart() {
     setItems((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: generateId(),
         colorMode,
         listAmount: amount,
         discountPercentage: 0,

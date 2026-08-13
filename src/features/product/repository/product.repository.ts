@@ -69,6 +69,7 @@ export class ProductRepository {
         purchasePrice: input.purchasePrice.toString(),
         salePrice: input.salePrice.toString(),
         stock: input.stock,
+        lowStockThreshold: input.lowStockThreshold,
         version: 1,
       })
       .returning();
@@ -86,6 +87,7 @@ export class ProductRepository {
     if (input.description !== undefined) updateData.description = input.description;
     if (input.purchasePrice !== undefined) updateData.purchasePrice = input.purchasePrice?.toString();
     if (input.salePrice !== undefined) updateData.salePrice = input.salePrice?.toString();
+    if (input.lowStockThreshold !== undefined) updateData.lowStockThreshold = input.lowStockThreshold;
 
     const whereConditions = [eq(products.id, id), eq(products.version, input.version)];
 

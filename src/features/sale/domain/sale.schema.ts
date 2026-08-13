@@ -48,6 +48,8 @@ export const salePaymentInputSchema = z.object({
   type: z.enum(['efectivo', 'transferencia', 'debito', 'credito']),
   amount: moneyField,
   installments: z.union([z.literal(1), z.literal(3), z.literal(6), z.literal(12)]).default(1),
+  /** Tarjeta usada para un pago en Crédito (referencia informativa; el servidor no recalcula el recargo). */
+  cardId: z.string().uuid().nullable().optional(),
 });
 
 export type SalePaymentInput = z.infer<typeof salePaymentInputSchema>;
@@ -180,6 +182,13 @@ export const saleRowSchema = createSelectSchema(sales).extend({
         type: z.string(),
         amount: z.preprocess((val) => parseFloat(val as string), z.number()),
         installments: z.number(),
+        card: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+          })
+          .optional()
+          .nullable(),
       })
     )
     .optional(),

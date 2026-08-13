@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Plus, Trash2, Edit2, AlertCircle } from 'lucide-react';
+import { CreditCard, Plus, Trash2, Edit2, AlertCircle, Percent } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { type SalePaymentInput } from '@/features/sale/domain/sale.schema';
-import { isValidDecimal } from '@/lib/utils';
+import { type CardDef } from '@/features/card/domain/card.schema';
+import { isValidDecimal, roundToDecimals } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 import { PAYMENT_TYPES, getPaymentTypeMeta, type PaymentType } from '@/lib/payment-types';
 
@@ -17,12 +18,16 @@ const PAYMENT_TYPE_TESTIDS: Record<PaymentType, string> = {
 interface SalePaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  total: number;
-  onConfirm: (payments: SalePaymentInput[]) => void;
+  /** Importe sin descontar — el modal aplica el % de descuento internamente. */
+  subtotal: number;
+  cards: CardDef[];
+  /** Restringe qué métodos de pago se muestran. Por defecto, los 4 habituales. */
+  allowedTypes?: PaymentType[];
+  onConfirm: (payments: SalePaymentInput[], discountPercentage: number) => void;
   isPending?: boolean;
 }
 
-export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending }: SalePaymentModalProps) {
+export function SalePaymentModal({ isOpen, onClose, subtotal, cards, allowedTypes = PAYMENT_TYPES, onConfirm, isPending }: SalePaymentModalProps) {
   const [payments, setPayments] = useState<SalePaymentInput[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -31,10 +36,59 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   const [type, setType] = useState<PaymentType | null>(null);
   const [amount, setAmount] = useState<string>('');
   const [installments, setInstallments] = useState<1 | 3 | 6 | 12>(1);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [discountPercentage, setDiscountPercentage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  const pVal = Math.min(100, Math.max(0, Number((discountPercentage || '0').replace(',', '.')) || 0));
+  const total = roundToDecimals(subtotal * (1 - pVal / 100));
 
   const currentCovered = payments.reduce((acc, p) => acc + p.amount, 0);
   const remaining = total - currentCovered;
+  // Al editar un pago ya agregado, su propio monto ya está sumado en currentCovered — hay que
+  // devolverlo al "saldo a cubrir" para no subestimar la base sobre la que aplicar el recargo.
+  const coverageBase = editingIndex !== null ? remaining + payments[editingIndex].amount : remaining;
+
+  const selectedCard = cards.find((c) => c.id === selectedCardId);
+
+  const applyInstallmentOption = (opt: { installments: number; interestPercentage: number }) => {
+    setInstallments(opt.installments as 1 | 3 | 6 | 12);
+    const computed = roundToDecimals(Math.max(coverageBase, 0) * (1 + opt.interestPercentage / 100));
+    setAmount(computed.toFixed(2).replace('.', ','));
+    setError(null);
+  };
+
+  // Mientras se compone un pago nuevo (no se está editando uno existente), recalcula el monto
+  // sugerido al saldo restante actualizado cada vez que cambia el % de descuento.
+  const refillAmountForNewPayment = (newPct: number) => {
+    if (!isAdding || editingIndex !== null) return;
+    const newTotal = roundToDecimals(subtotal * (1 - newPct / 100));
+    setAmount(Math.max(newTotal - currentCovered, 0).toFixed(2).replace('.', ','));
+  };
+
+  const handleDiscountChange = (val: string) => {
+    if (val === '') {
+      setDiscountPercentage('');
+      setError(null);
+      refillAmountForNewPayment(0);
+      return;
+    }
+    if (val.includes('.')) return;
+    if (/^\d*,?\d{0,2}$/.test(val)) {
+      const num = Number(val.replace(',', '.'));
+      if (num >= 0 && num <= 100) {
+        setDiscountPercentage(val);
+        setError(null);
+        refillAmountForNewPayment(num);
+      } else {
+        setError('El descuento debe estar entre 0 y 100');
+      }
+    } else if (val.includes(',') && val.split(',')[1].length > 2) {
+      setError('Máximo 2 decimales');
+    } else {
+      setError('Formato inválido');
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -42,17 +96,23 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       setIsAdding(false);
       setEditingIndex(null);
       setError(null);
+      setDiscountPercentage('');
       // Auto-start adding if empty
       setIsAdding(true);
       setType(null);
       setInstallments(1);
-      setAmount(total.toFixed(2).replace('.', ','));
+      setSelectedCardId(null);
+      setAmount(subtotal.toFixed(2).replace('.', ','));
     }
-  }, [isOpen, total]);
+  }, [isOpen, subtotal]);
 
   const validateAndAdd = () => {
     if (!type) {
       setError('Elegí un método de pago');
+      return;
+    }
+    if (type === 'credito' && !selectedCardId) {
+      setError('Elegí una tarjeta');
       return;
     }
     const normalizedAmount = amount.replace(',', '.');
@@ -81,7 +141,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       }
 
       const newPayments = [...payments];
-      newPayments[editingIndex] = { type, amount: numAmount, installments: type === 'credito' ? installments : 1 };
+      newPayments[editingIndex] = { type, amount: numAmount, installments: type === 'credito' ? installments : 1, cardId: type === 'credito' ? selectedCardId : null };
       setPayments(newPayments);
       setEditingIndex(null);
     } else {
@@ -97,7 +157,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
         return;
       }
 
-      setPayments([...payments, { type, amount: numAmount, installments: type === 'credito' ? installments : 1 }]);
+      setPayments([...payments, { type, amount: numAmount, installments: type === 'credito' ? installments : 1, cardId: type === 'credito' ? selectedCardId : null }]);
     }
 
     setIsAdding(false);
@@ -113,6 +173,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
     setType(p.type);
     setAmount(p.amount.toFixed(2).replace('.', ','));
     setInstallments((p.installments as 1 | 3 | 6 | 12) || 1);
+    setSelectedCardId(p.cardId ?? null);
     setEditingIndex(index);
     setIsAdding(true);
   };
@@ -124,7 +185,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       setError('El total de los pagos debe cubrir el total de la venta');
       return;
     }
-    onConfirm(payments);
+    onConfirm(payments, pVal);
   };
 
   // Mask logic similar to product form
@@ -152,6 +213,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
   const remainingFormatted = remaining.toLocaleString('es-AR', { minimumFractionDigits: 2 });
   const totalFormatted = total.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+  const subtotalFormatted = subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2 });
 
   return (
     <ResponsiveModal
@@ -162,13 +224,43 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       width='md'
     >
       <div className='space-y-6'>
-        <div className='bg-zinc-50 dark:bg-zinc-900/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-900/30'>
+        <div className='bg-zinc-50 dark:bg-zinc-900/20 p-4 rounded-xl border border-zinc-100 dark:border-zinc-900/30 space-y-2'>
           <div className='flex justify-between items-center'>
+            <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Subtotal</span>
+            <span className='text-sm font-black text-zinc-500'>${subtotalFormatted}</span>
+          </div>
+          <div className='flex justify-between items-center gap-3'>
+            <span className='flex items-center gap-1 text-xs font-black uppercase text-zinc-400 tracking-widest'>
+              <Percent className='w-3 h-3' /> Descuento
+            </span>
+            <div className='relative w-24'>
+              <input
+                type='text'
+                inputMode='decimal'
+                value={discountPercentage}
+                onChange={(e) => handleDiscountChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === ',' && e.currentTarget.value.includes(',')) {
+                    e.preventDefault();
+                    return;
+                  }
+                  if (!/^[0-9]$/.test(e.key) && e.key !== ',' && !['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                  }
+                }}
+                placeholder='0'
+                className='w-full pl-2 pr-6 py-1 text-sm text-right font-bold border rounded-lg bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-zinc-500'
+                data-testid={TEST_IDS.ventas.discount.descuentoPorcentual}
+              />
+              <span className='absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-400'>%</span>
+            </div>
+          </div>
+          <div className='flex justify-between items-center pt-2 border-t border-zinc-100 dark:border-zinc-900/30'>
             <span className='text-xs font-black uppercase text-zinc-400 tracking-widest'>Total a Cobrar</span>
             <span className='text-2xl font-black text-zinc-700 dark:text-zinc-300'>${totalFormatted}</span>
           </div>
           {remaining > 0 && (
-            <div className='flex justify-between items-center mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-900/30'>
+            <div className='flex justify-between items-center pt-2 border-t border-zinc-100 dark:border-zinc-900/30'>
               <span className='text-[10px] font-black uppercase text-zinc-500 tracking-widest'>Saldo Restante</span>
               <span className='text-lg font-black text-zinc-600'>${remainingFormatted}</span>
             </div>
@@ -187,6 +279,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                   setEditingIndex(null);
                   setType(null);
                   setInstallments(1);
+                  setSelectedCardId(null);
                   setAmount(Math.max(remaining, 0).toFixed(2).replace('.', ','));
                 }}
                 leftIcon={<Plus className='w-3 h-3' />}
@@ -201,6 +294,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
             {payments.map((p, i) => {
               const meta = getPaymentTypeMeta(p.type);
               const Icon = meta.icon;
+              const cardName = p.cardId ? cards.find((c) => c.id === p.cardId)?.name : undefined;
               return (
               <div
                 key={i}
@@ -211,6 +305,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                   <div>
                     <p className='text-xs font-bold uppercase text-zinc-900 dark:text-zinc-100 tracking-tight'>
                       {meta.label}
+                      {cardName && <span className='text-zinc-400 font-medium normal-case'> · {cardName}</span>}
                       {p.installments > 1 && <span className='text-zinc-400 font-medium normal-case'> · {p.installments} cuotas</span>}
                     </p>
                     <p className='text-sm font-black text-zinc-600'>${p.amount.toLocaleString('es-AR')}</p>
@@ -237,7 +332,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
             {isAdding && (
               <div className='p-4 bg-zinc-50 dark:bg-zinc-950 border-2 border-dashed border-zinc-200 dark:border-zinc-900/30 rounded-xl space-y-4 animate-in fade-in zoom-in-95 duration-200'>
                 <div className='grid grid-cols-2 gap-3'>
-                  {PAYMENT_TYPES.map((t) => {
+                  {allowedTypes.map((t) => {
                     const meta = getPaymentTypeMeta(t);
                     const Icon = meta.icon;
                     const isSelected = type === t;
@@ -247,7 +342,10 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                         type='button'
                         onClick={() => {
                           setType(t);
-                          if (t !== 'credito') setInstallments(1);
+                          if (t !== 'credito') {
+                            setInstallments(1);
+                            setSelectedCardId(null);
+                          }
                         }}
                         className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-colors duration-100 ease-out ${isSelected ? meta.selected : `border-transparent ${meta.resting}`} ${meta.hover}`}
                         data-testid={PAYMENT_TYPE_TESTIDS[t]}
@@ -261,19 +359,63 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
 
                 {type === 'credito' && (
                   <div>
-                    <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1.5'>Cuotas</label>
-                    <div className='grid grid-cols-4 gap-2'>
-                      {([1, 3, 6, 12] as const).map((n) => (
-                        <button
-                          key={n}
-                          type='button'
-                          onClick={() => setInstallments(n)}
-                          className={`py-2 rounded-lg border-2 text-xs font-black transition-colors duration-100 ease-out ${installments === n ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-300' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'}`}
-                        >
-                          {n}
-                        </button>
-                      ))}
-                    </div>
+                    <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1.5'>{selectedCard ? 'Cuotas' : 'Tarjeta'}</label>
+                    {!selectedCard ? (
+                      cards.filter((c) => c.isActive).length === 0 ? (
+                        <p className='text-xs text-zinc-500 p-3 bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg'>
+                          No hay tarjetas registradas. Pedile a un administrador que cargue una en &quot;Alta de tarjetas&quot;.
+                        </p>
+                      ) : (
+                        <div className='grid grid-cols-2 gap-2'>
+                          {cards
+                            .filter((c) => c.isActive)
+                            .map((c) => (
+                              <button
+                                key={c.id}
+                                type='button'
+                                onClick={() => setSelectedCardId(c.id)}
+                                className='py-2 px-3 rounded-lg border-2 border-transparent bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-bold hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors truncate'
+                              >
+                                {c.name}
+                              </button>
+                            ))}
+                        </div>
+                      )
+                    ) : (
+                      <div className='space-y-2'>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-xs font-bold text-zinc-700 dark:text-zinc-300'>{selectedCard.name}</span>
+                          <button
+                            type='button'
+                            onClick={() => {
+                              setSelectedCardId(null);
+                              setInstallments(1);
+                            }}
+                            className='text-[10px] font-black text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 uppercase'
+                          >
+                            Cambiar tarjeta
+                          </button>
+                        </div>
+                        {selectedCard.installments.length === 0 ? (
+                          <p className='text-xs text-zinc-500 p-3 bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg'>Esta tarjeta no tiene cuotas habilitadas.</p>
+                        ) : (
+                          <div className='grid grid-cols-4 gap-2'>
+                            {[...selectedCard.installments]
+                              .sort((a, b) => a.installments - b.installments)
+                              .map((opt) => (
+                                <button
+                                  key={opt.id}
+                                  type='button'
+                                  onClick={() => applyInstallmentOption(opt)}
+                                  className={`py-2 rounded-lg border-2 text-[11px] font-black transition-colors duration-100 ease-out ${installments === opt.installments ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700 dark:text-zinc-300' : 'border-transparent bg-white dark:bg-zinc-900 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'}`}
+                                >
+                                  {opt.installments}x{opt.interestPercentage > 0 ? ` +${opt.interestPercentage}%` : ''}
+                                </button>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 

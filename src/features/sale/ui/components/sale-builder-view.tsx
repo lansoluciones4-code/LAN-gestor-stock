@@ -167,7 +167,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
   });
 
   return (
-    <div className='flex flex-col h-full space-y-4 animate-in fade-in duration-300 relative overflow-hidden'>
+    <div className='flex flex-col h-full space-y-3 animate-in fade-in duration-300 relative overflow-hidden'>
       <div className='flex flex-col sm:flex-row items-stretch sm:items-center justify-between shrink-0 px-1 gap-3 sm:gap-0'>
         <Button
           variant='secondary'
@@ -199,7 +199,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               setActiveTab(tab.id);
               setSearch('');
             }}
-            className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-md transition-all ${activeTab === tab.id ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+            className={`flex-1 py-1.5 text-xs sm:text-sm font-bold rounded-md transition-all ${activeTab === tab.id ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
           >
             {tab.label}
           </button>
@@ -270,7 +270,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               {filteredServices.map((s) => (
                 <button
                   key={`pos-service-${s.id}`}
-                  onClick={() => addServiceItem(s)}
+                  onDoubleClick={() => addServiceItem(s)}
                   className='w-full flex items-center justify-between p-4 rounded-xl border transition-all bg-white dark:bg-zinc-900 border-zinc-200 hover:border-zinc-500 hover:shadow-md'
                 >
                   <div className='text-left min-w-0 flex-1 mr-4'>
@@ -289,7 +289,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                   </div>
                   <div className='text-right'>
                     <div className='text-lg font-black leading-none text-zinc-600'>${s.value.toLocaleString('es-AR')}</div>
-                    <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>Agregar</div>
+                    <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>Doble click</div>
                   </div>
                 </button>
               ))}
@@ -308,7 +308,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                 <button
                   key={`pos-prod-${p.id}`}
                   disabled={p.stock <= 0}
-                  onClick={() => addToCart(p)}
+                  onDoubleClick={() => addToCart(p)}
                   className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${p.stock <= 0 ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-zinc-500 hover:shadow-md'}`}
                   data-testid={TEST_IDS.ventas.pos.btnAgregarProductoLista}
                 >
@@ -332,7 +332,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                   </div>
                   <div className='text-right'>
                     <div className='text-lg font-black leading-none text-zinc-600'>${p.salePrice.toLocaleString('es-AR')}</div>
-                    <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>Agregar</div>
+                    <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>Doble click</div>
                   </div>
                 </button>
               ))}
@@ -348,15 +348,15 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
 
         {/* Carrito unificado — Desktop */}
         <div className='hidden lg:flex lg:col-span-5 flex-col bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shrink-0 shadow-sm'>
-          <div className='p-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center shrink-0'>
+          <div className='p-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-800/30 flex justify-between items-center shrink-0'>
             <span className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Items en Carrito</span>
             <span className='bg-zinc-600 text-white text-[10px] font-bold px-2 py-0.5 rounded'>{totalItems}</span>
           </div>
-          <div className='flex-1 min-h-0 overflow-y-auto p-4 space-y-2 custom-scrollbar'>
+          <div className='flex-1 min-h-0 overflow-y-auto p-4 space-y-1.5 custom-scrollbar'>
             {cart.map((item) => (
               <div
                 key={`cart-item-${item.productId}`}
-                className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0'
+                className='p-2.5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shadow-sm shrink-0'
               >
                 <div className='flex justify-between items-start gap-2 overflow-hidden'>
                   <span
@@ -408,7 +408,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
             {printItems.map((item) => (
               <div
                 key={`cart-print-${item.id}`}
-                className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0'
+                className='p-2.5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shadow-sm shrink-0'
               >
                 <div className='flex justify-between items-start gap-2 overflow-hidden'>
                   <span className='text-xs font-bold uppercase leading-tight truncate'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</span>
@@ -440,7 +440,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
             {serviceItems.map((item) => (
               <div
                 key={`cart-service-${item.technicalServiceId}`}
-                className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0'
+                className='p-2.5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shadow-sm shrink-0'
               >
                 <div className='flex justify-between items-start gap-2 overflow-hidden'>
                   <span
@@ -496,7 +496,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               </div>
             )}
           </div>
-          <div className='p-5 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl shrink-0'>
+          <div className='p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 space-y-4 rounded-b-xl shrink-0'>
             <div className='flex justify-between items-center pt-2'>
               <span className='text-[10px] text-zinc-400 uppercase font-black'>Total Venta</span>
               <span className='text-3xl text-zinc-600 font-black tracking-tighter'>${cartTotal.toLocaleString('es-AR')}</span>
@@ -508,7 +508,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               disabled={totalItems === 0 || !isCustomerSelectionValid(customerSelectionState) || isPending}
               data-testid={TEST_IDS.ventas.pos.btnConfirmarCarrito}
             >
-              {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
+              {isPending ? 'Procesando...' : 'Siguiente: Método de Pago'}
             </Button>
           </div>
         </div>
@@ -541,11 +541,11 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                 <X className='w-6 h-6' />
               </button>
             </div>
-            <div className='flex-1 min-h-0 overflow-y-auto p-4 space-y-3 custom-scrollbar'>
+            <div className='flex-1 min-h-0 overflow-y-auto p-4 space-y-2 custom-scrollbar'>
               {cart.map((item) => (
                 <div
                   key={`cart-mob-${item.productId}`}
-                  className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0'
+                  className='p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shrink-0'
                 >
                   <div className='flex justify-between items-start overflow-hidden'>
                     <span
@@ -597,7 +597,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               {printItems.map((item) => (
                 <div
                   key={`print-mob-${item.id}`}
-                  className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0'
+                  className='p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shrink-0'
                 >
                   <div className='flex justify-between items-start overflow-hidden'>
                     <span className='text-sm font-bold uppercase leading-tight truncate'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</span>
@@ -629,7 +629,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               {serviceItems.map((item) => (
                 <div
                   key={`service-mob-${item.technicalServiceId}`}
-                  className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0'
+                  className='p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shrink-0'
                 >
                   <div className='flex justify-between items-start overflow-hidden'>
                     <span
@@ -689,7 +689,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                 size='lg'
                 disabled={totalItems === 0 || !isCustomerSelectionValid(customerSelectionState) || isPending}
               >
-                {isPending ? 'Procesando...' : 'Siguiente: Descuentos'}
+                {isPending ? 'Procesando...' : 'Siguiente: Método de Pago'}
               </Button>
             </div>
           </div>

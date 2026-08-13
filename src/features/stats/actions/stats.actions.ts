@@ -43,7 +43,7 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         const stock = Number(p.stock || 0);
         totalEquipos += stock;
         currentInventoryCost += Number(p.purchasePrice || 0) * stock;
-        if (stock > 0 && stock <= 5) lowStockCount += 1;
+        if (stock > 0 && stock <= p.lowStockThreshold) lowStockCount += 1;
       });
 
       // 3. Process Sales (Revenue, COGS, Seller Stats)

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench, CreditCard } from 'lucide-react';
 
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { logoutAction } from '@/features/auth/actions/auth.actions';
@@ -21,6 +21,7 @@ const navigation = [
 
 const adminNavigation = [
   { name: 'Alta de productos', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
+  { name: 'Alta de tarjetas', href: '/tarjetas', icon: CreditCard, roles: ['admin'] },
   { name: 'Usuarios', href: '/usuarios', icon: UserCog, roles: ['admin'] },
   { name: 'Auditoría', href: '/logs', icon: ShieldAlert, roles: ['admin'] },
 ];

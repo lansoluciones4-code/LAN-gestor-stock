@@ -35,7 +35,13 @@ export class SaleRepository {
             },
           },
         },
-        payments: true,
+        payments: {
+          with: {
+            card: {
+              columns: { id: true, name: true },
+            },
+          },
+        },
       },
     });
   }
@@ -61,7 +67,11 @@ export class SaleRepository {
             technicalService: true,
           },
         },
-        payments: true,
+        payments: {
+          with: {
+            card: true,
+          },
+        },
       },
     });
   }
@@ -211,6 +221,7 @@ export class SaleRepository {
       for (const p of input.payments) {
         await dbtx.insert(salePayments).values({
           saleId: sale.id,
+          cardId: p.cardId || null,
           type: p.type as any,
           amount: p.amount.toString(),
           installments: p.installments,

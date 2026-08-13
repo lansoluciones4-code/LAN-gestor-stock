@@ -23,6 +23,7 @@ interface SalesListViewProps {
   setEndDate: (v: string) => void;
   onSync: () => void;
   onNewSale: () => void;
+  onQuickSale: () => void;
   onPrintRow: (s: SaleDef) => void;
   onDeleteRow: (id: string) => void;
   globalMessage: React.ReactNode;
@@ -41,7 +42,7 @@ function filterSales(sales: SaleDef[], searchTerm: string, startDate: string, en
   });
 }
 
-export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, startDate, setStartDate, endDate, setEndDate, onSync, onNewSale, onPrintRow, onDeleteRow, globalMessage }: SalesListViewProps) {
+export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, startDate, setStartDate, endDate, setEndDate, onSync, onNewSale, onQuickSale, onPrintRow, onDeleteRow, globalMessage }: SalesListViewProps) {
   const role = useAuthStore((s) => s.user?.role);
   const filteredSales = filterSales(sales, searchTerm, startDate, endDate);
   const columns = getSalesColumns({ role, onPrint: onPrintRow, onDelete: onDeleteRow });
@@ -69,10 +70,16 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
           </Button>
         }
         actions={
-          <Button variant='primary' onClick={onNewSale} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnAgregar}>
-            <span className='hidden sm:inline'>Nueva Venta</span>
-            <span className='sm:hidden'>Nueva</span>
-          </Button>
+          <div className='flex flex-col gap-2 w-full sm:w-auto'>
+            <Button variant='success' onClick={onQuickSale} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnVentaRapida}>
+              <span className='hidden sm:inline'>Venta Rápida</span>
+              <span className='sm:hidden'>Rápida</span>
+            </Button>
+            <Button variant='primary' onClick={onNewSale} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnAgregar}>
+              <span className='hidden sm:inline'>Nueva Venta</span>
+              <span className='sm:hidden'>Nueva</span>
+            </Button>
+          </div>
         }
       />
 

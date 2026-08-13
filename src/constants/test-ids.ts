@@ -2,6 +2,7 @@ export const TEST_IDS = {
   general: {
     btnSincronizar: 'btnSincronizar',
     btnAgregar: 'btnAgregar',
+    btnVentaRapida: 'btnVentaRapida',
     btnVerOcultos: 'btnVerOcultos',
     inputBusquedaTabla: 'inputBusquedaTabla',
     btnSubmitModal: 'btnSubmitModal',

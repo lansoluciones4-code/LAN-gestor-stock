@@ -131,6 +131,7 @@ export function ProductFormModal({
           purchasePrice: editingItem.purchasePrice.toFixed(2).replace('.', ','),
           salePrice: editingItem.salePrice.toFixed(2).replace('.', ','),
           stock: editingItem.stock,
+          lowStockThreshold: editingItem.lowStockThreshold,
         } as any);
         const impliedMargin = editingItem.purchasePrice > 0 ? ((editingItem.salePrice - editingItem.purchasePrice) / editingItem.purchasePrice) * 100 : 0;
         setMarginPercent(impliedMargin > 0 ? impliedMargin.toFixed(2).replace('.', ',') : '');
@@ -145,6 +146,7 @@ export function ProductFormModal({
           purchasePrice: '',
           salePrice: '',
           stock: 1,
+          lowStockThreshold: 5,
         } as any);
         setMarginPercent('');
         setSelectedSection('tech');
@@ -403,6 +405,22 @@ export function ProductFormModal({
             className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
           />
           {errors.stock && <p className='text-zinc-500 text-xs mt-1'>{errors.stock.message}</p>}
+        </div>
+
+        <div>
+          <label className='block text-sm font-medium mb-1.5'>Stock Límite</label>
+          <input
+            type='number'
+            {...register('lowStockThreshold', { valueAsNumber: true })}
+            onKeyDown={(e) => {
+              if (PRICE_BLOCKED_KEYS.includes(e.key)) e.preventDefault();
+            }}
+            min='0'
+            step='1'
+            className='w-full px-4 py-2 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+          />
+          <p className='text-zinc-400 text-xs mt-1'>A partir de cuántas unidades se avisa que este producto está bajo de stock.</p>
+          {errors.lowStockThreshold && <p className='text-zinc-500 text-xs mt-1'>{errors.lowStockThreshold.message}</p>}
         </div>
       </div>
     </ResponsiveModal>

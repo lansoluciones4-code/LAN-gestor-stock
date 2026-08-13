@@ -5,7 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'success';
   fullWidth?: boolean;
   leftIcon?: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'icon';
@@ -26,6 +26,7 @@ export function Button({ children, variant = 'primary', fullWidth = false, leftI
     primary: 'bg-black hover:bg-zinc-800 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200',
     secondary: 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800',
     danger: 'bg-red-600 hover:bg-red-700 text-white',
+    success: 'bg-emerald-600 hover:bg-emerald-700 text-white',
     ghost: 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400',
     outline: 'bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900',
   };
