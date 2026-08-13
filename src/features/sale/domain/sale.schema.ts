@@ -113,7 +113,7 @@ export const saleCreateSchema = createInsertSchema(sales)
     payments: z
       .array(salePaymentInputSchema)
       .min(1, 'Debe especificar al menos un método de pago')
-      .max(2, 'Solo se permiten hasta dos métodos de pago'),
+      .max(1, 'Solo se permite un método de pago'),
   })
   .refine((data) => data.items.length + data.printItems.length + data.serviceItems.length > 0, {
     message: 'La venta debe tener al menos un producto, impresión o servicio técnico',

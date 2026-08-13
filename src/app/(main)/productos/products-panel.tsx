@@ -116,7 +116,7 @@ export function ProductsPanel() {
     return products
       .filter((p) => {
         const terms = normalizeForSearch(search).split(/\s+/);
-        const text = [normalizeForSearch(p.device?.name), normalizeForSearch(p.device?.brand), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
+        const text = [normalizeForSearch(p.device?.name), normalizeForSearch(p.device?.category), normalizeForSearch(p.device?.brand), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
         return terms.every((w) => text.includes(w)) && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0) && (!showOnlyLanding || p.showOnLanding);
@@ -148,7 +148,7 @@ export function ProductsPanel() {
       <PanelToolbar
         search={search}
         onSearchChange={setSearch}
-        searchPlaceholder={role === 'admin' ? 'Buscar por equipo, descripción o proveedor' : 'Buscar por equipo o descripción'}
+        searchPlaceholder={role === 'admin' ? 'Buscar por equipo, categoría, marca, descripción o proveedor' : 'Buscar por equipo, categoría, marca o descripción'}
         searchPlaceholderMobile='Buscar productos...'
         data-testid={TEST_IDS.general.inputBusquedaTabla}
         filters={

@@ -44,10 +44,17 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
           id='print-area-wrapper'
           className='bg-white text-zinc-900 p-4 sm:p-12 border border-zinc-200 rounded-xl shadow-lg max-w-2xl mx-auto'
         >
-          <div className='flex justify-between items-start mb-12 border-b-2 border-zinc-50 pb-8'>
+          <div className='grid grid-cols-3 items-start mb-12 border-b-2 border-zinc-50 pb-8'>
             <div>
-              <h2 className='text-3xl font-black text-zinc-600'>ARGENSTOCK</h2>
-              <p className='text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1'>Registro Comercial</p>
+              <h2 className='text-5xl font-black text-zinc-600'>LAN</h2>
+              <p className='text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] mt-1'>Soluciones Tecnológicas</p>
+            </div>
+            <div className='flex justify-center'>
+              <img
+                src='/LAN_icono.jpg'
+                alt='LAN Soluciones Tecnológicas'
+                className='w-28 h-28 rounded-full object-cover border border-zinc-200 shadow-sm shrink-0'
+              />
             </div>
             <div className='text-right'>
               <div className='text-[11px] font-bold text-zinc-900 uppercase'>
@@ -198,6 +205,14 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 <span className='text-3xl font-black text-zinc-700 forced-color-black animate-in fade-in zoom-in duration-500 delay-300'>${sale.total.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
+          </div>
+
+          <div className='print-footer mt-10 pt-4 border-t border-zinc-100 text-center'>
+            <p className='text-[15px] text-zinc-400 font-medium leading-relaxed'>
+              LAN Soluciones Tecnológicas de Franco BISSIO · CUIT 20-31923402-1
+              <br />
+              Avenida Guillermo Hudson 196 · Rawson - Chubut · CEL: 2804777200
+            </p>
           </div>
         </div>
       </div>

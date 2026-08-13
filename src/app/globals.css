@@ -68,6 +68,10 @@ button:focus,
 }
 
 @media print {
+  @page {
+    margin: 0;
+  }
+
   body {
     background: white !important;
     -webkit-print-color-adjust: exact !important;
@@ -126,6 +130,19 @@ button:focus,
     visibility: visible !important;
     display: block !important;
     z-index: 9999;
+  }
+
+  /* Footer del comprobante: siempre centrado y pegado abajo de cada hoja impresa,
+     en el lugar donde el navegador imprimiría su propio footer de URL/página. */
+  .print-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 8mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-top: none !important;
+    text-align: center;
   }
 
 }

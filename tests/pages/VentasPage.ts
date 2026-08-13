@@ -35,11 +35,8 @@ export class VentasPage {
   readonly btnQuitarDescuentos: Locator;
 
   // Metodos de pago
-  readonly btnAgregarMetodoDePago: Locator;
   readonly btnFinalizarYFacturar: Locator;
   readonly btnVolverCarrito: Locator;
-  readonly btnCancelarMetodoDePago: Locator;
-  readonly btnAddAnotherMetodoDePago: Locator;
   readonly btnEfectivo: Locator;
   readonly btnTranserencia: Locator;
   readonly inputMontoPago: Locator;
@@ -70,11 +67,8 @@ export class VentasPage {
     this.btnQuitarDescuentos = page.getByTestId(TEST_IDS.ventas.discount.btnQuitarDescuento).filter({ visible: true });
 
     // Metodos de pago
-    this.btnAgregarMetodoDePago = page.getByTestId(TEST_IDS.ventas.payment.btnAddMetodoDePago).filter({ visible: true });
     this.btnFinalizarYFacturar = page.getByTestId(TEST_IDS.ventas.payment.btnFinalizarYFacturar).filter({ visible: true });
     this.btnVolverCarrito = page.getByTestId(TEST_IDS.ventas.payment.btnVolverCarrito).filter({ visible: true });
-    this.btnCancelarMetodoDePago = page.getByTestId(TEST_IDS.ventas.payment.btnCancelarMetodoDePago).filter({ visible: true });
-    this.btnAddAnotherMetodoDePago = page.getByTestId(TEST_IDS.ventas.payment.btnAddAnotherMetodoDePago).filter({ visible: true });
     this.btnEfectivo = page.getByTestId(TEST_IDS.ventas.payment.btnEfectivo).filter({ visible: true });
     this.btnTranserencia = page.getByTestId(TEST_IDS.ventas.payment.btnTranserencia).filter({ visible: true });
     this.inputMontoPago = page.getByTestId(TEST_IDS.ventas.payment.inputMonto).filter({ visible: true });
@@ -195,8 +189,6 @@ export class VentasPage {
     if (monto !== undefined) {
       await this.inputMontoPago.fill(monto);
     }
-
-    await this.btnAgregarMetodoDePago.click();
   }
 
   async agregarMetodoTransferencia(monto?: string) {
@@ -205,8 +197,6 @@ export class VentasPage {
     if (monto !== undefined) {
       await this.inputMontoPago.fill(monto);
     }
-
-    await this.btnAgregarMetodoDePago.click();
   }
 
   async finalizarFactura() {
