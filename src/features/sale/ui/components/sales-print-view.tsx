@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { getPaymentTypeMeta } from '@/lib/payment-types';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
-  const itemsSubtotal = sale.businessSection === 'impresiones' ? sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0 : sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0;
+  const itemsSubtotal = (sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0) + (sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0) + (sale.serviceItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,31 +69,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
             </div>
           </div>
 
-          {sale.businessSection === 'impresiones' ? (
-            <table className='w-full mb-16'>
-              <thead>
-                <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
-                  <th className='py-5'>Hojas</th>
-                  <th className='py-5 text-center'>Modo</th>
-                  <th className='py-5 text-right'>Precio</th>
-                  <th className='py-5 text-right'>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-zinc-100'>
-                {sale.printItems?.map((item: any) => (
-                  <tr
-                    key={item.id}
-                    className='text-[13px] text-zinc-900'
-                  >
-                    <td className='py-5 font-bold text-zinc-900'>{item.pages}</td>
-                    <td className='py-5 text-center font-bold text-zinc-900 uppercase'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</td>
-                    <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
+          {sale.items && sale.items.length > 0 && (
             <table className='w-full mb-16'>
               <thead>
                 <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
@@ -104,7 +80,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                 </tr>
               </thead>
               <tbody className='divide-y divide-zinc-100'>
-                {sale.items?.map((item: any) => (
+                {sale.items.map((item: any) => (
                   <tr
                     key={item.id}
                     className='text-[13px] text-zinc-900'
@@ -115,6 +91,54 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     </td>
                     <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
                     <td className='py-5 text-right text-zinc-900'>${item.unitPrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {sale.printItems && sale.printItems.length > 0 && (
+            <table className='w-full mb-16'>
+              <thead>
+                <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
+                  <th className='py-5'>Modo</th>
+                  <th className='py-5 text-right'>Importe</th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-zinc-100'>
+                {sale.printItems.map((item: any) => (
+                  <tr
+                    key={item.id}
+                    className='text-[13px] text-zinc-900'
+                  >
+                    <td className='py-5 font-bold text-zinc-900 uppercase'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</td>
+                    <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {sale.serviceItems && sale.serviceItems.length > 0 && (
+            <table className='w-full mb-16'>
+              <thead>
+                <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
+                  <th className='py-5'>Servicio</th>
+                  <th className='py-5 text-center'>Cant</th>
+                  <th className='py-5 text-right'>Valor</th>
+                  <th className='py-5 text-right'>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-zinc-100'>
+                {sale.serviceItems.map((item: any) => (
+                  <tr
+                    key={item.id}
+                    className='text-[13px] text-zinc-900'
+                  >
+                    <td className='py-5 font-bold text-zinc-900'>{item.technicalService?.name ?? 'Servicio técnico'}</td>
+                    <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
+                    <td className='py-5 text-right text-zinc-900'>${item.unitValue.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                 ))}

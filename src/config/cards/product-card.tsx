@@ -88,12 +88,14 @@ export function renderProductCard(actions: ProductCardActionsProps) {
                 onClick={() => actions.onManagePhotos(product)}
               />
             )}
-            <CardAction
-              icon={<Trash2 className='w-4 h-4' />}
-              label='Eliminar'
-              onClick={() => actions.onDelete(product.id!)}
-              variant='danger'
-            />
+            {actions.role === 'admin' && (
+              <CardAction
+                icon={<Trash2 className='w-4 h-4' />}
+                label='Eliminar'
+                onClick={() => actions.onDelete(product.id!)}
+                variant='danger'
+              />
+            )}
           </>
         }
       />

@@ -18,6 +18,7 @@ export class AuditLogRepository {
           const entityMapping = [
             { label: 'usuario', value: 'USER' },
             { label: 'proveedor', value: 'PROVIDER' },
+            { label: 'servicio técnico', value: 'TECHNICAL_SERVICE' },
             { label: 'producto', value: 'PRODUCT' },
             { label: 'cliente', value: 'CUSTOMER' },
             { label: 'equipo', value: 'DEVICE' },

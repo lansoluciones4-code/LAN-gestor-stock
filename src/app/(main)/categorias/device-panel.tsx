@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
@@ -14,6 +14,7 @@ import { DeviceModal } from '@/features/device/ui/components/device-modal';
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { useDeviceStore } from '@/features/device/store/device.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { getDeviceColumns } from '@/config/tables/device-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeForSearch } from '@/lib/utils';
@@ -23,7 +24,6 @@ import { renderDeviceCard } from '@/config/cards/device-card';
 
 export function DevicePanel() {
   const role = useAuthStore((s) => s.user?.role);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
   const { devices, setDevices, isLoaded } = useDeviceStore();
 
@@ -42,13 +42,7 @@ export function DevicePanel() {
     showInactive,
   });
 
-  useEffect(() => {
-    if (isLoaded) { setInitialLoading(false); return; }
-    setInitialLoading(true);
-    fetchDevices().then(setDevices).finally(() => setInitialLoading(false));
-  }, [isLoaded, setDevices]);
-
-
+  const { initialLoading } = useAutoSync({ isLoaded, sync: () => fetchDevices().then(setDevices) });
 
   const filteredDevices = useMemo(() =>
     devices

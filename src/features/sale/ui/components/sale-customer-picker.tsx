@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { IdCard, User, Phone, Mail, Loader2, CheckCircle2, RotateCcw } from 'lucide-react';
-import { fetchCustomerByDocumentNumberAction } from '@/features/customer/actions/customer.actions';
+import { fetchCustomersByDocumentPrefixAction } from '@/features/customer/actions/customer.actions';
+import { type CustomerDef } from '@/features/customer/domain/customer.schema';
 
 export type SaleCustomerSelection =
   | { mode: 'final' }
@@ -23,8 +24,9 @@ interface SaleCustomerPickerProps {
 export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
   const [tab, setTab] = useState<'final' | 'data'>('final');
   const [documentNumber, setDocumentNumber] = useState('');
-  const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'found' | 'not_found'>('idle');
+  const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'suggestions' | 'found' | 'not_found'>('idle');
   const [found, setFound] = useState<{ id: string; name: string; phone: string; email: string } | null>(null);
+  const [suggestions, setSuggestions] = useState<CustomerDef[]>([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -43,26 +45,39 @@ export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
   }, [tab, found, name, phone, email, documentNumber]);
 
   useEffect(() => {
-    if (tab !== 'data') return;
+    if (tab !== 'data' || found) return;
     const normalized = documentNumber.replace(/[.\-]/g, '').trim();
-    if (normalized.length < 4) {
+    if (normalized.length < 1) {
       setLookupStatus('idle');
-      setFound(null);
+      setSuggestions([]);
       return;
     }
     setLookupStatus('loading');
     const timeout = setTimeout(async () => {
-      const result = await fetchCustomerByDocumentNumberAction(documentNumber);
-      if (result) {
-        setFound({ id: result.id, name: result.name, phone: result.phone, email: result.email });
+      const results = await fetchCustomersByDocumentPrefixAction(documentNumber);
+      const exactMatch = results.find((r) => r.documentNumber.replace(/[.\-]/g, '') === normalized);
+
+      if (exactMatch) {
+        setFound({ id: exactMatch.id, name: exactMatch.name, phone: exactMatch.phone, email: exactMatch.email });
+        setSuggestions([]);
         setLookupStatus('found');
+      } else if (results.length > 0) {
+        setSuggestions(results);
+        setLookupStatus('suggestions');
       } else {
-        setFound(null);
-        setLookupStatus('not_found');
+        setSuggestions([]);
+        setLookupStatus(normalized.length >= 4 ? 'not_found' : 'idle');
       }
     }, 400);
     return () => clearTimeout(timeout);
-  }, [documentNumber, tab]);
+  }, [documentNumber, tab, found]);
+
+  const selectSuggestion = (customer: CustomerDef) => {
+    setFound({ id: customer.id, name: customer.name, phone: customer.phone, email: customer.email });
+    setDocumentNumber(customer.documentNumber);
+    setSuggestions([]);
+    setLookupStatus('found');
+  };
 
   return (
     <div className='w-full space-y-2'>
@@ -98,6 +113,24 @@ export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
             {lookupStatus === 'found' && <CheckCircle2 className='absolute right-3 top-2.5 h-4 w-4 text-emerald-500' />}
           </div>
 
+          {lookupStatus === 'suggestions' && suggestions.length > 0 && (
+            <div className='flex flex-col divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden max-h-48 overflow-y-auto'>
+              {suggestions.map((customer) => (
+                <button
+                  key={customer.id}
+                  type='button'
+                  onClick={() => selectSuggestion(customer)}
+                  className='flex items-center justify-between gap-2 p-2 text-left bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors'
+                >
+                  <div className='min-w-0'>
+                    <p className='text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate'>{customer.name}</p>
+                    <p className='text-[10px] text-zinc-500 truncate'>{customer.documentNumber}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
           {lookupStatus === 'found' && found && (
             <div className='flex items-center justify-between gap-2 p-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-900/30 rounded-lg'>
               <div className='min-w-0'>
@@ -109,6 +142,7 @@ export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
                 onClick={() => {
                   setDocumentNumber('');
                   setFound(null);
+                  setSuggestions([]);
                   setLookupStatus('idle');
                 }}
                 className='shrink-0 p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'

@@ -24,11 +24,11 @@ export function renderProviderCard(actions: ProviderCardActionsProps) {
         <div className='flex flex-col gap-1 mt-1'>
           <div className='flex justify-between'>
             <span className='text-xs text-zinc-400'>Teléfono</span>
-            <span className='truncate max-w-[180px]'>{provider.phone}</span>
+            <span className='truncate max-w-[180px]'>{provider.phone || 'Sin especificar'}</span>
           </div>
           <div className='flex justify-between'>
             <span className='text-xs text-zinc-400'>Email</span>
-            <span className='truncate max-w-[180px]'>{provider.email}</span>
+            <span className='truncate max-w-[180px]'>{provider.email || 'Sin especificar'}</span>
           </div>
         </div>
       }

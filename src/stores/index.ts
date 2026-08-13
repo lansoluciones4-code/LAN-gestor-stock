@@ -6,6 +6,7 @@ import { useProviderStore } from '@/features/provider/store/provider.store';
 import { useSaleStore } from '@/features/sale/store/sale.store';
 import { useStatsStore } from '@/features/stats/store/stats.store';
 import { useUserStore } from '@/features/user/store/user.store';
+import { useTechnicalServiceStore } from '@/features/technical-service/store/technical-service.store';
 
 /**
  * Centrally invalidates all data caches in the application.
@@ -20,4 +21,5 @@ export const invalidateAllCaches = () => {
   useSaleStore.getState().setLoaded(false);
   useStatsStore.getState().setLoaded(false);
   useUserStore.getState().setLoaded(false);
+  useTechnicalServiceStore.getState().setLoaded(false);
 };

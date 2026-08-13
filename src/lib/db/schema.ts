@@ -55,6 +55,19 @@ export const providers = pgTable('providers', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const technicalServices = pgTable('technical_services', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 150 }).notNull().unique(),
+  description: varchar('description', { length: 500 }).notNull().default(''),
+  value: numeric('value', { precision: 10, scale: 2 }).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const customers = pgTable('customers', {
   id: uuid('id')
     .primaryKey()
@@ -116,7 +129,6 @@ export const sales = pgTable(
     vendorId: uuid('vendor_id')
       .notNull()
       .references(() => users.id),
-    businessSection: businessSectionEnum('business_section').notNull().default('tech'),
     total: numeric('total', { precision: 10, scale: 2 }).notNull(),
     discountAmount: numeric('discount_amount', { precision: 10, scale: 2 }).default('0').notNull(),
     discountPercentage: numeric('discount_percentage', { precision: 5, scale: 2 }).default('0').notNull(),
@@ -154,12 +166,29 @@ export const salePrintItems = pgTable(
     saleId: uuid('sale_id')
       .notNull()
       .references(() => sales.id),
-    pages: integer('pages').notNull(),
     colorMode: colorModeEnum('color_mode').notNull(),
-    unitPrice: numeric('unit_price', { precision: 10, scale: 2 }).notNull(),
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
   (table) => [index('sale_print_items_sale_id_idx').on(table.saleId)]
+);
+
+export const saleServiceItems = pgTable(
+  'sale_service_items',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    saleId: uuid('sale_id')
+      .notNull()
+      .references(() => sales.id),
+    technicalServiceId: uuid('technical_service_id')
+      .notNull()
+      .references(() => technicalServices.id),
+    quantity: integer('quantity').notNull().default(1),
+    unitValue: numeric('unit_value', { precision: 10, scale: 2 }).notNull(),
+    subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
+  },
+  (table) => [index('sale_service_items_sale_id_idx').on(table.saleId)]
 );
 
 export const auditLogs = pgTable(
@@ -246,6 +275,7 @@ export const salesRelations = relations(sales, ({ one, many }) => ({
   }),
   items: many(saleItems),
   printItems: many(salePrintItems),
+  serviceItems: many(saleServiceItems),
   payments: many(salePayments),
 }));
 
@@ -253,6 +283,17 @@ export const salePrintItemsRelations = relations(salePrintItems, ({ one }) => ({
   sale: one(sales, {
     fields: [salePrintItems.saleId],
     references: [sales.id],
+  }),
+}));
+
+export const saleServiceItemsRelations = relations(saleServiceItems, ({ one }) => ({
+  sale: one(sales, {
+    fields: [saleServiceItems.saleId],
+    references: [sales.id],
+  }),
+  technicalService: one(technicalServices, {
+    fields: [saleServiceItems.technicalServiceId],
+    references: [technicalServices.id],
   }),
 }));
 
@@ -294,6 +335,11 @@ export const providersRelations = relations(providers, ({ many }) => ({
   logs: many(auditLogs),
 }));
 
+export const technicalServicesRelations = relations(technicalServices, ({ many }) => ({
+  saleItems: many(saleServiceItems),
+  logs: many(auditLogs),
+}));
+
 export const customersRelations = relations(customers, ({ many }) => ({
   sales: many(sales),
   logs: many(auditLogs),
@@ -315,6 +361,10 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   provider: one(providers, {
     fields: [auditLogs.entityId],
     references: [providers.id],
+  }),
+  technicalService: one(technicalServices, {
+    fields: [auditLogs.entityId],
+    references: [technicalServices.id],
   }),
   device: one(devices, {
     fields: [auditLogs.entityId],

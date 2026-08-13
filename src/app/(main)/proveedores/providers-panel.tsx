@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Store, RefreshCcw } from 'lucide-react';
@@ -13,6 +13,7 @@ import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,6 @@ import { renderProviderCard } from '@/config/cards/provider-card';
 
 export function ProvidersPanel() {
   const role = useAuthStore((s) => s.user?.role);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
   const { providers, setProviders, isLoaded } = useProviderStore();
 
@@ -43,11 +43,7 @@ export function ProvidersPanel() {
     showInactive,
   });
 
-  useEffect(() => {
-    if (isLoaded) { setInitialLoading(false); return; }
-    setInitialLoading(true);
-    fetchProviders().then(setProviders).finally(() => setInitialLoading(false));
-  }, [isLoaded, setProviders]);
+  const { initialLoading } = useAutoSync({ isLoaded, sync: () => fetchProviders().then(setProviders) });
 
   const { register, handleSubmit, reset, formState: { errors, dirtyFields } } = useForm<ProviderInput>({
     resolver: zodResolver(providerCreateSchema),

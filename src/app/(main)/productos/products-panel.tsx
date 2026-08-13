@@ -10,6 +10,7 @@ import { useProviderStore } from '@/features/provider/store/provider.store';
 import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { useEntityActions } from '@/hooks/use-entity-actions';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
@@ -31,7 +32,6 @@ import { ProductPhotosManager } from '@/features/product/ui/components/product-p
 
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [showZeroStock, setShowZeroStock] = useState(false);
   const [showOnlyLanding, setShowOnlyLanding] = useState(false);
   const [showPricesOnCatalog, setShowPricesOnCatalog] = useState(true);
@@ -83,14 +83,15 @@ export function ProductsPanel() {
 
   const isPending = isPendingAction || isPendingLocal || isUploadingPhotos;
 
-  useEffect(() => {
-    if (prodsLoaded && devicesLoaded && supsLoaded) { setInitialLoading(false); return; }
-    setInitialLoading(true);
-    const promises: Promise<unknown>[] = [];
-    if (!prodsLoaded) promises.push(fetchProducts().then(setProducts));
-    if (!devicesLoaded || !supsLoaded) promises.push(fetchSelectorData().then((res) => { setDevices(res.devices); setSuppliers(res.providers); }));
-    Promise.all(promises).finally(() => setInitialLoading(false));
-  }, [prodsLoaded, devicesLoaded, supsLoaded, setProducts, setDevices, setSuppliers]);
+  const { initialLoading } = useAutoSync({
+    isLoaded: prodsLoaded && devicesLoaded && supsLoaded,
+    sync: async () => {
+      const [prods, selector] = await Promise.all([fetchProducts(), fetchSelectorData()]);
+      setProducts(prods);
+      setDevices(selector.devices);
+      setSuppliers(selector.providers);
+    },
+  });
 
   useEffect(() => {
     if (role === 'admin') fetchShowPrices().then(setShowPricesOnCatalog);

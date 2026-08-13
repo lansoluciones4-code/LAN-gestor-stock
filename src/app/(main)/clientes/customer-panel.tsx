@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
@@ -12,6 +12,7 @@ import { createCustomerAction, updateCustomerAction, deleteCustomerAction, fetch
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { useCustomerStore } from '@/features/customer/store/customer.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { getCustomerColumns } from '@/config/tables/customer-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeForSearch } from '@/lib/utils';
@@ -22,7 +23,6 @@ import { renderCustomerCard } from '@/config/cards/customer-card';
 
 export function CustomerPanel() {
   const role = useAuthStore((s) => s.user?.role);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [showInactive, setShowInactive] = useState(false);
   const { customers, setCustomers, isLoaded } = useCustomerStore();
 
@@ -41,11 +41,7 @@ export function CustomerPanel() {
     showInactive,
   });
 
-  useEffect(() => {
-    if (isLoaded) { setInitialLoading(false); return; }
-    setInitialLoading(true);
-    fetchCustomers().then(setCustomers).finally(() => setInitialLoading(false));
-  }, [isLoaded, setCustomers]);
+  const { initialLoading } = useAutoSync({ isLoaded, sync: () => fetchCustomers().then(setCustomers) });
 
   const filteredCustomers = useMemo(() =>
     customers

@@ -12,6 +12,7 @@ import { fetchAuditLogs } from '@/features/audit/actions/audit.actions';
 import { useAuditStore } from '@/features/audit/store/audit.store';
 import { invalidateAllCaches } from '@/stores';
 import { useEntityManager } from '@/hooks/use-entity-manager';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { getAuditColumns } from '@/config/tables/audit-columns';
 import { TEST_IDS } from '@/constants/test-ids';
 import { renderAuditCard } from '@/config/cards/audit-card';
@@ -99,7 +100,6 @@ AuditDetailModal.displayName = 'AuditDetailModal';
 
 export function LogPanel() {
   const { logs, setLogs, appendLogs, isLoaded } = useAuditStore();
-  const [initialLoading, setInitialLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(logs.length === 0 || logs.length >= PAGE_SIZE);
@@ -122,12 +122,7 @@ export function LogPanel() {
     if (!isPending && hasMore) setPage((p) => p + 1);
   }, [isPending, hasMore]);
 
-  // Initial load
-  useEffect(() => {
-    if (!isLoaded) { loadData(true).finally(() => setInitialLoading(false)); }
-    else { setHasMore(logs.length > 0 && logs.length % PAGE_SIZE === 0); setInitialLoading(false); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, logs.length]);
+  const { initialLoading } = useAutoSync({ isLoaded, sync: () => loadData(true) });
 
   // Filter change → debounced reset
   useEffect(() => {

@@ -5,21 +5,22 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench } from 'lucide-react';
 
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { logoutAction } from '@/features/auth/actions/auth.actions';
 
 const navigation = [
   { name: 'Estadísticas', href: '/', icon: LayoutDashboard, roles: ['admin'] },
-  { name: 'Buscador de productos', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
+  { name: 'Stock', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
   { name: 'Ventas', href: '/ventas', icon: Briefcase, roles: ['admin', 'vendedor'] },
   { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
   { name: 'Proveedores', href: '/proveedores', icon: Users, roles: ['admin'] },
+  { name: 'Servicios técnicos', href: '/servicios-tecnicos', icon: Wrench, roles: ['admin'] },
 ];
 
 const adminNavigation = [
-  { name: 'Stock', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
+  { name: 'Alta de productos', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
   { name: 'Usuarios', href: '/usuarios', icon: UserCog, roles: ['admin'] },
   { name: 'Auditoría', href: '/logs', icon: ShieldAlert, roles: ['admin'] },
 ];

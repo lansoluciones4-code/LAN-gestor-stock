@@ -115,13 +115,15 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
               <Camera className='w-4 h-4' />
             </button>
           ) : null}
-          <button
-            onClick={() => onDelete(p.id!)}
-            className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-lg transition-colors'
-            title='Eliminar'
-          >
-            <Trash2 className='w-4 h-4' />
-          </button>
+          {role === 'admin' ? (
+            <button
+              onClick={() => onDelete(p.id!)}
+              className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-lg transition-colors'
+              title='Eliminar'
+            >
+              <Trash2 className='w-4 h-4' />
+            </button>
+          ) : null}
         </>
       ),
     },

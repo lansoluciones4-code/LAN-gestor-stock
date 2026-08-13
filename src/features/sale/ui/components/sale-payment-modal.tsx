@@ -28,7 +28,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   // Internal form state
-  const [type, setType] = useState<PaymentType>('efectivo');
+  const [type, setType] = useState<PaymentType | null>(null);
   const [amount, setAmount] = useState<string>('');
   const [installments, setInstallments] = useState<1 | 3 | 6 | 12>(1);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +44,17 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
       setError(null);
       // Auto-start adding if empty
       setIsAdding(true);
-      setType('efectivo');
+      setType(null);
       setInstallments(1);
       setAmount(total.toFixed(2).replace('.', ','));
     }
   }, [isOpen, total]);
 
   const validateAndAdd = () => {
+    if (!type) {
+      setError('Elegí un método de pago');
+      return;
+    }
     const normalizedAmount = amount.replace(',', '.');
     const numAmount = Number(normalizedAmount);
     if (isNaN(numAmount) || numAmount < 0 || (numAmount === 0 && total > 0)) {
@@ -181,8 +185,7 @@ export function SalePaymentModal({ isOpen, onClose, total, onConfirm, isPending 
                 onClick={() => {
                   setIsAdding(true);
                   setEditingIndex(null);
-                  const usedTypes = payments.map((p) => p.type);
-                  setType(PAYMENT_TYPES.find((t) => !usedTypes.includes(t)) ?? PAYMENT_TYPES[0]);
+                  setType(null);
                   setInstallments(1);
                   setAmount(Math.max(remaining, 0).toFixed(2).replace('.', ','));
                 }}

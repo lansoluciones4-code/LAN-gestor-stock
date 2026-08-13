@@ -5,8 +5,8 @@ import { providers } from '@/lib/db/schema';
 /** Input schema for creating a provider (form → server). */
 export const providerCreateSchema = createInsertSchema(providers, {
   name: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'Nombre demasiado largo'),
-  phone: z.string().trim().min(1, 'El teléfono es obligatorio').max(30, 'Número de teléfono demasiado largo'),
-  email: z.email('Formato de correo electrónico inválido').trim().min(1, 'El correo es obligatorio').max(100, 'El correo electrónico es demasiado largo'),
+  phone: z.string().trim().max(30, 'Número de teléfono demasiado largo').optional(),
+  email: z.union([z.email('Formato de correo electrónico inválido').max(100, 'El correo electrónico es demasiado largo'), z.literal('')]).optional(),
 }).pick({ name: true, phone: true, email: true });
 
 export type ProviderInput = z.infer<typeof providerCreateSchema>;

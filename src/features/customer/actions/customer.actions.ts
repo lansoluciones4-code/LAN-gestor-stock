@@ -39,6 +39,21 @@ export async function fetchCustomerByDocumentNumberAction(documentNumber: string
   }
 }
 
+/** Read-only lookup used by the sale flow to suggest existing customers as the DNI is typed. */
+export async function fetchCustomersByDocumentPrefixAction(documentNumber: string): Promise<CustomerDef[]> {
+  try {
+    await verifyAuthOrAdmin(false);
+    const normalized = documentNumber.replace(/[.\-]/g, '').trim();
+    if (normalized.length < 1) return [];
+
+    const results = await customerRepository.findByDocumentNumberPrefix(documentNumber);
+    return z.array(customerRowSchema).parse(results);
+  } catch (error) {
+    console.error('fetchCustomersByDocumentPrefixAction error:', error);
+    return [];
+  }
+}
+
 export async function toggleCustomerActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);

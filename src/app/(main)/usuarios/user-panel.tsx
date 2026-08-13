@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
@@ -12,6 +12,7 @@ import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggl
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { useUserStore } from '@/features/user/store/user.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeForSearch } from '@/lib/utils';
@@ -24,7 +25,6 @@ import { renderUserCard } from '@/config/cards/user-card';
 export function UserPanel() {
   const currentUserId = useAuthStore((s) => s.user?.id);
   const role = useAuthStore((s) => s.user?.role);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [showInactives, setShowInactives] = useState(false);
   const { users, setUsers, isLoaded } = useUserStore();
 
@@ -43,11 +43,7 @@ export function UserPanel() {
     showInactive: showInactives,
   });
 
-  useEffect(() => {
-    if (isLoaded) { setInitialLoading(false); return; }
-    setInitialLoading(true);
-    fetchUsers().then(setUsers).finally(() => setInitialLoading(false));
-  }, [isLoaded, setUsers]);
+  const { initialLoading } = useAutoSync({ isLoaded, sync: () => fetchUsers().then(setUsers) });
 
   const filteredUsers = useMemo(() =>
     users

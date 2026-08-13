@@ -2,11 +2,13 @@ import { useTransition } from 'react';
 import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { type CustomerDef } from '@/features/customer/domain/customer.schema';
 import { type ProductDef } from '@/features/product/domain/product.schema';
-import { createSaleAction, createPrintSaleAction, deleteSaleAction, fetchSales } from '@/features/sale/actions/sale.actions';
+import { createSaleAction, deleteSaleAction, fetchSales } from '@/features/sale/actions/sale.actions';
 import { fetchProducts } from '@/features/product/actions/product.actions';
 import { fetchCustomers, createCustomerAction } from '@/features/customer/actions/customer.actions';
 import { type SaleCustomerSelection } from '@/features/sale/ui/components/sale-customer-picker';
+import { type CartItem } from '@/features/sale/ui/hooks/useCart';
 import { type PrintCartItem } from '@/features/sale/ui/hooks/usePrintCart';
+import { type ServiceCartItem } from '@/features/sale/ui/hooks/useServiceCart';
 import { invalidateAllCaches } from '@/stores';
 
 interface UseSalesActionsProps {
@@ -17,11 +19,13 @@ interface UseSalesActionsProps {
   setCustomers: (data: CustomerDef[]) => void;
   setItemToDelete: (val: string | null) => void;
   clearCart: () => void;
+  clearPrintItems: () => void;
+  clearServiceItems: () => void;
   closeMobileCart: () => void;
   navigateToList: () => void;
 }
 
-export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, setProducts, setCustomers, setItemToDelete, clearCart, closeMobileCart, navigateToList }: UseSalesActionsProps) {
+export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, setProducts, setCustomers, setItemToDelete, clearCart, clearPrintItems, clearServiceItems, closeMobileCart, navigateToList }: UseSalesActionsProps) {
   const [isPending, startTransition] = useTransition();
 
   const loadData = async (manual = false) => {
@@ -50,8 +54,9 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     return { id: result.data!.id };
   };
 
-  const handleCreateSale = async (customerSelection: SaleCustomerSelection, section: 'tech' | 'libreria', cart: any[], cartTotal: number, payments: any[], discounts: { amount: number; percentage: number }) => {
-    if (cart.length === 0 || payments.length === 0) return;
+  /** Crea una venta que puede combinar productos, impresiones y servicios técnicos en un mismo registro. */
+  const handleCreateSale = async (customerSelection: SaleCustomerSelection, cart: CartItem[], printItems: PrintCartItem[], serviceItems: ServiceCartItem[], total: number, payments: any[], discounts: { amount: number; percentage: number }) => {
+    if ((cart.length === 0 && printItems.length === 0 && serviceItems.length === 0) || payments.length === 0) return;
 
     startTransition(async () => {
       const { id: customerId, error: customerError } = await resolveCustomerId(customerSelection);
@@ -62,13 +67,26 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
 
       const result = await createSaleAction({
         customerId,
-        businessSection: section,
-        items: cart.map(({ name, desc, max, ...rest }) => ({
-          ...rest,
-          unitPrice: rest.unitPrice,
-          subtotal: rest.subtotal,
+        items: cart.map(({ productId, quantity, unitPrice, unitCost, subtotal, discountPercentage }) => ({
+          productId,
+          quantity,
+          unitPrice,
+          unitCost,
+          subtotal,
+          discountPercentage,
         })),
-        total: cartTotal,
+        printItems: printItems.map(({ colorMode, subtotal }) => ({
+          colorMode,
+          subtotal,
+        })),
+        serviceItems: serviceItems.map(({ technicalServiceId, quantity, unitValue, subtotal, discountPercentage }) => ({
+          technicalServiceId,
+          quantity,
+          unitValue,
+          subtotal,
+          discountPercentage,
+        })),
+        total,
         discountAmount: discounts.amount,
         discountPercentage: discounts.percentage,
         payments: payments.map((p) => ({
@@ -80,37 +98,8 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
       if (result.success) {
         onSuccessMessage(result.message || 'Venta realizada con éxito');
         clearCart();
-        closeMobileCart();
-        navigateToList();
-        loadData();
-      } else {
-        onErrorMessage(result.error);
-      }
-    });
-  };
-
-  const handleCreatePrintSale = async (customerSelection: SaleCustomerSelection, items: PrintCartItem[], total: number, payments: any[], discounts: { amount: number; percentage: number }, onDone: () => void) => {
-    if (items.length === 0 || payments.length === 0) return;
-
-    startTransition(async () => {
-      const { id: customerId, error: customerError } = await resolveCustomerId(customerSelection);
-      if (customerError) {
-        onErrorMessage(customerError);
-        return;
-      }
-
-      const result = await createPrintSaleAction({
-        customerId,
-        items: items.map(({ id, ...rest }) => rest),
-        total,
-        discountAmount: discounts.amount,
-        discountPercentage: discounts.percentage,
-        payments: payments.map((p) => ({ ...p, amount: p.amount })),
-      });
-
-      if (result.success) {
-        onSuccessMessage(result.message || 'Venta realizada con éxito');
-        onDone();
+        clearPrintItems();
+        clearServiceItems();
         closeMobileCart();
         navigateToList();
         loadData();
@@ -138,7 +127,6 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
     isPending,
     loadData,
     handleCreateSale,
-    handleCreatePrintSale,
     confirmDelete,
   };
 }

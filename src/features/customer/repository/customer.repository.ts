@@ -26,6 +26,17 @@ export class CustomerRepository {
     return existing ?? null;
   }
 
+  /** Finds customers whose document number starts with the given prefix, ignoring `.`/`-` formatting. Matches regardless of active status. */
+  async findByDocumentNumberPrefix(prefix: string, dbtx: any = db, limit = 8) {
+    const normalized = prefix.replace(/[.\-]/g, '');
+    if (!normalized) return [];
+    return await dbtx.query.customers.findMany({
+      where: sql`REPLACE(REPLACE(${customers.documentNumber}, '.', ''), '-', '') ILIKE ${normalized + '%'}`,
+      orderBy: [customers.documentNumber],
+      limit,
+    });
+  }
+
   async updateActiveStatus(id: string, isActive: boolean, dbtx: any = db) {
     const result = await dbtx
       .update(customers)

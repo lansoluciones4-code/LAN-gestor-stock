@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { saleRepository } from '@/features/sale/repository/sale.repository';
-import { saleCreateSchema, printSaleCreateSchema, saleRowSchema, type SaleInput, type PrintSaleInput, type SaleDef } from '@/features/sale/domain/sale.schema';
+import { saleCreateSchema, saleRowSchema, type SaleInput, type SaleDef } from '@/features/sale/domain/sale.schema';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { recordAuditLog } from '@/lib/audit-logs';
 
@@ -28,7 +28,8 @@ export async function fetchSales(): Promise<SaleDef[]> {
 }
 
 /**
- * Create a new sale. Decrements stock.
+ * Create a new sale. Puede combinar productos (decrementa stock), impresiones y servicios técnicos
+ * en un mismo registro.
  */
 export async function createSaleAction(input: SaleInput): Promise<ActionResult<{ id: string }>> {
   try {
@@ -42,39 +43,8 @@ export async function createSaleAction(input: SaleInput): Promise<ActionResult<{
       const saleDetail = {
         total: String(result.total),
         itemCount: parsed.data.items.length,
-        discountAmount: String(parsed.data.discountAmount ?? 0),
-        discountPercentage: String(parsed.data.discountPercentage ?? 0),
-        paymentTypes: parsed.data.payments?.map((p) => p.type) ?? [],
-      };
-
-      await recordAuditLog(caller.id, 'CREAR', 'SALE', result.id, saleDetail, tx);
-
-      return {
-        success: true,
-        message: 'Venta realizada con éxito',
-        data: { id: result.id },
-      };
-    });
-  } catch (error: any) {
-    return { success: false, error: handleDatabaseError(error, 'Venta') };
-  }
-}
-
-/**
- * Create a new Impresiones sale. No stock/product involved.
- */
-export async function createPrintSaleAction(input: PrintSaleInput): Promise<ActionResult<{ id: string }>> {
-  try {
-    const caller = await verifyAuthOrAdmin(false);
-    const parsed = printSaleCreateSchema.safeParse(input);
-    if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
-
-    return await db.transaction(async (tx) => {
-      const result = await saleRepository.createPrintSale(caller.id, parsed.data, tx);
-
-      const saleDetail = {
-        total: String(result.total),
-        itemCount: parsed.data.items.length,
+        printItemCount: parsed.data.printItems.length,
+        serviceItemCount: parsed.data.serviceItems.length,
         discountAmount: String(parsed.data.discountAmount ?? 0),
         discountPercentage: String(parsed.data.discountPercentage ?? 0),
         paymentTypes: parsed.data.payments?.map((p) => p.type) ?? [],
@@ -108,7 +78,6 @@ export async function deleteSaleAction(id: string): Promise<ActionResult> {
         snapshotTotal: String(sale.total),
         customerName: sale.customer?.name ?? 'Sin cliente',
         vendorUsername: sale.vendor?.username ?? 'Desconocido',
-        businessSection: sale.businessSection,
         itemCount: sale.items.length,
         items: sale.items.map((item) => ({
           productName: item.product?.device?.name ?? 'Producto',
@@ -117,9 +86,13 @@ export async function deleteSaleAction(id: string): Promise<ActionResult> {
           unitPrice: String(item.unitPrice),
         })),
         printItems: sale.printItems?.map((item) => ({
-          pages: item.pages,
           colorMode: item.colorMode,
-          unitPrice: String(item.unitPrice),
+          subtotal: String(item.subtotal),
+        })),
+        serviceItems: sale.serviceItems?.map((item) => ({
+          name: item.technicalService?.name ?? 'Servicio técnico',
+          quantity: item.quantity,
+          unitValue: String(item.unitValue),
         })),
         paymentTypes: sale.payments.map((p) => p.type),
         note: sale.items.length > 0 ? 'Venta anulada. Stock restablecido.' : 'Venta anulada.',

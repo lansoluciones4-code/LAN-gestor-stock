@@ -5,13 +5,22 @@ import { roundToDecimals } from '@/lib/utils';
 export interface CartItem {
   productId: string;
   quantity: number;
+  /** Precio de lista del producto, sin descuentos. */
+  listPrice: number;
   unitPrice: number;
   unitCost: number;
+  /** Descuento aplicado a este producto en particular (0-100). */
+  discountPercentage: number;
   subtotal: number;
   name: string;
   desc: string;
   max: number;
 }
+
+const computeItem = (quantity: number, listPrice: number, discountPercentage: number) => {
+  const unitPrice = roundToDecimals(listPrice * (1 - discountPercentage / 100));
+  return { unitPrice, subtotal: roundToDecimals(unitPrice * quantity) };
+};
 
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -22,15 +31,18 @@ export function useCart() {
       const existing = prev.find((i) => i.productId === product.id);
       if (existing) {
         if (existing.quantity >= product.stock) return prev;
-        return prev.map((i) => (i.productId === product.id ? { ...i, quantity: i.quantity + 1, subtotal: roundToDecimals((i.quantity + 1) * i.unitPrice) } : i));
+        const newQty = existing.quantity + 1;
+        return prev.map((i) => (i.productId === product.id ? { ...i, quantity: newQty, ...computeItem(newQty, i.listPrice, i.discountPercentage) } : i));
       }
       return [
         ...prev,
         {
           productId: product.id,
           quantity: 1,
+          listPrice: product.salePrice,
           unitPrice: product.salePrice,
           unitCost: product.purchasePrice,
+          discountPercentage: 0,
           subtotal: product.salePrice,
           name: `${product.device?.name || 'Equipo'}`,
           desc: product.description || '',
@@ -50,11 +62,16 @@ export function useCart() {
         if (i.productId === productId) {
           const newQty = i.quantity + delta;
           if (newQty > i.max || newQty < 1) return i;
-          return { ...i, quantity: newQty, subtotal: roundToDecimals(newQty * i.unitPrice) };
+          return { ...i, quantity: newQty, ...computeItem(newQty, i.listPrice, i.discountPercentage) };
         }
         return i;
       })
     );
+  };
+
+  const setItemDiscount = (productId: string, discountPercentage: number) => {
+    const clamped = Math.min(100, Math.max(0, discountPercentage));
+    setCart((prev) => prev.map((i) => (i.productId === productId ? { ...i, discountPercentage: clamped, ...computeItem(i.quantity, i.listPrice, clamped) } : i)));
   };
 
   const clearCart = () => setCart([]);
@@ -66,6 +83,7 @@ export function useCart() {
     addToCart,
     removeFromCart,
     updateCartQty,
+    setItemDiscount,
     clearCart,
     cartTotal,
   };
