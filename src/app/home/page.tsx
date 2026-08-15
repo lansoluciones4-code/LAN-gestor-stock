@@ -7,11 +7,11 @@ import { CatalogClient } from './components/catalog-client';
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: 'ArgenStock - Catálogo',
+  title: 'LAN Soluciones Tecnológicas - Catálogo',
   description: 'Descubre nuestra colección exclusiva de fundas, cargadores, cables y accesorios premium diseñados para tus dispositivos Apple. Calidad superior, envío rápido y la mejor protección.',
   keywords: 'accesorios apple, fundas iphone, cargador magsafe, cables premium, apple watch, airpods, tienda de accesorios, fundas premium',
   icons: {
-    icon: '/LAN_icono.jpg',
+    icon: '/icon_web.jpeg',
   },
   robots: {
     index: true,
@@ -32,19 +32,20 @@ export default async function HomePage() {
   return (
     <div className='lg:h-screen lg:overflow-hidden bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-zinc-500/30 flex flex-col'>
       {/* Hero Section */}
-      <section className='relative pb-4 md:pb-10 pt-16 md:pt-12 overflow-hidden px-4 sm:px-8 shrink-0'>
-        <div className='absolute top-4 right-4 z-50'>
-          <ThemeToggle />
+      <section className='relative pb-3 md:pb-4 pt-6 md:pt-6 overflow-hidden px-4 sm:px-8 shrink-0 bg-gradient-to-b from-[#0B1F3D] to-[#123465]'>
+        <div className='absolute top-3 right-4 z-50'>
+          <ThemeToggle className='!bg-white/10 !text-white hover:!text-white' />
         </div>
-        <div className='max-w-6xl mx-auto text-center space-y-4 md:space-y-6'>
-          <div className='w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-700 shadow-sm'>
+        <div className='max-w-6xl mx-auto text-center space-y-1.5 md:space-y-2'>
+          <div className='w-11 h-11 md:w-14 md:h-14 mx-auto rounded-full overflow-hidden border border-white/20 shadow-lg shadow-sky-500/20'>
             <img
-              src='/LAN_icono.jpg'
-              alt='LAN Soluciones'
+              src='/icon_web.jpeg'
+              alt='LAN Soluciones Tecnológicas'
               className='w-full h-full object-cover'
             />
           </div>
-          <h1 className='text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white'>ArgenStock</h1>
+          <h1 className='text-2xl md:text-3xl font-black text-white'>LAN</h1>
+          <p className='text-[10px] md:text-xs text-sky-300 font-bold uppercase tracking-[0.3em] -mt-1.5 md:-mt-2'>Soluciones Tecnológicas</p>
         </div>
       </section>
 
@@ -59,7 +60,7 @@ export default async function HomePage() {
 
       {/* Footer - Minimal on desktop to save space */}
       <footer className='shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 text-center text-[14px] text-zinc-500 dark:text-zinc-400 px-6'>
-        <p>© {new Date().getFullYear()} ArgenStock. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} LAN Soluciones Tecnológicas. Todos los derechos reservados.</p>
       </footer>
     </div>
   );

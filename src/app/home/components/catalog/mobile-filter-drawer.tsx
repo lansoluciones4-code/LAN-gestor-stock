@@ -63,7 +63,8 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, selectedCatego
 
             <div className='flex-1 overflow-y-auto space-y-10 pr-2'>
               <section>
-                <h3 className='text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4 flex items-center gap-2'>
+                <h3 className='text-xs font-bold uppercase tracking-widest text-zinc-400 pt-6 mb-4 flex items-center gap-2'>
+                   
                   <Tag className='w-3 h-3' /> Categorías
                 </h3>
                 <div className='grid grid-cols-1 gap-2'>

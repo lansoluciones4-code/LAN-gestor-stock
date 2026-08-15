@@ -73,7 +73,7 @@ export function CatalogPagination({ currentPage, totalPages, onPageChange }: Cat
               onClick={() => onPageChange(page as number)}
               className={`
                 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-xs sm:text-sm font-bold transition-all duration-200 border
-                ${isActive ? 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 border-transparent hover:bg-white/50 dark:hover:bg-zinc-800/50 hover:text-zinc-600 dark:hover:text-zinc-400'}
+                ${isActive ? 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-200 dark:border-sky-500/30 shadow-sm' : 'text-zinc-500 dark:text-zinc-400 border-transparent hover:bg-white/50 dark:hover:bg-zinc-800/50 hover:text-zinc-600 dark:hover:text-zinc-400'}
               `}
               aria-current={isActive ? 'page' : undefined}
             >

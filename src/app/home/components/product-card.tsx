@@ -72,7 +72,7 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-zinc-500/10 transition-all duration-500 ${isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''}`}
+      className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-200 dark:hover:border-sky-500/30 transition-all duration-500 ${isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''}`}
     >
       <Link
         href={`/product/${product.id}`}
@@ -124,7 +124,7 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
                     {images.map((_, i) => (
                       <div
                         key={i}
-                        className={`w-1.5 h-1.5 rounded-full transition-colors ${i === currentImageIndex ? 'bg-zinc-800 dark:bg-zinc-200' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${i === currentImageIndex ? 'bg-sky-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       />
                     ))}
                   </div>
