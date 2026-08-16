@@ -3,7 +3,10 @@ import { roundToDecimals } from '@/lib/utils';
 
 export interface PrintCartItem {
   id: string;
-  colorMode: 'color' | 'blanco_y_negro';
+  /** null cuando el color no aplica (Venta Rápida nunca lo pregunta) — solo es un valor real en Nueva Venta. */
+  colorMode: 'color' | 'blanco_y_negro' | null;
+  /** Distingue una fotocopia (shortcut de Venta Rápida) de una impresión de catálogo normal. */
+  kind: 'fotocopia' | 'impresion';
   /** Importe total cargado originalmente, sin descuento. */
   listAmount: number;
   /** Descuento aplicado a esta impresión en particular (0-100). */
@@ -22,13 +25,14 @@ const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36
 export function usePrintCart() {
   const [items, setItems] = useState<PrintCartItem[]>([]);
 
-  const addItem = (colorMode: 'color' | 'blanco_y_negro', amount: number) => {
+  const addItem = (colorMode: 'color' | 'blanco_y_negro' | null, amount: number, kind: 'fotocopia' | 'impresion' = 'impresion') => {
     if (amount <= 0) return;
     setItems((prev) => [
       ...prev,
       {
         id: generateId(),
         colorMode,
+        kind,
         listAmount: amount,
         discountPercentage: 0,
         ...computeItem(amount, 0),

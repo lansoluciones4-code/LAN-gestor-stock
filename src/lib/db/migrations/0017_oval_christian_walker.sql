@@ -1,0 +1,1 @@
+ALTER TABLE "sale_print_items" ALTER COLUMN "color_mode" DROP NOT NULL;

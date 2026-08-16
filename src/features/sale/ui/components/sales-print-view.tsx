@@ -58,8 +58,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
             </div>
             <div className='text-right'>
               <div className='text-[11px] font-bold text-zinc-900 uppercase'>
-                ID:
-                {sale.id.substring(0, 8).toUpperCase()}
+                Recibo N° {String(sale.saleNumber).padStart(8, '0')}
               </div>
               <div className='text-[10px] text-zinc-500 font-medium'>{new Date(sale.createdAt).toLocaleDateString('es-AR')}</div>
             </div>
@@ -119,7 +118,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     key={item.id}
                     className='text-[13px] text-zinc-900'
                   >
-                    <td className='py-5 font-bold text-zinc-900 uppercase'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</td>
+                    <td className='py-5 font-bold text-zinc-900 uppercase'>{item.kind === 'fotocopia' ? 'Fotocopia' : item.colorMode ? (item.colorMode === 'color' ? 'Color' : 'Blanco y Negro') : 'Impresión'}</td>
                     <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                 ))}

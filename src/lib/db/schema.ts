@@ -1,10 +1,11 @@
-import { pgTable, uuid, varchar, timestamp, pgEnum, numeric, integer, jsonb, index, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, pgEnum, numeric, integer, jsonb, index, unique, boolean } from 'drizzle-orm/pg-core';
 import { sql, relations } from 'drizzle-orm';
 
 export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
 export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia', 'debito', 'credito']);
 export const businessSectionEnum = pgEnum('business_section', ['tech', 'impresiones', 'libreria']);
 export const colorModeEnum = pgEnum('color_mode', ['color', 'blanco_y_negro']);
+export const printKindEnum = pgEnum('print_kind', ['fotocopia', 'impresion']);
 
 /** Fila única con configuración global del catálogo público (ej. mostrar precios o no). */
 export const appSettings = pgTable('app_settings', {
@@ -28,19 +29,23 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const devices = pgTable('devices', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  name: varchar('name', { length: 100 }).notNull().unique(),
-  category: varchar('category', { length: 100 }),
-  brand: varchar('brand', { length: 100 }),
-  section: businessSectionEnum('section').notNull().default('tech'),
-  isActive: boolean('is_active').default(true).notNull(),
-  version: integer('version').default(1).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+export const devices = pgTable(
+  'devices',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    name: varchar('name', { length: 100 }).notNull(),
+    category: varchar('category', { length: 100 }),
+    brand: varchar('brand', { length: 100 }),
+    section: businessSectionEnum('section').notNull().default('tech'),
+    isActive: boolean('is_active').default(true).notNull(),
+    version: integer('version').default(1).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [unique('devices_name_brand_unique').on(table.name, table.brand)]
+);
 
 export const providers = pgTable('providers', {
   id: uuid('id')
@@ -152,6 +157,7 @@ export const sales = pgTable(
     id: uuid('id')
       .primaryKey()
       .default(sql`gen_random_uuid()`),
+    saleNumber: integer('sale_number').generatedAlwaysAsIdentity().notNull(),
     customerId: uuid('customer_id').references(() => customers.id),
     vendorId: uuid('vendor_id')
       .notNull()
@@ -193,7 +199,10 @@ export const salePrintItems = pgTable(
     saleId: uuid('sale_id')
       .notNull()
       .references(() => sales.id),
-    colorMode: colorModeEnum('color_mode').notNull(),
+    // null = el color no aplica (ej. Venta Rápida, donde nunca se pregunta); solo tiene un
+    // valor real cuando el vendedor efectivamente eligió Color/Blanco y Negro (Nueva Venta).
+    colorMode: colorModeEnum('color_mode'),
+    kind: printKindEnum('kind').notNull().default('impresion'),
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
   (table) => [index('sale_print_items_sale_id_idx').on(table.saleId)]

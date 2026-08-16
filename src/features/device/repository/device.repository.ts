@@ -1,4 +1,4 @@
-import { desc, eq, ilike, sql, and, isNotNull, ne } from 'drizzle-orm';
+import { desc, eq, ilike, sql, and, isNotNull, isNull, ne } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { devices, products } from '@/lib/db/schema';
 import type { DeviceInput, DeviceUpdateInput } from '@/features/device/domain/device.schema';
@@ -42,9 +42,10 @@ export class DeviceRepository {
   }
 
   async createDevice(input: DeviceInput, dbtx: any = db) {
-    // Check for existing (for reactivation logic)
+    // Check for existing (for reactivation logic) — el mismo Modelo puede repetirse
+    // en distintas Marcas, así que el chequeo de duplicado es por la combinación de ambos.
     const existing = await dbtx.query.devices.findFirst({
-      where: ilike(devices.name, input.name),
+      where: and(ilike(devices.name, input.name), input.brand ? eq(devices.brand, input.brand) : isNull(devices.brand)),
     });
 
     if (existing) {
@@ -88,13 +89,18 @@ export class DeviceRepository {
       updatedAt: sql`NOW()`,
       version: sql`${devices.version} + 1`,
     };
-    if (input.name !== undefined) {
+    if (input.name !== undefined || input.brand !== undefined) {
+      // El duplicado se evalúa por la combinación final de nombre + marca (no solo nombre),
+      // resolviendo con el valor actual del registro lo que no venga en este update puntual.
+      const current = await dbtx.query.devices.findFirst({ where: eq(devices.id, id) });
+      const finalName = input.name !== undefined ? input.name : current?.name;
+      const finalBrand = input.brand !== undefined ? input.brand || null : current?.brand;
       const existing = await dbtx.query.devices.findFirst({
-        where: and(ilike(devices.name, input.name), sql`${devices.id} != ${id}`),
+        where: and(ilike(devices.name, finalName), finalBrand ? eq(devices.brand, finalBrand) : isNull(devices.brand), ne(devices.id, id)),
       });
       if (existing) throw new DuplicateEntityError();
-      updateData.name = input.name;
     }
+    if (input.name !== undefined) updateData.name = input.name;
     if (input.category !== undefined) updateData.category = input.category;
     if (input.brand !== undefined) updateData.brand = input.brand || null;
     if (input.section !== undefined) updateData.section = input.section;

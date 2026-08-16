@@ -24,7 +24,12 @@ export function renderTechnicalServiceCard(actions: TechnicalServiceCardActionsP
         <div className='flex flex-col gap-1 mt-1'>
           <div className='flex justify-between'>
             <span className='text-xs text-zinc-400'>Descripción</span>
-            <span className='truncate max-w-[180px]'>{service.description || '---'}</span>
+            <span
+              className='truncate max-w-[180px]'
+              title={service.description || '---'}
+            >
+              {service.description || '---'}
+            </span>
           </div>
           <div className='flex justify-between'>
             <span className='text-xs text-zinc-400'>Valor</span>

@@ -42,8 +42,20 @@ export function EntityCard({ title, subtitle, badges, details, actions }: Entity
       {/* Header row: title + action menu */}
       <div className='flex items-start justify-between gap-2'>
         <div className='min-w-0 flex-1'>
-          <div className='font-bold text-zinc-900 dark:text-zinc-100 truncate'>{title}</div>
-          {subtitle && <div className='text-xs text-zinc-500 truncate mt-0.5'>{subtitle}</div>}
+          <div
+            className='font-bold text-zinc-900 dark:text-zinc-100 truncate'
+            title={typeof title === 'string' ? title : undefined}
+          >
+            {title}
+          </div>
+          {subtitle && (
+            <div
+              className='text-xs text-zinc-500 truncate mt-0.5'
+              title={typeof subtitle === 'string' ? subtitle : undefined}
+            >
+              {subtitle}
+            </div>
+          )}
         </div>
 
         <div className='relative shrink-0' ref={menuRef}>

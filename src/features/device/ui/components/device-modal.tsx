@@ -101,14 +101,14 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
       onClose={onClose}
       title={editingItem ? 'Actualizar Modelo' : 'Nuevo Modelo en Catálogo'}
       icon={<MonitorSmartphone className='w-5 h-5 text-zinc-500' />}
-      width='sm'
+      width='4xl'
       onSubmit={handleSubmit(handleFormSubmit)}
       submitLabel={editingItem ? 'Actualizar Modelo' : 'Agregar Modelo'}
       submitTestId={TEST_IDS.general.btnSubmitModal}
       isPending={isPending}
     >
       <ErrorAlert error={serverError} />
-      <div className='max-h-[60vh] overflow-y-auto px-1 space-y-4'>
+      <div className='px-1 space-y-4'>
         <div>
           <label className='block text-md font-bold text-zinc-700 dark:text-zinc-300 mb-2'>Sección</label>
           <div className='flex rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1'>

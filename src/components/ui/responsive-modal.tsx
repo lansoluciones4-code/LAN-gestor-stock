@@ -9,7 +9,7 @@ interface ResponsiveModalProps {
   title: React.ReactNode;
   icon?: React.ReactNode;
   children: React.ReactNode;
-  width?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  width?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl';
   onSubmit?: (e: React.FormEvent) => void;
   submitLabel?: string;
   cancelLabel?: string;

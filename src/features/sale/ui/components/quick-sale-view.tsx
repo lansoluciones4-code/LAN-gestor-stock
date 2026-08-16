@@ -130,12 +130,12 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
             <QuickPrintButton
               icon={<Copy className='w-4 h-4' />}
               label='Fotocopias'
-              onAdd={(amount) => addPrintItem('blanco_y_negro', amount)}
+              onAdd={(amount) => addPrintItem(null, amount, 'fotocopia')}
             />
             <QuickPrintButton
               icon={<Printer className='w-4 h-4' />}
               label='Impresiones'
-              onAdd={(amount) => addPrintItem('blanco_y_negro', amount)}
+              onAdd={(amount) => addPrintItem(null, amount, 'impresion')}
             />
           </div>
 
@@ -246,7 +246,7 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                 className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0'
               >
                 <div className='flex justify-between items-center gap-2 overflow-hidden'>
-                  <span className='text-xs font-bold uppercase leading-tight truncate'>Fotocopias / Impresiones</span>
+                  <span className='text-xs font-bold uppercase leading-tight truncate'>{item.kind === 'fotocopia' ? 'Fotocopia' : 'Impresión'}</span>
                   <button
                     onClick={() => removePrintItem(item.id)}
                     className='text-zinc-300 hover:text-zinc-500 transition-colors p-1'
@@ -360,7 +360,7 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                   className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0'
                 >
                   <div className='flex justify-between items-center overflow-hidden'>
-                    <span className='text-sm font-bold uppercase leading-tight truncate'>Fotocopias / Impresiones</span>
+                    <span className='text-sm font-bold uppercase leading-tight truncate'>{item.kind === 'fotocopia' ? 'Fotocopia' : 'Impresión'}</span>
                     <button
                       onClick={() => removePrintItem(item.id)}
                       className='text-zinc-500 p-1'

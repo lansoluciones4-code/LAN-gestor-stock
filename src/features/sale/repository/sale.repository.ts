@@ -114,6 +114,7 @@ export class SaleRepository {
     // directamente (ya con su descuento por línea aplicado), no hay fórmula que recalcular.
     const resolvedPrintItems = input.printItems.map((item) => ({
       colorMode: item.colorMode,
+      kind: item.kind,
       subtotal: roundToDecimals(item.subtotal),
     }));
 
@@ -201,6 +202,7 @@ export class SaleRepository {
       await dbtx.insert(salePrintItems).values({
         saleId: sale.id,
         colorMode: item.colorMode,
+        kind: item.kind,
         subtotal: item.subtotal.toString(),
       });
     }
