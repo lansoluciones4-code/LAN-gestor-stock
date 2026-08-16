@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type useCart } from '../hooks/useCart';
 import { type usePrintCart } from '../hooks/usePrintCart';
+import { DiscountControl } from './discount-control';
 import { blockInvalidPriceKey } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -75,12 +76,31 @@ function QuickPrintButton({ icon, label, onAdd }: { icon: React.ReactNode; label
 }
 
 export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, isPaymentModalOpen, setIsPaymentModalOpen }: QuickSaleViewProps) {
-  const { cart, addToCart, removeFromCart, updateCartQty } = cartProps;
-  const { items: printItems, addItem: addPrintItem, removeItem: removePrintItem } = printCartProps;
+  const { cart, addToCart, removeFromCart, updateCartQty, setItemDiscount } = cartProps;
+  const { items: printItems, addItem: addPrintItem, removeItem: removePrintItem, setItemDiscount: setPrintItemDiscount } = printCartProps;
 
   const [search, setSearch] = useState('');
 
+  // Editor de descuento por ítem — clave compuesta `${tipo}:${id}`, mismo patrón que Nueva Venta.
+  const [discountEditorFor, setDiscountEditorFor] = useState<string | null>(null);
+  const [discountInput, setDiscountInput] = useState('');
+
   const totalItems = cart.length + printItems.length;
+
+  const toggleDiscountEditor = (key: string, currentDiscount: number) => {
+    if (discountEditorFor === key) {
+      setDiscountEditorFor(null);
+      return;
+    }
+    setDiscountEditorFor(key);
+    setDiscountInput(currentDiscount > 0 ? String(currentDiscount).replace('.', ',') : '');
+  };
+
+  const applyDiscount = (key: string, apply: (val: number) => void) => {
+    const value = Math.min(100, Math.max(0, Number((discountInput || '0').replace(',', '.')) || 0));
+    apply(value);
+    setDiscountEditorFor(null);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -219,6 +239,18 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                     <Trash2 className='w-4 h-4' />
                   </button>
                 </div>
+                <DiscountControl
+                  discountPercentage={item.discountPercentage}
+                  isEditing={discountEditorFor === `product:${item.productId}`}
+                  onToggle={() => toggleDiscountEditor(`product:${item.productId}`, item.discountPercentage)}
+                  value={discountInput}
+                  onValueChange={setDiscountInput}
+                  onApply={() => applyDiscount(`product:${item.productId}`, (v) => setItemDiscount(item.productId, v))}
+                  onClear={() => {
+                    setItemDiscount(item.productId, 0);
+                    setDiscountEditorFor(null);
+                  }}
+                />
                 <div className='flex justify-between items-center'>
                   <div className='flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 p-1 rounded border border-zinc-200 dark:border-zinc-800'>
                     <button
@@ -254,6 +286,18 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                     <Trash2 className='w-4 h-4' />
                   </button>
                 </div>
+                <DiscountControl
+                  discountPercentage={item.discountPercentage}
+                  isEditing={discountEditorFor === `print:${item.id}`}
+                  onToggle={() => toggleDiscountEditor(`print:${item.id}`, item.discountPercentage)}
+                  value={discountInput}
+                  onValueChange={setDiscountInput}
+                  onApply={() => applyDiscount(`print:${item.id}`, (v) => setPrintItemDiscount(item.id, v))}
+                  onClear={() => {
+                    setPrintItemDiscount(item.id, 0);
+                    setDiscountEditorFor(null);
+                  }}
+                />
                 <div className='flex justify-end items-center'>
                   <span className='font-bold text-sm'>${item.subtotal.toLocaleString('es-AR')}</span>
                 </div>
@@ -333,6 +377,18 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                       <Trash2 className='w-4 h-4' />
                     </button>
                   </div>
+                  <DiscountControl
+                    discountPercentage={item.discountPercentage}
+                    isEditing={discountEditorFor === `product-m:${item.productId}`}
+                    onToggle={() => toggleDiscountEditor(`product-m:${item.productId}`, item.discountPercentage)}
+                    value={discountInput}
+                    onValueChange={setDiscountInput}
+                    onApply={() => applyDiscount(`product-m:${item.productId}`, (v) => setItemDiscount(item.productId, v))}
+                    onClear={() => {
+                      setItemDiscount(item.productId, 0);
+                      setDiscountEditorFor(null);
+                    }}
+                  />
                   <div className='flex justify-between items-center'>
                     <div className='flex items-center gap-3 bg-white dark:bg-zinc-900 p-1.5 rounded-lg border border-zinc-200'>
                       <button
@@ -368,6 +424,18 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                       <Trash2 className='w-4 h-4' />
                     </button>
                   </div>
+                  <DiscountControl
+                    discountPercentage={item.discountPercentage}
+                    isEditing={discountEditorFor === `print-m:${item.id}`}
+                    onToggle={() => toggleDiscountEditor(`print-m:${item.id}`, item.discountPercentage)}
+                    value={discountInput}
+                    onValueChange={setDiscountInput}
+                    onApply={() => applyDiscount(`print-m:${item.id}`, (v) => setPrintItemDiscount(item.id, v))}
+                    onClear={() => {
+                      setPrintItemDiscount(item.id, 0);
+                      setDiscountEditorFor(null);
+                    }}
+                  />
                   <div className='flex justify-end items-center'>
                     <span className='font-black text-base'>${item.subtotal.toLocaleString('es-AR')}</span>
                   </div>
