@@ -16,7 +16,7 @@ const navigation = [
   { name: 'Ventas', href: '/ventas', icon: Briefcase, roles: ['admin', 'vendedor'] },
   { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
   { name: 'Proveedores', href: '/proveedores', icon: Users, roles: ['admin'] },
-  { name: 'Servicios técnicos', href: '/servicios-tecnicos', icon: Wrench, roles: ['admin'] },
+  { name: 'Servicio técnico', href: '/servicios-tecnicos', icon: Wrench, roles: ['admin'] },
 ];
 
 const adminNavigation = [
