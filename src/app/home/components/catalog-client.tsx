@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 
@@ -23,13 +23,20 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
 
   const { search, setSearch, selectedCategory, setSelectedCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, page, setPage, totalPages, paginatedProducts, clearFilters } = useCatalogFilters({ products, itemsPerPage });
 
+  // Una categoría solo se muestra como filtro si tiene al menos un producto visible en el catálogo
+  // (los productos ocultos desde el gestor ya vienen excluidos de `products`).
+  const visibleCategories = useMemo(
+    () => categories.filter((cat) => products.some((p) => p.device?.category === cat.name)),
+    [categories, products]
+  );
+
   return (
     <div className='h-full max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col min-h-0'>
       <div className='flex flex-col lg:flex-row gap-10 h-full min-h-0'>
         {/* Sidebar container - Fixed height matching parent */}
         <aside className='hidden lg:block w-72 shrink-0 h-full'>
           <CatalogSidebar
-            categories={categories}
+            categories={visibleCategories}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
@@ -43,7 +50,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
               onSearchChange={setSearch}
               onOpenFilters={() => setIsSidebarOpen(true)}
               selectedCategory={selectedCategory}
-              categories={categories}
+              categories={visibleCategories}
               onClearCategory={() => setSelectedCategory(null)}
               minPrice={minPrice}
               onMinPriceChange={setMinPrice}
@@ -71,7 +78,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
       <MobileFilterDrawer
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        categories={categories}
+        categories={visibleCategories}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
         minPrice={minPrice}

@@ -142,7 +142,7 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
 
         <div className='flex flex-col flex-1 p-3 sm:p-4 text-center'>
           <h3 className='text-xs sm:text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-1 sm:mb-1.5 line-clamp-1'>{deviceName}</h3>
-          <p className='text-[11px] sm:text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-2 sm:mb-3 leading-relaxed flex-1'>{product.description || 'Diseñado con precisión para ofrecer la mejor experiencia y protección.'}</p>
+          <p className='text-sm sm:text-base text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-2 sm:mb-3 leading-relaxed flex-1'>{product.description || 'Diseñado con precisión para ofrecer la mejor experiencia y protección.'}</p>
           <div className='mb-3'>
             {showPrice ? (
               <span className='text-sm sm:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100'>${product.salePrice.toLocaleString('es-AR')}</span>
