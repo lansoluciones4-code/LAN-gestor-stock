@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useTransition } from 'react';
-import { Plus, RefreshCcw } from 'lucide-react';
+import { Plus, RefreshCcw, Eye, ChevronDown } from 'lucide-react';
 import { type ProductInput, type ProductDef, type ProductUpdateInput } from '@/features/product/domain/product.schema';
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { useProductStore } from '@/features/product/store/product.store';
@@ -14,7 +14,7 @@ import { useAutoSync } from '@/hooks/use-auto-sync';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
-import { fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction } from '@/features/product/actions/product.actions';
+import { fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction, bulkSetProductVisibilityBySectionAction } from '@/features/product/actions/product.actions';
 import { uploadProductPhoto } from '@/features/product/actions/upload-product-photo';
 import { fetchShowPrices, updateShowPricesAction } from '@/features/settings/actions/settings.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
@@ -41,6 +41,8 @@ export function ProductsPanel() {
   const [isPendingLocal, startTransition] = useTransition();
   const pendingPhotosRef = useRef<File[]>([]);
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
+  const [showVisibilityMenu, setShowVisibilityMenu] = useState(false);
+  const visibilityMenuRef = useRef<HTMLDivElement>(null);
 
   const { products, setProducts, isLoaded: prodsLoaded } = useProductStore();
   const { devices, setDevices, isLoaded: devicesLoaded } = useDeviceStore();
@@ -97,6 +99,17 @@ export function ProductsPanel() {
     if (role === 'admin') fetchShowPrices().then(setShowPricesOnCatalog);
   }, [role]);
 
+  useEffect(() => {
+    if (!showVisibilityMenu) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (visibilityMenuRef.current && !visibilityMenuRef.current.contains(e.target as Node)) {
+        setShowVisibilityMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [showVisibilityMenu]);
+
   const handleToggleShowPrices = (checked: boolean) => {
     setShowPricesOnCatalog(checked);
     startTransition(async () => {
@@ -111,6 +124,16 @@ export function ProductsPanel() {
   };
 
 
+
+  const allTechVisible = useMemo(() => {
+    const techProducts = products.filter((p) => p.device?.section === 'tech');
+    return techProducts.length > 0 && techProducts.every((p) => p.showOnLanding);
+  }, [products]);
+
+  const allLibreriaVisible = useMemo(() => {
+    const libreriaProducts = products.filter((p) => p.device?.section === 'libreria');
+    return libreriaProducts.length > 0 && libreriaProducts.every((p) => p.showOnLanding);
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
     return products
@@ -133,6 +156,15 @@ export function ProductsPanel() {
   const handleToggleVisibility = (p: ProductDef) => {
     startTransition(async () => {
       const result = await toggleProductVisibilityAction(p.id!, !p.showOnLanding);
+      if (!result.success) return showGlobalMessage('error', result.error);
+      showGlobalMessage('success', result.message || 'Visibilidad actualizada');
+      invalidateAllCaches(); syncData();
+    });
+  };
+
+  const handleBulkToggleSection = (section: 'tech' | 'libreria', isVisible: boolean) => {
+    startTransition(async () => {
+      const result = await bulkSetProductVisibilityBySectionAction(section, isVisible);
       if (!result.success) return showGlobalMessage('error', result.error);
       showGlobalMessage('success', result.message || 'Visibilidad actualizada');
       invalidateAllCaches(); syncData();
@@ -190,6 +222,26 @@ export function ProductsPanel() {
       />
 
       <GlobalMessage message={globalMessage} />
+
+      {role === 'admin' && (
+        <div className='flex justify-end mb-2 relative' ref={visibilityMenuRef}>
+          <button
+            onClick={() => setShowVisibilityMenu((v) => !v)}
+            className='flex items-center gap-2 px-3 h-9 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shadow-sm'
+          >
+            <Eye className='w-4 h-4' />
+            Visibilidad masiva
+            <ChevronDown className={`w-4 h-4 transition-transform ${showVisibilityMenu ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showVisibilityMenu && (
+            <div className='absolute right-0 top-full mt-1 z-30 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg p-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-1 duration-150'>
+              <ToggleFilter id='showAllTech' checked={allTechVisible} onChange={(checked) => handleBulkToggleSection('tech', checked)} label='Mostrar tech en el catálogo' />
+              <ToggleFilter id='showAllLibreria' checked={allLibreriaVisible} onChange={(checked) => handleBulkToggleSection('libreria', checked)} label='Mostrar librería en el catálogo' />
+            </div>
+          )}
+        </div>
+      )}
 
       <ResponsivePanelView
         columns={columns}

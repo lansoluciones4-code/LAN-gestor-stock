@@ -1,6 +1,6 @@
-import { desc, eq, sql, and, gte } from 'drizzle-orm';
+import { desc, eq, sql, and, gte, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { products, productLosses, productImages } from '@/lib/db/schema';
+import { products, productLosses, productImages, devices } from '@/lib/db/schema';
 import type { ProductInput, ProductUpdateInput } from '@/features/product/domain/product.schema';
 import { ConcurrencyError } from '@/lib/errors';
 
@@ -149,6 +149,23 @@ export class ProductRepository {
       .returning();
     if (result.length === 0) throw new ConcurrencyError();
     return result[0];
+  }
+
+  async bulkSetVisibilityBySection(section: 'tech' | 'libreria', isVisible: boolean, dbtx: any = db) {
+    return await dbtx
+      .update(products)
+      .set({
+        showOnLanding: isVisible,
+        updatedAt: sql`NOW()`,
+        version: sql`${products.version} + 1`,
+      })
+      .where(
+        inArray(
+          products.deviceId,
+          dbtx.select({ id: devices.id }).from(devices).where(eq(devices.section, section))
+        )
+      )
+      .returning({ id: products.id });
   }
 }
 

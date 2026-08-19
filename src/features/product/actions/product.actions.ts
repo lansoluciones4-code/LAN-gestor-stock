@@ -212,3 +212,29 @@ export async function toggleProductVisibilityAction(id: string, isVisible: boole
   }
 }
 
+export async function bulkSetProductVisibilityBySectionAction(section: 'tech' | 'libreria', isVisible: boolean): Promise<ActionResult> {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+    const sectionLabel = section === 'tech' ? 'Tech' : 'Librería';
+
+    return await db.transaction(async (tx) => {
+      const updated = await productRepository.bulkSetVisibilityBySection(section, isVisible, tx);
+
+      await recordAuditLog(caller.id, 'ACTUALIZAR_VISIBILIDAD_LANDING_MASIVO', 'PRODUCT', undefined, {
+        section: sectionLabel,
+        showOnLanding: isVisible,
+        productosAfectados: updated.length,
+      }, tx);
+
+      return {
+        success: true,
+        message: isVisible
+          ? `${updated.length} producto(s) de ${sectionLabel} ahora visibles en el catálogo`
+          : `${updated.length} producto(s) de ${sectionLabel} ahora ocultos del catálogo`,
+      };
+    });
+  } catch (error: any) {
+    return { success: false, error: handleDatabaseError(error, 'producto') };
+  }
+}
+
