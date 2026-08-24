@@ -116,7 +116,6 @@ export class SaleRepository {
       colorMode: item.colorMode,
       kind: item.kind,
       title: item.title,
-      quantity: item.quantity,
       subtotal: roundToDecimals(item.subtotal),
     }));
 
@@ -206,7 +205,6 @@ export class SaleRepository {
         colorMode: item.colorMode,
         kind: item.kind,
         title: item.title,
-        quantity: item.quantity != null ? item.quantity.toString() : null,
         subtotal: item.subtotal.toString(),
       });
     }

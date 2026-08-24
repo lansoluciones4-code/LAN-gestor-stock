@@ -29,7 +29,6 @@ interface QuickSaleViewProps {
 
 interface QuickAddExtra {
   title?: string;
-  quantity?: number;
 }
 
 /** Botón rápido tipo "Fotocopias"/"Impresiones": al tocar despliega, además del importe, el campo extra que pida `extraField` (nombre de operación para Trámites, cantidad de horas para Ciber). */
@@ -37,21 +36,17 @@ function QuickAddButton({ icon, label, extraField, onAdd }: { icon: React.ReactN
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
-  const [hours, setHours] = useState('');
 
   const confirm = () => {
     const amountNum = Number((amount || '').replace(',', '.'));
     if (isNaN(amountNum) || amountNum <= 0) return;
     if (extraField === 'title' && !title.trim()) return;
 
-    const hoursNum = Number((hours || '').replace(',', '.'));
     onAdd(amountNum, {
       title: extraField === 'title' ? title.trim() : undefined,
-      quantity: extraField === 'hours' && !isNaN(hoursNum) && hoursNum > 0 ? hoursNum : undefined,
     });
     setAmount('');
     setTitle('');
-    setHours('');
     setOpen(false);
   };
 
@@ -74,20 +69,6 @@ function QuickAddButton({ icon, label, extraField, onAdd }: { icon: React.ReactN
               placeholder='Operación'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') confirm();
-              }}
-              className='w-full px-3 py-1.5 text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
-            />
-          )}
-          {extraField === 'hours' && (
-            <input
-              type='text'
-              inputMode='decimal'
-              autoFocus
-              placeholder='Cantidad de horas'
-              value={hours}
-              onChange={(e) => setHours(e.target.value.replace(/[^0-9.,]/g, ''))}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') confirm();
               }}

@@ -1,0 +1,1 @@
+ALTER TABLE "sale_print_items" DROP COLUMN "quantity";

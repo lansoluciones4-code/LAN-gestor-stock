@@ -93,6 +93,15 @@ El cliente quiere que UN vendedor puntual pueda registrar devoluciones sin volve
 - **Frontend**: nav de "Devoluciones" visible para vendedor solo si `canManageReturns` (caso especial en el filtro de `navLinks`, documentado con comentario). Botón checkmark (`CircleCheck`/`Circle`) en `user-columns.tsx`/`user-card.tsx`, solo en filas de vendedor.
 - Verificado con `tsc --noEmit`, `eslint`, `npm run build`, `psql \d users` (columna confirmada), contenedor `app` reconstruido y sano.
 
+### Paso 13 — Quitar "cantidad de horas" de Hora de Ciber (COMPLETADO)
+El ítem "Hora de Ciber" pedía horas + monto; ahora solo pide monto, igual que Anillados/Plastificados. Quitado de Venta Rápida, Nueva Venta, la base de datos y la factura.
+
+- **`src/lib/print-kinds.ts`**: `ciber.extraField` pasa de `'hours'` a `'none'`; se eliminó el variante `'hours'` de `PrintKindExtraField`; `formatPrintItemLabel('ciber')` ya no muestra `(X hs)`.
+- **`usePrintCart.ts`**, **Venta Rápida** (`quick-sale-view.tsx`) y **Nueva Venta** (`sale-builder-view.tsx`): se eliminó el estado/input de horas y el cálculo de `quantity` al armar el ítem.
+- **`sale.schema.ts`** y **`sale.repository.ts`**: se eliminó `quantity` de `salePrintItemInputSchema`, del `printItems` anidado en `saleRowSchema`, y de los dos lugares donde `sale.repository.ts` lo leía/insertaba (encontrado recién al correr `tsc`, no estaba listado en el plan original — buen recordatorio de que `tsc --noEmit` después de un cambio de schema encuentra referencias que un grep manual puede pasar por alto).
+- **Schema DB**: columna `sale_print_items.quantity` eliminada (migración `DROP COLUMN`) — pérdida de datos histórica aceptada (el dato era puramente informativo, nunca se usó para calcular nada).
+- Verificado con `tsc --noEmit`, `eslint`, `npm run build`, `psql \d sale_print_items` (columna confirmada eliminada), contenedor `app` reconstruido y sano.
+
 ### Paso 8 — Catálogo público: ordenar por precio ← SIGUIENTE
 `src/app/home/components/catalog/use-catalog-filters.ts` — hoy `sortedProducts` solo ordena "con stock primero". Agregar estado `sortBy` (precio asc/desc) + selector nuevo en `catalog-controls.tsx`/`catalog-sidebar.tsx` (desktop) y `mobile-filter-drawer.tsx`. Sin migración, sin backend — `salePrice` ya es `number` en `ProductDef`. Definir al implementar si precio es criterio primario o desempate de "con stock primero".
 

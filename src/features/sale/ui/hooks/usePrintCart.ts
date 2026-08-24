@@ -9,8 +9,6 @@ export interface PrintCartItem {
   kind: PrintKind;
   /** Solo usado con kind: 'tramite' — nombre del trámite cargado a mano. */
   title?: string;
-  /** Solo usado con kind: 'ciber' — cantidad de horas, puramente informativo. */
-  quantity?: number;
   /** Importe total cargado originalmente, sin descuento. */
   listAmount: number;
   /** Descuento aplicado a esta impresión en particular (0-100). */
@@ -20,7 +18,6 @@ export interface PrintCartItem {
 
 export interface PrintCartItemExtra {
   title?: string;
-  quantity?: number;
 }
 
 const computeItem = (listAmount: number, discountPercentage: number) => ({
@@ -43,7 +40,6 @@ export function usePrintCart() {
         colorMode,
         kind,
         title: extra?.title,
-        quantity: extra?.quantity,
         listAmount: amount,
         discountPercentage: 0,
         ...computeItem(amount, 0),

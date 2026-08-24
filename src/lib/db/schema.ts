@@ -207,8 +207,6 @@ export const salePrintItems = pgTable(
     kind: printKindEnum('kind').notNull().default('impresion'),
     // Solo se usa con kind: 'tramite' — nombre del trámite cargado a mano.
     title: varchar('title', { length: 150 }),
-    // Solo se usa con kind: 'ciber' — cantidad de horas, puramente informativo (el monto no se calcula a partir de esto).
-    quantity: numeric('quantity', { precision: 6, scale: 2 }),
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
   (table) => [index('sale_print_items_sale_id_idx').on(table.saleId)]

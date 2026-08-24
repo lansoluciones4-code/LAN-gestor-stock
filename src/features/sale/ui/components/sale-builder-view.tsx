@@ -67,7 +67,6 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
   const [colorMode, setColorMode] = useState<'color' | 'blanco_y_negro'>('blanco_y_negro');
   const [printAmount, setPrintAmount] = useState('');
   const [printTitle, setPrintTitle] = useState('');
-  const [printHours, setPrintHours] = useState('');
 
   // Editor de descuento compartido — clave compuesta `${tipo}:${id}` para las 3 líneas de carrito.
   const [discountEditorFor, setDiscountEditorFor] = useState<string | null>(null);
@@ -102,14 +101,11 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
     if (!kind) return;
     if (kind === 'tramite' && !printTitle.trim()) return;
 
-    const hoursNum = Number((printHours || '').replace(',', '.'));
     addPrintItem(kind === 'impresion' ? colorMode : null, amountNum, kind, {
       title: kind === 'tramite' ? printTitle.trim() : undefined,
-      quantity: kind === 'ciber' && !isNaN(hoursNum) && hoursNum > 0 ? hoursNum : undefined,
     });
     setPrintAmount('');
     setPrintTitle('');
-    setPrintHours('');
   };
 
   const toggleDiscountEditor = (key: string, currentDiscount: number) => {
@@ -198,19 +194,6 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                     type='text'
                     value={printTitle}
                     onChange={(e) => setPrintTitle(e.target.value)}
-                    className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
-                  />
-                </div>
-              )}
-
-              {activeTab === 'ciber' && (
-                <div>
-                  <label className='block text-xs font-medium mb-1.5'>Cantidad de Horas</label>
-                  <input
-                    type='text'
-                    inputMode='decimal'
-                    value={printHours}
-                    onChange={(e) => setPrintHours(e.target.value.replace(/[^0-9.,]/g, ''))}
                     className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
                   />
                 </div>
