@@ -5,7 +5,7 @@ export const roleEnum = pgEnum('role', ['admin', 'vendedor']);
 export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferencia', 'debito', 'credito']);
 export const businessSectionEnum = pgEnum('business_section', ['tech', 'impresiones', 'libreria']);
 export const colorModeEnum = pgEnum('color_mode', ['color', 'blanco_y_negro']);
-export const printKindEnum = pgEnum('print_kind', ['fotocopia', 'impresion']);
+export const printKindEnum = pgEnum('print_kind', ['fotocopia', 'impresion', 'ciber', 'anillado_plastificado', 'tramite']);
 
 /** Fila única con configuración global del catálogo público (ej. mostrar precios o no). */
 export const appSettings = pgTable('app_settings', {
@@ -24,6 +24,8 @@ export const users = pgTable('users', {
   passwordHash: varchar('password_hash').notNull(),
   role: roleEnum('role').notNull(),
   isActive: boolean('is_active').default(true).notNull(),
+  // Permiso puntual: deja que un usuario con role 'vendedor' acceda a /devoluciones sin ser admin.
+  canManageReturns: boolean('can_manage_returns').default(false).notNull(),
   version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -203,6 +205,10 @@ export const salePrintItems = pgTable(
     // valor real cuando el vendedor efectivamente eligió Color/Blanco y Negro (Nueva Venta).
     colorMode: colorModeEnum('color_mode'),
     kind: printKindEnum('kind').notNull().default('impresion'),
+    // Solo se usa con kind: 'tramite' — nombre del trámite cargado a mano.
+    title: varchar('title', { length: 150 }),
+    // Solo se usa con kind: 'ciber' — cantidad de horas, puramente informativo (el monto no se calcula a partir de esto).
+    quantity: numeric('quantity', { precision: 6, scale: 2 }),
     subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
   },
   (table) => [index('sale_print_items_sale_id_idx').on(table.saleId)]
@@ -262,6 +268,26 @@ export const productLosses = pgTable(
   (table) => [index('loss_product_id_idx').on(table.productId), index('loss_user_id_idx').on(table.userId)]
 );
 
+export const productReturns = pgTable(
+  'product_returns',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    quantity: integer('quantity').notNull(),
+    reason: varchar('reason', { length: 255 }).notNull(),
+    amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('return_product_id_idx').on(table.productId), index('return_user_id_idx').on(table.userId)]
+);
+
 export const salePayments = pgTable(
   'sale_payments',
   {
@@ -290,6 +316,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [providers.id],
   }),
   losses: many(productLosses),
+  returns: many(productReturns),
   logs: many(auditLogs),
   images: many(productImages),
 }));
@@ -345,6 +372,17 @@ export const productLossesRelations = relations(productLosses, ({ one }) => ({
   }),
 }));
 
+export const productReturnsRelations = relations(productReturns, ({ one }) => ({
+  product: one(products, {
+    fields: [productReturns.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [productReturns.userId],
+    references: [users.id],
+  }),
+}));
+
 export const saleItemsRelations = relations(saleItems, ({ one }) => ({
   sale: one(sales, {
     fields: [saleItems.saleId],
@@ -360,6 +398,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sales: many(sales),
   logs: many(auditLogs),
   losses: many(productLosses),
+  returns: many(productReturns),
 }));
 
 export const devicesRelations = relations(devices, ({ many }) => ({

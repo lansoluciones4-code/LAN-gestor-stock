@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
@@ -8,7 +8,7 @@ import { ToggleFilter } from '@/components/ui/toggle-filter';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
 import { type UserInput, type UserDef, type UserUpdateInput } from '@/features/user/domain/user.schema';
-import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction } from '@/features/user/actions/user.actions';
+import { createUserAction, updateUserAction, deleteUserAction, fetchUsers, toggleUserActiveAction, toggleUserReturnsAccessAction } from '@/features/user/actions/user.actions';
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { useUserStore } from '@/features/user/store/user.store';
 import { useEntityActions } from '@/hooks/use-entity-actions';
@@ -16,6 +16,7 @@ import { useAutoSync } from '@/hooks/use-auto-sync';
 import { getUserColumns } from '@/config/tables/user-columns';
 import { useEntityManager } from '@/hooks/use-entity-manager';
 import { normalizeForSearch } from '@/lib/utils';
+import { invalidateAllCaches } from '@/stores';
 import { UserModal } from '@/features/user/ui/components/user-modal';
 import { ConfirmModal } from '@/components/ui/responsive-modal';
 import { GlobalMessage } from '@/components/ui/alert';
@@ -26,12 +27,13 @@ export function UserPanel() {
   const currentUserId = useAuthStore((s) => s.user?.id);
   const role = useAuthStore((s) => s.user?.role);
   const [showInactives, setShowInactives] = useState(false);
+  const [isPendingReturnsAccess, startReturnsAccessTransition] = useTransition();
   const { users, setUsers, isLoaded } = useUserStore();
 
   const { isModalOpen, editingItem, openFormModal, closeFormModal, itemToDelete, setItemToDelete, serverError, setServerError, globalMessage, showGlobalMessage, search, setSearch } =
     useEntityManager<UserDef>();
 
-  const { isPending, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<UserDef, UserInput, UserUpdateInput>({
+  const { isPending: isPendingAction, syncData, handleEditSubmit, handleDelete, handleToggleActive } = useEntityActions<UserDef, UserInput, UserUpdateInput>({
     handlers: { fetchData: fetchUsers, createAction: createUserAction, updateAction: updateUserAction, deleteAction: deleteUserAction, toggleActiveAction: toggleUserActiveAction },
     setStoreData: setUsers,
     onSuccessMessage: (msg) => showGlobalMessage('success', msg),
@@ -45,6 +47,18 @@ export function UserPanel() {
 
   const { initialLoading } = useAutoSync({ isLoaded, sync: () => fetchUsers().then(setUsers) });
 
+  const isPending = isPendingAction || isPendingReturnsAccess;
+
+  const handleToggleReturnsAccess = (u: UserDef) => {
+    startReturnsAccessTransition(async () => {
+      const result = await toggleUserReturnsAccessAction(u.id!, !u.canManageReturns);
+      if (!result.success) return showGlobalMessage('error', result.error);
+      showGlobalMessage('success', result.message || 'Permiso actualizado');
+      invalidateAllCaches();
+      syncData();
+    });
+  };
+
   const filteredUsers = useMemo(() =>
     users
       .filter((u) => {
@@ -57,7 +71,7 @@ export function UserPanel() {
     [users, search, showInactives]
   );
 
-  const columns = getUserColumns({ currentUserId, role, onEdit: openFormModal, onDelete: setItemToDelete, onToggleActive: handleToggleActive });
+  const columns = getUserColumns({ currentUserId, role, onEdit: openFormModal, onDelete: setItemToDelete, onToggleActive: handleToggleActive, onToggleReturnsAccess: handleToggleReturnsAccess });
 
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
@@ -92,7 +106,7 @@ export function UserPanel() {
         data={filteredUsers}
         isLoading={isPending}
         emptyMessage='No se han encontrado usuarios con credenciales activas.'
-        renderCard={renderUserCard({ onEdit: openFormModal, onDelete: setItemToDelete, onToggleActive: handleToggleActive, currentUserId })}
+        renderCard={renderUserCard({ onEdit: openFormModal, onDelete: setItemToDelete, onToggleActive: handleToggleActive, onToggleReturnsAccess: handleToggleReturnsAccess, currentUserId })}
       />
 
       <UserModal isOpen={isModalOpen} onClose={closeFormModal} editingItem={editingItem} onSubmit={handleEditSubmit} isPending={isPending} serverError={serverError} />

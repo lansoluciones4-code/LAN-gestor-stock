@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search, Printer, Wrench } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type TechnicalServiceDef } from '@/features/technical-service/domain/technical-service.schema';
@@ -12,14 +12,29 @@ import { SaleCustomerPicker, isCustomerSelectionValid, type SaleCustomerSelectio
 import { DiscountControl } from './discount-control';
 import { blockInvalidPriceKey } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
+import { getPrintKindMeta, formatPrintItemLabel, type PrintKind } from '@/lib/print-kinds';
 
-type BuilderTab = 'tech' | 'libreria' | 'impresiones' | 'servicio';
+type BuilderTab = 'tech' | 'libreria' | 'impresiones' | 'servicio' | 'ciber' | 'anillado_plastificado' | 'tramite';
+
+/** Tabs cuyo panel izquierdo es el formulario "tipo impresión" (importe + campo extra según el kind), en vez de una lista de búsqueda. */
+const PRINT_LIKE_TABS: BuilderTab[] = ['impresiones', 'ciber', 'anillado_plastificado', 'tramite'];
+
+/** El id del tab "Impresiones" es plural por convención de UI; el kind real en la DB es singular ('impresion'). */
+const TAB_TO_PRINT_KIND: Partial<Record<BuilderTab, PrintKind>> = {
+  impresiones: 'impresion',
+  ciber: 'ciber',
+  anillado_plastificado: 'anillado_plastificado',
+  tramite: 'tramite',
+};
 
 const BUILDER_TABS: { id: BuilderTab; label: string }[] = [
   { id: 'tech', label: 'Tech' },
   { id: 'libreria', label: 'Librería' },
   { id: 'impresiones', label: 'Impresiones' },
   { id: 'servicio', label: 'Servicio técnico' },
+  { id: 'ciber', label: 'Hora de Ciber' },
+  { id: 'anillado_plastificado', label: 'Anillados/Plastificados' },
+  { id: 'tramite', label: 'Trámites Online' },
 ];
 
 interface SaleBuilderViewProps {
@@ -48,9 +63,11 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
   const [search, setSearch] = useState('');
   const [customerSelectionState, setCustomerSelectionState] = useState<SaleCustomerSelection>({ mode: 'final' });
 
-  // Formulario de Impresiones
+  // Formulario compartido por los 4 tabs "tipo impresión" (Impresiones/Ciber/Anillados-Plastificados/Trámites)
   const [colorMode, setColorMode] = useState<'color' | 'blanco_y_negro'>('blanco_y_negro');
   const [printAmount, setPrintAmount] = useState('');
+  const [printTitle, setPrintTitle] = useState('');
+  const [printHours, setPrintHours] = useState('');
 
   // Editor de descuento compartido — clave compuesta `${tipo}:${id}` para las 3 líneas de carrito.
   const [discountEditorFor, setDiscountEditorFor] = useState<string | null>(null);
@@ -80,8 +97,19 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
   const handleAddPrint = () => {
     const amountNum = Number((printAmount || '').replace(',', '.'));
     if (isNaN(amountNum) || amountNum <= 0) return;
-    addPrintItem(colorMode, amountNum);
+
+    const kind = TAB_TO_PRINT_KIND[activeTab];
+    if (!kind) return;
+    if (kind === 'tramite' && !printTitle.trim()) return;
+
+    const hoursNum = Number((printHours || '').replace(',', '.'));
+    addPrintItem(kind === 'impresion' ? colorMode : null, amountNum, kind, {
+      title: kind === 'tramite' ? printTitle.trim() : undefined,
+      quantity: kind === 'ciber' && !isNaN(hoursNum) && hoursNum > 0 ? hoursNum : undefined,
+    });
     setPrintAmount('');
+    setPrintTitle('');
+    setPrintHours('');
   };
 
   const toggleDiscountEditor = (key: string, currentDiscount: number) => {
@@ -140,7 +168,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
         <SaleCustomerPicker onChange={handleCustomerChange} />
       </div>
 
-      <div className='shrink-0 flex rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1 mx-1'>
+      <div className='shrink-0 flex gap-1 overflow-x-auto rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1 mx-1'>
         {BUILDER_TABS.map((tab) => (
           <button
             key={tab.id}
@@ -149,7 +177,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               setActiveTab(tab.id);
               setSearch('');
             }}
-            className={`flex-1 py-1.5 text-xs sm:text-sm font-bold rounded-md transition-all ${activeTab === tab.id ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+            className={`flex-1 min-w-[130px] py-2.5 px-2 text-center leading-tight text-xs sm:text-sm font-bold rounded-md transition-all ${activeTab === tab.id ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
           >
             {tab.label}
           </button>
@@ -159,9 +187,35 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
       <div className='flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden'>
         {/* Panel de búsqueda/alta — cambia según el tab activo */}
         <div className='lg:col-span-7 flex flex-col min-h-0 space-y-4 px-1 pt-1'>
-          {activeTab === 'impresiones' ? (
+          {PRINT_LIKE_TABS.includes(activeTab) ? (
             <div className='p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4 shrink-0'>
-              <h3 className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Nueva Impresión</h3>
+              <h3 className='text-[10px] font-black uppercase text-zinc-400 tracking-widest'>Nueva {BUILDER_TABS.find((t) => t.id === activeTab)?.label}</h3>
+
+              {activeTab === 'tramite' && (
+                <div>
+                  <label className='block text-xs font-medium mb-1.5'>Nombre del Trámite</label>
+                  <input
+                    type='text'
+                    value={printTitle}
+                    onChange={(e) => setPrintTitle(e.target.value)}
+                    className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+                  />
+                </div>
+              )}
+
+              {activeTab === 'ciber' && (
+                <div>
+                  <label className='block text-xs font-medium mb-1.5'>Cantidad de Horas</label>
+                  <input
+                    type='text'
+                    inputMode='decimal'
+                    value={printHours}
+                    onChange={(e) => setPrintHours(e.target.value.replace(/[^0-9.,]/g, ''))}
+                    className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+                  />
+                </div>
+              )}
+
               <div>
                 <label className='block text-xs font-medium mb-1.5'>Importe Total ($)</label>
                 <input
@@ -173,30 +227,37 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                   className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
                 />
               </div>
-              <div>
-                <label className='block text-xs font-medium mb-1.5'>Modo de Impresión</label>
-                <div className='grid grid-cols-2 gap-3'>
-                  <button
-                    type='button'
-                    onClick={() => setColorMode('blanco_y_negro')}
-                    className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all font-bold text-xs uppercase ${colorMode === 'blanco_y_negro' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-950 text-zinc-400'}`}
-                  >
-                    Blanco y Negro
-                  </button>
-                  <button
-                    type='button'
-                    onClick={() => setColorMode('color')}
-                    className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all font-bold text-xs uppercase ${colorMode === 'color' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-950 text-zinc-400'}`}
-                  >
-                    Color
-                  </button>
+
+              {activeTab === 'impresiones' && (
+                <div>
+                  <label className='block text-xs font-medium mb-1.5'>Modo de Impresión</label>
+                  <div className='grid grid-cols-2 gap-3'>
+                    <button
+                      type='button'
+                      onClick={() => setColorMode('blanco_y_negro')}
+                      className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all font-bold text-xs uppercase ${colorMode === 'blanco_y_negro' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-950 text-zinc-400'}`}
+                    >
+                      Blanco y Negro
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => setColorMode('color')}
+                      className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all font-bold text-xs uppercase ${colorMode === 'color' ? 'border-zinc-500 bg-zinc-50 dark:bg-zinc-500/10 text-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-950 text-zinc-400'}`}
+                    >
+                      Color
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
+
               <Button
                 fullWidth
                 variant='secondary'
                 onClick={handleAddPrint}
-                leftIcon={<Printer className='w-4 h-4' />}
+                leftIcon={(() => {
+                  const Icon = getPrintKindMeta(TAB_TO_PRINT_KIND[activeTab] || 'impresion').icon;
+                  return <Icon className='w-4 h-4' />;
+                })()}
               >
                 Agregar a la Venta
               </Button>
@@ -361,7 +422,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                 className='p-2.5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shadow-sm shrink-0'
               >
                 <div className='flex justify-between items-start gap-2 overflow-hidden'>
-                  <span className='text-xs font-bold uppercase leading-tight truncate'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</span>
+                  <span className='text-xs font-bold uppercase leading-tight truncate'>{formatPrintItemLabel(item)}</span>
                   <button
                     onClick={() => removePrintItem(item.id)}
                     className='text-zinc-300 hover:text-zinc-500 transition-colors p-1'
@@ -550,7 +611,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                   className='p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shrink-0'
                 >
                   <div className='flex justify-between items-start overflow-hidden'>
-                    <span className='text-sm font-bold uppercase leading-tight truncate'>{item.colorMode === 'color' ? 'Color' : 'Blanco y Negro'}</span>
+                    <span className='text-sm font-bold uppercase leading-tight truncate'>{formatPrintItemLabel(item)}</span>
                     <button
                       onClick={() => removePrintItem(item.id)}
                       className='text-zinc-500 p-1'

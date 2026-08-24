@@ -2,7 +2,7 @@ import { desc, or, and, eq, gte, lte, sql, exists } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { auditLogs, users, products, customers, providers, devices } from '@/lib/db/schema';
 import { type AuditLogInput } from '@/features/audit/domain/audit-log.schema';
-import { normalizeForSearch } from '@/lib/utils';
+import { normalizeForSearch, argDateRangeBounds } from '@/lib/utils';
 
 export class AuditLogRepository {
   async getAllLogs(options?: { page?: number; limit?: number; search?: string; startDate?: string; endDate?: string }) {
@@ -29,6 +29,7 @@ export class AuditLogRepository {
           // Map Action labels for better searchability
           const actionMapping = [
             { label: 'pérdida', value: 'PÉRDIDA' },
+            { label: 'devolución', value: 'DEVOLUCIÓN' },
             { label: 'creación', value: 'CREAR' },
             { label: 'edición', value: 'ACTUALIZAR' },
             { label: 'borrado', value: 'ELIMINAR' },
@@ -107,11 +108,10 @@ export class AuditLogRepository {
           if (cond) conditions.push(cond);
         }
 
-        if (startDate) {
-          conditions.push(gte(logs.createdAt, new Date(startDate + 'T00:00:00')));
-        }
-        if (endDate) {
-          conditions.push(lte(logs.createdAt, new Date(endDate + 'T23:59:59')));
+        if (startDate || endDate) {
+          const { start, end } = argDateRangeBounds(startDate, endDate);
+          if (startDate) conditions.push(gte(logs.createdAt, start));
+          if (endDate) conditions.push(lte(logs.createdAt, end));
         }
 
         return conditions.length > 0 ? and(...conditions) : undefined;

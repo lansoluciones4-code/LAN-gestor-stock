@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "can_manage_returns" boolean DEFAULT false NOT NULL;

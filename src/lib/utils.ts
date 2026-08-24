@@ -47,6 +47,20 @@ export function roundToDecimals(num: number, decimals: number = 2): number {
   return Math.round((num + Number.EPSILON) * factor) / factor;
 }
 
+/**
+ * Converts a 'YYYY-MM-DD' calendar-day string (as picked by the user in Argentina) into the
+ * actual start/end instants of that day. Uses a hardcoded '-03:00' offset instead of the server's
+ * local timezone — the server (Docker container) runs in UTC, so `new Date(str + 'T00:00:00')`
+ * (no offset) would silently compute midnight UTC instead of midnight ART, shifting every date
+ * filter by 3 hours. Argentina has not observed daylight saving time since 2009, so a fixed
+ * -03:00 offset is safe year-round.
+ */
+export function argDateRangeBounds(startDate?: string, endDate?: string): { start: Date; end: Date } {
+  const start = startDate ? new Date(`${startDate}T00:00:00-03:00`) : new Date(0);
+  const end = endDate ? new Date(`${endDate}T23:59:59-03:00`) : new Date();
+  return { start, end };
+}
+
 /** Keys that browsers inject into number inputs but are invalid for price fields. */
 export const PRICE_BLOCKED_KEYS = ['-', '.', ',', 'e', 'E', '+'];
 

@@ -22,6 +22,7 @@ const ACTION_COLORS: Record<string, string> = {
   EDITAR: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
   ELIMINAR: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
   'PÉRDIDA': 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
+  'DEVOLUCIÓN': 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
   LOGIN: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/10 dark:text-zinc-400',
 };
 

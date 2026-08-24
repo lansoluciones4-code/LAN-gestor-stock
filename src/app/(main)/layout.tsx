@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench, CreditCard, Undo2 } from 'lucide-react';
 
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { logoutAction } from '@/features/auth/actions/auth.actions';
@@ -22,6 +22,7 @@ const navigation = [
 const adminNavigation = [
   { name: 'Alta de productos', href: '/categorias', icon: MonitorSmartphone, roles: ['admin'] },
   { name: 'Alta de tarjetas', href: '/tarjetas', icon: CreditCard, roles: ['admin'] },
+  { name: 'Devoluciones', href: '/devoluciones', icon: Undo2, roles: ['admin', 'vendedor'] },
   { name: 'Usuarios', href: '/usuarios', icon: UserCog, roles: ['admin'] },
   { name: 'Auditoría', href: '/logs', icon: ShieldAlert, roles: ['admin'] },
 ];
@@ -52,7 +53,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     window.location.href = '/login';
   };
 
-  const navLinks = [...navigation, ...adminNavigation].filter((item) => item.roles.includes(user?.role || 'vendedor'));
+  const navLinks = [...navigation, ...adminNavigation]
+    .filter((item) => item.roles.includes(user?.role || 'vendedor'))
+    // Caso especial: "Devoluciones" es visible para 'vendedor' en el array de roles (para no bloquearlo
+    // a nivel ruta), pero solo debe aparecer en el menú del vendedor puntual habilitado por un admin.
+    .filter((item) => item.href !== '/devoluciones' || user?.role === 'admin' || user?.canManageReturns);
 
   const SidebarContent = () => (
     <div className='flex h-full w-full flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 transition-colors relative'>

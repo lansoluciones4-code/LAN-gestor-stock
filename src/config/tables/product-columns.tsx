@@ -14,7 +14,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
   return [
     {
       header: 'Equipo y Detalle',
-      cellClassName: 'max-w-[250px]',
+      headerClassName: 'w-[34%]',
       cell: (p) => {
         const categoryBrand = [p.device?.category, p.device?.brand].filter(Boolean).join(' · ');
         return (
@@ -45,9 +45,10 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
     },
     {
       header: 'Stock',
+      headerClassName: 'w-[10%]',
       cell: (p) => (
         <span
-          className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+          className={`px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
             p.stock > p.lowStockThreshold
               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
               : p.stock > 0
@@ -61,6 +62,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
     },
     {
       header: 'Precio Público',
+      headerClassName: 'w-[12%]',
       cellClassName: 'font-semibold text-zinc-600 dark:text-zinc-400',
       cell: (p) => `$${p.salePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
     },
@@ -68,6 +70,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
       ? [
           {
             header: 'Costo',
+            headerClassName: 'w-[11%]',
             cellClassName: 'font-medium text-zinc-500',
             cell: (p: ProductDef) => `$${p.purchasePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
           },
@@ -77,7 +80,8 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
       ? [
           {
             header: 'Proveedor',
-            cellClassName: 'text-zinc-500 max-w-[150px] truncate',
+            headerClassName: 'w-[13%]',
+            cellClassName: 'text-zinc-500 truncate',
             cell: (p: ProductDef) => <span title={p.provider?.name || '---'}>{p.provider?.name || '---'}</span>,
           },
         ]
@@ -106,15 +110,13 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
               <Edit className='w-4 h-4' />
             </button>
           ) : null}
-          {role === 'admin' ? (
-            <button
-              onClick={() => onManagePhotos(p)}
-              className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-lg transition-colors'
-              title='Gestionar Fotos'
-            >
-              <Camera className='w-4 h-4' />
-            </button>
-          ) : null}
+          <button
+            onClick={() => onManagePhotos(p)}
+            className='p-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-lg transition-colors'
+            title='Gestionar Fotos'
+          >
+            <Camera className='w-4 h-4' />
+          </button>
           {role === 'admin' ? (
             <button
               onClick={() => onDelete(p.id!)}

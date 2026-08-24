@@ -2,26 +2,28 @@
 
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 import { db } from '@/lib/db';
-import { sales, products, productLosses } from '@/lib/db/schema';
+import { sales, products, productLosses, productReturns } from '@/lib/db/schema';
 import { gte, lte, and } from 'drizzle-orm';
+import { argDateRangeBounds } from '@/lib/utils';
 
 export async function fetchDashboardStats(startDate?: string, endDate?: string) {
   try {
     await verifyAuthOrAdmin(false);
 
-    const start = startDate ? new Date(startDate + 'T00:00:00') : new Date(0);
-    const end = endDate ? new Date(endDate + 'T23:59:59') : new Date();
+    const { start, end } = argDateRangeBounds(startDate, endDate);
 
     // Use transaction for cross-query consistency (snapshot isolation)
     const result = await db.transaction(async (tx) => {
       // 1. Fetch data in parallel
-      const [allProducts, salesWithItems, lossesWithProducts] = await Promise.all([
+      const [allProducts, salesWithItems, lossesWithProducts, returnsInRange] = await Promise.all([
         tx.select().from(products),
         tx.query.sales.findMany({
           where: and(gte(sales.createdAt, start), lte(sales.createdAt, end)),
           with: {
             vendor: true,
-            items: { with: { product: true } },
+            items: { with: { product: { with: { device: true } } } },
+            printItems: true,
+            serviceItems: true,
             payments: true,
           },
         }),
@@ -30,6 +32,9 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
           with: {
             product: true,
           },
+        }),
+        tx.query.productReturns.findMany({
+          where: and(gte(productReturns.createdAt, start), lte(productReturns.createdAt, end)),
         }),
       ]);
 
@@ -53,7 +58,14 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
       let transferRevenue = 0;
       let debitoRevenue = 0;
       let creditoRevenue = 0;
+      let techRevenue = 0;
+      let libreriaRevenue = 0;
+      let impresionesRevenue = 0;
+      let ciberRevenue = 0;
+      let tramitesRevenue = 0;
+      let servicioTecnicoRevenue = 0;
       const sellerMap: Record<string, { username: string; total: number; count: number }> = {};
+      const techSales: { productLabel: string; vendorUsername: string; amount: number; createdAt: Date }[] = [];
 
       salesWithItems.forEach((s: any) => {
         totalRevenue += Number(s.total);
@@ -62,6 +74,33 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         s.items.forEach((item: any) => {
           const unitCost = Number(item.unitCost || 0);
           totalCostOfGoodsSold += unitCost * item.quantity;
+
+          const subtotal = Number(item.subtotal || 0);
+          if (item.product?.device?.section === 'libreria') {
+            libreriaRevenue += subtotal;
+          } else {
+            techRevenue += subtotal;
+            const device = item.product?.device;
+            techSales.push({
+              productLabel: [device?.category, device?.brand, device?.name].filter(Boolean).join(' · ') || 'Producto',
+              vendorUsername: s.vendor?.username || 'Sistema',
+              amount: subtotal,
+              createdAt: s.createdAt,
+            });
+          }
+        });
+
+        // Desglose por rubro — impresiones/ciber/anillados/trámites
+        (s.printItems as any[]).forEach((p) => {
+          const subtotal = Number(p.subtotal || 0);
+          if (p.kind === 'fotocopia' || p.kind === 'impresion') impresionesRevenue += subtotal;
+          else if (p.kind === 'ciber') ciberRevenue += subtotal;
+          else if (p.kind === 'anillado_plastificado') libreriaRevenue += subtotal;
+          else if (p.kind === 'tramite') tramitesRevenue += subtotal;
+        });
+
+        (s.serviceItems as any[]).forEach((sv) => {
+          servicioTecnicoRevenue += Number(sv.subtotal || 0);
         });
 
         // Payments Breakdown
@@ -91,11 +130,18 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         totalLossCost += purchasePrice * (l.quantity || 0);
       });
 
-      // 5. Final Calculations
-      const netProfit = totalRevenue - totalCostOfGoodsSold - totalLossCost;
+      // 5. Process Returns
+      let totalReturnValue = 0;
+      returnsInRange.forEach((r: any) => {
+        totalReturnValue += Number(r.amount || 0);
+      });
+
+      // 6. Final Calculations
+      const netProfit = totalRevenue - totalCostOfGoodsSold - totalLossCost - totalReturnValue;
       const topSellers = Object.values(sellerMap)
         .sort((a, b) => b.total - a.total)
         .slice(0, 5);
+      techSales.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       return {
         totalEquipos,
@@ -105,12 +151,20 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
         lowStockCount,
         netProfit,
         totalLossCost,
+        totalReturnValue,
         topSellers,
+        techSales,
         salesCount: salesWithItems.length,
         cashRevenue,
         transferRevenue,
         debitoRevenue,
         creditoRevenue,
+        techRevenue,
+        libreriaRevenue,
+        impresionesRevenue,
+        ciberRevenue,
+        tramitesRevenue,
+        servicioTecnicoRevenue,
       };
     });
 

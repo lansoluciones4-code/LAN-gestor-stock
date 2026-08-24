@@ -6,9 +6,12 @@ import { cloudinaryService } from '@/lib/cloudinary';
 import { ActionResult } from '@/lib/action-result';
 import { eq } from 'drizzle-orm';
 import { ConcurrencyError } from '@/lib/errors';
+import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 
 export async function deleteProductPhoto(publicId: string): Promise<ActionResult> {
   try {
+    await verifyAuthOrAdmin(true);
+
     if (!publicId) {
       return { success: false, error: 'Public ID is required' };
     }

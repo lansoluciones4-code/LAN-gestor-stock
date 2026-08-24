@@ -3,6 +3,7 @@ import { ArrowLeft, Printer } from 'lucide-react';
 import { type SaleDef } from '@/features/sale/domain/sale.schema';
 import { Button } from '@/components/ui/button';
 import { getPaymentTypeMeta } from '@/lib/payment-types';
+import { formatPrintItemLabel } from '@/lib/print-kinds';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
   const itemsSubtotal = (sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0) + (sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0) + (sale.serviceItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0);
@@ -108,7 +109,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
             <table className='w-full mb-16'>
               <thead>
                 <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
-                  <th className='py-5'>Modo</th>
+                  <th className='py-5'>Concepto</th>
                   <th className='py-5 text-right'>Importe</th>
                 </tr>
               </thead>
@@ -118,7 +119,7 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     key={item.id}
                     className='text-[13px] text-zinc-900'
                   >
-                    <td className='py-5 font-bold text-zinc-900 uppercase'>{item.kind === 'fotocopia' ? 'Fotocopia' : item.colorMode ? (item.colorMode === 'color' ? 'Color' : 'Blanco y Negro') : 'Impresión'}</td>
+                    <td className='py-5 font-bold text-zinc-900 uppercase'>{formatPrintItemLabel(item)}</td>
                     <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                 ))}

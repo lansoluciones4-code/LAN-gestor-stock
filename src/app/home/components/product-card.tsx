@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type ProductDef } from '@/features/product/domain/product.schema';
-import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import Link from 'next/link';
 import { ContactButtons } from '@/components/contact/contact-buttons';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
 
 interface ProductCardProps {
   product: ProductDef & { images?: { publicId: string; url: string }[] };
@@ -15,6 +16,7 @@ interface ProductCardProps {
 export function ProductCard({ product, showPrice }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const deviceName = product.device?.name || 'Accesorio Apple';
   const isOutOfStock = product.stock <= 0;
   
@@ -101,10 +103,21 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={1}
                     onDragEnd={handleDragEnd}
-                    className='object-cover w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
+                    className='object-contain w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
                   />
                 </AnimatePresence>
-              
+
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsLightboxOpen(true);
+                }}
+                className="absolute top-2 right-2 bg-white/80 dark:bg-black/50 p-1.5 rounded-full text-zinc-800 dark:text-zinc-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black"
+                title="Ampliar imagen"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
+
               {/* Carousel Controls */}
               {images.length > 1 && (
                 <>
@@ -159,6 +172,16 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
           showLabels={false}
         />
       </div>
+
+      {hasImages && (
+        <ImageLightbox
+          images={images}
+          open={isLightboxOpen}
+          index={currentImageIndex}
+          onClose={() => setIsLightboxOpen(false)}
+          onIndexChange={setCurrentImageIndex}
+        />
+      )}
     </motion.div>
   );
 }

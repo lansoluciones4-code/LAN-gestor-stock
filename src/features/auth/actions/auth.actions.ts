@@ -16,6 +16,7 @@ type LoginResult = {
     id: string;
     username: string;
     role: Role;
+    canManageReturns: boolean;
   };
 };
 
@@ -81,7 +82,7 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
       // Success: Clear failed attempts
       rateLimitCache.delete(username);
 
-      const sessionPayload = { id: user.id, username: user.username, role: user.role as Role };
+      const sessionPayload = { id: user.id, username: user.username, role: user.role as Role, canManageReturns: user.canManageReturns };
       const token = await signToken(sessionPayload);
 
       const cookieStore = await cookies();

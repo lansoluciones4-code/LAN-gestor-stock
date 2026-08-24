@@ -1,6 +1,6 @@
 import { type UserDef } from '@/features/user/domain/user.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, CircleCheck, Circle } from 'lucide-react';
 
 interface ColumnActions {
   currentUserId?: string;
@@ -8,9 +8,10 @@ interface ColumnActions {
   onEdit: (u: UserDef) => void;
   onDelete: (id: string) => void;
   onToggleActive: (u: UserDef) => void;
+  onToggleReturnsAccess: (u: UserDef) => void;
 }
 
-export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggleActive }: ColumnActions): ColumnDef<UserDef>[] {
+export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggleActive, onToggleReturnsAccess }: ColumnActions): ColumnDef<UserDef>[] {
   return [
     {
       header: 'Usuario Creado',
@@ -50,6 +51,16 @@ export function getUserColumns({ currentUserId, role, onEdit, onDelete, onToggle
           >
             <Plus className={`w-4 h-4 ${u.isActive ? 'rotate-45' : ''}`} />
           </button>
+
+          {u.role === 'vendedor' && (
+            <button
+              onClick={() => onToggleReturnsAccess(u)}
+              className={`p-1.5 rounded-lg transition-colors ${u.canManageReturns ? 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400'}`}
+              title={u.canManageReturns ? 'Puede gestionar devoluciones' : 'No puede gestionar devoluciones'}
+            >
+              {u.canManageReturns ? <CircleCheck className='w-4 h-4' /> : <Circle className='w-4 h-4' />}
+            </button>
+          )}
 
           <button
             onClick={() => onEdit(u)}

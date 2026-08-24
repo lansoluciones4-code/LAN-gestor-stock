@@ -50,6 +50,29 @@ export async function toggleUserActiveAction(id: string, isActive: boolean): Pro
   }
 }
 
+export async function toggleUserReturnsAccessAction(id: string, canManageReturns: boolean): Promise<ActionResult> {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+
+    return await db.transaction(async (tx) => {
+      const target = await userRepository.getUserById(id, tx);
+      await userRepository.updateReturnsAccess(id, canManageReturns, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', 'USER', id, {
+        username: target?.username ?? 'Desconocido',
+        role: target?.role ?? 'Desconocido',
+        canManageReturns,
+        note: canManageReturns ? 'Habilitado para gestionar devoluciones' : 'Deshabilitado para gestionar devoluciones',
+      }, tx);
+      return {
+        success: true,
+        message: canManageReturns ? 'Acceso a Devoluciones habilitado' : 'Acceso a Devoluciones deshabilitado',
+      };
+    });
+  } catch (error: any) {
+    return { success: false, error: handleDatabaseError(error, 'Usuario') };
+  }
+}
+
 export async function createUserAction(input: UserInput): Promise<ActionResult<UserDef>> {
   try {
     const caller = await verifyAuthOrAdmin(true);

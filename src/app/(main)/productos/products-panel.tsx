@@ -214,10 +214,12 @@ export function ProductsPanel() {
           </Button>
         }
         actions={
-          <Button variant='primary' onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnAgregar}>
-            <span className='hidden sm:inline'>Ingresar Stock</span>
-            <span className='sm:hidden'>Agregar</span>
-          </Button>
+          role === 'admin' ? (
+            <Button variant='primary' onClick={() => handleEditClick()} leftIcon={<Plus className='w-5 h-5' />} className='h-11 w-full sm:w-auto text-sm font-medium shrink-0 shadow-sm xl:text-base' data-testid={TEST_IDS.general.btnAgregar}>
+              <span className='hidden sm:inline'>Ingresar Stock</span>
+              <span className='sm:hidden'>Agregar</span>
+            </Button>
+          ) : null
         }
       />
 
@@ -272,6 +274,7 @@ export function ProductsPanel() {
         isOpen={!!photoManageProduct}
         onClose={() => setPhotoManageProduct(null)}
         product={photoManageProduct}
+        canDelete={role === 'admin'}
       />
     </div>
   );

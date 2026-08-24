@@ -1,17 +1,26 @@
 import { useState } from 'react';
 import { roundToDecimals } from '@/lib/utils';
+import { type PrintKind } from '@/lib/print-kinds';
 
 export interface PrintCartItem {
   id: string;
-  /** null cuando el color no aplica (Venta Rápida nunca lo pregunta) — solo es un valor real en Nueva Venta. */
+  /** null cuando el color no aplica (Venta Rápida nunca lo pregunta, ni los kinds nuevos) — solo es un valor real en Impresiones de Nueva Venta. */
   colorMode: 'color' | 'blanco_y_negro' | null;
-  /** Distingue una fotocopia (shortcut de Venta Rápida) de una impresión de catálogo normal. */
-  kind: 'fotocopia' | 'impresion';
+  kind: PrintKind;
+  /** Solo usado con kind: 'tramite' — nombre del trámite cargado a mano. */
+  title?: string;
+  /** Solo usado con kind: 'ciber' — cantidad de horas, puramente informativo. */
+  quantity?: number;
   /** Importe total cargado originalmente, sin descuento. */
   listAmount: number;
   /** Descuento aplicado a esta impresión en particular (0-100). */
   discountPercentage: number;
   subtotal: number;
+}
+
+export interface PrintCartItemExtra {
+  title?: string;
+  quantity?: number;
 }
 
 const computeItem = (listAmount: number, discountPercentage: number) => ({
@@ -25,7 +34,7 @@ const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36
 export function usePrintCart() {
   const [items, setItems] = useState<PrintCartItem[]>([]);
 
-  const addItem = (colorMode: 'color' | 'blanco_y_negro' | null, amount: number, kind: 'fotocopia' | 'impresion' = 'impresion') => {
+  const addItem = (colorMode: 'color' | 'blanco_y_negro' | null, amount: number, kind: PrintKind = 'impresion', extra?: PrintCartItemExtra) => {
     if (amount <= 0) return;
     setItems((prev) => [
       ...prev,
@@ -33,6 +42,8 @@ export function usePrintCart() {
         id: generateId(),
         colorMode,
         kind,
+        title: extra?.title,
+        quantity: extra?.quantity,
         listAmount: amount,
         discountPercentage: 0,
         ...computeItem(amount, 0),

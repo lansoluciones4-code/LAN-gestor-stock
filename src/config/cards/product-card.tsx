@@ -81,13 +81,11 @@ export function renderProductCard(actions: ProductCardActionsProps) {
                 onClick={() => actions.onEdit(product)}
               />
             )}
-            {actions.role === 'admin' && (
-              <CardAction
-                icon={<Camera className='w-4 h-4' />}
-                label='Gestionar Fotos'
-                onClick={() => actions.onManagePhotos(product)}
-              />
-            )}
+            <CardAction
+              icon={<Camera className='w-4 h-4' />}
+              label='Gestionar Fotos'
+              onClick={() => actions.onManagePhotos(product)}
+            />
             {actions.role === 'admin' && (
               <CardAction
                 icon={<Trash2 className='w-4 h-4' />}

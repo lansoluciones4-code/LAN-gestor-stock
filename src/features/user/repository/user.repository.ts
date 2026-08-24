@@ -15,6 +15,7 @@ export class UserRepository {
         role: true,
         passwordHash: true,
         isActive: true,
+        canManageReturns: true,
         version: true,
       },
     });
@@ -33,6 +34,7 @@ export class UserRepository {
         username: true,
         role: true,
         isActive: true,
+        canManageReturns: true,
         version: true,
         createdAt: true,
         updatedAt: true,
@@ -55,6 +57,20 @@ export class UserRepository {
       .update(users)
       .set({
         isActive,
+        updatedAt: sql`NOW()`,
+        version: sql`${users.version} + 1`,
+      })
+      .where(eq(users.id, id))
+      .returning();
+    if (result.length === 0) throw new ConcurrencyError();
+    return result[0];
+  }
+
+  async updateReturnsAccess(id: string, canManageReturns: boolean, dbtx: any = db) {
+    const result = await dbtx
+      .update(users)
+      .set({
+        canManageReturns,
         updatedAt: sql`NOW()`,
         version: sql`${users.version} + 1`,
       })

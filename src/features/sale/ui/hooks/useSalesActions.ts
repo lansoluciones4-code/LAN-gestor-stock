@@ -75,9 +75,11 @@ export function useSalesActions({ onSuccessMessage, onErrorMessage, setSales, se
           subtotal,
           discountPercentage,
         })),
-        printItems: printItems.map(({ colorMode, kind, subtotal }) => ({
+        printItems: printItems.map(({ colorMode, kind, title, quantity, subtotal }) => ({
           colorMode,
           kind,
+          title,
+          quantity,
           subtotal,
         })),
         serviceItems: serviceItems.map(({ technicalServiceId, quantity, unitValue, subtotal, discountPercentage }) => ({

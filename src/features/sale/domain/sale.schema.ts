@@ -60,7 +60,14 @@ export const salePrintItemInputSchema = createInsertSchema(salePrintItems, {
     .number()
     .gt(0, 'El importe debe ser mayor a 0')
     .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales'),
-}).pick({ colorMode: true, kind: true, subtotal: true });
+  // Solo usado con kind: 'ciber' — cantidad de horas, puramente informativo.
+  quantity: z
+    .number()
+    .min(0)
+    .refine((v) => isValidDecimal(v, 2), 'Máximo 2 decimales')
+    .optional()
+    .nullable(),
+}).pick({ colorMode: true, kind: true, title: true, quantity: true, subtotal: true });
 
 export type SalePrintItemInput = z.infer<typeof salePrintItemInputSchema>;
 
@@ -155,6 +162,8 @@ export const saleRowSchema = createSelectSchema(sales).extend({
         id: z.string(),
         colorMode: z.string().nullable(),
         kind: z.string(),
+        title: z.string().nullable().optional(),
+        quantity: z.preprocess((val) => (val == null ? null : parseFloat(val as string)), z.number().nullable()).optional(),
         subtotal: z.preprocess((val) => parseFloat(val as string), z.number()),
       })
     )

@@ -44,7 +44,7 @@ export async function fetchSelectorData(): Promise<{ devices: DeviceDef[]; provi
 
 export async function createProductAction(input: ProductInput): Promise<ActionResult<ProductDef>> {
   try {
-    const caller = await verifyAuthOrAdmin(false);
+    const caller = await verifyAuthOrAdmin(true);
     const parsed = productCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 

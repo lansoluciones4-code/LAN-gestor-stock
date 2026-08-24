@@ -115,6 +115,8 @@ export class SaleRepository {
     const resolvedPrintItems = input.printItems.map((item) => ({
       colorMode: item.colorMode,
       kind: item.kind,
+      title: item.title,
+      quantity: item.quantity,
       subtotal: roundToDecimals(item.subtotal),
     }));
 
@@ -203,6 +205,8 @@ export class SaleRepository {
         saleId: sale.id,
         colorMode: item.colorMode,
         kind: item.kind,
+        title: item.title,
+        quantity: item.quantity != null ? item.quantity.toString() : null,
         subtotal: item.subtotal.toString(),
       });
     }

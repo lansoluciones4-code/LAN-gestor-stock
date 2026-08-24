@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
 
 interface ProductImageViewProps {
   images?: { publicId: string; url: string }[];
@@ -13,6 +14,7 @@ interface ProductImageViewProps {
 export function ProductImageView({ images = [], deviceName, isOutOfStock }: ProductImageViewProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const hasImages = images.length > 0;
 
   const nextImage = (e?: any) => {
@@ -84,9 +86,17 @@ export function ProductImageView({ images = [], deviceName, isOutOfStock }: Prod
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={1}
               onDragEnd={handleDragEnd}
-              className='object-cover w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
+              className='object-contain w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing'
             />
           </AnimatePresence>
+
+          <button
+            onClick={() => setIsLightboxOpen(true)}
+            className="absolute top-4 left-4 bg-white/80 dark:bg-black/50 p-3 rounded-full text-zinc-800 dark:text-zinc-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-black shadow-md"
+            title="Ampliar imagen"
+          >
+            <Maximize2 className="w-6 h-6" />
+          </button>
 
           {/* Carousel Controls */}
           {images.length > 1 && (
@@ -121,6 +131,16 @@ export function ProductImageView({ images = [], deviceName, isOutOfStock }: Prod
         <div className='absolute top-8 right-8'>
           <span className='bg-zinc-900 dark:bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] shadow-2xl'>Agotado</span>
         </div>
+      )}
+
+      {hasImages && (
+        <ImageLightbox
+          images={images}
+          open={isLightboxOpen}
+          index={currentImageIndex}
+          onClose={() => setIsLightboxOpen(false)}
+          onIndexChange={setCurrentImageIndex}
+        />
       )}
     </div>
   );

@@ -50,7 +50,9 @@ export async function proxy(request: NextRequest) {
   // 3. Protección de Rutas por ROL (RBAC) para Vendedor
   if (isAuthenticated && user.role === 'vendedor') {
     const isRoot = pathname === '/';
-    const isAllowed = allowedVendedorPaths.some((p) => pathname.startsWith(p));
+    // /devoluciones no es un path fijo de vendedor: solo lo pueden usar los vendedores puntuales
+    // habilitados por un admin (checkmark en /usuarios, users.canManageReturns), no todos.
+    const isAllowed = allowedVendedorPaths.some((p) => pathname.startsWith(p)) || (pathname.startsWith('/devoluciones') && user.canManageReturns === true);
 
     if (isRoot || (!isPublicPath && !isAllowed)) {
       return NextResponse.redirect(new URL('/productos', request.url));

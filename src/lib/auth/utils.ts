@@ -21,3 +21,12 @@ export async function verifyAuthOrAdmin(requireAdmin = true) {
 
   return dbUser;
 }
+
+/** Admin o el/los vendedor/es puntuales habilitados vía el checkmark de /usuarios (users.canManageReturns). */
+export async function verifyAuthForReturns() {
+  const dbUser = await verifyAuthOrAdmin(false);
+  if (dbUser.role !== 'admin' && !dbUser.canManageReturns) {
+    throw new Error('No tenés permiso para gestionar devoluciones.');
+  }
+  return dbUser;
+}

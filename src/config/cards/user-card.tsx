@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Edit, Trash2, ToggleLeft, ToggleRight, CircleCheck, Circle } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type UserDef } from '@/features/user/domain/user.schema';
 
@@ -7,6 +7,7 @@ interface UserCardActionsProps {
   onEdit: (u: UserDef) => void;
   onDelete: (id: string) => void;
   onToggleActive: (u: UserDef) => void;
+  onToggleReturnsAccess: (u: UserDef) => void;
   currentUserId?: string;
 }
 
@@ -48,6 +49,14 @@ export function renderUserCard(actions: UserCardActionsProps) {
             label='Editar'
             onClick={() => actions.onEdit(user)}
           />
+          {user.role === 'vendedor' && (
+            <CardAction
+              icon={user.canManageReturns ? <CircleCheck className='w-4 h-4' /> : <Circle className='w-4 h-4' />}
+              label={user.canManageReturns ? 'Puede gestionar devoluciones' : 'No puede gestionar devoluciones'}
+              onClick={() => actions.onToggleReturnsAccess(user)}
+              variant={user.canManageReturns ? 'success' : 'default'}
+            />
+          )}
           {user.id !== actions.currentUserId && (
             <CardAction
               icon={<Trash2 className='w-4 h-4' />}

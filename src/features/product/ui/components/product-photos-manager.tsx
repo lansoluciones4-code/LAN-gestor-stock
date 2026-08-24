@@ -14,9 +14,10 @@ interface ProductPhotosManagerProps {
   product: ProductDef | null;
   isOpen: boolean;
   onClose: () => void;
+  canDelete?: boolean;
 }
 
-export function ProductPhotosManager({ product, isOpen, onClose }: ProductPhotosManagerProps) {
+export function ProductPhotosManager({ product, isOpen, onClose, canDelete = true }: ProductPhotosManagerProps) {
   const [activeTab, setActiveTab] = useState<'view' | 'upload'>('view');
   const [photos, setPhotos] = useState<ProductImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,14 +139,16 @@ export function ProductPhotosManager({ product, isOpen, onClose }: ProductPhotos
                 {photos.map((photo) => (
                   <div key={photo.publicId} className='relative group aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800'>
                     <img src={photo.url} alt='Product photo' className='w-full h-full object-contain p-2' />
-                    <button
-                      onClick={() => handleDelete(photo.publicId)}
-                      disabled={isPending}
-                      className='absolute top-2 right-2 p-2 bg-zinc-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-600 shadow-sm disabled:opacity-50'
-                      title='Eliminar foto'
-                    >
-                      <Trash2 className='w-4 h-4' />
-                    </button>
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(photo.publicId)}
+                        disabled={isPending}
+                        className='absolute top-2 right-2 p-2 bg-zinc-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-600 shadow-sm disabled:opacity-50'
+                        title='Eliminar foto'
+                      >
+                        <Trash2 className='w-4 h-4' />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

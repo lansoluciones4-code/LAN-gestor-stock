@@ -9,6 +9,7 @@ export const userSessionSchema = z.object({
   id: z.string(),
   username: z.string(),
   role: z.enum(['admin', 'vendedor']),
+  canManageReturns: z.boolean().default(false),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

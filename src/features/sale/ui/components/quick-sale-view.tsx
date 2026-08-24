@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search, Copy, Printer, Zap } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type useCart } from '../hooks/useCart';
@@ -9,6 +9,9 @@ import { type usePrintCart } from '../hooks/usePrintCart';
 import { DiscountControl } from './discount-control';
 import { blockInvalidPriceKey } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
+import { getPrintKindMeta, formatPrintItemLabel, type PrintKind, type PrintKindExtraField } from '@/lib/print-kinds';
+
+const QUICK_KINDS: PrintKind[] = ['fotocopia', 'impresion', 'ciber', 'anillado_plastificado', 'tramite'];
 
 interface QuickSaleViewProps {
   products: ProductDef[];
@@ -24,51 +27,95 @@ interface QuickSaleViewProps {
   setIsPaymentModalOpen: (v: boolean) => void;
 }
 
-/** Botón "Fotocopias"/"Impresiones": al tocar despliega un campo de importe inline, sin pedir modo de color. */
-function QuickPrintButton({ icon, label, onAdd }: { icon: React.ReactNode; label: string; onAdd: (amount: number) => void }) {
+interface QuickAddExtra {
+  title?: string;
+  quantity?: number;
+}
+
+/** Botón rápido tipo "Fotocopias"/"Impresiones": al tocar despliega, además del importe, el campo extra que pida `extraField` (nombre de operación para Trámites, cantidad de horas para Ciber). */
+function QuickAddButton({ icon, label, extraField, onAdd }: { icon: React.ReactNode; label: string; extraField: PrintKindExtraField; onAdd: (amount: number, extra?: QuickAddExtra) => void }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
+  const [title, setTitle] = useState('');
+  const [hours, setHours] = useState('');
 
   const confirm = () => {
     const amountNum = Number((amount || '').replace(',', '.'));
     if (isNaN(amountNum) || amountNum <= 0) return;
-    onAdd(amountNum);
+    if (extraField === 'title' && !title.trim()) return;
+
+    const hoursNum = Number((hours || '').replace(',', '.'));
+    onAdd(amountNum, {
+      title: extraField === 'title' ? title.trim() : undefined,
+      quantity: extraField === 'hours' && !isNaN(hoursNum) && hoursNum > 0 ? hoursNum : undefined,
+    });
     setAmount('');
+    setTitle('');
+    setHours('');
     setOpen(false);
   };
 
   return (
-    <div className='flex-1'>
+    <div className='shrink-0 w-[190px]'>
       <button
         type='button'
         onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all font-bold text-xs uppercase ${open ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 shadow-md' : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 shadow-sm hover:border-zinc-400 hover:shadow-md'}`}
+        className={`w-full flex items-center justify-center gap-2 px-3 py-3.5 rounded-lg border-2 transition-all font-bold text-xs uppercase text-center leading-tight ${open ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 shadow-md' : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 shadow-sm hover:border-zinc-400 hover:shadow-md'}`}
       >
         {icon}
-        {label}
+        <span>{label}</span>
       </button>
       {open && (
-        <div className='flex items-center gap-1.5 mt-2'>
-          <input
-            type='text'
-            inputMode='decimal'
-            autoFocus
-            placeholder='Importe $'
-            value={amount}
-            onChange={(e) => setAmount(e.target.value.replace(/\./g, ''))}
-            onKeyDown={(e) => {
-              blockInvalidPriceKey(e);
-              if (e.key === 'Enter') confirm();
-            }}
-            className='w-full px-3 py-1.5 text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
-          />
-          <button
-            type='button'
-            onClick={confirm}
-            className='px-3 py-1.5 text-[10px] font-bold uppercase bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-lg shrink-0'
-          >
-            Agregar
-          </button>
+        <div className='flex flex-col gap-1.5 mt-2'>
+          {extraField === 'title' && (
+            <input
+              type='text'
+              autoFocus
+              placeholder='Operación'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirm();
+              }}
+              className='w-full px-3 py-1.5 text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+            />
+          )}
+          {extraField === 'hours' && (
+            <input
+              type='text'
+              inputMode='decimal'
+              autoFocus
+              placeholder='Cantidad de horas'
+              value={hours}
+              onChange={(e) => setHours(e.target.value.replace(/[^0-9.,]/g, ''))}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirm();
+              }}
+              className='w-full px-3 py-1.5 text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+            />
+          )}
+          <div className='flex items-center gap-1.5'>
+            <input
+              type='text'
+              inputMode='decimal'
+              autoFocus={extraField === 'none'}
+              placeholder='Importe $'
+              value={amount}
+              onChange={(e) => setAmount(e.target.value.replace(/\./g, ''))}
+              onKeyDown={(e) => {
+                blockInvalidPriceKey(e);
+                if (e.key === 'Enter') confirm();
+              }}
+              className='w-full px-3 py-1.5 text-sm border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+            />
+            <button
+              type='button'
+              onClick={confirm}
+              className='px-3 py-1.5 text-[10px] font-bold uppercase bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-lg shrink-0'
+            >
+              Agregar
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -146,17 +193,20 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
 
       <div className='flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden'>
         <div className='lg:col-span-7 flex flex-col min-h-0 space-y-3 px-1 pt-1'>
-          <div className='flex gap-3 shrink-0'>
-            <QuickPrintButton
-              icon={<Copy className='w-4 h-4' />}
-              label='Fotocopias'
-              onAdd={(amount) => addPrintItem(null, amount, 'fotocopia')}
-            />
-            <QuickPrintButton
-              icon={<Printer className='w-4 h-4' />}
-              label='Impresiones'
-              onAdd={(amount) => addPrintItem(null, amount, 'impresion')}
-            />
+          <div className='flex gap-3 shrink-0 overflow-x-auto pb-1 -mx-1 px-1'>
+            {QUICK_KINDS.map((kind) => {
+              const meta = getPrintKindMeta(kind);
+              const Icon = meta.icon;
+              return (
+                <QuickAddButton
+                  key={kind}
+                  icon={<Icon className='w-4 h-4' />}
+                  label={meta.label}
+                  extraField={meta.extraField}
+                  onAdd={(amount, extra) => addPrintItem(null, amount, kind, extra)}
+                />
+              );
+            })}
           </div>
 
           <div className='relative shrink-0'>
@@ -278,7 +328,7 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                 className='p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shadow-sm shrink-0'
               >
                 <div className='flex justify-between items-center gap-2 overflow-hidden'>
-                  <span className='text-xs font-bold uppercase leading-tight truncate'>{item.kind === 'fotocopia' ? 'Fotocopia' : 'Impresión'}</span>
+                  <span className='text-xs font-bold uppercase leading-tight truncate'>{formatPrintItemLabel(item)}</span>
                   <button
                     onClick={() => removePrintItem(item.id)}
                     className='text-zinc-300 hover:text-zinc-500 transition-colors p-1'
@@ -416,7 +466,7 @@ export function QuickSaleView({ products, cartProps, printCartProps, cartTotal, 
                   className='p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-2 shrink-0'
                 >
                   <div className='flex justify-between items-center overflow-hidden'>
-                    <span className='text-sm font-bold uppercase leading-tight truncate'>{item.kind === 'fotocopia' ? 'Fotocopia' : 'Impresión'}</span>
+                    <span className='text-sm font-bold uppercase leading-tight truncate'>{formatPrintItemLabel(item)}</span>
                     <button
                       onClick={() => removePrintItem(item.id)}
                       className='text-zinc-500 p-1'
