@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { Check, ChevronsUpDown, Search, X, Plus } from 'lucide-react';
+import { Check, ChevronsUpDown, Search, X, Plus, Pencil } from 'lucide-react';
 
 interface Option {
   id: string;
@@ -30,13 +30,19 @@ interface ComboboxProps {
   freeText?: boolean;
   /** Called when the small "x" on a `deletable` option is clicked. */
   onDeleteOption?: (id: string) => void;
+  /** Shows a pencil icon on every row, which turns it into an inline text input to rename that option. */
+  editable?: boolean;
+  /** Called with (id, newName) when an inline rename is confirmed. */
+  onEditOption?: (id: string, newValue: string) => void;
 }
 
-export function Combobox({ options, value, onChange, placeholder = 'Seleccionar...', searchPlaceholder = 'Buscar...', emptyMessage = 'No se encontraron resultados.', addNewLabel, onAddNew, className = '', 'data-testid': testId, searchTestId, freeText = false, onDeleteOption }: ComboboxProps) {
+export function Combobox({ options, value, onChange, placeholder = 'Seleccionar...', searchPlaceholder = 'Buscar...', emptyMessage = 'No se encontraron resultados.', addNewLabel, onAddNew, className = '', 'data-testid': testId, searchTestId, freeText = false, onDeleteOption, editable = false, onEditOption }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [mounted, setMounted] = React.useState(false);
   const [dropdownStyle, setDropdownStyle] = React.useState<{ top: number; left: number; width: number } | null>(null);
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [editValue, setEditValue] = React.useState('');
   const containerRef = React.useRef<HTMLDivElement>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -82,6 +88,24 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
       window.removeEventListener('resize', updatePosition);
     };
   }, [open]);
+
+  React.useEffect(() => {
+    if (!open) setEditingId(null);
+  }, [open]);
+
+  const startEdit = (opt: Option) => {
+    setEditingId(opt.id);
+    setEditValue(opt.name);
+  };
+
+  const confirmEdit = () => {
+    const trimmed = editValue.trim();
+    const opt = options.find((o) => o.id === editingId);
+    if (trimmed && opt && trimmed !== opt.name && editingId) {
+      onEditOption?.(editingId, trimmed);
+    }
+    setEditingId(null);
+  };
 
   return (
     <div
@@ -158,6 +182,56 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
 
               {filteredOptions.map((opt) => {
                 const optValue = freeText ? opt.name : opt.id;
+
+                if (editingId === opt.id) {
+                  return (
+                    <div
+                      key={opt.id}
+                      className='relative flex w-full items-center gap-1 px-3 py-1.5'
+                    >
+                      <input
+                        autoFocus
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            confirmEdit();
+                          }
+                          if (e.key === 'Escape') {
+                            e.preventDefault();
+                            setEditingId(null);
+                          }
+                        }}
+                        className='flex-1 min-w-0 h-8 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500'
+                      />
+                      <button
+                        type='button'
+                        title='Guardar'
+                        className='shrink-0 p-1.5 rounded text-zinc-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmEdit();
+                        }}
+                      >
+                        <Check className='h-3.5 w-3.5' />
+                      </button>
+                      <button
+                        type='button'
+                        title='Cancelar'
+                        className='shrink-0 p-1.5 rounded text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingId(null);
+                        }}
+                      >
+                        <X className='h-3.5 w-3.5' />
+                      </button>
+                    </div>
+                  );
+                }
+
                 return (
                   <div
                     key={opt.id}
@@ -176,6 +250,19 @@ export function Combobox({ options, value, onChange, placeholder = 'Seleccionar.
                       <Check className={`mr-2 h-4 w-4 shrink-0 ${value === optValue ? 'opacity-100' : 'opacity-0'} text-zinc-500`} />
                       <span className='truncate'>{opt.name}</span>
                     </button>
+                    {editable && onEditOption && (
+                      <button
+                        type='button'
+                        title='Editar nombre'
+                        className='shrink-0 p-1.5 rounded text-zinc-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-500/10 transition-colors'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startEdit(opt);
+                        }}
+                      >
+                        <Pencil className='h-3.5 w-3.5' />
+                      </button>
+                    )}
                     {opt.deletable && onDeleteOption && (
                       <button
                         type='button'

@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, Tag, ChevronRight } from 'lucide-react';
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
-import { toSentenceCase } from '@/lib/utils';
 import { useEffect } from 'react';
 
 interface MobileFilterDrawerProps {
@@ -86,7 +85,7 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, selectedCatego
                       }}
                       className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-between outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${selectedCategory === category.id ? 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 shadow-sm border border-zinc-200 dark:border-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'}`}
                     >
-                      {toSentenceCase(category.name)}
+                      {category.name.toUpperCase()}
                       {selectedCategory === category.id && <ChevronRight className='w-4 h-4' />}
                     </button>
                   ))}

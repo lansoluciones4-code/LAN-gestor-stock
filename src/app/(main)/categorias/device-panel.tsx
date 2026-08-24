@@ -104,6 +104,7 @@ export function DevicePanel() {
         editingItem={editingItem}
         serverError={serverError}
         isPending={isPending}
+        onFieldOptionsChanged={() => syncData(true)}
       />
 
       <ConfirmModal

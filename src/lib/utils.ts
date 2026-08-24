@@ -10,14 +10,6 @@ export function normalizeForSearch(str: string | null | undefined): string {
 }
 
 /**
- * Converts a string to sentence case (First letter uppercase, rest lowercase).
- */
-export function toSentenceCase(str: string | null | undefined): string {
-  if (!str) return '';
-  const lowercase = str.toLowerCase();
-  return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
-}
-/**
  * Converts a string into a URL-friendly slug (lowercase, no accents, hyphens for spaces).
  */
 export function slugify(str: string): string {

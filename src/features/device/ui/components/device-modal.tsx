@@ -7,7 +7,7 @@ import { MonitorSmartphone } from 'lucide-react';
 import { ResponsiveModal } from '@/components/ui/responsive-modal';
 import { Combobox } from '@/components/ui/combobox';
 import { deviceCreateSchema, type DeviceInput, type DeviceDef, type DeviceUpdateInput } from '@/features/device/domain/device.schema';
-import { fetchDeviceFieldOptions, deleteDeviceFieldOptionAction, type DeviceFieldOption } from '@/features/device/actions/device.actions';
+import { fetchDeviceFieldOptions, deleteDeviceFieldOptionAction, renameDeviceFieldOptionAction, type DeviceFieldOption } from '@/features/device/actions/device.actions';
 import { ErrorAlert } from '@/components/ui/alert';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -18,9 +18,11 @@ interface DeviceModalProps {
   editingItem?: DeviceDef | null;
   serverError?: string | null;
   isPending?: boolean;
+  /** Called after a category/marca rename succeeds, so the caller can refresh the devices list (and the rest of the app) beyond this modal's own combobox options. */
+  onFieldOptionsChanged?: () => void;
 }
 
-export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverError, isPending }: DeviceModalProps) {
+export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverError, isPending, onFieldOptionsChanged }: DeviceModalProps) {
   const {
     register,
     handleSubmit,
@@ -75,6 +77,16 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
   const handleDeleteOption = async (field: 'category' | 'brand', value: string) => {
     const res = await deleteDeviceFieldOptionAction(field, value, section || 'tech');
     if (res.success) loadOptions(section || 'tech');
+  };
+
+  const handleEditOption = async (field: 'category' | 'brand', oldValue: string, newValue: string) => {
+    const res = await renameDeviceFieldOptionAction(field, oldValue, newValue, section || 'tech');
+    if (res.success) {
+      loadOptions(section || 'tech');
+      if (field === 'category' && category === oldValue) setValue('category', newValue, { shouldValidate: true, shouldDirty: true });
+      if (field === 'brand' && brand === oldValue) setValue('brand', newValue, { shouldValidate: true, shouldDirty: true });
+      onFieldOptionsChanged?.();
+    }
   };
 
   const handleFormSubmit = (data: DeviceInput) => {
@@ -136,6 +148,8 @@ export function DeviceModal({ isOpen, onClose, onSubmit, editingItem, serverErro
             value={category || ''}
             onChange={(val) => setValue('category', val, { shouldValidate: true, shouldDirty: true })}
             onDeleteOption={(val) => handleDeleteOption('category', val)}
+            editable
+            onEditOption={(oldValue, newValue) => handleEditOption('category', oldValue, newValue)}
             freeText
             placeholder='Elegir categoría'
             searchPlaceholder='Buscar o escribir una categoría nueva...'

@@ -2,7 +2,6 @@
 
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 import { Tag, ChevronRight } from 'lucide-react';
-import { toSentenceCase } from '@/lib/utils';
 
 interface CatalogSidebarProps {
   categories: LandingCategory[];
@@ -32,7 +31,7 @@ export function CatalogSidebar({ categories, selectedCategory, onSelectCategory 
             onClick={() => onSelectCategory(category.id)}
             className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-between outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border group ${selectedCategory === category.id ? 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 shadow-sm border-sky-200 dark:border-sky-500/30' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
           >
-            <span className='truncate pr-2'>{toSentenceCase(category.name)}</span>
+            <span className='truncate pr-2'>{category.name.toUpperCase()}</span>
             <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${selectedCategory === category.id ? 'translate-x-0' : '-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}`} />
           </button>
         ))}

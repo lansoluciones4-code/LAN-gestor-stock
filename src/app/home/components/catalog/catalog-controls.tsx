@@ -5,7 +5,6 @@ import { Filter, Tag, X } from 'lucide-react';
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 import { type CatalogSortBy } from './use-catalog-filters';
 import { CatalogSortDropdown } from './catalog-sort-dropdown';
-import { toSentenceCase } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 
 interface CatalogControlsProps {
@@ -108,7 +107,7 @@ export function CatalogControls({ search, onSearchChange, onOpenFilters, selecte
       {selectedCategory && (
         <div className='flex lg:hidden items-center gap-2 px-3 py-1.5 w-fit bg-zinc-50 dark:bg-zinc-500/10 border border-zinc-100 dark:border-zinc-500/20 rounded-full text-xs font-medium text-zinc-600 dark:text-zinc-400'>
           <Tag className='w-3.5 h-3.5' />
-          {toSentenceCase(selectedCategoryName)}
+          {selectedCategoryName?.toUpperCase()}
           <button
             onClick={onClearCategory}
             className='ml-1 p-0.5 hover:bg-zinc-100 dark:hover:bg-zinc-500/20 rounded-full transition-colors'

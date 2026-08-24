@@ -154,6 +154,17 @@ export class DeviceRepository {
 
     await db.update(devices).set({ [field]: null }).where(and(eq(column, value), eq(devices.section, section)));
   }
+
+  /** Renombra `field` de `oldValue` a `newValue` en todos los devices que lo usan dentro de `section`, tengan o no productos. Devuelve la cantidad de equipos afectados. */
+  async renameFieldOption(field: DeviceTextField, oldValue: string, newValue: string, section: 'tech' | 'libreria', dbtx: any = db) {
+    const column = devices[field];
+    const result = await dbtx
+      .update(devices)
+      .set({ [field]: newValue, updatedAt: sql`NOW()`, version: sql`${devices.version} + 1` })
+      .where(and(eq(column, oldValue), eq(devices.section, section)))
+      .returning({ id: devices.id });
+    return result.length;
+  }
 }
 
 export const deviceRepository = new DeviceRepository();

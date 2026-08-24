@@ -46,6 +46,23 @@ export async function deleteDeviceFieldOptionAction(field: 'category' | 'brand',
   }
 }
 
+export async function renameDeviceFieldOptionAction(field: 'category' | 'brand', oldValue: string, newValue: string, section: 'tech' | 'libreria'): Promise<ActionResult> {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+    const trimmed = newValue.trim();
+    if (!trimmed) return { success: false, error: 'El nuevo nombre no puede estar vacío.' };
+    if (trimmed === oldValue) return { success: true, message: 'Sin cambios.' };
+
+    return await db.transaction(async (tx) => {
+      const affectedCount = await deviceRepository.renameFieldOption(field, oldValue, trimmed, section, tx);
+      await recordAuditLog(caller.id, 'ACTUALIZAR', field === 'category' ? 'DEVICE_CATEGORY' : 'DEVICE_BRAND', undefined, { oldValue, newValue: trimmed, section, affectedCount }, tx);
+      return { success: true, message: `Se renombró "${oldValue}" a "${trimmed}" en ${affectedCount} equipo(s).` };
+    });
+  } catch (error: any) {
+    return { success: false, error: error?.message || 'No se pudo renombrar.' };
+  }
+}
+
 export async function toggleDeviceActiveAction(id: string, isActive: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);
