@@ -33,7 +33,7 @@ export default async function HomePage() {
     <div className='bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-zinc-500/30 flex flex-col'>
       {/* Hero Section */}
       <section
-        className='relative overflow-hidden shrink-0 w-full aspect-[1983/793] max-h-40 sm:max-h-48 md:max-h-56 lg:max-h-64 bg-[#050a14] bg-[url(/banner_LAN.jpeg)] bg-cover bg-center'
+        className='relative overflow-hidden shrink-0 w-full aspect-[1774/887] max-h-40 sm:max-h-48 md:max-h-56 lg:max-h-64 bg-[#050a14] bg-[url(/banner_LAN.jpeg)] bg-cover bg-center'
         role='img'
         aria-label='LAN Soluciones Tecnológicas'
       >
