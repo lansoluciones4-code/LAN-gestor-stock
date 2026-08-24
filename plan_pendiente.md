@@ -102,8 +102,21 @@ El ítem "Hora de Ciber" pedía horas + monto; ahora solo pide monto, igual que 
 - **Schema DB**: columna `sale_print_items.quantity` eliminada (migración `DROP COLUMN`) — pérdida de datos histórica aceptada (el dato era puramente informativo, nunca se usó para calcular nada).
 - Verificado con `tsc --noEmit`, `eslint`, `npm run build`, `psql \d sale_print_items` (columna confirmada eliminada), contenedor `app` reconstruido y sano.
 
-### Paso 8 — Catálogo público: ordenar por precio ← SIGUIENTE
-`src/app/home/components/catalog/use-catalog-filters.ts` — hoy `sortedProducts` solo ordena "con stock primero". Agregar estado `sortBy` (precio asc/desc) + selector nuevo en `catalog-controls.tsx`/`catalog-sidebar.tsx` (desktop) y `mobile-filter-drawer.tsx`. Sin migración, sin backend — `salePrice` ya es `number` en `ProductDef`. Definir al implementar si precio es criterio primario o desempate de "con stock primero".
+### Paso 8 — Catálogo público: ordenar por precio (COMPLETADO)
+**Confirmado por el usuario**: al elegir un orden de precio, el precio manda solo (orden estrictamente por precio, sin agrupar por stock); sin elegir nada, sigue "con stock primero" como siempre.
 
-### Paso 9 (al final) — Catálogo público: "más vistos"
-**Confirmado por el usuario: se deja para el final**, con su propia ronda de diseño cuando llegue el turno. No existe ningún tracking de vistas hoy (sin columna, sin tabla, sin lógica). Puntos que van a necesitar decisión en ese momento: qué cuenta como "vista" (ficha vs. card del listado), deduplicación (sesión/IP, ventana de tiempo), modelo de datos (columna simple vs. tabla con timestamp), problema de ISR/caching en `product/[id]/page.tsx` y `home/page.tsx` (revalidate=30 puede no reflejar cada visita), y — el más delicado — que `publicarStock()` hace DELETE+INSERT completo de `products` hacia Supabase en cada publicación, lo que podría resetear un contador de vistas si se modela como columna de esa misma tabla.
+- **`use-catalog-filters.ts`**: nuevo estado `sortBy: 'default' | 'price_asc' | 'price_desc' | 'most_viewed'`; `sortedProducts` ordena estrictamente por `salePrice` cuando corresponde. `clearFilters()` también resetea `sortBy`.
+- **`catalog-sort-dropdown.tsx`**: desplegable propio (no el `<select>` nativo inicial, reemplazado a pedido del usuario por no seguir el estilo del sitio) — trigger + menú flotante con acento sky en la opción activa, mismo lenguaje visual que el resto del catálogo.
+- Verificado con `tsc --noEmit`, `eslint`, `npm run build`, contenedor `app` reconstruido y sano (`/home` responde 200).
+
+### Paso 9 — Catálogo público: "más vistos" (COMPLETADO)
+Idea del usuario: tabla separada para las vistas (no columna en `products`) para que `publicarStock()` no la pise. Se confirmó el riesgo técnico real: `publicarStock()` hace `DELETE FROM products` + reinsert completo en cada publicación — una FK real desde una tabla de vistas hacia `products.id` haría fallar ese DELETE apenas un producto tuviera vistas. Solución: `product_id` como uuid suelto sin FK, mismo patrón que `audit_logs.entity_id` ya usa en este proyecto.
+
+- **`product_views`** (`productId` PK sin FK, `viewCount`, `updatedAt`) — comentario explícito en el schema y en `publish-stock.actions.ts` de por qué esta tabla nunca debe sumarse a la replicación.
+- **Qué cuenta como vista**: entrar a `/product/[id]` (no las cards del listado). **Deduplicación**: una vez por sesión de navegador vía `sessionStorage`, sin IP ni cookies de tracking.
+- `incrementProductViewAction` (`public-product.actions.ts`): upsert atómico (`onConflictDoUpdate`), try/catch silencioso — un fallo de conteo nunca rompe la página.
+- `fetchLandingProducts()` mergea `viewCount` en JS (no hay relación Drizzle posible sin FK).
+- Conteo disparado por `track-product-view.tsx` (Client Component montado en `product/[id]/page.tsx`) en vez de depender del ciclo de revalidación/ISR de la página — así se evita por completo el problema de caching que tenía este paso en el roadmap original.
+- "Más vistos" se sumó como 4ª opción al desplegable de orden del Paso 8 — sin UI nueva.
+- **Pendiente fuera de esta sesión**: la migración de `product_views` también hay que aplicarla contra la Supabase real de producción cuando el usuario esté listo para usar la función en vivo (no tenemos `SUPABASE_DB_URL` local a propósito, Paso 3.5).
+- Verificado con `tsc --noEmit`, `eslint`, `npm run build`, `psql \d product_views` (sin FK, confirmado), simulación del upsert directo contra la base (2 incrementos → `view_count = 2`, después limpiado), contenedor `app` reconstruido y sano.

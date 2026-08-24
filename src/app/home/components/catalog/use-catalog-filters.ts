@@ -9,11 +9,14 @@ interface UseCatalogFiltersProps {
   itemsPerPage: number;
 }
 
+export type CatalogSortBy = 'default' | 'price_asc' | 'price_desc' | 'most_viewed';
+
 export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
+  const [sortBy, setSortBy] = useState<CatalogSortBy>('default');
   const [page, setPage] = useState(1);
 
   // Use deferred value for search to keep the input snappy
@@ -22,7 +25,7 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [deferredSearch, selectedCategory, minPrice, maxPrice]);
+  }, [deferredSearch, selectedCategory, minPrice, maxPrice, sortBy]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -46,12 +49,15 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
   }, [products, deferredSearch, selectedCategory, minPrice, maxPrice]);
 
   const sortedProducts = useMemo(() => {
+    if (sortBy === 'price_asc') return [...filteredProducts].sort((a, b) => a.salePrice - b.salePrice);
+    if (sortBy === 'price_desc') return [...filteredProducts].sort((a, b) => b.salePrice - a.salePrice);
+    if (sortBy === 'most_viewed') return [...filteredProducts].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
     return [...filteredProducts].sort((a, b) => {
       if (a.stock > 0 && b.stock <= 0) return -1;
       if (a.stock <= 0 && b.stock > 0) return 1;
       return 0;
     });
-  }, [filteredProducts]);
+  }, [filteredProducts, sortBy]);
 
   const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
   const paginatedProducts = sortedProducts.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -61,6 +67,7 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
     setSelectedCategory(null);
     setMinPrice('');
     setMaxPrice('');
+    setSortBy('default');
   };
 
   return {
@@ -72,6 +79,8 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
     setMinPrice,
     maxPrice,
     setMaxPrice,
+    sortBy,
+    setSortBy,
     page,
     setPage,
     totalPages,

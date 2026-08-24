@@ -286,6 +286,20 @@ export const productReturns = pgTable(
   (table) => [index('return_product_id_idx').on(table.productId), index('return_user_id_idx').on(table.userId)]
 );
 
+/**
+ * Contador de vistas del catálogo público (Paso 9). `productId` es un uuid SUELTO, sin
+ * `.references()` a `products.id` a propósito — `publicarStock()` (src/features/sync/actions/publish-stock.actions.ts)
+ * hace `DELETE FROM products` + reinsert completo en cada publicación; una FK real acá haría
+ * fallar ese DELETE apenas un producto tuviera una vista registrada. Mismo patrón ya usado en
+ * este proyecto por `auditLogs.entityId` (relación resuelta en código, no a nivel de schema).
+ * Por la misma razón, esta tabla NUNCA debe sumarse a la lista de tablas que replica `publicarStock()`.
+ */
+export const productViews = pgTable('product_views', {
+  productId: uuid('product_id').primaryKey(),
+  viewCount: integer('view_count').default(0).notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const salePayments = pgTable(
   'sale_payments',
   {

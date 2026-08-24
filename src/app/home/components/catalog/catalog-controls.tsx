@@ -3,6 +3,8 @@
 import { SearchBar } from '@/components/ui/search-bar';
 import { Filter, Tag, X } from 'lucide-react';
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
+import { type CatalogSortBy } from './use-catalog-filters';
+import { CatalogSortDropdown } from './catalog-sort-dropdown';
 import { toSentenceCase } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -17,9 +19,11 @@ interface CatalogControlsProps {
   onMinPriceChange: (val: string) => void;
   maxPrice: string;
   onMaxPriceChange: (val: string) => void;
+  sortBy: CatalogSortBy;
+  onSortChange: (val: CatalogSortBy) => void;
 }
 
-export function CatalogControls({ search, onSearchChange, onOpenFilters, selectedCategory, categories, onClearCategory, minPrice, onMinPriceChange, maxPrice, onMaxPriceChange }: CatalogControlsProps) {
+export function CatalogControls({ search, onSearchChange, onOpenFilters, selectedCategory, categories, onClearCategory, minPrice, onMinPriceChange, maxPrice, onMaxPriceChange, sortBy, onSortChange }: CatalogControlsProps) {
   const selectedCategoryName = categories.find((c) => c.id === selectedCategory)?.name;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +89,11 @@ export function CatalogControls({ search, onSearchChange, onOpenFilters, selecte
               className='w-full bg-transparent border-none text-sm focus:ring-0 p-0 text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-400 font-medium outline-none'
             />
           </div>
+
+          <CatalogSortDropdown
+            value={sortBy}
+            onChange={onSortChange}
+          />
 
           <button
             onClick={onOpenFilters}

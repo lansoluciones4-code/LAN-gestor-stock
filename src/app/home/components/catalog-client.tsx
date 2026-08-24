@@ -21,7 +21,12 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const itemsPerPage = 16;
 
-  const { search, setSearch, selectedCategory, setSelectedCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, page, setPage, totalPages, paginatedProducts, clearFilters } = useCatalogFilters({ products, itemsPerPage });
+  const { search, setSearch, selectedCategory, setSelectedCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, sortBy, setSortBy, page, setPage, totalPages, paginatedProducts, clearFilters } = useCatalogFilters({ products, itemsPerPage });
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0 });
+  };
 
   // Una categoría solo se muestra como filtro si tiene al menos un producto visible en el catálogo
   // (los productos ocultos desde el gestor ya vienen excluidos de `products`).
@@ -31,10 +36,10 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
   );
 
   return (
-    <div className='h-full max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col min-h-0'>
-      <div className='flex flex-col lg:flex-row gap-10 h-full min-h-0'>
-        {/* Sidebar container - Fixed height matching parent */}
-        <aside className='hidden lg:block w-72 shrink-0 h-full'>
+    <div className='max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col'>
+      <div className='flex flex-col lg:flex-row gap-10'>
+        {/* Sidebar container - stretches to match main's height via flex align-items: stretch */}
+        <aside className='hidden lg:block w-72 shrink-0'>
           <CatalogSidebar
             categories={visibleCategories}
             selectedCategory={selectedCategory}
@@ -42,7 +47,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
           />
         </aside>
 
-        <main className='flex-1 flex flex-col min-h-0 space-y-8 lg:overflow-y-auto pr-0 lg:pr-6 custom-scrollbar pb-8 lg:pb-0 relative'>
+        <main className='flex-1 flex flex-col space-y-8 pr-0 lg:pr-6 pb-8 lg:pb-0 relative'>
           {/* Sticky Controls */}
           <div className='sticky top-0 z-10 bg-[#F5F5F7] dark:bg-zinc-950 pt-2 pb-4 -mx-2 px-2'>
             <CatalogControls
@@ -56,6 +61,13 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
               onMinPriceChange={setMinPrice}
               maxPrice={maxPrice}
               onMaxPriceChange={setMaxPrice}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
+            <CatalogPagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
             />
           </div>
 
@@ -70,7 +82,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
           <CatalogPagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
           />
         </main>
       </div>

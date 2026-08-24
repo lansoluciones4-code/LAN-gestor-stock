@@ -5,6 +5,7 @@ import { slugify } from '@/lib/utils';
 import { BackButton } from '../components/back-button';
 import { ProductImageView } from '../components/product-image-view';
 import { ProductInfo } from '../components/product-info';
+import { TrackProductView } from '../components/track-product-view';
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -23,6 +24,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className='lg:h-screen lg:overflow-hidden bg-white dark:bg-zinc-950 pt-8 md:pt-10 pb-4 md:pb-4 px-4 sm:px-6 flex flex-col'>
+      <TrackProductView productId={product.id!} />
       <div className='max-w-7xl mx-auto w-full flex-1 flex flex-col min-h-0'>
         <div className='shrink-0'>
           <BackButton />

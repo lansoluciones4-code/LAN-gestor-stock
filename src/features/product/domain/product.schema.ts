@@ -67,6 +67,8 @@ export const productRowSchema = createSelectSchema(products).extend({
     .nullable(),
   provider: z.object({ id: z.string(), name: z.string(), version: z.number() }).optional().nullable(),
   images: z.array(z.object({ publicId: z.string(), url: z.string() })).optional(),
+  /** Contador del catálogo público (Paso 9) — no es columna de `products`, se mergea aparte en `fetchLandingProducts`. */
+  viewCount: z.number().optional().default(0),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 });

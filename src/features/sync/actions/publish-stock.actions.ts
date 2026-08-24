@@ -20,6 +20,12 @@ type PublishSummary = {
  * Lee el catálogo completo de la base LOCAL y sobrescribe (DELETE + INSERT en una
  * transacción) las mismas tablas en Supabase, que es lo que ya lee el sitio público
  * de Vercel hoy. No toca users/sales/customers/audit_logs: esas quedan solo locales.
+ *
+ * `product_views` (contador de "más vistos", Paso 9) tampoco se toca acá — y es a propósito,
+ * no un olvido: esa tabla vive solo en Supabase, poblada por las visitas reales del sitio
+ * público, y su `product_id` es un uuid suelto sin FK justamente para no depender de este
+ * DELETE+INSERT de `products`. Sumarla a este reemplazo le resetearía el contador en cada
+ * publicación — no agregarla a las listas de abajo.
  */
 export async function publicarStock(): Promise<ActionResult<PublishSummary>> {
   try {
