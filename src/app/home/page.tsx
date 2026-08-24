@@ -33,7 +33,7 @@ export default async function HomePage() {
     <div className='bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-zinc-500/30 flex flex-col'>
       {/* Hero Section */}
       <section
-        className='relative overflow-hidden shrink-0 w-full aspect-[1774/887] max-h-40 sm:max-h-48 md:max-h-56 lg:max-h-64 bg-[#050a14] bg-[url(/banner_LAN.jpeg)] bg-cover bg-center'
+        className='relative overflow-hidden shrink-0 w-full aspect-[4128/860] bg-[#050a14] bg-[url(/banner_LAN.jpeg)] bg-[length:100%_100%] bg-no-repeat'
         role='img'
         aria-label='LAN Soluciones Tecnológicas'
       >
@@ -52,7 +52,9 @@ export default async function HomePage() {
       </div>
 
       {/* Footer - Minimal on desktop to save space */}
-      <footer className='shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 text-center text-[14px] text-zinc-500 dark:text-zinc-400 px-6'>
+      <footer className='shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 text-center text-[14px] text-zinc-500 dark:text-zinc-400 px-6 space-y-1'>
+        <p>LAN Soluciones Tecnológicas de Franco BISSIO · CUIT 20-31923402-1</p>
+        <p>Avenida Guillermo Hudson 196 · Rawson - Chubut · CEL: 2804777200</p>
         <p>© {new Date().getFullYear()} LAN Soluciones Tecnológicas. Todos los derechos reservados.</p>
       </footer>
     </div>
