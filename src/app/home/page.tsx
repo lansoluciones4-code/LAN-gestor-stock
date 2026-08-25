@@ -33,7 +33,8 @@ export default async function HomePage() {
     <div className='bg-[#F5F5F7] dark:bg-zinc-950 selection:bg-zinc-500/30 flex flex-col'>
       {/* Hero Section */}
       <section
-        className='relative overflow-hidden shrink-0 w-full aspect-[4128/860] bg-[#050a14] bg-[url(/banner_LAN.jpeg)] bg-[length:100%_100%] bg-no-repeat'
+        className='relative overflow-hidden shrink-0 w-full aspect-[4128/860] bg-[#050a14] bg-[url(/banner_LAN.png)] bg-cover'
+        style={{ backgroundPosition: 'center 65%' }}
         role='img'
         aria-label='LAN Soluciones Tecnológicas'
       >

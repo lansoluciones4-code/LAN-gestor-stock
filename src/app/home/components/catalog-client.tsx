@@ -28,6 +28,11 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
     window.scrollTo({ top: 0 });
   };
 
+  const handleCategoryChange = (categoryId: string | null) => {
+    setSelectedCategory(categoryId);
+    window.scrollTo({ top: 0 });
+  };
+
   // Una categoría solo se muestra como filtro si tiene al menos un producto visible en el catálogo
   // (los productos ocultos desde el gestor ya vienen excluidos de `products`).
   const visibleCategories = useMemo(
@@ -43,7 +48,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
           <CatalogSidebar
             categories={visibleCategories}
             selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            onSelectCategory={handleCategoryChange}
           />
         </aside>
 
@@ -56,7 +61,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
               onOpenFilters={() => setIsSidebarOpen(true)}
               selectedCategory={selectedCategory}
               categories={visibleCategories}
-              onClearCategory={() => setSelectedCategory(null)}
+              onClearCategory={() => handleCategoryChange(null)}
               minPrice={minPrice}
               onMinPriceChange={setMinPrice}
               maxPrice={maxPrice}
@@ -92,7 +97,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
         onClose={() => setIsSidebarOpen(false)}
         categories={visibleCategories}
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={handleCategoryChange}
         minPrice={minPrice}
         onMinPriceChange={setMinPrice}
         maxPrice={maxPrice}
