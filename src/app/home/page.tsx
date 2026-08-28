@@ -8,8 +8,8 @@ export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: 'LAN Soluciones Tecnológicas - Catálogo',
-  description: 'Descubre nuestra colección exclusiva de fundas, cargadores, cables y accesorios premium diseñados para tus dispositivos Apple. Calidad superior, envío rápido y la mejor protección.',
-  keywords: 'accesorios apple, fundas iphone, cargador magsafe, cables premium, apple watch, airpods, tienda de accesorios, fundas premium',
+  description: 'Descubre nuestra colección exclusiva de tecnología, desde perifericos, hasta cargadores, joysticks, componentes para tu PC y mucho más.',
+  keywords: 'tecnologia, lan, LAN, teclado, mouse, componentes, cable, cargador, hdmi, HDMI, usb, parlante,',
   icons: {
     icon: '/icon_web.jpeg',
   },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: 'Accesorios Premium para Apple',
+    title: 'Catálogo web | LAN Soluciones Tecnológicas',
     description: 'La mejor colección de accesorios para tu iPhone, iPad y Apple Watch.',
     type: 'website',
   },

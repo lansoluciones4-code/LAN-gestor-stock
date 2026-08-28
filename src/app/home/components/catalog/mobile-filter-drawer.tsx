@@ -74,7 +74,7 @@ export function MobileFilterDrawer({ isOpen, onClose, categories, selectedCatego
                     }}
                     className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${selectedCategory === null ? 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 shadow-sm border-zinc-200 dark:border-zinc-700' : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400'}`}
                   >
-                    Todos los productos
+                    TODOS LOS PRODUCTOS
                   </button>
                   {categories.map((category) => (
                     <button

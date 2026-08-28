@@ -19,9 +19,9 @@ export const cloudinaryService = {
         folder: `products/${productId}`,
         resource_type: 'image',
         transformation: [
-          // 'fill' recorta lo sobrante, y 'auto' usa IA para mantener el producto centrado sin cortar lo importante (efecto zoom/cover).
+          // 'limit' redimensiona sin recortar, respetando la proporción original, y nunca agranda una foto más chica que 800x800.
           // 'fetch_format: auto' y 'quality: auto' reducen drásticamente el peso para ahorrar ancho de banda.
-          { width: 800, height: 800, crop: 'fill', gravity: 'auto', fetch_format: 'auto', quality: 'auto' }
+          { width: 800, height: 800, crop: 'limit', fetch_format: 'auto', quality: 'auto' }
         ]
       });
       return {
