@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Catálogo web | LAN Soluciones Tecnológicas',
-    description: 'La mejor colección de accesorios para tu iPhone, iPad y Apple Watch.',
+    description: 'Descubre nuestra colección exclusiva de tecnología, desde perifericos, hasta cargadores, joysticks, componentes para tu PC y mucho más.',
     type: 'website',
   },
 };
