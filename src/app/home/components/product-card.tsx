@@ -77,7 +77,7 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
       className={`h-full group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-sky-500/10 hover:border-sky-200 dark:hover:border-sky-500/30 transition-all duration-500 ${isOutOfStock ? 'opacity-70 grayscale-[0.3]' : ''}`}
     >
       {!!product.viewCount && (
-        <span className='absolute top-2 left-2 z-20 flex items-center gap-1 bg-white/80 dark:bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-medium text-zinc-400 dark:text-zinc-500 pointer-events-none select-none'>
+        <span className='absolute top-2 left-2 z-20 flex items-center gap-1 bg-zinc-900/80 dark:bg-zinc-800/80 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-medium text-white dark:text-white pointer-events-none select-none'>
           <Eye className='w-3 h-3' />
           {product.viewCount}
         </span>
