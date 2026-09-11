@@ -57,7 +57,7 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
                 : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
           }`}
         >
-          {p.stock > 0 ? `${p.stock} ${p.stock === 1 ? 'Unidad' : 'Unidades'}` : 'CONSULTAR STOCK'}
+          {p.stock > 0 ? `${p.stock} ${p.stock === 1 ? 'Unidad' : 'Unidades'}` : 'Sin stock'}
         </span>
       ),
     },

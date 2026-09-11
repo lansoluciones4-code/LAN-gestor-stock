@@ -149,7 +149,7 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
 
           {isOutOfStock && (
             <div className='absolute inset-x-0 bottom-4 flex justify-center'>
-              <span className='bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full uppercase tracking-wider'>Agotado</span>
+              <span className='bg-zinc-900/80 dark:bg-black/80 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full uppercase tracking-wider'>CONSULTAR STOCK</span>
             </div>
           )}
         </div>
