@@ -3,6 +3,7 @@ import { fetchLandingProducts } from '@/features/product/actions/public-product.
 import { fetchLandingCategories } from '@/features/device/actions/public-device.actions';
 import { fetchPublicShowPrices } from '@/features/settings/actions/public-settings.actions';
 import { CatalogClient } from './components/catalog-client';
+import { SiteFooter } from './components/site-footer';
 
 export const revalidate = 30;
 
@@ -52,12 +53,7 @@ export default async function HomePage() {
         />
       </div>
 
-      {/* Footer - Minimal on desktop to save space */}
-      <footer className='shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-8 text-center text-[14px] text-zinc-500 dark:text-zinc-400 px-6 space-y-1'>
-        <p>LAN Soluciones Tecnológicas de Franco BISSIO · CUIT 20-31923402-1</p>
-        <p>Avenida Guillermo Hudson 196 · Rawson - Chubut · CEL: 2804777200</p>
-        <p>© {new Date().getFullYear()} LAN Soluciones Tecnológicas. Todos los derechos reservados.</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

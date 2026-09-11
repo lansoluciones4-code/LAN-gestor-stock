@@ -133,6 +133,9 @@ export const products = pgTable(
     stock: integer('stock').default(1).notNull(),
     lowStockThreshold: integer('low_stock_threshold').default(5).notNull(),
     showOnLanding: boolean('show_on_landing').default(true).notNull(),
+    // Null = no destacado. Con fecha = destacado en el HOME del catálogo público; el orden en HOME
+    // es simplemente por esta fecha descendente (el último marcado como destacado aparece primero).
+    featuredAt: timestamp('featured_at'),
     version: integer('version').default(1).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

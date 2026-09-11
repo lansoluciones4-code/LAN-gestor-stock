@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { PackageSearch } from 'lucide-react';
+import { PackageSearch, Star } from 'lucide-react';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { ProductCard } from '../product-card';
 
@@ -9,9 +9,28 @@ interface CatalogGridProps {
   products: ProductDef[];
   onResetFilters: () => void;
   showPrices: boolean;
+  isHome: boolean;
+  hasFeaturedProducts: boolean;
 }
 
-export function CatalogGrid({ products, onResetFilters, showPrices }: CatalogGridProps) {
+export function CatalogGrid({ products, onResetFilters, showPrices, isHome, hasFeaturedProducts }: CatalogGridProps) {
+  // HOME sin ningún producto destacado todavía (nada que ver con los filtros de búsqueda/precio).
+  if (products.length === 0 && isHome && !hasFeaturedProducts) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className='flex flex-col items-center justify-center py-24 text-center space-y-4'
+      >
+        <div className='w-20 h-20 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mb-4'>
+          <Star className='w-10 h-10 text-zinc-400' />
+        </div>
+        <h3 className='text-xl font-bold text-zinc-900 dark:text-white'>Todavía no hay productos destacados</h3>
+        <p className='text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto'>Muy pronto vas a encontrar acá una selección de productos. Mientras tanto, explorá las categorías del catálogo.</p>
+      </motion.div>
+    );
+  }
+
   if (products.length === 0) {
     return (
       <motion.div
@@ -28,7 +47,7 @@ export function CatalogGrid({ products, onResetFilters, showPrices }: CatalogGri
           onClick={onResetFilters}
           className='mt-4 px-6 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-xl text-sm font-bold hover:scale-105 active:scale-95 transition-all shadow-xl'
         >
-          Ver todos los productos
+          Quitar filtros
         </button>
       </motion.div>
     );

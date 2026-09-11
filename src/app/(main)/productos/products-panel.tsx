@@ -14,7 +14,7 @@ import { useAutoSync } from '@/hooks/use-auto-sync';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { PanelToolbar } from '@/components/ui/panel-toolbar';
 import { ResponsivePanelView } from '@/components/ui/responsive-panel-view';
-import { fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction, bulkSetProductVisibilityBySectionAction } from '@/features/product/actions/product.actions';
+import { fetchProducts, fetchSelectorData, createProductAction, updateProductAction, deleteProductAction, toggleProductVisibilityAction, toggleProductFeaturedAction, bulkSetProductVisibilityBySectionAction } from '@/features/product/actions/product.actions';
 import { uploadProductPhoto } from '@/features/product/actions/upload-product-photo';
 import { fetchShowPrices, updateShowPricesAction } from '@/features/settings/actions/settings.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
@@ -162,6 +162,15 @@ export function ProductsPanel() {
     });
   };
 
+  const handleToggleFeatured = (p: ProductDef) => {
+    startTransition(async () => {
+      const result = await toggleProductFeaturedAction(p.id!, !p.featuredAt);
+      if (!result.success) return showGlobalMessage('error', result.error);
+      showGlobalMessage('success', result.message || 'Destacado actualizado');
+      invalidateAllCaches(); syncData();
+    });
+  };
+
   const handleBulkToggleSection = (section: 'tech' | 'libreria', isVisible: boolean) => {
     startTransition(async () => {
       const result = await bulkSetProductVisibilityBySectionAction(section, isVisible);
@@ -171,7 +180,7 @@ export function ProductsPanel() {
     });
   };
 
-  const columns = getProductColumns({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen });
+  const columns = getProductColumns({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onToggleFeatured: handleToggleFeatured, onManagePhotos: handleManagePhotosOpen });
 
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
@@ -250,7 +259,7 @@ export function ProductsPanel() {
         data={filteredProducts}
         isLoading={isPending}
         emptyMessage='No se han encontrado productos coincidentes.'
-        renderCard={renderProductCard({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onManagePhotos: handleManagePhotosOpen })}
+        renderCard={renderProductCard({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onToggleFeatured: handleToggleFeatured, onManagePhotos: handleManagePhotosOpen })}
       />
 
       <ProductFormModal

@@ -212,6 +212,31 @@ export async function toggleProductVisibilityAction(id: string, isVisible: boole
   }
 }
 
+export async function toggleProductFeaturedAction(id: string, isFeatured: boolean): Promise<ActionResult> {
+  try {
+    const caller = await verifyAuthOrAdmin(true);
+
+    return await db.transaction(async (tx) => {
+      await productRepository.toggleFeatured(id, isFeatured, tx);
+
+      const product = await productRepository.getProductById(id);
+
+      await recordAuditLog(caller.id, 'ACTUALIZAR_DESTACADO_HOME', 'PRODUCT', id, {
+        productName: product?.device?.name ?? 'Desconocido',
+        description: product?.description ?? '',
+        featured: isFeatured,
+      }, tx);
+
+      return {
+        success: true,
+        message: isFeatured ? 'Producto destacado en el HOME' : 'Producto quitado del HOME',
+      };
+    });
+  } catch (error: any) {
+    return { success: false, error: handleDatabaseError(error, 'producto') };
+  }
+}
+
 export async function bulkSetProductVisibilityBySectionAction(section: 'tech' | 'libreria', isVisible: boolean): Promise<ActionResult> {
   try {
     const caller = await verifyAuthOrAdmin(true);

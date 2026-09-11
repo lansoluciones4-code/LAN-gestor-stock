@@ -71,6 +71,8 @@ export const productRowSchema = createSelectSchema(products).extend({
   viewCount: z.number().optional().default(0),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
+  /** Null = no destacado. Con fecha = destacado en el HOME del catálogo público (orden = esta fecha, descendente). */
+  featuredAt: z.union([z.date(), z.string()]).nullable().optional(),
 });
 
 export type ProductDef = z.infer<typeof productRowSchema>;

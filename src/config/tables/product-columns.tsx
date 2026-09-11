@@ -1,16 +1,17 @@
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type ColumnDef } from '@/components/ui/virtualized-data-table';
-import { Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Camera, Star, StarOff } from 'lucide-react';
 
 interface ColumnActions {
   role?: string;
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (p: ProductDef) => void;
+  onToggleFeatured: (p: ProductDef) => void;
   onManagePhotos: (p: ProductDef) => void;
 }
 
-export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, onManagePhotos }: ColumnActions): ColumnDef<ProductDef>[] {
+export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, onToggleFeatured, onManagePhotos }: ColumnActions): ColumnDef<ProductDef>[] {
   return [
     {
       header: 'Equipo y Detalle',
@@ -99,6 +100,15 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
               title={p.showOnLanding ? 'Ocultar en Landing' : 'Mostrar en Landing'}
             >
               {p.showOnLanding ? <Eye className='w-4 h-4' /> : <EyeOff className='w-4 h-4' />}
+            </button>
+          )}
+          {role === 'admin' && (
+            <button
+              onClick={() => onToggleFeatured(p)}
+              className={`p-1.5 rounded-lg transition-colors hover:bg-zinc-900 hover:text-white dark:hover:bg-zinc-700 dark:hover:text-white ${p.featuredAt ? 'text-amber-500' : 'text-zinc-400'}`}
+              title={p.featuredAt ? 'Quitar del HOME' : 'Destacar en HOME'}
+            >
+              {p.featuredAt ? <Star className='w-4 h-4 fill-current' /> : <StarOff className='w-4 h-4' />}
             </button>
           )}
           {role === 'admin' ? (

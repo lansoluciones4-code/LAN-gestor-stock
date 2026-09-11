@@ -151,6 +151,20 @@ export class ProductRepository {
     return result[0];
   }
 
+  async toggleFeatured(id: string, isFeatured: boolean, dbtx: any = db) {
+    const result = await dbtx
+      .update(products)
+      .set({
+        featuredAt: isFeatured ? sql`NOW()` : null,
+        updatedAt: sql`NOW()`,
+        version: sql`${products.version} + 1`,
+      })
+      .where(eq(products.id, id))
+      .returning();
+    if (result.length === 0) throw new ConcurrencyError();
+    return result[0];
+  }
+
   async bulkSetVisibilityBySection(section: 'tech' | 'libreria', isVisible: boolean, dbtx: any = db) {
     return await dbtx
       .update(products)

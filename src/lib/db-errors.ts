@@ -22,11 +22,6 @@ export function handleDatabaseError(error: any, entityName: string): string {
     return MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION;
   }
 
-  // Si llegamos aquí y es un error de "Failed query", devolvemos algo genérico pero amigable
-  if (message.includes('failed query')) {
-    return MESSAGES.ERROR.DATABASE.CONCURRENCY;
-  }
-
   if (error.name === 'ConcurrencyError') {
     return MESSAGES.ERROR.DATABASE.CONCURRENCY;
   }
@@ -35,5 +30,8 @@ export function handleDatabaseError(error: any, entityName: string): string {
     return MESSAGES.ERROR.DATABASE.UNIQUE_VIOLATION;
   }
 
-  return error.message || MESSAGES.ERROR.DATABASE.GENERIC(entityName);
+  // Cualquier otro fallo de SQL ("Failed query: ...", columna inexistente, sintaxis, etc.) no tiene
+  // nada que ver con un conflicto de versión — no lo etiquetamos como CONCURRENCY para no confundir
+  // al usuario, y tampoco exponemos el mensaje crudo del driver.
+  return MESSAGES.ERROR.DATABASE.GENERIC(entityName);
 }

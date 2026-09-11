@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { Edit, Trash2, Eye, EyeOff, Camera } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Camera, Star, StarOff } from 'lucide-react';
 import { EntityCard, CardAction } from '@/components/ui/entity-card';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 
@@ -8,6 +8,7 @@ interface ProductCardActionsProps {
   onEdit: (p: ProductDef) => void;
   onDelete: (id: string) => void;
   onToggleVisibility: (p: ProductDef) => void;
+  onToggleFeatured: (p: ProductDef) => void;
   onManagePhotos: (p: ProductDef) => void;
 }
 
@@ -32,6 +33,11 @@ export function renderProductCard(actions: ProductCardActionsProps) {
             {actions.role === 'admin' && product.showOnLanding && (
               <span className='px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-500/20 dark:text-zinc-400'>
                 En landing
+              </span>
+            )}
+            {actions.role === 'admin' && product.featuredAt && (
+              <span className='px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
+                Destacado
               </span>
             )}
           </>
@@ -72,6 +78,14 @@ export function renderProductCard(actions: ProductCardActionsProps) {
                 label={product.showOnLanding ? 'Ocultar en Landing' : 'Mostrar en Landing'}
                 onClick={() => actions.onToggleVisibility(product)}
                 variant={product.showOnLanding ? 'success' : 'default'}
+              />
+            )}
+            {actions.role === 'admin' && (
+              <CardAction
+                icon={product.featuredAt ? <Star className='w-4 h-4' /> : <StarOff className='w-4 h-4' />}
+                label={product.featuredAt ? 'Quitar del HOME' : 'Destacar en HOME'}
+                onClick={() => actions.onToggleFeatured(product)}
+                variant={product.featuredAt ? 'success' : 'default'}
               />
             )}
             {actions.role === 'admin' && (

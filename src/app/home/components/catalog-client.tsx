@@ -40,6 +40,10 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
     [categories, products]
   );
 
+  // Si todavía no hay ningún producto destacado (independientemente de búsqueda/filtros), HOME
+  // muestra un estado vacío distinto al de "sin resultados para estos filtros".
+  const hasFeaturedProducts = useMemo(() => products.some((p) => !!p.featuredAt), [products]);
+
   return (
     <div className='max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col'>
       <div className='flex flex-col lg:flex-row gap-10'>
@@ -81,6 +85,8 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
               products={paginatedProducts}
               onResetFilters={clearFilters}
               showPrices={showPrices}
+              isHome={selectedCategory === null}
+              hasFeaturedProducts={hasFeaturedProducts}
             />
           </div>
 
