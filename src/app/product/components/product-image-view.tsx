@@ -129,7 +129,7 @@ export function ProductImageView({ images = [], deviceName, isOutOfStock }: Prod
 
       {isOutOfStock && (
         <div className='absolute top-8 right-8'>
-          <span className='bg-zinc-900 dark:bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] shadow-2xl'>Agotado</span>
+          <span className='bg-zinc-900 dark:bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-[0.2em] shadow-2xl'>CONSULTAR STOCK</span>
         </div>
       )}
 
