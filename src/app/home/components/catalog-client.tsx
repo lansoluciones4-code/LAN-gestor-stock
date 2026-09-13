@@ -48,7 +48,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
     <div className='max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col'>
       <div className='flex flex-col lg:flex-row gap-10'>
         {/* Sidebar container - stretches to match main's height via flex align-items: stretch */}
-        <aside className='hidden lg:block w-72 shrink-0'>
+        <aside className='hidden lg:block w-72 shrink-0 sticky top-0 h-dvh'>
           <CatalogSidebar
             categories={visibleCategories}
             selectedCategory={selectedCategory}
