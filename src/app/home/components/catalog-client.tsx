@@ -58,7 +58,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
 
         <main className='flex-1 flex flex-col space-y-8 pr-0 lg:pr-6 pb-8 lg:pb-0 relative'>
           {/* Sticky Controls */}
-          <div className='sticky top-0 z-10 bg-[#F5F5F7] dark:bg-zinc-950 pt-2 pb-4 -mx-2 px-2'>
+          <div className='sticky top-0 z-40 bg-[#F5F5F7] dark:bg-zinc-950 pt-2 pb-4 -mx-2 px-2'>
             <CatalogControls
               search={search}
               onSearchChange={setSearch}
