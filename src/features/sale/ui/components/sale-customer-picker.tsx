@@ -19,10 +19,12 @@ export function isCustomerSelectionValid(selection: SaleCustomerSelection): bool
 
 interface SaleCustomerPickerProps {
   onChange: (selection: SaleCustomerSelection) => void;
+  /** false oculta la pestaña "Consumidor Final" — para flujos donde el cliente es obligatorio (ej. alta de repuestos). Default true. */
+  allowFinal?: boolean;
 }
 
-export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
-  const [tab, setTab] = useState<'final' | 'data'>('final');
+export function SaleCustomerPicker({ onChange, allowFinal = true }: SaleCustomerPickerProps) {
+  const [tab, setTab] = useState<'final' | 'data'>(allowFinal ? 'final' : 'data');
   const [documentNumber, setDocumentNumber] = useState('');
   const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'suggestions' | 'found' | 'not_found'>('idle');
   const [found, setFound] = useState<{ id: string; name: string; phone: string; email: string } | null>(null);
@@ -81,24 +83,26 @@ export function SaleCustomerPicker({ onChange }: SaleCustomerPickerProps) {
 
   return (
     <div className='w-full space-y-2'>
-      <div className='flex rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1'>
-        <button
-          type='button'
-          onClick={() => setTab('final')}
-          className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-md transition-all ${tab === 'final' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
-        >
-          Consumidor Final
-        </button>
-        <button
-          type='button'
-          onClick={() => setTab('data')}
-          className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-md transition-all ${tab === 'data' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
-        >
-          Cargar Datos
-        </button>
-      </div>
+      {allowFinal && (
+        <div className='flex rounded-lg bg-zinc-100 dark:bg-zinc-800/50 p-1'>
+          <button
+            type='button'
+            onClick={() => setTab('final')}
+            className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-md transition-all ${tab === 'final' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+          >
+            Consumidor Final
+          </button>
+          <button
+            type='button'
+            onClick={() => setTab('data')}
+            className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-md transition-all ${tab === 'data' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+          >
+            Cargar Datos
+          </button>
+        </div>
+      )}
 
-      {tab === 'data' && (
+      {(!allowFinal || tab === 'data') && (
         <div className='space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg'>
           <label className='block text-[10px] font-black uppercase text-zinc-400 tracking-widest'>DNI / CUIT</label>
           <div className='relative'>

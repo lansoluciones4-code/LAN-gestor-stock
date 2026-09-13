@@ -6,7 +6,11 @@ import { getPaymentTypeMeta } from '@/lib/payment-types';
 import { formatPrintItemLabel } from '@/lib/print-kinds';
 
 export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () => void }) {
-  const itemsSubtotal = (sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0) + (sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0) + (sale.serviceItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0);
+  const itemsSubtotal =
+    (sale.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0) +
+    (sale.printItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0) +
+    (sale.serviceItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0) +
+    (sale.sparePartItems?.reduce((acc, item) => acc + item.subtotal, 0) || 0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -146,6 +150,28 @@ export function SalesPrintView({ sale, onClose }: { sale: SaleDef; onClose: () =
                     <td className='py-5 font-bold text-zinc-900'>{item.technicalService?.name ?? 'Servicio técnico'}</td>
                     <td className='py-5 text-center font-bold text-zinc-900'>{item.quantity}</td>
                     <td className='py-5 text-right text-zinc-900'>${item.unitValue.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {sale.sparePartItems && sale.sparePartItems.length > 0 && (
+            <table className='w-full mb-16'>
+              <thead>
+                <tr className='border-b-2 border-zinc-900 text-left text-[10px] font-bold text-zinc-900 uppercase tracking-widest'>
+                  <th className='py-5'>Repuesto/Usado</th>
+                  <th className='py-5 text-right'>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-zinc-100'>
+                {sale.sparePartItems.map((item: any) => (
+                  <tr
+                    key={item.id}
+                    className='text-[13px] text-zinc-900'
+                  >
+                    <td className='py-5 font-bold text-zinc-900 uppercase'>{item.sparePart?.title ?? 'Repuesto/Usado'}</td>
                     <td className='py-5 text-right font-black text-zinc-900'>${item.subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                 ))}

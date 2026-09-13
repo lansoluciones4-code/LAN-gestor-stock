@@ -24,6 +24,7 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
             items: { with: { product: { with: { device: true } } } },
             printItems: true,
             serviceItems: true,
+            sparePartItems: true,
             payments: true,
           },
         }),
@@ -101,6 +102,12 @@ export async function fetchDashboardStats(startDate?: string, endDate?: string) 
 
         (s.serviceItems as any[]).forEach((sv) => {
           servicioTecnicoRevenue += Number(sv.subtotal || 0);
+        });
+
+        // Repuestos/Usados: solo la ganancia real se contabiliza en Tech (no el precio de venta
+        // completo ni su costo — igual de simple que Servicio Técnico/Impresiones, sin COGS propio).
+        (s.sparePartItems as any[]).forEach((sp) => {
+          techRevenue += Number(sp.profitAmount || 0);
         });
 
         // Payments Breakdown

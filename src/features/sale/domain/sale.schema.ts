@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { sales, saleItems, salePrintItems, saleServiceItems } from '@/lib/db/schema';
+import { sales, saleItems, salePrintItems, saleServiceItems, saleSparePartItems } from '@/lib/db/schema';
 import { isValidDecimal } from '@/lib/utils';
 import { toNumber } from '@/lib/zod-helpers';
 
@@ -84,7 +84,12 @@ export const saleServiceItemInputSchema = createInsertSchema(saleServiceItems, {
 
 export type SaleServiceItemInput = z.infer<typeof saleServiceItemInputSchema>;
 
-/** Input schema for creating a sale (form → server). Puede combinar productos, impresiones y servicios técnicos en un mismo registro. */
+/** Input schema for a single repuesto/usado line item — el cliente solo manda el id, el precio se recalcula siempre en el servidor. */
+export const saleSparePartItemInputSchema = createInsertSchema(saleSparePartItems).pick({ sparePartId: true });
+
+export type SaleSparePartItemInput = z.infer<typeof saleSparePartItemInputSchema>;
+
+/** Input schema for creating a sale (form → server). Puede combinar productos, impresiones, servicios técnicos y repuestos/usados en un mismo registro. */
 export const saleCreateSchema = createInsertSchema(sales)
   .pick({ customerId: true, total: true, discountAmount: true, discountPercentage: true })
   .extend({
@@ -110,13 +115,14 @@ export const saleCreateSchema = createInsertSchema(sales)
     items: z.array(saleItemInputSchema).default([]),
     printItems: z.array(salePrintItemInputSchema).default([]),
     serviceItems: z.array(saleServiceItemInputSchema).default([]),
+    sparePartItems: z.array(saleSparePartItemInputSchema).default([]),
     payments: z
       .array(salePaymentInputSchema)
       .min(1, 'Debe especificar al menos un método de pago')
       .max(1, 'Solo se permite un método de pago'),
   })
-  .refine((data) => data.items.length + data.printItems.length + data.serviceItems.length > 0, {
-    message: 'La venta debe tener al menos un producto, impresión o servicio técnico',
+  .refine((data) => data.items.length + data.printItems.length + data.serviceItems.length + data.sparePartItems.length > 0, {
+    message: 'La venta debe tener al menos un producto, impresión, servicio técnico o repuesto',
     path: ['items'],
   });
 
@@ -171,6 +177,25 @@ export const saleRowSchema = createSelectSchema(sales).extend({
           .object({
             id: z.string(),
             name: z.string(),
+          })
+          .optional()
+          .nullable(),
+      })
+    )
+    .optional(),
+  sparePartItems: z
+    .array(
+      z.object({
+        id: z.string(),
+        unitCost: z.preprocess((val) => parseFloat(val as string), z.number()),
+        profitAmount: z.preprocess((val) => parseFloat(val as string), z.number()),
+        subtotal: z.preprocess((val) => parseFloat(val as string), z.number()),
+        sparePart: z
+          .object({
+            id: z.string(),
+            title: z.string(),
+            condition: z.string(),
+            customer: z.object({ id: z.string(), name: z.string() }).optional().nullable(),
           })
           .optional()
           .nullable(),

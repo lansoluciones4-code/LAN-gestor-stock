@@ -1,4 +1,5 @@
 import { useCustomerStore } from '@/features/customer/store/customer.store';
+import { useCounterStore } from '@/features/counter/store/counter.store';
 import { useDeviceStore } from '@/features/device/store/device.store';
 import { useAuditStore } from '@/features/audit/store/audit.store';
 import { useProductStore } from '@/features/product/store/product.store';
@@ -9,6 +10,7 @@ import { useStatsStore } from '@/features/stats/store/stats.store';
 import { useUserStore } from '@/features/user/store/user.store';
 import { useTechnicalServiceStore } from '@/features/technical-service/store/technical-service.store';
 import { useCardStore } from '@/features/card/store/card.store';
+import { useSparePartStore } from '@/features/spare-part/store/spare-part.store';
 
 /**
  * Centrally invalidates all data caches in the application.
@@ -16,6 +18,7 @@ import { useCardStore } from '@/features/card/store/card.store';
  */
 export const invalidateAllCaches = () => {
   useCustomerStore.getState().setLoaded(false);
+  useCounterStore.getState().setLoaded(false);
   useDeviceStore.getState().setLoaded(false);
   useAuditStore.getState().setLoaded(false);
   useProductStore.getState().setLoaded(false);
@@ -26,4 +29,5 @@ export const invalidateAllCaches = () => {
   useUserStore.getState().setLoaded(false);
   useTechnicalServiceStore.getState().setLoaded(false);
   useCardStore.getState().setLoaded(false);
+  useSparePartStore.getState().setLoaded(false);
 };

@@ -6,6 +6,7 @@ export const paymentTypeEnum = pgEnum('payment_type', ['efectivo', 'transferenci
 export const businessSectionEnum = pgEnum('business_section', ['tech', 'impresiones', 'libreria']);
 export const colorModeEnum = pgEnum('color_mode', ['color', 'blanco_y_negro']);
 export const printKindEnum = pgEnum('print_kind', ['fotocopia', 'impresion', 'ciber', 'anillado_plastificado', 'tramite']);
+export const sparePartConditionEnum = pgEnum('spare_part_condition', ['usado', 'nuevo']);
 
 /** Fila única con configuración global del catálogo público (ej. mostrar precios o no). */
 export const appSettings = pgTable('app_settings', {
@@ -75,6 +76,18 @@ export const technicalServices = pgTable('technical_services', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+/** Anotadores simples: título + cantidad, sin vínculo a ninguna otra tabla (recordatorios sueltos del cliente). */
+export const counters = pgTable('counters', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: varchar('title', { length: 150 }).notNull(),
+  quantity: integer('quantity').default(0).notNull(),
+  version: integer('version').default(1).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const cards = pgTable('cards', {
   id: uuid('id')
     .primaryKey()
@@ -110,6 +123,23 @@ export const customers = pgTable('customers', {
   email: varchar('email', { length: 100 }).notNull().default(''),
   documentNumber: varchar('document_number', { length: 20 }).notNull().default('').unique(),
   isActive: boolean('is_active').default(true).notNull(),
+  version: integer('version').default(1).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/** Repuesto/Art. usado: alta admin-only, ligado a un cliente de antemano, se vende una sola vez. */
+export const spareParts = pgTable('spare_parts', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: varchar('title', { length: 150 }).notNull(),
+  condition: sparePartConditionEnum('condition').notNull(),
+  customerId: uuid('customer_id')
+    .notNull()
+    .references(() => customers.id),
+  cost: numeric('cost', { precision: 10, scale: 2 }).notNull(),
+  profitPercentage: numeric('profit_percentage', { precision: 5, scale: 2 }).notNull(),
   version: integer('version').default(1).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -234,6 +264,27 @@ export const saleServiceItems = pgTable(
   (table) => [index('sale_service_items_sale_id_idx').on(table.saleId)]
 );
 
+/** Línea de venta de un repuesto — que exista es lo que significa "vendido"; si se anula la venta se borra y el repuesto vuelve a estar disponible. */
+export const saleSparePartItems = pgTable(
+  'sale_spare_part_items',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    saleId: uuid('sale_id')
+      .notNull()
+      .references(() => sales.id),
+    sparePartId: uuid('spare_part_id')
+      .notNull()
+      .unique()
+      .references(() => spareParts.id),
+    unitCost: numeric('unit_cost', { precision: 10, scale: 2 }).notNull(),
+    profitAmount: numeric('profit_amount', { precision: 10, scale: 2 }).notNull(),
+    subtotal: numeric('subtotal', { precision: 10, scale: 2 }).notNull(),
+  },
+  (table) => [index('sale_spare_part_items_sale_id_idx').on(table.saleId)]
+);
+
 export const auditLogs = pgTable(
   'audit_logs',
   {
@@ -355,6 +406,7 @@ export const salesRelations = relations(sales, ({ one, many }) => ({
   items: many(saleItems),
   printItems: many(salePrintItems),
   serviceItems: many(saleServiceItems),
+  sparePartItems: many(saleSparePartItems),
   payments: many(salePayments),
 }));
 
@@ -373,6 +425,25 @@ export const saleServiceItemsRelations = relations(saleServiceItems, ({ one }) =
   technicalService: one(technicalServices, {
     fields: [saleServiceItems.technicalServiceId],
     references: [technicalServices.id],
+  }),
+}));
+
+export const sparePartsRelations = relations(spareParts, ({ one, many }) => ({
+  customer: one(customers, {
+    fields: [spareParts.customerId],
+    references: [customers.id],
+  }),
+  saleItem: many(saleSparePartItems),
+}));
+
+export const saleSparePartItemsRelations = relations(saleSparePartItems, ({ one }) => ({
+  sale: one(sales, {
+    fields: [saleSparePartItems.saleId],
+    references: [sales.id],
+  }),
+  sparePart: one(spareParts, {
+    fields: [saleSparePartItems.sparePartId],
+    references: [spareParts.id],
   }),
 }));
 
@@ -446,6 +517,7 @@ export const cardInstallmentsRelations = relations(cardInstallments, ({ one }) =
 
 export const customersRelations = relations(customers, ({ many }) => ({
   sales: many(sales),
+  spareParts: many(spareParts),
   logs: many(auditLogs),
 }));
 

@@ -1,6 +1,6 @@
 import { desc, eq, sql, and, gte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { sales, saleItems, salePrintItems, saleServiceItems, products, customers, salePayments, technicalServices } from '@/lib/db/schema';
+import { sales, saleItems, salePrintItems, saleServiceItems, saleSparePartItems, products, customers, salePayments, technicalServices, spareParts } from '@/lib/db/schema';
 import type { SaleInput } from '@/features/sale/domain/sale.schema';
 import { ConcurrencyError } from '@/lib/errors';
 import { roundToDecimals } from '@/lib/utils';
@@ -32,6 +32,14 @@ export class SaleRepository {
           with: {
             technicalService: {
               columns: { id: true, name: true },
+            },
+          },
+        },
+        sparePartItems: {
+          with: {
+            sparePart: {
+              columns: { id: true, title: true, condition: true },
+              with: { customer: { columns: { id: true, name: true } } },
             },
           },
         },
@@ -67,6 +75,11 @@ export class SaleRepository {
             technicalService: true,
           },
         },
+        sparePartItems: {
+          with: {
+            sparePart: { with: { customer: true } },
+          },
+        },
         payments: {
           with: {
             card: true,
@@ -78,8 +91,8 @@ export class SaleRepository {
 
   /**
    * Crea una venta que puede combinar en un mismo registro: productos de stock (Tech/Librería),
-   * impresiones y servicios técnicos. Cualquier combinación de los 3 arrays es válida siempre que
-   * al menos uno tenga contenido (lo valida `saleCreateSchema`).
+   * impresiones, servicios técnicos y repuestos/usados. Cualquier combinación de los 4 arrays es
+   * válida siempre que al menos uno tenga contenido (lo valida `saleCreateSchema`).
    */
   async createSale(vendorId: string, input: SaleInput, dbtx: any = db) {
     // 1. Productos: validar stock y resolver precio/costo real desde la base — nunca confiar en
@@ -143,9 +156,39 @@ export class SaleRepository {
       });
     }
 
-    // 4. Recomputar el total real a partir de los 3 grupos + el descuento de la venta, y exigir que
+    // 3b. Repuestos/Usados: se venden una sola vez — que exista la fila en sale_spare_part_items ES
+    // lo que significa "vendido". Mismo criterio anti-fraude: costo/ganancia salen de la tabla
+    // spareParts, nunca del carrito del cliente.
+    const resolvedSpareParts: { sparePartId: string; unitCost: number; profitAmount: number; subtotal: number }[] = [];
+    for (const item of input.sparePartItems) {
+      const sp = await dbtx.query.spareParts.findFirst({
+        where: eq(spareParts.id, item.sparePartId),
+        columns: { cost: true, profitPercentage: true },
+      });
+      if (!sp) {
+        throw new Error('Uno de los repuestos seleccionados ya no existe.');
+      }
+      const alreadySold = await dbtx.query.saleSparePartItems.findFirst({
+        where: eq(saleSparePartItems.sparePartId, item.sparePartId),
+      });
+      if (alreadySold) {
+        throw new Error('Uno de los repuestos seleccionados ya fue vendido.');
+      }
+      const cost = parseFloat(sp.cost);
+      const profitAmount = roundToDecimals(cost * (parseFloat(sp.profitPercentage) / 100));
+      resolvedSpareParts.push({
+        sparePartId: item.sparePartId,
+        unitCost: cost,
+        profitAmount,
+        subtotal: roundToDecimals(cost + profitAmount),
+      });
+    }
+
+    // 4. Recomputar el total real a partir de los 4 grupos + el descuento de la venta, y exigir que
     // los pagos lo cubran. El `total` del cliente solo sirve de piso para cuotas con interés.
-    const itemsSubtotal = roundToDecimals(resolvedItems.reduce((acc, i) => acc + i.subtotal, 0) + resolvedPrintItems.reduce((acc, i) => acc + i.subtotal, 0) + resolvedServiceItems.reduce((acc, i) => acc + i.subtotal, 0));
+    const itemsSubtotal = roundToDecimals(
+      resolvedItems.reduce((acc, i) => acc + i.subtotal, 0) + resolvedPrintItems.reduce((acc, i) => acc + i.subtotal, 0) + resolvedServiceItems.reduce((acc, i) => acc + i.subtotal, 0) + resolvedSpareParts.reduce((acc, i) => acc + i.subtotal, 0)
+    );
     const discountAmount = input.discountAmount || 0;
     const discountPercentage = input.discountPercentage || 0;
     const expectedTotal = Math.max(0, roundToDecimals(itemsSubtotal * (1 - discountPercentage / 100) - discountAmount));
@@ -220,6 +263,17 @@ export class SaleRepository {
       });
     }
 
+    // 8b. Insertar items de repuestos/usados — esta fila es la que marca "vendido" (ver punto 3b).
+    for (const item of resolvedSpareParts) {
+      await dbtx.insert(saleSparePartItems).values({
+        saleId: sale.id,
+        sparePartId: item.sparePartId,
+        unitCost: item.unitCost.toString(),
+        profitAmount: item.profitAmount.toString(),
+        subtotal: item.subtotal.toString(),
+      });
+    }
+
     // 9. Insertar pagos
     if (input.payments && input.payments.length > 0) {
       for (const p of input.payments) {
@@ -262,6 +316,8 @@ export class SaleRepository {
     await dbtx.delete(saleItems).where(eq(saleItems.saleId, id));
     await dbtx.delete(salePrintItems).where(eq(salePrintItems.saleId, id));
     await dbtx.delete(saleServiceItems).where(eq(saleServiceItems.saleId, id));
+    // Borrar esta fila es lo que "libera" al repuesto — vuelve a aparecer como pendiente de venta.
+    await dbtx.delete(saleSparePartItems).where(eq(saleSparePartItems.saleId, id));
     await dbtx.delete(salePayments).where(eq(salePayments.saleId, id));
 
     // Final delete of the locked sale record

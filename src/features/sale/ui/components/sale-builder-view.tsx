@@ -1,20 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search, Wrench } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Trash2, MinusCircle, PlusCircle, X, Search, Wrench, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type TechnicalServiceDef } from '@/features/technical-service/domain/technical-service.schema';
 import { type useCart } from '../hooks/useCart';
 import { type usePrintCart } from '../hooks/usePrintCart';
 import { type useServiceCart } from '../hooks/useServiceCart';
+import { type useSparePartCart, type PendingSparePart } from '../hooks/useSparePartCart';
 import { SaleCustomerPicker, isCustomerSelectionValid, type SaleCustomerSelection } from './sale-customer-picker';
 import { DiscountControl } from './discount-control';
 import { blockInvalidPriceKey } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 import { getPrintKindMeta, formatPrintItemLabel, type PrintKind } from '@/lib/print-kinds';
 
-type BuilderTab = 'tech' | 'libreria' | 'impresiones' | 'servicio' | 'ciber' | 'anillado_plastificado' | 'tramite';
+type BuilderTab = 'tech' | 'libreria' | 'impresiones' | 'servicio' | 'repuestos' | 'ciber' | 'anillado_plastificado' | 'tramite';
 
 /** Tabs cuyo panel izquierdo es el formulario "tipo impresión" (importe + campo extra según el kind), en vez de una lista de búsqueda. */
 const PRINT_LIKE_TABS: BuilderTab[] = ['impresiones', 'ciber', 'anillado_plastificado', 'tramite'];
@@ -32,6 +33,7 @@ const BUILDER_TABS: { id: BuilderTab; label: string }[] = [
   { id: 'libreria', label: 'Librería' },
   { id: 'impresiones', label: 'Impresiones' },
   { id: 'servicio', label: 'Servicio técnico' },
+  { id: 'repuestos', label: 'Repuestos/Usados' },
   { id: 'ciber', label: 'Hora de Ciber' },
   { id: 'anillado_plastificado', label: 'Anillados/Plastificados' },
   { id: 'tramite', label: 'Trámites Online' },
@@ -40,9 +42,11 @@ const BUILDER_TABS: { id: BuilderTab; label: string }[] = [
 interface SaleBuilderViewProps {
   products: ProductDef[];
   technicalServices: TechnicalServiceDef[];
+  spareParts: PendingSparePart[];
   cartProps: ReturnType<typeof useCart>;
   printCartProps: ReturnType<typeof usePrintCart>;
   serviceCartProps: ReturnType<typeof useServiceCart>;
+  sparePartCartProps: ReturnType<typeof useSparePartCart>;
   cartTotal: number;
   setCustomerSelection: (selection: SaleCustomerSelection) => void;
   isPending: boolean;
@@ -54,10 +58,11 @@ interface SaleBuilderViewProps {
   setIsPaymentModalOpen: (v: boolean) => void;
 }
 
-export function SaleBuilderView({ products, technicalServices, cartProps, printCartProps, serviceCartProps, cartTotal, setCustomerSelection, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, isPaymentModalOpen, setIsPaymentModalOpen }: SaleBuilderViewProps) {
+export function SaleBuilderView({ products, technicalServices, spareParts, cartProps, printCartProps, serviceCartProps, sparePartCartProps, cartTotal, setCustomerSelection, isPending, onConfirmSale, onCancel, showMobileCart, setShowMobileCart, isPaymentModalOpen, setIsPaymentModalOpen }: SaleBuilderViewProps) {
   const { cart, addToCart, removeFromCart, updateCartQty, setItemDiscount } = cartProps;
   const { items: printItems, addItem: addPrintItem, removeItem: removePrintItem, setItemDiscount: setPrintItemDiscount } = printCartProps;
   const { items: serviceItems, addItem: addServiceItem, removeItem: removeServiceItem, updateQty: updateServiceQty, setItemDiscount: setServiceItemDiscount } = serviceCartProps;
+  const { items: sparePartItems, addItem: addSparePartItem, removeItem: removeSparePartItem } = sparePartCartProps;
 
   const [activeTab, setActiveTab] = useState<BuilderTab>('tech');
   const [search, setSearch] = useState('');
@@ -72,7 +77,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
   const [discountEditorFor, setDiscountEditorFor] = useState<string | null>(null);
   const [discountInput, setDiscountInput] = useState('');
 
-  const totalItems = cart.length + printItems.length + serviceItems.length;
+  const totalItems = cart.length + printItems.length + serviceItems.length + sparePartItems.length;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -137,6 +142,13 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
     if (!search) return true;
     const terms = search.toLowerCase().trim().split(/\s+/);
     const combinedText = `${s.name} ${s.description || ''}`.toLowerCase();
+    return terms.every((word) => combinedText.includes(word));
+  });
+
+  const filteredSpareParts = spareParts.filter((sp) => {
+    if (!search) return true;
+    const terms = search.toLowerCase().trim().split(/\s+/);
+    const combinedText = `${sp.title} ${sp.customerName || ''}`.toLowerCase();
     return terms.every((word) => combinedText.includes(word));
   });
 
@@ -250,7 +262,7 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               <Search className='absolute left-3 top-2.5 h-5 w-5 text-zinc-400' />
               <input
                 type='text'
-                placeholder={activeTab === 'servicio' ? 'Buscar servicio técnico...' : 'Buscar productos...'}
+                placeholder={activeTab === 'servicio' ? 'Buscar servicio técnico...' : activeTab === 'repuestos' ? 'Buscar repuesto o cliente...' : 'Buscar productos...'}
                 className='w-full pl-10 pr-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-500 dark:text-zinc-100 transition-colors shadow-sm h-10'
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -291,6 +303,47 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                 <div className='py-10 text-center opacity-30 flex flex-col items-center gap-2'>
                   <Wrench className='w-8 h-8' />
                   <p className='text-[10px] font-bold uppercase tracking-widest'>Sin servicios técnicos cargados</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'repuestos' && (
+            <div className='flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-24 lg:pb-6 font-medium'>
+              {filteredSpareParts.map((sp) => {
+                const cost = Number(sp.cost);
+                const price = Math.round((cost + cost * (Number(sp.profitPercentage) / 100)) * 100) / 100;
+                const alreadyInCart = sparePartItems.some((i) => i.sparePartId === sp.id);
+                return (
+                  <button
+                    key={`pos-spare-part-${sp.id}`}
+                    disabled={alreadyInCart}
+                    onDoubleClick={() => addSparePartItem(sp)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${alreadyInCart ? 'opacity-40 bg-zinc-50 cursor-not-allowed border-zinc-200' : 'bg-white dark:bg-zinc-900 border-zinc-200 hover:border-zinc-500 hover:shadow-md'}`}
+                  >
+                    <div className='text-left min-w-0 flex-1 mr-4'>
+                      <div className='flex items-center gap-2'>
+                        <h4
+                          className='font-bold text-zinc-900 dark:text-zinc-100 text-sm truncate'
+                          title={sp.title}
+                        >
+                          {sp.title}
+                        </h4>
+                        <span className={`shrink-0 text-[9px] font-black uppercase px-1.5 py-0.5 rounded ${sp.condition === 'nuevo' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'}`}>{sp.condition}</span>
+                      </div>
+                      <p className='text-[10px] text-zinc-400 uppercase font-black tracking-widest leading-tight truncate'>Para: {sp.customerName || '--'}</p>
+                    </div>
+                    <div className='text-right'>
+                      <div className='text-lg font-black leading-none text-zinc-600'>${price.toLocaleString('es-AR')}</div>
+                      <div className='text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1'>{alreadyInCart ? 'Ya agregado' : 'Doble click'}</div>
+                    </div>
+                  </button>
+                );
+              })}
+              {filteredSpareParts.length === 0 && (
+                <div className='py-10 text-center opacity-30 flex flex-col items-center gap-2'>
+                  <Package className='w-8 h-8' />
+                  <p className='text-[10px] font-bold uppercase tracking-widest'>Sin repuestos pendientes de venta</p>
                 </div>
               )}
             </div>
@@ -483,6 +536,32 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
               </div>
             ))}
 
+            {sparePartItems.map((item) => (
+              <div
+                key={`cart-spare-part-${item.sparePartId}`}
+                className='p-2.5 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shadow-sm shrink-0'
+              >
+                <div className='flex justify-between items-start gap-2 overflow-hidden'>
+                  <span
+                    className='text-xs font-bold uppercase leading-tight truncate'
+                    title={item.title}
+                  >
+                    {item.title}
+                  </span>
+                  <button
+                    onClick={() => removeSparePartItem(item.sparePartId)}
+                    className='text-zinc-300 hover:text-zinc-500 transition-colors p-1'
+                  >
+                    <Trash2 className='w-4 h-4' />
+                  </button>
+                </div>
+                <div className='flex justify-between items-center'>
+                  <span className='text-[10px] text-zinc-400 uppercase font-black tracking-widest truncate'>Para: {item.customerName || '--'}</span>
+                  <span className='font-bold text-sm shrink-0'>${item.subtotal.toLocaleString('es-AR')}</span>
+                </div>
+              </div>
+            ))}
+
             {totalItems === 0 && (
               <div className='py-10 text-center opacity-30 flex flex-col items-center gap-2'>
                 <ShoppingCart className='w-8 h-8' />
@@ -668,6 +747,32 @@ export function SaleBuilderView({ products, technicalServices, cartProps, printC
                       </button>
                     </div>
                     <span className='font-black text-base'>${item.subtotal.toLocaleString('es-AR')}</span>
+                  </div>
+                </div>
+              ))}
+
+              {sparePartItems.map((item) => (
+                <div
+                  key={`spare-part-mob-${item.sparePartId}`}
+                  className='p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-100 dark:border-zinc-800 flex flex-col gap-1.5 shrink-0'
+                >
+                  <div className='flex justify-between items-start overflow-hidden'>
+                    <span
+                      className='text-sm font-bold uppercase leading-tight truncate'
+                      title={item.title}
+                    >
+                      {item.title}
+                    </span>
+                    <button
+                      onClick={() => removeSparePartItem(item.sparePartId)}
+                      className='text-zinc-500 p-1'
+                    >
+                      <Trash2 className='w-4 h-4' />
+                    </button>
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <span className='text-[10px] text-zinc-400 uppercase font-black tracking-widest truncate'>Para: {item.customerName || '--'}</span>
+                    <span className='font-black text-base shrink-0'>${item.subtotal.toLocaleString('es-AR')}</span>
                   </div>
                 </div>
               ))}

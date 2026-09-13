@@ -6,6 +6,7 @@ import { fetchSales } from '@/features/sale/actions/sale.actions';
 import { fetchCustomers } from '@/features/customer/actions/customer.actions';
 import { fetchProducts } from '@/features/product/actions/product.actions';
 import { fetchTechnicalServices } from '@/features/technical-service/actions/technical-service.actions';
+import { fetchPendingSparePartsForSale } from '@/features/spare-part/actions/spare-part.actions';
 import { fetchCards } from '@/features/card/actions/card.actions';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { SalesListView } from '@/features/sale/ui/components/sales-list-view';
@@ -15,6 +16,7 @@ import { SalesPrintView } from '@/features/sale/ui/components/sales-print-view';
 import { useCart } from '@/features/sale/ui/hooks/useCart';
 import { usePrintCart } from '@/features/sale/ui/hooks/usePrintCart';
 import { useServiceCart } from '@/features/sale/ui/hooks/useServiceCart';
+import { useSparePartCart, type PendingSparePart } from '@/features/sale/ui/hooks/useSparePartCart';
 import { useSalesActions } from '@/features/sale/ui/hooks/useSalesActions';
 import { type SaleCustomerSelection } from '@/features/sale/ui/components/sale-customer-picker';
 import { SalePaymentModal } from '@/features/sale/ui/components/sale-payment-modal';
@@ -37,18 +39,22 @@ export function SalesPanel() {
   const { setCustomers, isLoaded: custLoaded } = useCustomerStore();
   const { technicalServices, setTechnicalServices, isLoaded: servicesLoaded } = useTechnicalServiceStore();
   const { cards, setCards, isLoaded: cardsLoaded } = useCardStore();
+  const [spareParts, setSpareParts] = useState<PendingSparePart[]>([]);
+  const [sparePartsLoaded, setSparePartsLoaded] = useState(false);
 
   const { itemToDelete, setItemToDelete, globalMessage, showGlobalMessage, search: searchTerm, setSearch: setSearchTerm } = useEntityManager<SaleDef>();
 
   const { initialLoading } = useAutoSync({
-    isLoaded: salesLoaded && prodsLoaded && custLoaded && servicesLoaded && cardsLoaded,
+    isLoaded: salesLoaded && prodsLoaded && custLoaded && servicesLoaded && cardsLoaded && sparePartsLoaded,
     sync: async () => {
-      const [s, p, c, ts, cd] = await Promise.all([fetchSales(), fetchProducts(), fetchCustomers(), fetchTechnicalServices(), fetchCards()]);
+      const [s, p, c, ts, cd, sp] = await Promise.all([fetchSales(), fetchProducts(), fetchCustomers(), fetchTechnicalServices(), fetchCards(), fetchPendingSparePartsForSale()]);
       setSales(s);
       setProducts(p);
       setCustomers(c);
       setTechnicalServices(ts);
       setCards(cd);
+      setSpareParts(sp);
+      setSparePartsLoaded(true);
     },
   });
 
@@ -64,6 +70,7 @@ export function SalesPanel() {
   const cartProps = useCart();
   const printCartProps = usePrintCart();
   const serviceCartProps = useServiceCart();
+  const sparePartCartProps = useSparePartCart();
 
   // Carrito propio de Venta Rápida — independiente del de "Nueva venta" para que no se pisen si el
   // vendedor alterna entre los dos flujos.
@@ -76,10 +83,12 @@ export function SalesPanel() {
     setSales,
     setProducts,
     setCustomers,
+    setSpareParts,
     setItemToDelete,
     clearCart: cartProps.clearCart,
     clearPrintItems: printCartProps.clearItems,
     clearServiceItems: serviceCartProps.clearItems,
+    clearSparePartItems: sparePartCartProps.clearItems,
     closeMobileCart: () => setShowMobileCart(false),
     navigateToList: () => setView('list'),
   });
@@ -94,6 +103,7 @@ export function SalesPanel() {
     clearCart: quickCartProps.clearCart,
     clearPrintItems: quickPrintCartProps.clearItems,
     clearServiceItems: () => {},
+    clearSparePartItems: () => {},
     closeMobileCart: () => setShowMobileCart(false),
     navigateToList: () => setView('list'),
   });
@@ -118,7 +128,7 @@ export function SalesPanel() {
     );
   }
 
-  const currentSubtotal = roundToDecimals(cartProps.cartTotal + printCartProps.printTotal + serviceCartProps.serviceTotal);
+  const currentSubtotal = roundToDecimals(cartProps.cartTotal + printCartProps.printTotal + serviceCartProps.serviceTotal + sparePartCartProps.sparePartTotal);
   const quickSubtotal = roundToDecimals(quickCartProps.cartTotal + quickPrintCartProps.printTotal);
 
   if (view === 'quick') {
@@ -151,7 +161,7 @@ export function SalesPanel() {
             const baseTotal = roundToDecimals(quickSubtotal * (1 - discountPercentage / 100));
             const paymentsSum = roundToDecimals(payments.reduce((acc, p) => acc + p.amount, 0));
             const finalTotal = Math.max(baseTotal, paymentsSum);
-            handleCreateQuickSale({ mode: 'final' }, quickCartProps.cart, quickPrintCartProps.items, [], finalTotal, payments, { amount: 0, percentage: discountPercentage });
+            handleCreateQuickSale({ mode: 'final' }, quickCartProps.cart, quickPrintCartProps.items, [], [], finalTotal, payments, { amount: 0, percentage: discountPercentage });
             setIsPaymentModalOpen(false);
           }}
         />
@@ -165,9 +175,11 @@ export function SalesPanel() {
         <SaleBuilderView
           products={products}
           technicalServices={technicalServices}
+          spareParts={spareParts}
           cartProps={cartProps}
           printCartProps={printCartProps}
           serviceCartProps={serviceCartProps}
+          sparePartCartProps={sparePartCartProps}
           cartTotal={currentSubtotal}
           setCustomerSelection={setCustomerSelection}
           isPending={isPending}
@@ -191,7 +203,7 @@ export function SalesPanel() {
             const baseTotal = roundToDecimals(currentSubtotal * (1 - discountPercentage / 100));
             const paymentsSum = roundToDecimals(payments.reduce((acc, p) => acc + p.amount, 0));
             const finalTotal = Math.max(baseTotal, paymentsSum);
-            handleCreateSale(customerSelection, cartProps.cart, printCartProps.items, serviceCartProps.items, finalTotal, payments, { amount: 0, percentage: discountPercentage });
+            handleCreateSale(customerSelection, cartProps.cart, printCartProps.items, serviceCartProps.items, sparePartCartProps.items, finalTotal, payments, { amount: 0, percentage: discountPercentage });
             setIsPaymentModalOpen(false);
           }}
         />
@@ -201,6 +213,7 @@ export function SalesPanel() {
 
   const saleBeingDeleted = sales.find((s) => s.id === itemToDelete);
   const willRestoreStock = (saleBeingDeleted?.items?.length ?? 0) > 0;
+  const willFreeSpareParts = (saleBeingDeleted?.sparePartItems?.length ?? 0) > 0;
 
   return (
     <>
@@ -237,7 +250,15 @@ export function SalesPanel() {
         onClose={() => setItemToDelete(null)}
         onConfirm={() => confirmDelete(itemToDelete as string)}
         title='Anular Venta'
-        description={willRestoreStock ? '¿Deseas anular esta venta? El stock de los productos asociados será repuesto automáticamente. Esta acción no se puede deshacer.' : '¿Deseas anular esta venta? Esta acción no se puede deshacer.'}
+        description={
+          willRestoreStock && willFreeSpareParts
+            ? '¿Deseas anular esta venta? El stock de los productos asociados será repuesto y los repuestos/usados volverán a estar disponibles para vender. Esta acción no se puede deshacer.'
+            : willRestoreStock
+              ? '¿Deseas anular esta venta? El stock de los productos asociados será repuesto automáticamente. Esta acción no se puede deshacer.'
+              : willFreeSpareParts
+                ? '¿Deseas anular esta venta? Los repuestos/usados asociados volverán a estar disponibles para vender. Esta acción no se puede deshacer.'
+                : '¿Deseas anular esta venta? Esta acción no se puede deshacer.'
+        }
         submitLabel='Confirmar Anulación'
         isPending={isPending}
       />

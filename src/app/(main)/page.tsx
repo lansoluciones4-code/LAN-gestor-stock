@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { TrendingUp, Users, DollarSign, Activity, ArrowUpRight, Clock, Briefcase, UploadCloud, AlertTriangle, Cpu, BookOpen, Printer, Wrench, Monitor, FileText } from 'lucide-react';
+import { TrendingUp, Users, Activity, ArrowUpRight, Briefcase, UploadCloud, Cpu, BookOpen, Printer, Wrench, Monitor, FileText } from 'lucide-react';
 import { fetchDashboardStats } from '@/features/stats/actions/stats.actions';
+import { CountersGrid } from '@/features/counter/ui/counters-grid';
 import { publicarStock, getLastSyncInfo, type LastSyncInfo } from '@/features/sync/actions/publish-stock.actions';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { invalidateAllCaches } from '@/stores';
@@ -336,57 +337,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Informative Grid */}
-        <div className='lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 px-2 pb-6'>
-          <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
-            <div className='flex items-center gap-3 mb-4'>
-              <Clock className='w-5 h-5 text-zinc-500' />
-              <h4 className='font-bold text-sm'>Actividad Reciente</h4>
-            </div>
-            <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-              El inventario actual cuenta con <strong>{stats?.totalEquipos}</strong> unidades operativas distribuidas en <strong>{stats?.totalModels}</strong> modelos diferentes.
-            </p>
-          </div>
-
-          <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
-            <div className='flex items-center gap-3 mb-4'>
-              <ArrowUpRight className='w-5 h-5 text-zinc-500' />
-              <h4 className='font-bold text-sm'>Rendimiento Operativo</h4>
-            </div>
-            <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-              Se han procesado <strong>{stats?.salesCount}</strong> órdenes de venta, generando una ganancia bruta de <strong>${stats?.totalRevenue?.toLocaleString('es-AR')}</strong>.
-            </p>
-          </div>
-
-          <div className='bg-amber-50/50 dark:bg-amber-900/10 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/30 transition-all hover:border-amber-200 dark:hover:border-amber-900/50'>
-            <div className='flex items-center gap-3 mb-4'>
-              <AlertTriangle className='w-5 h-5 text-amber-500' />
-              <h4 className='font-bold text-sm text-amber-800 dark:text-amber-400'>Alerta de Stock</h4>
-            </div>
-            <p className='text-xs text-amber-700/80 dark:text-amber-400/80 leading-relaxed font-medium'>
-              Hay <strong>{stats?.lowStockCount ?? 0}</strong> productos con pocas unidades — revisá la reposición para no quedarte sin stock.
-            </p>
-          </div>
-
-          <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
-            <div className='flex items-center gap-3 mb-4'>
-              <Briefcase className='w-5 h-5 text-zinc-500' />
-              <h4 className='font-bold text-sm'>Inversión en Activos</h4>
-            </div>
-            <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-              El capital total actualmente retenido en stock físico (mercadería disponible) asciende a <strong>${stats?.currentInventoryCost?.toLocaleString('es-AR')}</strong>.
-            </p>
-          </div>
-
-          <div className='bg-zinc-100 dark:bg-zinc-950 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 transition-all hover:border-zinc-300 dark:hover:border-zinc-700'>
-            <div className='flex items-center gap-3 mb-4'>
-              <DollarSign className='w-5 h-5 text-zinc-500' />
-              <h4 className='font-bold text-sm'>Flujo de Caja</h4>
-            </div>
-            <p className='text-xs text-zinc-500 leading-relaxed font-medium'>
-              Segmentación de cobros: <strong>${stats?.cashRevenue?.toLocaleString('es-AR')}</strong> en efectivo, <strong>${stats?.transferRevenue?.toLocaleString('es-AR')}</strong> por transferencia, <strong>${stats?.debitoRevenue?.toLocaleString('es-AR')}</strong> con débito y <strong>${stats?.creditoRevenue?.toLocaleString('es-AR')}</strong> con crédito.
-            </p>
-          </div>
+        {/* Anotadores: recordatorios simples de título + cantidad, gestión completa admin-only */}
+        <div className='lg:col-span-12 px-2 pb-6'>
+          <CountersGrid mode='manage' />
         </div>
       </div>
     </div>
