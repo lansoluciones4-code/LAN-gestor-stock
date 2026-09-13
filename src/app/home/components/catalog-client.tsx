@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { type ProductDef } from '@/features/product/domain/product.schema';
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 
@@ -21,6 +21,17 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const itemsPerPage = 16;
 
+  // La raíz de este componente empieza exactamente donde termina el banner. Su posición absoluta
+  // es el punto exacto donde el scroll deja el banner fuera de vista y el catálogo pegado al tope.
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const scrollToCatalogTop = () => {
+    const root = rootRef.current;
+    if (!root) return;
+    const target = root.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: target });
+  };
+
   const { search, setSearch, selectedCategory, setSelectedCategory, minPrice, setMinPrice, maxPrice, setMaxPrice, sortBy, setSortBy, page, setPage, totalPages, paginatedProducts, clearFilters } = useCatalogFilters({ products, itemsPerPage });
 
   const handlePageChange = (newPage: number) => {
@@ -30,7 +41,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
 
   const handleCategoryChange = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
-    window.scrollTo({ top: 0 });
+    scrollToCatalogTop();
   };
 
   // Una categoría solo se muestra como filtro si tiene al menos un producto visible en el catálogo
@@ -45,7 +56,7 @@ export function CatalogClient({ products, categories, showPrices }: CatalogClien
   const hasFeaturedProducts = useMemo(() => products.some((p) => !!p.featuredAt), [products]);
 
   return (
-    <div className='max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col'>
+    <div ref={rootRef} className='max-w-[1600px] mx-auto px-4 sm:px-8 pb-4 sm:pb-8 flex flex-col'>
       <div className='flex flex-col lg:flex-row gap-10'>
         {/* Sidebar container - stretches to match main's height via flex align-items: stretch */}
         <aside className='hidden lg:block w-72 shrink-0 sticky top-0 h-dvh'>
