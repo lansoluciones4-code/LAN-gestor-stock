@@ -18,7 +18,7 @@ const navigation = [
   { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
   { name: 'Proveedores', href: '/proveedores', icon: Users, roles: ['admin'] },
   { name: 'Servicio técnico', href: '/servicios-tecnicos', icon: Wrench, roles: ['admin'] },
-  { name: 'Repuestos / Usados', href: '/repuestos', icon: PackageSearch, roles: ['admin'] },
+  { name: 'Repuestos / Usados', href: '/repuestos', icon: PackageSearch, roles: ['admin', 'vendedor'] },
   { name: 'Recepción de Equipo', href: '/recepcion-equipos', icon: Inbox, roles: ['admin', 'vendedor'] },
 ];
 

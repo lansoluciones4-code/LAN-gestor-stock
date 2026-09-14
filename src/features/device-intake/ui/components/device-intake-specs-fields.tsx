@@ -14,7 +14,7 @@ export function DeviceIntakeSpecsFields({ equipmentType, specs, onChange }: Devi
   const fields = DEVICE_INTAKE_FIELDS[equipmentType];
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+    <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3'>
       {fields.map((field) => {
         if (field.kind === 'boolean') {
           return (

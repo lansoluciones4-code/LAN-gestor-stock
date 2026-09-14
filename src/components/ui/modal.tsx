@@ -5,7 +5,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  width?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl';
+  width?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '4xl' | 'full';
 }
 
 const Modal = ({ isOpen, onClose, children, width = '2xl' }: ModalProps) => {
@@ -28,6 +28,9 @@ const Modal = ({ isOpen, onClose, children, width = '2xl' }: ModalProps) => {
     xl: 'max-w-xl',
     '2xl': 'max-w-2xl',
     '4xl': 'max-w-4xl',
+    // Relativo al viewport (no a un breakpoint fijo en rem) para aprovechar pantallas anchas de
+    // verdad — en un monitor ultrawide, un cap fijo tipo max-w-4xl deja franjas enormes sin usar.
+    full: 'max-w-[95vw]',
   }[width];
 
   return (

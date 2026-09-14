@@ -17,10 +17,10 @@ import { MESSAGES } from '@/config/messages';
 import { handleDatabaseError } from '@/lib/db-errors';
 import { ActionResult } from '@/lib/action-result';
 
-/** Panel de gestión (admin-only): todos los repuestos, vendidos incluidos. */
+/** Panel de gestión (admin y vendedor): todos los repuestos, vendidos incluidos. */
 export async function fetchSpareParts(): Promise<SparePartDef[]> {
   try {
-    await verifyAuthOrAdmin(true);
+    await verifyAuthOrAdmin(false);
     const list = await sparePartRepository.getAllSpareParts();
     return z.array(sparePartRowSchema).parse(list);
   } catch (error) {
@@ -40,9 +40,10 @@ export async function fetchPendingSparePartsForSale() {
   }
 }
 
+/** Admin y vendedor pueden cargar un repuesto nuevo (igual que "ingresar stock" en Productos); editar/eliminar sigue siendo admin-only. */
 export async function createSparePartAction(input: SparePartInput): Promise<ActionResult<SparePartDef>> {
   try {
-    const caller = await verifyAuthOrAdmin(true);
+    const caller = await verifyAuthOrAdmin(false);
     const parsed = sparePartCreateSchema.safeParse(input);
     if (!parsed.success) return { success: false, error: MESSAGES.ERROR.VALIDATION.INVALID_DATA };
 

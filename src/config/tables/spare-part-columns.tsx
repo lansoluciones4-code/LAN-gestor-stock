@@ -5,9 +5,10 @@ import { Edit, Trash2 } from 'lucide-react';
 interface ColumnActions {
   onEdit: (s: SparePartDef) => void;
   onDelete: (id: string) => void;
+  role?: string;
 }
 
-export function getSparePartColumns({ onEdit, onDelete }: ColumnActions): ColumnDef<SparePartDef>[] {
+export function getSparePartColumns({ onEdit, onDelete, role }: ColumnActions): ColumnDef<SparePartDef>[] {
   return [
     {
       header: 'Repuesto',
@@ -53,7 +54,7 @@ export function getSparePartColumns({ onEdit, onDelete }: ColumnActions): Column
       headerClassName: 'text-right',
       cellClassName: 'flex gap-1 justify-end',
       cell: (s) =>
-        s.sold ? (
+        s.sold || role !== 'admin' ? (
           <span className='text-[10px] text-zinc-400 uppercase font-bold'>--</span>
         ) : (
           <>

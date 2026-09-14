@@ -6,6 +6,7 @@ import { type SparePartDef } from '@/features/spare-part/domain/spare-part.schem
 interface SparePartCardActionsProps {
   onEdit: (s: SparePartDef) => void;
   onDelete: (id: string) => void;
+  role?: string;
 }
 
 export function renderSparePartCard(actions: SparePartCardActionsProps) {
@@ -45,7 +46,7 @@ export function renderSparePartCard(actions: SparePartCardActionsProps) {
         </div>
       }
       actions={
-        sparePart.sold ? undefined : (
+        sparePart.sold || actions.role !== 'admin' ? undefined : (
           <>
             <CardAction
               icon={<Edit className='w-4 h-4' />}

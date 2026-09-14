@@ -127,7 +127,7 @@ export function DeviceIntakeFormModal({ isOpen, onClose, onSubmit, editingItem, 
       onClose={onClose}
       title={editingItem ? 'Editar Recepción de Equipo' : 'Nuevo Equipo'}
       icon={<Wrench className='w-5 h-5 text-zinc-500' />}
-      width='lg'
+      width='full'
       onSubmit={submit}
       submitLabel={editingItem ? 'Actualizar' : 'Registrar'}
       isPending={pending}
@@ -153,28 +153,31 @@ export function DeviceIntakeFormModal({ isOpen, onClose, onSubmit, editingItem, 
           </div>
         </div>
 
-        <div>
-          <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Cliente</label>
-          {editingItem ? (
-            <div className='px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-600 dark:text-zinc-400'>
-              {editingItem.customer?.name || '---'} <span className='text-[10px] uppercase font-bold text-zinc-400'>(no editable)</span>
-            </div>
-          ) : (
-            <SaleCustomerPicker
-              allowFinal={false}
-              onChange={setCustomerSelection}
-            />
-          )}
-        </div>
+        {/* Campos cortos lado a lado en pantallas anchas — evita que queden perdidos en medio de tanto espacio libre. */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+          <div>
+            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Cliente</label>
+            {editingItem ? (
+              <div className='px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-600 dark:text-zinc-400'>
+                {editingItem.customer?.name || '---'} <span className='text-[10px] uppercase font-bold text-zinc-400'>(no editable)</span>
+              </div>
+            ) : (
+              <SaleCustomerPicker
+                allowFinal={false}
+                onChange={setCustomerSelection}
+              />
+            )}
+          </div>
 
-        <div>
-          <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Quién recibió el equipo</label>
-          <input
-            type='text'
-            {...register('receivedByName')}
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.receivedByName ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
-          />
-          {errors.receivedByName && <p className='text-zinc-500 text-xs mt-1.5'>{errors.receivedByName.message}</p>}
+          <div>
+            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Quién recibió el equipo</label>
+            <input
+              type='text'
+              {...register('receivedByName')}
+              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-zinc-500 bg-zinc-50 dark:bg-zinc-950 dark:text-zinc-100 transition-colors ${errors.receivedByName ? 'border-zinc-500' : 'border-zinc-300 dark:border-zinc-700'}`}
+            />
+            {errors.receivedByName && <p className='text-zinc-500 text-xs mt-1.5'>{errors.receivedByName.message}</p>}
+          </div>
         </div>
 
         <div className='pt-2 border-t border-zinc-100 dark:border-zinc-800'>

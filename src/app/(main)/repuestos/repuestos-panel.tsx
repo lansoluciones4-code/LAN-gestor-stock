@@ -22,8 +22,10 @@ import { getSparePartColumns } from '@/config/tables/spare-part-columns';
 import { renderSparePartCard } from '@/config/cards/spare-part-card';
 import { normalizeForSearch, blockInvalidPriceKey } from '@/lib/utils';
 import { ErrorAlert, GlobalMessage } from '@/components/ui/alert';
+import { useAuthStore } from '@/features/auth/store/auth.store';
 
 export function RepuestosPanel() {
+  const role = useAuthStore((s) => s.user?.role);
   const [showSold, setShowSold] = useState(false);
   const { spareParts, setSpareParts, isLoaded } = useSparePartStore();
 
@@ -128,7 +130,7 @@ export function RepuestosPanel() {
     handleEditSubmit({ ...data, customerId });
   });
 
-  const columns = getSparePartColumns({ onEdit: handleEditClick, onDelete: setItemToDelete });
+  const columns = getSparePartColumns({ onEdit: handleEditClick, onDelete: setItemToDelete, role });
 
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
 
@@ -160,7 +162,7 @@ export function RepuestosPanel() {
         data={filteredSpareParts}
         isLoading={isPending}
         emptyMessage='No se han encontrado repuestos/usados.'
-        renderCard={renderSparePartCard({ onEdit: handleEditClick, onDelete: setItemToDelete })}
+        renderCard={renderSparePartCard({ onEdit: handleEditClick, onDelete: setItemToDelete, role })}
       />
 
       <ResponsiveModal
