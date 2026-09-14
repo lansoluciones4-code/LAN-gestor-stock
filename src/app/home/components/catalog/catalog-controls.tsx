@@ -3,7 +3,7 @@
 import { SearchBar } from '@/components/ui/search-bar';
 import { Filter, Tag, X } from 'lucide-react';
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
-import { type CatalogSortBy } from './use-catalog-filters';
+import { type CatalogSortBy, ALL_PRODUCTS_ID } from './use-catalog-filters';
 import { CatalogSortDropdown } from './catalog-sort-dropdown';
 import { TEST_IDS } from '@/constants/test-ids';
 
@@ -23,7 +23,7 @@ interface CatalogControlsProps {
 }
 
 export function CatalogControls({ search, onSearchChange, onOpenFilters, selectedCategory, categories, onClearCategory, minPrice, onMinPriceChange, maxPrice, onMaxPriceChange, sortBy, onSortChange }: CatalogControlsProps) {
-  const selectedCategoryName = categories.find((c) => c.id === selectedCategory)?.name;
+  const selectedCategoryName = selectedCategory === ALL_PRODUCTS_ID ? 'Todos los productos' : categories.find((c) => c.id === selectedCategory)?.name;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Remove special characters, allow only alphanumeric and spaces

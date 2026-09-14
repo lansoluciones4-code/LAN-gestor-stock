@@ -1,48 +1,43 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { productImages } from '@/lib/db/schema';
+import { deviceIntakePhotos } from '@/lib/db/schema';
 import { cloudinaryService } from '@/lib/cloudinary';
 import { ActionResult } from '@/lib/action-result';
 import { eq } from 'drizzle-orm';
 import { ConcurrencyError } from '@/lib/errors';
 import { verifyAuthOrAdmin } from '@/lib/auth/utils';
 
-export async function deleteProductPhoto(publicId: string): Promise<ActionResult> {
+export async function deleteDeviceIntakePhoto(publicId: string): Promise<ActionResult> {
   try {
-    // Mismo nivel que la subida (verifyAuthOrAdmin(false) en /api/product-photos): admin y
-    // vendedor pueden gestionar las fotos de un producto por igual.
     await verifyAuthOrAdmin(false);
 
     if (!publicId) {
       return { success: false, error: 'Public ID is required' };
     }
 
-    // Get the image details to find if it exists
-    const image = await db.query.productImages.findFirst({
-      where: eq(productImages.publicId, publicId),
+    const image = await db.query.deviceIntakePhotos.findFirst({
+      where: eq(deviceIntakePhotos.publicId, publicId),
     });
 
     if (!image) {
       throw new ConcurrencyError('La imagen ya fue eliminada o no existe.');
     }
 
-    // Delete from cloudinary
     await cloudinaryService.deleteImage(publicId);
 
-    // Delete from db
-    const deleted = await db.delete(productImages).where(eq(productImages.publicId, publicId)).returning();
-    
+    const deleted = await db.delete(deviceIntakePhotos).where(eq(deviceIntakePhotos.publicId, publicId)).returning();
+
     if (deleted.length === 0) {
       throw new ConcurrencyError('Error de concurrencia al eliminar la imagen.');
     }
 
     return { success: true, data: undefined };
   } catch (error: any) {
-    console.error('Error in deleteProductPhoto:', error);
+    console.error('Error in deleteDeviceIntakePhoto:', error);
     if (error instanceof ConcurrencyError) {
       return { success: false, error: error.message };
     }
-    return { success: false, error: 'No se pudo eliminar la foto del producto' };
+    return { success: false, error: 'No se pudo eliminar la foto de la recepción' };
   }
 }

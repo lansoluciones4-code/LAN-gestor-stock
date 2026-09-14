@@ -2,6 +2,7 @@
 
 import { type LandingCategory } from '@/features/device/actions/public-device.actions';
 import { Tag, ChevronRight } from 'lucide-react';
+import { ALL_PRODUCTS_ID } from './use-catalog-filters';
 
 interface CatalogSidebarProps {
   categories: LandingCategory[];
@@ -23,6 +24,13 @@ export function CatalogSidebar({ categories, selectedCategory, onSelectCategory 
           className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${selectedCategory === null ? 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 shadow-sm border-sky-200 dark:border-sky-500/30' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
         >
           HOME
+        </button>
+        <button
+          type='button'
+          onClick={() => onSelectCategory(ALL_PRODUCTS_ID)}
+          className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all outline-none focus:outline-none ring-0 focus:ring-0 active:outline-none select-none border ${selectedCategory === ALL_PRODUCTS_ID ? 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 shadow-sm border-sky-200 dark:border-sky-500/30' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
+        >
+          TODOS LOS PRODUCTOS
         </button>
         {categories.map((category) => (
           <button

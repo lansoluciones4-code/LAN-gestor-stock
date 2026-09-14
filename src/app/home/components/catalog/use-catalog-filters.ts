@@ -11,6 +11,13 @@ interface UseCatalogFiltersProps {
 
 export type CatalogSortBy = 'default' | 'price_asc' | 'price_desc' | 'most_viewed';
 
+/**
+ * Valor sentinela de `selectedCategory` para "TODOS LOS PRODUCTOS" — a diferencia de HOME
+ * (`null`, solo destacados) o de una categoría puntual, muestra el catálogo completo sin
+ * restricción, funcionando como buscador general sobre todo lo publicado.
+ */
+export const ALL_PRODUCTS_ID = '__todos__';
+
 /** Recuerda en qué categoría/página estaba el usuario dentro de la misma pestaña, para que
  * volver desde la ficha de producto (o con el botón atrás del navegador) no lo mande siempre
  * a HOME página 1. Solo categoría+página, no el resto de los filtros — es lo que se pidió. */
@@ -77,7 +84,8 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
       const matchesSearch = searchTerms.every((term) => combinedText.includes(term));
 
       // 2. Category filter — sin categoría seleccionada estamos en "HOME": solo destacados.
-      const matchesCategory = selectedCategory ? p.device?.category === selectedCategory : !!p.featuredAt;
+      // ALL_PRODUCTS_ID ("TODOS LOS PRODUCTOS") no filtra por categoría/destacado: es el buscador general.
+      const matchesCategory = selectedCategory === null ? !!p.featuredAt : selectedCategory === ALL_PRODUCTS_ID ? true : p.device?.category === selectedCategory;
 
       // 3. Price range filter
       const price = p.salePrice;
@@ -94,7 +102,7 @@ export function useCatalogFilters({ products, itemsPerPage }: UseCatalogFiltersP
     if (sortBy === 'price_desc') return [...filteredProducts].sort((a, b) => b.salePrice - a.salePrice);
     if (sortBy === 'most_viewed') return [...filteredProducts].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
     // Orden "Relevancia" en HOME: respeta el curado del admin — el último producto marcado
-    // como destacado aparece primero. En una categoría normal, en stock primero.
+    // como destacado aparece primero. En "Todos los productos" y en una categoría normal, en stock primero.
     if (selectedCategory === null) {
       return [...filteredProducts].sort((a, b) => new Date(b.featuredAt ?? 0).getTime() - new Date(a.featuredAt ?? 0).getTime());
     }

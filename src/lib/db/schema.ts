@@ -7,6 +7,7 @@ export const businessSectionEnum = pgEnum('business_section', ['tech', 'impresio
 export const colorModeEnum = pgEnum('color_mode', ['color', 'blanco_y_negro']);
 export const printKindEnum = pgEnum('print_kind', ['fotocopia', 'impresion', 'ciber', 'anillado_plastificado', 'tramite']);
 export const sparePartConditionEnum = pgEnum('spare_part_condition', ['usado', 'nuevo']);
+export const equipmentTypeEnum = pgEnum('equipment_type', ['consola', 'pc_escritorio', 'notebook']);
 
 /** Fila única con configuración global del catálogo público (ej. mostrar precios o no). */
 export const appSettings = pgTable('app_settings', {
@@ -62,6 +63,38 @@ export const providers = pgTable('providers', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+/**
+ * Boleta de gasto (compra) a un proveedor — tab "Gastos", admin-only. `section` reusa
+ * `businessSectionEnum` restringido a 'tech'/'libreria' a nivel Zod (mismo gotcha que
+ * `devices.section`: 'impresiones' no aplica acá). El número de boleta (estilo AFIP, punto de
+ * venta + número) se guarda partido en 2 columnas string para no perder ceros a la izquierda.
+ */
+export const expenses = pgTable(
+  'expenses',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    section: businessSectionEnum('section').notNull(),
+    providerId: uuid('provider_id')
+      .notNull()
+      .references(() => providers.id),
+    pointOfSale: varchar('point_of_sale', { length: 4 }).notNull(),
+    receiptNumber: varchar('receipt_number', { length: 8 }).notNull(),
+    amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+    date: timestamp('date').notNull(),
+    version: integer('version').default(1).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('expenses_provider_id_idx').on(table.providerId),
+    // Evita cargar la misma boleta dos veces por error; dos proveedores distintos sí pueden
+    // compartir el mismo número de boleta.
+    unique('expenses_provider_receipt_unique').on(table.providerId, table.pointOfSale, table.receiptNumber),
+  ]
+);
 
 export const technicalServices = pgTable('technical_services', {
   id: uuid('id')
@@ -144,6 +177,52 @@ export const spareParts = pgTable('spare_parts', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+/**
+ * Recepción de equipo para servicio técnico (planilla en papel digitalizada). `specs` guarda los
+ * campos propios de cada `equipmentType` (distintos entre Consola/PC Escritorio/Notebook) como
+ * JSON — ver `src/config/forms/device-intake-fields.ts`, que define esos campos y valida este
+ * JSON con un schema Zod discriminado por `equipmentType`. `diagnosedAt` (nullable) es lo que
+ * indica si ya se cargó el Diagnóstico Final, igual que `saleSparePartItems` indica "vendido".
+ */
+export const deviceIntakes = pgTable(
+  'device_intakes',
+  {
+    id: uuid('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    equipmentType: equipmentTypeEnum('equipment_type').notNull(),
+    customerId: uuid('customer_id')
+      .notNull()
+      .references(() => customers.id),
+    receivedByName: varchar('received_by_name', { length: 100 }).notNull(),
+    description: varchar('description', { length: 1000 }).notNull().default(''),
+    intakeReason: varchar('intake_reason', { length: 1000 }).notNull().default(''),
+    observations: varchar('observations', { length: 1000 }).notNull().default(''),
+    specs: jsonb('specs').notNull().default({}),
+    diagnosisAuthorName: varchar('diagnosis_author_name', { length: 100 }),
+    diagnosisDetail: varchar('diagnosis_detail', { length: 2000 }),
+    diagnosedAt: timestamp('diagnosed_at'),
+    isActive: boolean('is_active').default(true).notNull(),
+    version: integer('version').default(1).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [index('device_intakes_customer_id_idx').on(table.customerId)]
+);
+
+export const deviceIntakePhotos = pgTable(
+  'device_intake_photos',
+  {
+    publicId: varchar('public_id', { length: 255 }).primaryKey(),
+    deviceIntakeId: uuid('device_intake_id')
+      .notNull()
+      .references(() => deviceIntakes.id),
+    url: varchar('url', { length: 500 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('device_intake_photos_device_intake_id_idx').on(table.deviceIntakeId)]
+);
 
 export const products = pgTable(
   'products',
@@ -494,7 +573,15 @@ export const devicesRelations = relations(devices, ({ many }) => ({
 
 export const providersRelations = relations(providers, ({ many }) => ({
   products: many(products),
+  expenses: many(expenses),
   logs: many(auditLogs),
+}));
+
+export const expensesRelations = relations(expenses, ({ one }) => ({
+  provider: one(providers, {
+    fields: [expenses.providerId],
+    references: [providers.id],
+  }),
 }));
 
 export const technicalServicesRelations = relations(technicalServices, ({ many }) => ({
@@ -518,7 +605,23 @@ export const cardInstallmentsRelations = relations(cardInstallments, ({ one }) =
 export const customersRelations = relations(customers, ({ many }) => ({
   sales: many(sales),
   spareParts: many(spareParts),
+  deviceIntakes: many(deviceIntakes),
   logs: many(auditLogs),
+}));
+
+export const deviceIntakesRelations = relations(deviceIntakes, ({ one, many }) => ({
+  customer: one(customers, {
+    fields: [deviceIntakes.customerId],
+    references: [customers.id],
+  }),
+  photos: many(deviceIntakePhotos),
+}));
+
+export const deviceIntakePhotosRelations = relations(deviceIntakePhotos, ({ one }) => ({
+  deviceIntake: one(deviceIntakes, {
+    fields: [deviceIntakePhotos.deviceIntakeId],
+    references: [deviceIntakes.id],
+  }),
 }));
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({

@@ -283,7 +283,6 @@ export function ProductsPanel() {
         isOpen={!!photoManageProduct}
         onClose={() => setPhotoManageProduct(null)}
         product={photoManageProduct}
-        canDelete={role === 'admin'}
       />
     </div>
   );

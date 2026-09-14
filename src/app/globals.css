@@ -69,6 +69,7 @@ button:focus,
 
 @media print {
   @page {
+    size: A4;
     margin: 0;
   }
 
@@ -111,6 +112,18 @@ button:focus,
     display: block !important;
     padding: 0 !important;
     overflow: visible !important;
+  }
+
+  /* Ningún contenedor de la app debe recortar el documento a imprimir. El shell de (main)/layout.tsx,
+     el wrapper de cada page.tsx (todos usan su propio overflow-hidden con alto fijo) y el wrapper
+     propio de cada *-print-view.tsx tienen overflow/alto pensados para la UI interactiva con scroll
+     — sin este reset amplio, cualquiera de ellos corta el documento a lo que entra en una sola
+     "pantalla" en vez de dejarlo fluir en tantas hojas A4 como haga falta. Reemplaza tener que listar
+     a mano la clase de cada page.tsx nuevo. */
+  body :not(#print-area-wrapper):not(#print-area-wrapper *) {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
   }
 
   #print-area-wrapper {

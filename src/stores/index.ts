@@ -11,6 +11,8 @@ import { useUserStore } from '@/features/user/store/user.store';
 import { useTechnicalServiceStore } from '@/features/technical-service/store/technical-service.store';
 import { useCardStore } from '@/features/card/store/card.store';
 import { useSparePartStore } from '@/features/spare-part/store/spare-part.store';
+import { useDeviceIntakeStore } from '@/features/device-intake/store/device-intake.store';
+import { useExpenseStore } from '@/features/expense/store/expense.store';
 
 /**
  * Centrally invalidates all data caches in the application.
@@ -30,4 +32,6 @@ export const invalidateAllCaches = () => {
   useTechnicalServiceStore.getState().setLoaded(false);
   useCardStore.getState().setLoaded(false);
   useSparePartStore.getState().setLoaded(false);
+  useDeviceIntakeStore.getState().setLoaded(false);
+  useExpenseStore.getState().setLoaded(false);
 };

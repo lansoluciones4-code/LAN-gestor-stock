@@ -5,19 +5,21 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench, CreditCard, Undo2, PackageSearch } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Briefcase, MonitorSmartphone, ShieldAlert, Menu, Sun, Moon, LogOut, UserCog, X, Wrench, CreditCard, Undo2, PackageSearch, Inbox, Receipt } from 'lucide-react';
 
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { logoutAction } from '@/features/auth/actions/auth.actions';
 
 const navigation = [
   { name: 'Estadísticas', href: '/', icon: LayoutDashboard, roles: ['admin'] },
+  { name: 'Gastos', href: '/gastos', icon: Receipt, roles: ['admin'] },
   { name: 'Stock', href: '/productos', icon: Package, roles: ['admin', 'vendedor'] },
   { name: 'Ventas', href: '/ventas', icon: Briefcase, roles: ['admin', 'vendedor'] },
   { name: 'Clientes', href: '/clientes', icon: Users, roles: ['admin', 'vendedor'] },
   { name: 'Proveedores', href: '/proveedores', icon: Users, roles: ['admin'] },
   { name: 'Servicio técnico', href: '/servicios-tecnicos', icon: Wrench, roles: ['admin'] },
   { name: 'Repuestos / Usados', href: '/repuestos', icon: PackageSearch, roles: ['admin'] },
+  { name: 'Recepción de Equipo', href: '/recepcion-equipos', icon: Inbox, roles: ['admin', 'vendedor'] },
 ];
 
 const adminNavigation = [
