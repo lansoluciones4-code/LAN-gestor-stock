@@ -11,8 +11,9 @@ interface ColumnActions {
 export function getSparePartColumns({ onEdit, onDelete, role }: ColumnActions): ColumnDef<SparePartDef>[] {
   return [
     {
+      // Prioridad de ancho: es el dato que más le interesa leer completo al cliente.
       header: 'Repuesto',
-      cellClassName: 'max-w-[220px]',
+      headerClassName: 'w-[50%]',
       cell: (s) => (
         <div
           className='flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100 truncate min-w-0'
@@ -25,33 +26,19 @@ export function getSparePartColumns({ onEdit, onDelete, role }: ColumnActions): 
     },
     {
       header: 'Cliente',
-      cellClassName: 'text-zinc-500 max-w-[180px] truncate',
+      headerClassName: 'w-[22%]',
+      cellClassName: 'text-zinc-500 truncate',
       cell: (s) => <span title={s.customer?.name || 'Sin cliente asociado'}>{s.customer?.name || 'Sin cliente asociado'}</span>,
     },
     {
-      header: 'Costo',
-      cellClassName: 'text-zinc-500',
-      cell: (s) => `$${s.cost.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-    },
-    {
-      header: 'Ganancia',
-      cellClassName: 'font-semibold text-emerald-600 dark:text-emerald-400',
-      cell: (s) => `$${s.profitAmount.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${s.profitPercentage}%)`,
-    },
-    {
       header: 'Precio Venta',
+      headerClassName: 'w-[16%]',
       cellClassName: 'font-semibold text-zinc-600 dark:text-zinc-400',
       cell: (s) => `$${s.salePrice.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     },
     {
-      header: 'Estado',
-      cell: (s) => (
-        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${s.sold ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400' : 'bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400'}`}>{s.sold ? 'Vendido' : 'Pendiente'}</span>
-      ),
-    },
-    {
       header: 'Acciones',
-      headerClassName: 'text-right',
+      headerClassName: 'text-right w-[12%]',
       cellClassName: 'flex gap-1 justify-end',
       cell: (s) =>
         s.sold || role !== 'admin' ? (
