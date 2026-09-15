@@ -85,15 +85,6 @@ export function ExpenseFormModal({ isOpen, onClose, onSubmit, editingItem, serve
     }
   };
 
-  // Comodidad de carga: si el admin tipea menos dígitos de los requeridos, se completa con ceros
-  // a la izquierda al salir del campo (formato AFIP real, ej. "1" -> "0001").
-  const padOnBlur = (field: 'pointOfSale' | 'receiptNumber', length: number) => (e: React.FocusEvent<HTMLInputElement>) => {
-    const v = e.target.value.trim();
-    if (/^\d+$/.test(v) && v.length > 0 && v.length < length) {
-      setValue(field, v.padStart(length, '0'), { shouldValidate: true });
-    }
-  };
-
   return (
     <ResponsiveModal
       isOpen={isOpen}
@@ -125,19 +116,19 @@ export function ExpenseFormModal({ isOpen, onClose, onSubmit, editingItem, serve
             <input
               type='text'
               inputMode='numeric'
-              maxLength={4}
-              placeholder='0001'
-              {...register('pointOfSale', { onBlur: padOnBlur('pointOfSale', 4) })}
-              className='w-24 px-3 py-2 text-center border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+              maxLength={20}
+              placeholder='Ej: 1'
+              {...register('pointOfSale')}
+              className='flex-1 min-w-0 px-3 py-2 text-center border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
             />
             <span className='text-zinc-400 font-bold'>-</span>
             <input
               type='text'
               inputMode='numeric'
-              maxLength={8}
-              placeholder='00000001'
-              {...register('receiptNumber', { onBlur: padOnBlur('receiptNumber', 8) })}
-              className='flex-1 px-3 py-2 text-center border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
+              maxLength={20}
+              placeholder='Ej: 1234'
+              {...register('receiptNumber')}
+              className='flex-1 min-w-0 px-3 py-2 text-center border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
             />
           </div>
           {(errors.pointOfSale || errors.receiptNumber) && <p className='text-zinc-500 text-xs mt-1'>{errors.pointOfSale?.message || errors.receiptNumber?.message}</p>}

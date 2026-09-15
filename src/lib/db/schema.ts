@@ -67,8 +67,9 @@ export const providers = pgTable('providers', {
 /**
  * Boleta de gasto (compra) a un proveedor — tab "Gastos", admin-only. `section` reusa
  * `businessSectionEnum` restringido a 'tech'/'libreria' a nivel Zod (mismo gotcha que
- * `devices.section`: 'impresiones' no aplica acá). El número de boleta (estilo AFIP, punto de
- * venta + número) se guarda partido en 2 columnas string para no perder ceros a la izquierda.
+ * `devices.section`: 'impresiones' no aplica acá). El número de boleta se guarda partido en 2
+ * columnas string (punto de venta + número) para no perder ceros a la izquierda — el formato varía
+ * según el proveedor, así que la longitud es libre (no se fuerza un formato fijo tipo AFIP).
  */
 export const expenses = pgTable(
   'expenses',
@@ -80,8 +81,8 @@ export const expenses = pgTable(
     providerId: uuid('provider_id')
       .notNull()
       .references(() => providers.id),
-    pointOfSale: varchar('point_of_sale', { length: 4 }).notNull(),
-    receiptNumber: varchar('receipt_number', { length: 8 }).notNull(),
+    pointOfSale: varchar('point_of_sale', { length: 20 }).notNull(),
+    receiptNumber: varchar('receipt_number', { length: 20 }).notNull(),
     amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
     date: timestamp('date').notNull(),
     version: integer('version').default(1).notNull(),

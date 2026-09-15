@@ -15,11 +15,13 @@ export const expenseCreateSchema = createInsertSchema(expenses, {
   pointOfSale: z
     .string()
     .trim()
-    .regex(/^\d{4}$/, 'Deben ser 4 dígitos (ej. 0001)'),
+    .regex(/^\d+$/, 'Solo números')
+    .max(20, 'Máximo 20 dígitos'),
   receiptNumber: z
     .string()
     .trim()
-    .regex(/^\d{8}$/, 'Deben ser 8 dígitos (ej. 00000001)'),
+    .regex(/^\d+$/, 'Solo números')
+    .max(20, 'Máximo 20 dígitos'),
   amount: toNumber().pipe(
     z
       .number()
