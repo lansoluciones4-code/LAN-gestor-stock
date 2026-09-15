@@ -8,7 +8,8 @@ import { toNumber } from '@/lib/zod-helpers';
 export const sparePartCreateSchema = createInsertSchema(spareParts, {
   title: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(150, 'Nombre demasiado largo'),
   condition: z.enum(['usado', 'nuevo']),
-  customerId: z.string().uuid('Seleccioná un cliente'),
+  // Importante para el seguimiento, pero opcional — puede quedar sin cliente asociado.
+  customerId: z.string().uuid('ID de cliente inválido').optional().nullable(),
   cost: toNumber().pipe(
     z
       .number()

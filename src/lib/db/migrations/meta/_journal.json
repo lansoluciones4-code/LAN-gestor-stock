@@ -204,6 +204,13 @@
       "when": 1789489362263,
       "tag": "0028_wealthy_vulcan",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1789491011106,
+      "tag": "0029_outstanding_molly_hayes",
+      "breakpoints": true
     }
   ]
 }

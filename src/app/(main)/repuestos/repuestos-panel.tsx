@@ -46,7 +46,7 @@ export function RepuestosPanel() {
 
   const { initialLoading } = useAutoSync({ isLoaded, sync: () => fetchSpareParts().then(setSpareParts) });
 
-  const [customerSelection, setCustomerSelection] = useState<SaleCustomerSelection>({ mode: 'new', data: { name: '', phone: '', email: '', documentNumber: '' } });
+  const [customerSelection, setCustomerSelection] = useState<SaleCustomerSelection>({ mode: 'final' });
   const [customerError, setCustomerError] = useState<string | null>(null);
   const [isResolvingCustomer, setIsResolvingCustomer] = useState(false);
 
@@ -64,10 +64,13 @@ export function RepuestosPanel() {
   const condition = watch('condition');
   const costWatch = watch('cost');
   const profitPercentageWatch = watch('profitPercentage');
-  const profitAmountPreview = useMemo(() => {
+  // Precio final = costo + costo*%ganancia (ej. costo 100, ganancia 50% -> 150), igual al `salePrice`
+  // que ya calcula el server en sparePartRowSchema — esto es solo la preview en vivo del form.
+  const salePricePreview = useMemo(() => {
     const cost = Number(costWatch) || 0;
     const pct = Number(profitPercentageWatch) || 0;
-    return Math.round(cost * (pct / 100) * 100) / 100;
+    const profitAmount = cost * (pct / 100);
+    return Math.round((cost + profitAmount) * 100) / 100;
   }, [costWatch, profitPercentageWatch]);
 
   const filteredSpareParts = useMemo(
@@ -88,12 +91,13 @@ export function RepuestosPanel() {
       reset({ title: item.title, condition: item.condition, cost: item.cost, profitPercentage: item.profitPercentage });
     } else {
       reset({ title: '', condition: 'nuevo', cost: undefined, profitPercentage: undefined });
-      setCustomerSelection({ mode: 'new', data: { name: '', phone: '', email: '', documentNumber: '' } });
+      setCustomerSelection({ mode: 'final' });
     }
   };
 
-  /** Resuelve la selección de cliente a un id, creando el cliente al vuelo si hace falta (mismo patrón que useSalesActions.resolveCustomerId). */
+  /** Resuelve la selección de cliente a un id, creando el cliente al vuelo si hace falta (mismo patrón que useSalesActions.resolveCustomerId). Cliente es opcional acá: 'final' = sin cliente asociado. */
   const resolveCustomerId = async (): Promise<{ id?: string; error?: string }> => {
+    if (customerSelection.mode === 'final') return {};
     if (customerSelection.mode === 'existing') return { id: customerSelection.customerId };
     if (customerSelection.mode === 'new') {
       const result = await createCustomerAction(customerSelection.data);
@@ -123,8 +127,8 @@ export function RepuestosPanel() {
     setIsResolvingCustomer(true);
     const { id: customerId, error } = await resolveCustomerId();
     setIsResolvingCustomer(false);
-    if (error || !customerId) {
-      setCustomerError(error || 'No se pudo resolver el cliente.');
+    if (error) {
+      setCustomerError(error);
       return;
     }
     handleEditSubmit({ ...data, customerId });
@@ -212,10 +216,10 @@ export function RepuestosPanel() {
           <div>
             <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Cliente asociado</label>
             {editingItem ? (
-              <div className='px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-600 dark:text-zinc-400'>{editingItem.customer?.name || '---'} <span className='text-[10px] uppercase font-bold text-zinc-400'>(no editable)</span></div>
+              <div className='px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-600 dark:text-zinc-400'>{editingItem.customer?.name || 'Sin cliente asociado'} <span className='text-[10px] uppercase font-bold text-zinc-400'>(no editable)</span></div>
             ) : (
               <SaleCustomerPicker
-                allowFinal={false}
+                finalLabel='Sin cliente'
                 onChange={setCustomerSelection}
               />
             )}
@@ -247,9 +251,9 @@ export function RepuestosPanel() {
           </div>
 
           <div>
-            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Ganancia real</label>
+            <label className='block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5'>Precio final</label>
             <div className='px-4 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-900/30 rounded-lg text-sm font-bold text-emerald-700 dark:text-emerald-400'>
-              ${profitAmountPreview.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ${salePricePreview.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
         </div>

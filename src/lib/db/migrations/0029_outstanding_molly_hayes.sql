@@ -1,0 +1,1 @@
+ALTER TABLE "spare_parts" ALTER COLUMN "customer_id" DROP NOT NULL;

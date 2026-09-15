@@ -19,11 +19,13 @@ export function isCustomerSelectionValid(selection: SaleCustomerSelection): bool
 
 interface SaleCustomerPickerProps {
   onChange: (selection: SaleCustomerSelection) => void;
-  /** false oculta la pestaña "Consumidor Final" — para flujos donde el cliente es obligatorio (ej. alta de repuestos). Default true. */
+  /** false oculta la pestaña de "sin cliente" — para flujos donde el cliente es obligatorio. Default true. */
   allowFinal?: boolean;
+  /** Texto de la pestaña "sin cliente" — "Consumidor Final" tiene sentido en una venta, pero no en toda alta que reusa este picker (ej. Repuestos: "Sin cliente"). */
+  finalLabel?: string;
 }
 
-export function SaleCustomerPicker({ onChange, allowFinal = true }: SaleCustomerPickerProps) {
+export function SaleCustomerPicker({ onChange, allowFinal = true, finalLabel = 'Consumidor Final' }: SaleCustomerPickerProps) {
   const [tab, setTab] = useState<'final' | 'data'>(allowFinal ? 'final' : 'data');
   const [documentNumber, setDocumentNumber] = useState('');
   const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'suggestions' | 'found' | 'not_found'>('idle');
@@ -90,7 +92,7 @@ export function SaleCustomerPicker({ onChange, allowFinal = true }: SaleCustomer
             onClick={() => setTab('final')}
             className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-md transition-all ${tab === 'final' ? 'bg-white dark:bg-zinc-700 shadow text-zinc-900 dark:text-white' : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
           >
-            Consumidor Final
+            {finalLabel}
           </button>
           <button
             type='button'

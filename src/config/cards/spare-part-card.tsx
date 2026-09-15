@@ -26,9 +26,9 @@ export function renderSparePartCard(actions: SparePartCardActionsProps) {
             <span className='text-xs text-zinc-400'>Cliente</span>
             <span
               className='truncate max-w-[180px]'
-              title={sparePart.customer?.name || '---'}
+              title={sparePart.customer?.name || 'Sin cliente asociado'}
             >
-              {sparePart.customer?.name || '---'}
+              {sparePart.customer?.name || 'Sin cliente asociado'}
             </span>
           </div>
           <div className='flex justify-between'>

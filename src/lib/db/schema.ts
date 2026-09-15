@@ -162,16 +162,18 @@ export const customers = pgTable('customers', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-/** Repuesto/Art. usado: alta admin-only, ligado a un cliente de antemano, se vende una sola vez. */
+/**
+ * Repuesto/Art. usado: alta admin-only, se vende una sola vez. `customerId` es opcional — el
+ * cliente asociado es importante para el seguimiento pero no obligatorio (ej. repuestos propios,
+ * sin un tercero puntual detrás).
+ */
 export const spareParts = pgTable('spare_parts', {
   id: uuid('id')
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   title: varchar('title', { length: 150 }).notNull(),
   condition: sparePartConditionEnum('condition').notNull(),
-  customerId: uuid('customer_id')
-    .notNull()
-    .references(() => customers.id),
+  customerId: uuid('customer_id').references(() => customers.id),
   cost: numeric('cost', { precision: 10, scale: 2 }).notNull(),
   profitPercentage: numeric('profit_percentage', { precision: 5, scale: 2 }).notNull(),
   version: integer('version').default(1).notNull(),

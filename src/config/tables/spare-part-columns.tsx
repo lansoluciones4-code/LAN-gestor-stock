@@ -26,7 +26,7 @@ export function getSparePartColumns({ onEdit, onDelete, role }: ColumnActions): 
     {
       header: 'Cliente',
       cellClassName: 'text-zinc-500 max-w-[180px] truncate',
-      cell: (s) => <span title={s.customer?.name || '---'}>{s.customer?.name || '---'}</span>,
+      cell: (s) => <span title={s.customer?.name || 'Sin cliente asociado'}>{s.customer?.name || 'Sin cliente asociado'}</span>,
     },
     {
       header: 'Costo',
