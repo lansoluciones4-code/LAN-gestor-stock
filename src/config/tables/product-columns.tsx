@@ -48,17 +48,24 @@ export function getProductColumns({ role, onEdit, onDelete, onToggleVisibility, 
       header: 'Stock',
       headerClassName: 'w-[10%]',
       cell: (p) => (
-        <span
-          className={`px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
-            p.stock > p.lowStockThreshold
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-              : p.stock > 0
-                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-          }`}
-        >
-          {p.stock > 0 ? `${p.stock} ${p.stock === 1 ? 'Unidad' : 'Unidades'}` : 'Sin stock'}
-        </span>
+        <div className='flex flex-col items-start gap-1'>
+          <span
+            className={`px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
+              p.stock > p.lowStockThreshold
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                : p.stock > 0
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+            }`}
+          >
+            {p.stock > 0 ? `${p.stock} ${p.stock === 1 ? 'Unidad' : 'Unidades'}` : 'Sin stock'}
+          </span>
+          {p.stock <= 0 && (
+            <span className='text-[11px] text-zinc-400 whitespace-nowrap'>
+              {p.outOfStockAt ? `desde ${new Date(p.outOfStockAt).toLocaleDateString('es-AR')}` : 'sin fecha'}
+            </span>
+          )}
+        </div>
       ),
     },
     {

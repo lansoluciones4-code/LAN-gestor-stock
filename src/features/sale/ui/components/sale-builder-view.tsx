@@ -204,6 +204,7 @@ export function SaleBuilderView({ products, technicalServices, spareParts, cartP
                   <label className='block text-xs font-medium mb-1.5'>Nombre del Trámite</label>
                   <input
                     type='text'
+                    autoFocus
                     value={printTitle}
                     onChange={(e) => setPrintTitle(e.target.value)}
                     className='w-full px-4 py-2 border rounded-lg bg-zinc-50 dark:bg-zinc-950 border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-zinc-500'
@@ -213,9 +214,12 @@ export function SaleBuilderView({ products, technicalServices, spareParts, cartP
 
               <div>
                 <label className='block text-xs font-medium mb-1.5'>Importe Total ($)</label>
+                {/* key: los 4 tabs comparten este input — sin remontarlo, pasar de un tab a otro no vuelve a disparar el autoFocus. */}
                 <input
+                  key={activeTab}
                   type='text'
                   inputMode='decimal'
+                  autoFocus={activeTab !== 'tramite'}
                   value={printAmount}
                   onChange={(e) => setPrintAmount(e.target.value.replace(/\./g, ''))}
                   onKeyDown={blockInvalidPriceKey}

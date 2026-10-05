@@ -32,7 +32,9 @@ interface SalesListViewProps {
 function filterSales(sales: SaleDef[], searchTerm: string, startDate: string, endDate: string) {
   return sales.filter((s) => {
     const terms = normalizeForSearch(searchTerm).split(/\s+/);
-    const text = [normalizeForSearch(s.customer?.name || 'Consumidor Final'), normalizeForSearch(s.vendor?.username || '')].join(' ');
+    // Cada producto del ticket entra como "Categoría - Marca - Modelo", para poder encontrar cuándo y quién vendió un producto puntual.
+    const productLabels = (s.items ?? []).map((i) => normalizeForSearch([i.product?.device?.category, i.product?.device?.brand, i.product?.device?.name].filter(Boolean).join(' - ')));
+    const text = [normalizeForSearch(s.customer?.name || 'Consumidor Final'), normalizeForSearch(s.vendor?.username || ''), ...productLabels].join(' ');
     if (!terms.every((w) => text.includes(w))) return false;
 
     const saleTime = new Date(s.createdAt).getTime();
@@ -52,7 +54,7 @@ export function SalesListView({ sales, isPending, searchTerm, setSearchTerm, sta
       <PanelToolbar
         search={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder='Filtrar ventas por cliente o vendedor...'
+        searchPlaceholder='Filtrar ventas por cliente, vendedor o producto...'
         searchPlaceholderMobile='Buscar ventas...'
         data-testid={TEST_IDS.general.inputBusquedaTabla}
         filters={

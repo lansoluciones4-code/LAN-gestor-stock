@@ -12,6 +12,7 @@ export const TEST_IDS = {
   productos: {
     inputBusquedaPrecioMin: 'inputBusquedaPrecioMin',
     inputBusquedaPrecioMax: 'inputBusquedaPrecioMax',
+    toggleSoloSinStock: 'toggleSoloSinStock',
   },
 
   logPanel: {

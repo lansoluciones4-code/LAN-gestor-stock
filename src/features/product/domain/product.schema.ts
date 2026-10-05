@@ -73,6 +73,8 @@ export const productRowSchema = createSelectSchema(products).extend({
   updatedAt: z.union([z.date(), z.string()]),
   /** Null = no destacado. Con fecha = destacado en el HOME del catálogo público (orden = esta fecha, descendente). */
   featuredAt: z.union([z.date(), z.string()]).nullable().optional(),
+  /** Día en que quedó en stock 0. Null = tiene stock, o quedó en 0 sin fecha conocida. */
+  outOfStockAt: z.union([z.date(), z.string()]).nullable().optional(),
 });
 
 export type ProductDef = z.infer<typeof productRowSchema>;

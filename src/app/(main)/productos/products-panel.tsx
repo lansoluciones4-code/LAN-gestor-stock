@@ -19,6 +19,7 @@ import { uploadProductPhoto } from '@/features/product/actions/upload-product-ph
 import { fetchShowPrices, updateShowPricesAction } from '@/features/settings/actions/settings.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
 import { getProductColumns } from '@/config/tables/product-columns';
 import { normalizeForSearch, PRICE_BLOCKED_KEYS } from '@/lib/utils';
@@ -33,6 +34,10 @@ import { ProductPhotosManager } from '@/features/product/ui/components/product-p
 export function ProductsPanel() {
   const role = useAuthStore((s) => s.user?.role);
   const [showZeroStock, setShowZeroStock] = useState(false);
+  // "Solo sin stock": listado de productos en 0, filtrable por el día en que quedaron sin stock (`outOfStockAt`).
+  const [onlyOutOfStock, setOnlyOutOfStock] = useState(false);
+  const [outStartDate, setOutStartDate] = useState('');
+  const [outEndDate, setOutEndDate] = useState('');
   const [showOnlyLanding, setShowOnlyLanding] = useState(false);
   const [showPricesOnCatalog, setShowPricesOnCatalog] = useState(true);
   const [minPrice, setMinPrice] = useState('');
@@ -136,16 +141,38 @@ export function ProductsPanel() {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
+    const outOfStockTime = (p: ProductDef) => (p.outOfStockAt ? new Date(p.outOfStockAt).getTime() : null);
+    const matchesStock = (p: ProductDef) => {
+      if (!onlyOutOfStock) return showZeroStock || p.stock > 0;
+      if (p.stock > 0) return false;
+      if (!outStartDate && !outEndDate) return true;
+      // Con rango de fechas cargado, un producto sin fecha conocida no puede caer adentro.
+      const time = outOfStockTime(p);
+      if (time === null) return false;
+      if (outStartDate && time < new Date(outStartDate + 'T00:00:00').getTime()) return false;
+      if (outEndDate && time > new Date(outEndDate + 'T23:59:59').getTime()) return false;
+      return true;
+    };
+
     return products
       .filter((p) => {
         const terms = normalizeForSearch(search).split(/\s+/);
         const text = [normalizeForSearch(p.device?.name), normalizeForSearch(p.device?.category), normalizeForSearch(p.device?.brand), normalizeForSearch(p.description), role === 'admin' ? normalizeForSearch(p.provider?.name) : ''].join(' ');
         const min = parseFloat(minPrice) || 0;
         const max = parseFloat(maxPrice) || Infinity;
-        return terms.every((w) => text.includes(w)) && p.salePrice >= min && p.salePrice <= max && (showZeroStock || p.stock > 0) && (!showOnlyLanding || p.showOnLanding);
+        return terms.every((w) => text.includes(w)) && p.salePrice >= min && p.salePrice <= max && matchesStock(p) && (!showOnlyLanding || p.showOnLanding);
       })
-      .sort((a, b) => (a.stock > 0 && b.stock === 0 ? -1 : a.stock === 0 && b.stock > 0 ? 1 : 0));
-  }, [products, search, minPrice, maxPrice, showZeroStock, showOnlyLanding, role]);
+      .sort((a, b) => {
+        // "Solo sin stock": el que quedó en 0 más recientemente primero; los sin fecha conocida al final.
+        if (onlyOutOfStock) {
+          const ta = outOfStockTime(a);
+          const tb = outOfStockTime(b);
+          if (ta === null || tb === null) return ta === tb ? 0 : ta === null ? 1 : -1;
+          return tb - ta;
+        }
+        return a.stock > 0 && b.stock === 0 ? -1 : a.stock === 0 && b.stock > 0 ? 1 : 0;
+      });
+  }, [products, search, minPrice, maxPrice, showZeroStock, onlyOutOfStock, outStartDate, outEndDate, showOnlyLanding, role]);
 
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
@@ -208,9 +235,23 @@ export function ProductsPanel() {
                 className='w-full pl-8 pr-2 h-11 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-bold focus:outline-none focus:border-zinc-500 transition-colors shadow-sm'
                 data-testid={TEST_IDS.productos.inputBusquedaPrecioMax} />
             </div>
+            {/* Filtros de stock: disponibles para admin y vendedor. */}
+            <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' data-testid={TEST_IDS.general.btnVerOcultos} />
+            <ToggleFilter id='onlyOutOfStock' checked={onlyOutOfStock} onChange={setOnlyOutOfStock} label='Solo sin stock' data-testid={TEST_IDS.productos.toggleSoloSinStock} />
+            {onlyOutOfStock && (
+              <DateRangePicker
+                startDate={outStartDate}
+                endDate={outEndDate}
+                onStartChange={setOutStartDate}
+                onEndChange={setOutEndDate}
+                onClear={() => {
+                  setOutStartDate('');
+                  setOutEndDate('');
+                }}
+              />
+            )}
             {role === 'admin' && (
               <>
-                <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' data-testid={TEST_IDS.general.btnVerOcultos} />
                 <ToggleFilter id='showOnlyLanding' checked={showOnlyLanding} onChange={setShowOnlyLanding} label='Solo Landing' />
                 <ToggleFilter id='showPricesOnCatalog' checked={showPricesOnCatalog} onChange={handleToggleShowPrices} label='Mostrar Precios' />
               </>

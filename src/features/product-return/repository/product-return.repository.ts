@@ -1,6 +1,7 @@
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { products, productReturns } from '@/lib/db/schema';
+import { outOfStockAtFor } from '@/features/product/repository/product.repository';
 
 export class ProductReturnRepository {
   async getAllReturns() {
@@ -30,6 +31,7 @@ export class ProductReturnRepository {
       .update(products)
       .set({
         stock: sql`${products.stock} + ${quantity}`,
+        outOfStockAt: outOfStockAtFor(sql`${products.stock} + ${quantity}`),
         version: sql`${products.version} + 1`,
         updatedAt: sql`NOW()`,
       })

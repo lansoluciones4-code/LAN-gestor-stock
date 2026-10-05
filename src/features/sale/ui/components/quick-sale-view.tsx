@@ -31,7 +31,7 @@ interface QuickAddExtra {
   title?: string;
 }
 
-/** Botón rápido tipo "Fotocopias"/"Impresiones": al tocar despliega, además del importe, el campo extra que pida `extraField` (nombre de operación para Trámites, cantidad de horas para Ciber). */
+/** Botón rápido tipo "Fotocopias"/"Impresiones": al tocar despliega el importe y, si `extraField` lo pide, el nombre de operación (Trámites). El cursor queda en el primer campo. */
 function QuickAddButton({ icon, label, extraField, onAdd }: { icon: React.ReactNode; label: string; extraField: PrintKindExtraField; onAdd: (amount: number, extra?: QuickAddExtra) => void }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
@@ -79,7 +79,8 @@ function QuickAddButton({ icon, label, extraField, onAdd }: { icon: React.ReactN
             <input
               type='text'
               inputMode='decimal'
-              autoFocus={extraField === 'none'}
+              // Impresión tiene extraField 'colorMode', pero en Venta Rápida el color no se pregunta: solo Trámites tiene otro campo primero.
+              autoFocus={extraField !== 'title'}
               placeholder='Importe $'
               value={amount}
               onChange={(e) => setAmount(e.target.value.replace(/\./g, ''))}

@@ -148,7 +148,7 @@ export const saleRowSchema = createSelectSchema(sales).extend({
           .object({
             id: z.string(),
             description: z.string().nullable(),
-            device: z.object({ name: z.string() }).optional().nullable(),
+            device: z.object({ name: z.string(), category: z.string().nullable().optional(), brand: z.string().nullable().optional() }).optional().nullable(),
           })
           .optional()
           .nullable(),

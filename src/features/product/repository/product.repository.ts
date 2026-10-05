@@ -1,8 +1,17 @@
-import { desc, eq, sql, and, gte, inArray } from 'drizzle-orm';
+import { desc, eq, sql, and, gte, inArray, type SQL } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { products, productLosses, productImages, devices } from '@/lib/db/schema';
 import type { ProductInput, ProductUpdateInput } from '@/features/product/domain/product.schema';
 import { ConcurrencyError } from '@/lib/errors';
+
+/**
+ * Valor de `products.outOfStockAt` para un UPDATE que deja el stock en `newStock` (expresión SQL sobre la fila vieja —
+ * en Postgres todo el SET lee la fila previa). Al llegar a 0 fija la fecha (o conserva la que ya tenía si ya estaba en 0);
+ * al reponer la limpia. Va en el mismo UPDATE que mueve el stock, así la fecha nunca queda desfasada del stock real.
+ */
+export function outOfStockAtFor(newStock: SQL) {
+  return sql`CASE WHEN ${newStock} <= 0 THEN COALESCE(${products.outOfStockAt}, NOW()) ELSE NULL END`;
+}
 
 export class ProductRepository {
   async checkHasRelations(id: string, dbtx: any = db) {
@@ -45,6 +54,7 @@ export class ProductRepository {
       .update(products)
       .set({
         stock: sql`${products.stock} - ${quantity}`,
+        outOfStockAt: outOfStockAtFor(sql`${products.stock} - ${quantity}`),
         version: sql`${products.version} + 1`,
         updatedAt: sql`NOW()`,
       })
@@ -69,6 +79,7 @@ export class ProductRepository {
         purchasePrice: input.purchasePrice.toString(),
         salePrice: input.salePrice.toString(),
         stock: input.stock,
+        outOfStockAt: input.stock <= 0 ? sql`NOW()` : null,
         lowStockThreshold: input.lowStockThreshold,
         version: 1,
       })
@@ -93,10 +104,13 @@ export class ProductRepository {
 
     if (input.stockDelta !== undefined) {
       updateData.stock = sql`${products.stock} + ${input.stockDelta}`;
+      // Delta 0 = el stock no cambió: no se toca la fecha de "sin stock" (no se le inventa una a un producto que ya estaba en 0 sin fecha).
+      if (input.stockDelta !== 0) updateData.outOfStockAt = outOfStockAtFor(sql`${products.stock} + ${input.stockDelta}`);
       // El stock resultante nunca puede quedar negativo, sin importar lo que mande el cliente.
       whereConditions.push(gte(sql`${products.stock} + ${input.stockDelta}`, 0));
     } else if (input.stock !== undefined) {
       updateData.stock = input.stock;
+      updateData.outOfStockAt = outOfStockAtFor(sql`${input.stock}::integer`);
     }
 
     const result = await dbtx

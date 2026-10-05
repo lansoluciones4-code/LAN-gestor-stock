@@ -248,6 +248,10 @@ export const products = pgTable(
     // Null = no destacado. Con fecha = destacado en el HOME del catálogo público; el orden en HOME
     // es simplemente por esta fecha descendente (el último marcado como destacado aparece primero).
     featuredAt: timestamp('featured_at'),
+    // Día en que el producto quedó en stock 0 (filtro "Solo sin stock" del gestor). Null = tiene stock,
+    // o quedó en 0 antes de existir este registro sin venta/pérdida de la cual estimarlo. Se fija/limpia
+    // en el mismo UPDATE que mueve el stock — ver `outOfStockAtFor()` en product.repository.ts.
+    outOfStockAt: timestamp('out_of_stock_at'),
     version: integer('version').default(1).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

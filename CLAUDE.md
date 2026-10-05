@@ -189,7 +189,7 @@ Roles: **`admin`** y **`vendedor`**. Navegación filtrada por rol en `src/app/(m
 | `users` | Cuentas del gestor | `role`, `isActive`, `version` |
 | `devices` | Ficha de "tipo de equipo" (modelo + marca + categoría + `section: tech\|libreria`) | 1→N `products` |
 | `providers` | Proveedores/distribuidores | 1→N `products` |
-| `products` | Lote de stock concreto de un `device` (precio, cantidad, proveedor propios) — **única entidad de catálogo sin soft-delete** | N→1 `device`, N→1 `provider`, 1→N `productImages` |
+| `products` | Lote de stock concreto de un `device` (precio, cantidad, proveedor propios) — **única entidad de catálogo sin soft-delete**. `outOfStockAt` = día en que quedó en stock 0 (filtro "Solo sin stock"); se fija/limpia con `outOfStockAtFor()` (`product.repository.ts`) dentro del mismo UPDATE que mueve el stock — todo código nuevo que toque `stock` tiene que usarlo | N→1 `device`, N→1 `provider`, 1→N `productImages` |
 | `productImages` | Fotos en Cloudinary (PK = `publicId` de Cloudinary) | N→1 `products` |
 | `customers` | Clientes, `documentNumber` único | 1→N `sales` |
 | `technicalServices` | Catálogo de servicio técnico (`value` = precio de lista) | vendible vía `saleServiceItems` |
@@ -287,6 +287,7 @@ Specs por dominio en `tests/`: `clientes`, `concurrencia`, `equipos`, `landing`,
 - El **recargo por cuotas de tarjeta lo calcula y confía el cliente** — el servidor solo exige que el pago cubra el total esperado, nunca valida el `interestPercentage`.
 - `.agents/rules/coding-standards.md` describe una arquitectura genérica (`domain/application/infrastructure/presentation`, todo el código en inglés, máx. 200 líneas/archivo) que **no coincide del todo con el código real**: la arquitectura real es `features/<dominio>/{domain,repository,actions,store,ui}` (sección 6), y el código real usa español ampliamente en mensajes de error, nombres de acciones de auditoría y comentarios de negocio. Ante una diferencia, priorizá el patrón que efectivamente ves en el código sobre ese archivo de reglas genéricas.
 - El `README.md` todavía menciona `middleware.ts` — en este proyecto (Next 16) el archivo real es `src/proxy.ts` con función exportada `proxy()`.
+- **Toda columna nueva en una tabla replicada (`devices`, `providers`, `products`, `productImages`, `appSettings`) exige migrar también la Supabase de producción ANTES de deployar a Vercel o de tocar "Publicar"**: el sitio público y `publicarStock()` usan el mismo `schema.ts` y Drizzle lista todas las columnas en sus SELECT/INSERT — si la columna no existe en Supabase, el catálogo público queda vacío sin error visible (`fetchLandingProducts` devuelve `[]`) y la publicación falla. Pasó con `featured_at` y `out_of_stock_at`.
 - **`npm run build:public` es destructivo sobre el checkout real** (ver sección 2, punto 1 de las capas de defensa): borra `src/app/(main)` y `src/app/(auth)` del disco con `fs.rmSync`, no de una copia. No lo corras nunca sobre el working directory principal solo para verificar que el aislamiento sigue funcionando — el riesgo (perder archivos nuevos sin commitear) no vale la pena para algo que ya se puede confirmar leyendo el código de `prepare-vercel-build.js` y `src/proxy.ts`.
 
 ## 14. Antes de escribir código nuevo

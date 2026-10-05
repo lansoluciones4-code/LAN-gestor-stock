@@ -4,6 +4,7 @@ import { sales, saleItems, salePrintItems, saleServiceItems, saleSparePartItems,
 import type { SaleInput } from '@/features/sale/domain/sale.schema';
 import { ConcurrencyError } from '@/lib/errors';
 import { roundToDecimals } from '@/lib/utils';
+import { outOfStockAtFor } from '@/features/product/repository/product.repository';
 
 export class SaleRepository {
   async getAllSales() {
@@ -21,7 +22,8 @@ export class SaleRepository {
             product: {
               with: {
                 device: {
-                  columns: { name: true },
+                  // category/brand: el buscador del historial de ventas filtra por "Categoría - Marca - Modelo".
+                  columns: { name: true, category: true, brand: true },
                 },
               },
             },
@@ -230,6 +232,7 @@ export class SaleRepository {
         .update(products)
         .set({
           stock: sql`${products.stock} - ${item.quantity}`,
+          outOfStockAt: outOfStockAtFor(sql`${products.stock} - ${item.quantity}`),
           version: sql`${products.version} + 1`,
           updatedAt: sql`NOW()`,
         })
@@ -307,6 +310,7 @@ export class SaleRepository {
         .update(products)
         .set({
           stock: sql`${products.stock} + ${item.quantity}`,
+          outOfStockAt: outOfStockAtFor(sql`${products.stock} + ${item.quantity}`),
           version: sql`${products.version} + 1`,
           updatedAt: sql`NOW()`,
         })

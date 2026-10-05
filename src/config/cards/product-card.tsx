@@ -50,6 +50,12 @@ export function renderProductCard(actions: ProductCardActionsProps) {
                 ${product.salePrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
               </span>
             </div>
+            {product.stock <= 0 && (
+              <div className='flex justify-between items-center'>
+                <span className='text-xs text-zinc-400'>Sin stock desde</span>
+                <span className='text-zinc-500'>{product.outOfStockAt ? new Date(product.outOfStockAt).toLocaleDateString('es-AR') : 'sin fecha'}</span>
+              </div>
+            )}
             {actions.role === 'admin' && (
               <>
                 <div className='flex justify-between items-center'>
