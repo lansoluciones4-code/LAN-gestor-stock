@@ -16,7 +16,19 @@ interface ResponsivePanelViewProps<T extends { id: string | number }> {
   onEndReached?: () => void;
   hasMore?: boolean;
   fixedItemHeight?: number;
+  /** Contenido que en mobile/tablet va arriba de las cards y scrollea junto con ellas (en vez de quedar fijo y cortarse). */
+  mobileHeader?: React.ReactNode;
 }
+
+interface CardListContext {
+  header?: React.ReactNode;
+}
+
+// Componente estable (fuera del render): si Virtuoso recibiera uno nuevo en cada render, remontaría el
+// header y se perdería el foco de cualquier input que tenga adentro. El contenido le llega por `context`.
+const CardListHeader = ({ context }: { context?: CardListContext }) => <>{context?.header}</>;
+
+CardListHeader.displayName = 'CardListHeader';
 
 const CardListFooter = ({ hasMore }: { hasMore?: boolean }) => {
   if (!hasMore) return null;
@@ -48,6 +60,7 @@ export function ResponsivePanelView<T extends { id: string | number }>({
   onEndReached,
   hasMore,
   fixedItemHeight,
+  mobileHeader,
 }: ResponsivePanelViewProps<T>) {
   return (
     <>
@@ -67,12 +80,16 @@ export function ResponsivePanelView<T extends { id: string | number }>({
       {/* Mobile/tablet: virtualized card list — hidden at xl+ */}
       <div className='flex flex-col flex-1 overflow-hidden xl:hidden'>
         {data.length === 0 && !isLoading ? (
-          <div className='flex flex-1 items-center justify-center py-20 text-zinc-400 text-sm font-medium text-center opacity-60'>
-            {emptyMessage}
+          <div className='flex flex-col flex-1 overflow-y-auto custom-scrollbar'>
+            {mobileHeader}
+            <div className='flex flex-1 items-center justify-center py-20 text-zinc-400 text-sm font-medium text-center opacity-60'>
+              {emptyMessage}
+            </div>
           </div>
         ) : (
           <Virtuoso
             data={data}
+            context={{ header: mobileHeader }}
             endReached={onEndReached}
             increaseViewportBy={400}
             itemContent={(_, item) => (
@@ -81,6 +98,7 @@ export function ResponsivePanelView<T extends { id: string | number }>({
               </div>
             )}
             components={{
+              Header: CardListHeader,
               Footer: () => <CardListFooter hasMore={hasMore} />,
             }}
             style={{ height: '100%' }}

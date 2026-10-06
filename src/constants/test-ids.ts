@@ -13,6 +13,10 @@ export const TEST_IDS = {
     inputBusquedaPrecioMin: 'inputBusquedaPrecioMin',
     inputBusquedaPrecioMax: 'inputBusquedaPrecioMax',
     toggleSoloSinStock: 'toggleSoloSinStock',
+    toggleSinStockTech: 'toggleSinStockTech',
+    toggleSinStockLibreria: 'toggleSinStockLibreria',
+    textoSinStock: 'textoSinStock',
+    btnCopiarSinStock: 'btnCopiarSinStock',
   },
 
   logPanel: {

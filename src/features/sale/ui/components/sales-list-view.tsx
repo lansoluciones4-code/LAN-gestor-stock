@@ -8,7 +8,7 @@ import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import { getSalesColumns } from '@/config/tables/sales-columns';
-import { normalizeForSearch } from '@/lib/utils';
+import { normalizeForSearch, formatDeviceLabel } from '@/lib/utils';
 import { TEST_IDS } from '@/constants/test-ids';
 import { renderSaleCard } from '@/config/cards/sales-card';
 
@@ -33,7 +33,7 @@ function filterSales(sales: SaleDef[], searchTerm: string, startDate: string, en
   return sales.filter((s) => {
     const terms = normalizeForSearch(searchTerm).split(/\s+/);
     // Cada producto del ticket entra como "Categoría - Marca - Modelo", para poder encontrar cuándo y quién vendió un producto puntual.
-    const productLabels = (s.items ?? []).map((i) => normalizeForSearch([i.product?.device?.category, i.product?.device?.brand, i.product?.device?.name].filter(Boolean).join(' - ')));
+    const productLabels = (s.items ?? []).map((i) => normalizeForSearch(formatDeviceLabel(i.product?.device)));
     const text = [normalizeForSearch(s.customer?.name || 'Consumidor Final'), normalizeForSearch(s.vendor?.username || ''), ...productLabels].join(' ');
     if (!terms.every((w) => text.includes(w))) return false;
 

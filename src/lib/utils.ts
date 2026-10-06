@@ -53,6 +53,45 @@ export function argDateRangeBounds(startDate?: string, endDate?: string): { star
   return { start, end };
 }
 
+/** Nombre de un producto como "Categoría - Marca - Modelo" (omite las partes vacías). */
+export function formatDeviceLabel(device: { category?: string | null; brand?: string | null; name?: string | null } | null | undefined): string {
+  if (!device) return '';
+  return [device.category, device.brand, device.name].filter(Boolean).join(' - ');
+}
+
+/**
+ * Copia texto al portapapeles. `navigator.clipboard` solo existe en contextos seguros (HTTPS o
+ * localhost) y el gestor corre por HTTP plano en la LAN, así que fuera de localhost se usa el
+ * método clásico: un textarea temporal seleccionado + `document.execCommand('copy')`.
+ * Devuelve si se pudo copiar.
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  if (window.isSecureContext && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Sigue con el método clásico.
+    }
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    return document.execCommand('copy');
+  } catch {
+    return false;
+  } finally {
+    document.body.removeChild(textarea);
+  }
+}
+
 /** Keys that browsers inject into number inputs but are invalid for price fields. */
 export const PRICE_BLOCKED_KEYS = ['-', '.', ',', 'e', 'E', '+'];
 

@@ -19,7 +19,8 @@ import { uploadProductPhoto } from '@/features/product/actions/upload-product-ph
 import { fetchShowPrices, updateShowPricesAction } from '@/features/settings/actions/settings.actions';
 import { ResponsiveModal, ConfirmModal } from '@/components/ui/responsive-modal';
 import { ToggleFilter } from '@/components/ui/toggle-filter';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { type RestockSection } from '@/features/product/domain/restock-text';
+import { OutOfStockPanel } from '@/features/product/ui/components/out-of-stock-panel';
 import { Button } from '@/components/ui/button';
 import { getProductColumns } from '@/config/tables/product-columns';
 import { normalizeForSearch, PRICE_BLOCKED_KEYS } from '@/lib/utils';
@@ -38,6 +39,7 @@ export function ProductsPanel() {
   const [onlyOutOfStock, setOnlyOutOfStock] = useState(false);
   const [outStartDate, setOutStartDate] = useState('');
   const [outEndDate, setOutEndDate] = useState('');
+  const [outOfStockSections, setOutOfStockSections] = useState<Record<RestockSection, boolean>>({ tech: false, libreria: false });
   const [showOnlyLanding, setShowOnlyLanding] = useState(false);
   const [showPricesOnCatalog, setShowPricesOnCatalog] = useState(true);
   const [minPrice, setMinPrice] = useState('');
@@ -145,6 +147,8 @@ export function ProductsPanel() {
     const matchesStock = (p: ProductDef) => {
       if (!onlyOutOfStock) return showZeroStock || p.stock > 0;
       if (p.stock > 0) return false;
+      // Rubros TECH/LIBRERÍA: sin ninguno marcado se ven todos los sin stock.
+      if ((outOfStockSections.tech || outOfStockSections.libreria) && !outOfStockSections[p.device?.section as RestockSection]) return false;
       if (!outStartDate && !outEndDate) return true;
       // Con rango de fechas cargado, un producto sin fecha conocida no puede caer adentro.
       const time = outOfStockTime(p);
@@ -172,7 +176,7 @@ export function ProductsPanel() {
         }
         return a.stock > 0 && b.stock === 0 ? -1 : a.stock === 0 && b.stock > 0 ? 1 : 0;
       });
-  }, [products, search, minPrice, maxPrice, showZeroStock, onlyOutOfStock, outStartDate, outEndDate, showOnlyLanding, role]);
+  }, [products, search, minPrice, maxPrice, showZeroStock, onlyOutOfStock, outOfStockSections, outStartDate, outEndDate, showOnlyLanding, role]);
 
   const handleEditClick = (item?: ProductDef) => {
     openFormModal(item);
@@ -207,6 +211,20 @@ export function ProductsPanel() {
     });
   };
 
+  const outOfStockPanel = onlyOutOfStock ? (
+    <OutOfStockPanel
+      visibleProducts={filteredProducts}
+      allProducts={products}
+      sections={outOfStockSections}
+      onSectionsChange={setOutOfStockSections}
+      startDate={outStartDate}
+      endDate={outEndDate}
+      onStartDateChange={setOutStartDate}
+      onEndDateChange={setOutEndDate}
+      onCopyError={(msg) => showGlobalMessage('error', msg)}
+    />
+  ) : null;
+
   const columns = getProductColumns({ role, onEdit: handleEditClick, onDelete: setItemToDelete, onToggleVisibility: handleToggleVisibility, onToggleFeatured: handleToggleFeatured, onManagePhotos: handleManagePhotosOpen });
 
   if (initialLoading) return <div className='mt-8 animate-in fade-in duration-500'><TableSkeleton /></div>;
@@ -238,18 +256,6 @@ export function ProductsPanel() {
             {/* Filtros de stock: disponibles para admin y vendedor. */}
             <ToggleFilter id='showZeroStock' checked={showZeroStock} onChange={setShowZeroStock} label='Ver sin stock' data-testid={TEST_IDS.general.btnVerOcultos} />
             <ToggleFilter id='onlyOutOfStock' checked={onlyOutOfStock} onChange={setOnlyOutOfStock} label='Solo sin stock' data-testid={TEST_IDS.productos.toggleSoloSinStock} />
-            {onlyOutOfStock && (
-              <DateRangePicker
-                startDate={outStartDate}
-                endDate={outEndDate}
-                onStartChange={setOutStartDate}
-                onEndChange={setOutEndDate}
-                onClear={() => {
-                  setOutStartDate('');
-                  setOutEndDate('');
-                }}
-              />
-            )}
             {role === 'admin' && (
               <>
                 <ToggleFilter id='showOnlyLanding' checked={showOnlyLanding} onChange={setShowOnlyLanding} label='Solo Landing' />
@@ -295,7 +301,12 @@ export function ProductsPanel() {
         </div>
       )}
 
+      {/* Desktop: fijo arriba de la tabla. Mobile/tablet: va como encabezado de la lista de cards, para que scrollee
+          con ellas — fijo arriba no entra en la pantalla de un celular y la lista y el botón Copiar quedan cortados. */}
+      {outOfStockPanel && <div className='hidden xl:block shrink-0'>{outOfStockPanel}</div>}
+
       <ResponsivePanelView
+        mobileHeader={outOfStockPanel}
         columns={columns}
         data={filteredProducts}
         isLoading={isPending}
