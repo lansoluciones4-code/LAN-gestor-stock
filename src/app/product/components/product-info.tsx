@@ -34,7 +34,7 @@ export function ProductInfo({ deviceName, category, brand, salePrice, descriptio
 
           <div className='w-full lg:max-w-md'>
             <ContactButtons
-              product={{ category, brand, model: deviceName, inStock: !isOutOfStock }}
+              product={{ category, brand, model: deviceName, description, inStock: !isOutOfStock }}
               size='lg'
             />
           </div>

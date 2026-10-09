@@ -168,7 +168,7 @@ export function ProductCard({ product, showPrice }: ProductCardProps) {
 
       <div className='px-3 pb-4 pt-0 mt-auto'>
         <ContactButtons
-          product={{ category: product.device?.category, brand: product.device?.brand, model: deviceName, inStock: !isOutOfStock }}
+          product={{ category: product.device?.category, brand: product.device?.brand, model: deviceName, description: product.description, inStock: !isOutOfStock }}
           size='sm'
           showLabels={false}
         />
